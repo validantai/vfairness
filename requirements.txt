@@ -1,0 +1,82 @@
+# vfairness core runtime dependencies.
+#
+# pyproject.toml is the single source of truth for the complete dependency
+# set, including every optional feature group. This file lists only the core
+# runtime requirements so a plain "pip install -r requirements.txt" works.
+#
+# Install everything with:  pip install "vfairness[all]"
+# Or, for a pinned, reproducible environment:  uv sync --extra all
+
+# These floors MIRROR [project].dependencies in pyproject.toml and are tested
+# there by the `dependency-floor` CI job (lowest-direct resolution). Keep the two
+# lists identical: this file ships in the sdist, so a stale copy is a second,
+# contradicting support claim on the same release. See the comment above
+# [project].dependencies for why each floor is where it is.
+numpy>=1.23.2
+pandas>=2.2.1
+scipy>=1.9.2
+# Hard runtime deps (imported at package-import time / core paths); a plain
+# "pip install -r requirements.txt" could not even `import vfairness` without
+# requests. Mirrors the [project].dependencies set in pyproject.toml.
+requests>=2.25.0
+scikit-learn>=1.4.0
+
+# Optional feature groups (install only what a workflow needs).
+#
+# THIS LIST IS COMPLETE, NOT A CURATED SUBSET, and must stay that way: every
+# extra in [project.optional-dependencies] appears below. It previously named 14
+# of the 18 and silently dropped llm-transformers, parity, pulse and worker,
+# which is the same defect class as a stale floor. This file ships in the sdist,
+# and a subset reads exactly like a complete list, so someone installing from
+# source who needed the artifact decryption (`pulse`) or the fairlearn/aif360
+# comparison battery (`parity`) would find nothing here and could reasonably
+# conclude the extra did not exist. Adding an extra to pyproject.toml means
+# adding it here in the SAME change.
+#
+#   pip install "vfairness[dev]"              pytest, pytest-cov, hypothesis,
+#                                             ruff, mypy
+#   pip install "vfairness[viz]"              matplotlib, seaborn
+#   pip install "vfairness[rendering]"        jinja2
+#   pip install "vfairness[dashboard]"        plotly
+#   pip install "vfairness[interactive]"      plotly, dash
+#   pip install "vfairness[monitoring]"       PyWavelets (imports as `pywt`)
+#   pip install "vfairness[training]"         torch
+#   pip install "vfairness[mlops]"            mlflow, wandb
+#   pip install "vfairness[embeddings]"       sentence-transformers
+#   pip install "vfairness[llm]"              requests, vaderSentiment,
+#                                             alt-profanity-check
+#   pip install "vfairness[llm-transformers]" transformers, flair, detoxify,
+#                                             torch. The transformer-backed rungs
+#                                             of the LLM scorer ladder. NOT part
+#                                             of [all]: the downloads are
+#                                             multi-GB and the keyword/VADER
+#                                             rungs stay the supported default.
+#   pip install "vfairness[xai]"              shap, lime, dice-ml, captum, torch,
+#                                             anchor-exp, sage-importance
+#   pip install "vfairness[parity]"           fairlearn, aif360. The reference
+#                                             implementations the cross-library
+#                                             parity battery measures against.
+#                                             Without them those tests
+#                                             importorskip and the comparison is
+#                                             unverified rather than passing.
+#   pip install "vfairness[causal]"           dowhy, networkx
+#   pip install "vfairness[mcp]"              mcp (Python >= 3.10 only, capped
+#                                             <2: 2.0.0 removed the
+#                                             mcp.server.fastmcp module that the
+#                                             shipped `vfairness-mcp` script is
+#                                             built on).
+#   pip install "vfairness[cicd]"             PyYAML, so the shipped
+#                                             `vfairness-precommit check-config`
+#                                             hook can parse YAML fairness gate
+#                                             configs. Without it the hook fails
+#                                             closed rather than passing them
+#                                             unchecked.
+#   pip install "vfairness[pulse]"            cryptography, certifi. Decrypts the
+#                                             AES-256-GCM artifact envelope and
+#                                             fetches it over a pinned TLS
+#                                             context.
+#   pip install "vfairness[worker]"           supabase, for the async
+#                                             explainability job worker and its
+#                                             job storage.
+#   pip install "vfairness[all]"              every group above EXCEPT
+#                                             llm-transformers (see its note).

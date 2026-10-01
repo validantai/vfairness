@@ -1,0 +1,49 @@
+{
+  "use_case": "housing",
+  "jurisdiction": "us-federal",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "ethnicity": {
+      "status": "forbidden",
+      "legal_basis": "Fair Housing Act §3604, 42 USC §3601 et seq.",
+      "notes": "Race, color, national origin forbidden as a basis of decision; HUD disparate-impact rule applies."
+    },
+    "religion": {
+      "status": "forbidden",
+      "legal_basis": "FHA §3604(a)"
+    },
+    "gender": {
+      "status": "forbidden",
+      "legal_basis": "FHA §3604; HUD final rule 2021 on sex incl. orientation/identity"
+    },
+    "sexual_orientation": {
+      "status": "forbidden",
+      "legal_basis": "HUD final rule 2021 interpreting FHA §3604"
+    },
+    "marital_status": {
+      "status": "forbidden",
+      "legal_basis": "FHA familial status §3604; many state laws add marital status"
+    },
+    "disability": {
+      "status": "forbidden",
+      "legal_basis": "FHA §3604(f); reasonable-accommodation duty"
+    },
+    "nationality": {
+      "status": "forbidden",
+      "legal_basis": "FHA §3604 national origin"
+    },
+    "criminal_record": {
+      "status": "restricted",
+      "legal_basis": "HUD 2016 Guidance on use of criminal records in tenant screening",
+      "notes": "Blanket bans on applicants with any conviction create disparate-impact liability."
+    },
+    "credit_score": {
+      "status": "restricted",
+      "notes": "FCRA disclosure required; disparate-impact risk."
+    },
+    "postcode": {
+      "status": "restricted",
+      "notes": "Steering / redlining risk."
+    }
+  }
+}

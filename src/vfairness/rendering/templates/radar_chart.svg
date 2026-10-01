@@ -1,0 +1,116 @@
+{# ── Fairness Metrics · Radar / Spider Chart ── #}
+{# ── vfairness G1 Design System ── #}
+
+{# ── Height computation ── #}
+{% set chart_h = 340 %}
+{% set status_h = 36 %}
+{% set content_h = status_h + 16 + chart_h + 20 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% endif %}
+{% set exp_y = 140 + content_h %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 {{ total_h }}" font-family="'Inter','Segoe UI',system-ui,sans-serif">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ── Status badge ── #}
+{% set badge_y = 140 %}
+<rect x="36" y="{{ badge_y }}" width="180" height="{{ status_h }}" rx="10" fill="{{ status_bg }}"/>
+<text x="56" y="{{ badge_y + 22 }}" font-size="11" font-weight="700" fill="{{ status_color }}">{{ status_icon }} {{ status_text }}</text>
+
+{# ── Ungraded count, in the HEADLINE BAND, beside the verdict it qualifies ──
+   The adapter appends "N metric(s) could not be measured and are not plotted"
+   to the subtitle, and `_fit_subtitle` then trims the subtitle to the 644px
+   line: on a partly measured run the sentence was cut at "Labels show raw…"
+   and the count never reached the canvas at all, while the accessible <desc>
+   stated it. A metric that is not on this chart leaves no gap a reader can
+   see, because the polygon simply closes over fewer spokes, so the count has
+   to be drawn where the verdict is and in a chip that cannot be trimmed.
+   Absent for a fully measured run, so a healthy canvas is byte-identical. #}
+{% if n_unmeasured %}
+<rect x="226" y="{{ badge_y }}" width="260" height="{{ status_h }}" rx="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+<text x="246" y="{{ badge_y + 15 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.8">COULD NOT CHECK</text>
+<text x="246" y="{{ badge_y + 29 }}" font-size="10.5" font-weight="700" fill="#64748b">{{ n_unmeasured }} metric(s) not plotted</text>
+{% endif %}
+
+{# ── Radar chart area ── #}
+{% set chart_y = badge_y + status_h + 16 %}
+{% set cx = 340 %}
+{% set cy = 362 %}
+
+{# Grid rings (fixed fairness axis 0..1) #}
+{% for ring in rings %}
+{% set rr = (ring.fraction * 140)|int %}
+<circle cx="{{ cx }}" cy="{{ cy }}" r="{{ rr }}" fill="none" stroke="#cbd5e1" stroke-width="0.5"/>
+{% if ring.label %}<text x="{{ cx + 4 }}" y="{{ cy - rr + 4 }}" font-size="7.5" fill="#94a3b8">{{ ring.label }}</text>{% endif %}
+{% endfor %}
+
+{# Spoke lines and labels #}
+{% for axis in axes %}
+<line x1="{{ cx }}" y1="{{ cy }}" x2="{{ axis.spoke_x }}" y2="{{ axis.spoke_y }}" stroke="#cbd5e1" stroke-width="0.5"/>
+<text x="{{ axis.label_x }}" y="{{ axis.label_y }}" text-anchor="{{ axis.label_anchor }}" font-size="9" font-weight="600" fill="#64748b">{{ axis.label }}</text>
+{% endfor %}
+
+{# Threshold ring (dashed): every metric's pass line maps to this one circle,
+   so a dot outside the ring passes and a dot inside it fails. #}
+{% if threshold_ring_fraction %}
+{% set tr = (threshold_ring_fraction * 140)|int %}
+<circle cx="{{ cx }}" cy="{{ cy }}" r="{{ tr }}" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+<text x="{{ cx + 4 }}" y="{{ cy - tr - 3 }}" font-size="7.5" fill="#94a3b8">pass</text>
+{% endif %}
+
+{# Data polygon #}
+{% if data_points %}
+<polygon points="{{ data_points }}" fill="{{ polygon_color }}" fill-opacity="0.12" stroke="{{ polygon_color }}" stroke-width="2"/>
+{% for pt in data_dots %}
+<circle cx="{{ pt.x }}" cy="{{ pt.y }}" r="4.5" fill="{{ polygon_color }}" stroke="#ffffff" stroke-width="1.5"/>
+{% endfor %}
+{% endif %}
+
+{# Value labels #}
+{% for pt in data_dots %}
+<text x="{{ pt.value_x }}" y="{{ pt.value_y }}" text-anchor="{{ pt.value_anchor|default('middle') }}" font-size="9" font-weight="700" fill="{{ polygon_color }}">{{ pt.value|f2 }}</text>
+{% endfor %}
+
+{# Legend #}
+{% set legend_y = chart_y + chart_h - 20 %}
+<line x1="36" y1="{{ legend_y }}" x2="56" y2="{{ legend_y }}" stroke="{{ polygon_color }}" stroke-width="2"/>
+<circle cx="46" cy="{{ legend_y }}" r="3" fill="{{ polygon_color }}"/>
+<text x="62" y="{{ legend_y + 4 }}" font-size="9" fill="#64748b">Metric fairness</text>
+<line x1="170" y1="{{ legend_y }}" x2="190" y2="{{ legend_y }}" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+<text x="196" y="{{ legend_y + 4 }}" font-size="9" fill="#94a3b8">Pass threshold</text>
+
+{# ── Explanation panel ── #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+
+</svg>

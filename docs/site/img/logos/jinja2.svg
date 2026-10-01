@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 95 40" height="40">
+  <g transform="translate(4,6)">
+    <text x="0" y="22" font-family="monospace" font-size="26" font-weight="700" fill="#B41717">&#123;%</text>
+  </g>
+  <text x="38" y="26" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="600" fill="#B41717">Jinja2</text>
+</svg>

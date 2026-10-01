@@ -1,0 +1,276 @@
+{# ── FairnessPowerAnalyzer · Power Analysis Report SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set summary_h = 66 %}
+{% set table_header_h = 40 %}
+{% set table_row_h = 36 %}
+{% set table_h = table_header_h + intersections|length * table_row_h + 10 %}
+{% set chart_h = 180 %}
+{% set mde_h = 66 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}
+{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 40 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{% set summary_y = header_h %}
+{% set table_y = summary_y + summary_h + 16 %}
+{% set chart_y = table_y + table_h + 16 %}
+{% set mde_y = chart_y + chart_h + 16 %}
+{% set exp_y = mde_y + mde_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── Power bar chart geometry ── #}
+{% set bcl = 160 %}
+{% set bcr = 620 %}
+{% set bct = chart_y + 44 %}
+{% set bcb = chart_y + chart_h - 24 %}
+{% set bcw = bcr - bcl %}
+{% set bch = bcb - bct %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Power summary cards                                                #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Three states on all three cards, never two.
+
+   With no result supplied at all this row read "POWERED 0 / 0" behind a GREEN
+   accent, "AVG POWER 0%" and "TOTAL REQUIRED N 0". Green means every
+   intersection cleared the target, 0% means a measured floor, and a required N
+   of 0 means no further data is needed: three findings about an analysis that
+   sized nothing. A count of zero is not a finding of zero, and an average of
+   nothing is not 0 percent.
+
+   The green accent additionally requires that every row was GRADED: rows with
+   no power and no verdict are not evidence of adequacy. #}
+<rect x="36" y="{{ summary_y }}" width="200" height="{{ summary_h }}" rx="10" fill="#ffffff"/>
+{% if not measured %}
+<rect x="36" y="{{ summary_y }}" width="2.5" height="{{ summary_h }}" rx="1" fill="#64748b"/>
+{% elif n_underpowered > 0 %}
+<rect x="36" y="{{ summary_y }}" width="2.5" height="{{ summary_h }}" rx="1" fill="#f59e0b"/>
+{% elif n_ungraded > 0 %}
+<rect x="36" y="{{ summary_y }}" width="2.5" height="{{ summary_h }}" rx="1" fill="#64748b"/>
+{% else %}
+<rect x="36" y="{{ summary_y }}" width="2.5" height="{{ summary_h }}" rx="1" fill="#059669"/>
+{% endif %}
+<text x="56" y="{{ summary_y + 20 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">POWERED</text>
+{% if measured %}
+<text x="56" y="{{ summary_y + 46 }}" font-size="22" font-weight="700" fill="#0f172a">{{ n_powered }} / {{ n_total }}</text>
+{% if n_ungraded > 0 %}
+<text x="56" y="{{ summary_y + 60 }}" font-size="8.5" fill="#94a3b8">graded ≥ 80% power; {{ n_ungraded }} not graded</text>
+{% else %}
+<text x="56" y="{{ summary_y + 60 }}" font-size="8.5" fill="#94a3b8">intersections ≥ 80% power</text>
+{% endif %}
+{% else %}
+<text x="56" y="{{ summary_y + 44 }}" font-size="12" font-weight="700" fill="#64748b">{{ could_not_check_text|default('COULD NOT CHECK', true) }}</text>
+{# Two different absences, and only one of them is an empty call. With rows #}
+{# supplied but none carrying a power value or a powered verdict, "no       #}
+{# intersection was supplied" describes a call that did not happen.         #}
+<text x="56" y="{{ summary_y + 60 }}" font-size="8.5" fill="#94a3b8">{% if n_supplied %}no intersection was graded{% else %}no intersection was supplied{% endif %}</text>
+{% endif %}
+
+<rect x="252" y="{{ summary_y }}" width="200" height="{{ summary_h }}" rx="10" fill="#ffffff"/>
+<text x="272" y="{{ summary_y + 20 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">AVG POWER</text>
+{% if avg_power_known %}
+<text x="272" y="{{ summary_y + 46 }}" font-size="22" font-weight="700" fill="{{ '#059669' if avg_power >= 0.8 else '#f59e0b' if avg_power >= 0.5 else '#dc2626' }}">{{ avg_power_display }}%</text>
+{% if n_power_known == n_supplied %}
+<text x="272" y="{{ summary_y + 60 }}" font-size="8.5" fill="#94a3b8">across all intersections</text>
+{% else %}
+<text x="272" y="{{ summary_y + 60 }}" font-size="8.5" fill="#94a3b8">across {{ n_power_known }} of {{ n_supplied }} intersections</text>
+{% endif %}
+{% else %}
+<text x="272" y="{{ summary_y + 44 }}" font-size="12" font-weight="700" fill="#64748b">{{ could_not_check_text|default('COULD NOT CHECK', true) }}</text>
+<text x="272" y="{{ summary_y + 60 }}" font-size="8.5" fill="#94a3b8">no power value was reported</text>
+{% endif %}
+
+<rect x="468" y="{{ summary_y }}" width="212" height="{{ summary_h }}" rx="10" fill="#ffffff"/>
+<text x="488" y="{{ summary_y + 20 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">TOTAL REQUIRED N</text>
+{% if total_required_known %}
+<text x="488" y="{{ summary_y + 46 }}" font-size="22" font-weight="700" fill="#0f172a">{{ total_required_n }}</text>
+{% if n_required_known == n_supplied %}
+<text x="488" y="{{ summary_y + 60 }}" font-size="8.5" fill="#94a3b8">for 80% power everywhere</text>
+{% else %}
+<text x="488" y="{{ summary_y + 60 }}" font-size="8.5" fill="#94a3b8">over {{ n_required_known }} of {{ n_supplied }} intersections, a floor</text>
+{% endif %}
+{% else %}
+<text x="488" y="{{ summary_y + 44 }}" font-size="12" font-weight="700" fill="#64748b">{{ could_not_check_text|default('COULD NOT CHECK', true) }}</text>
+<text x="488" y="{{ summary_y + 60 }}" font-size="8.5" fill="#94a3b8">no required sample size was derived</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Per-intersection table                                             #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ table_y }}" width="644" height="{{ table_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">INTERSECTION</text>
+<text x="210" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">POWER</text>
+<text x="310" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">REQUIRED N</text>
+<text x="410" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">CURRENT N</text>
+<text x="500" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">EFFECT SIZE</text>
+<text x="590" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">STATUS</text>
+<line x1="56" y1="{{ table_y + 32 }}" x2="660" y2="{{ table_y + 32 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for i in intersections %}
+{% set ry = table_y + table_header_h + loop.index0 * table_row_h %}
+
+{# A row is only tinted and striped amber once it has been GRADED underpowered.
+   With `power` defaulting to 0 a row that reported nothing came out as the
+   loudest row on the table: amber stripe, 0% in red, NEEDS DATA. #}
+{% if i.powered_known and not i.is_powered %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ table_row_h }}" fill="#fef3c7" opacity="0.2"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ table_row_h }}" fill="#f59e0b"/>
+{% endif %}
+
+<text x="56" y="{{ ry + 22 }}" font-size="10" font-weight="500" fill="#0f172a">{{ i.name|truncate_text(20) }}</text>
+
+{# Power value + mini bar. No power, no bar: a 3px minimum bar drawn from a
+   defaulted 0 is a drawn measurement of no power. #}
+{% if i.power_known %}
+<text x="210" y="{{ ry + 16 }}" font-size="11" font-weight="600" fill="{{ '#059669' if i.power >= 0.8 else '#f59e0b' if i.power >= 0.5 else '#dc2626' }}">{{ i.power_display }}%</text>
+{% set pbar_w = (i.power * 60)|int %}
+{% if pbar_w < 3 %}{% set pbar_w = 3 %}{% endif %}
+<rect x="210" y="{{ ry + 22 }}" width="60" height="6" rx="3" fill="#f1f5f9"/>
+<rect x="210" y="{{ ry + 22 }}" width="{{ pbar_w }}" height="6" rx="3" fill="{{ '#059669' if i.power >= 0.8 else '#f59e0b' if i.power >= 0.5 else '#dc2626' }}" opacity="0.7"/>
+{% else %}
+<text x="210" y="{{ ry + 22 }}" font-size="9.5" fill="#94a3b8">{{ i.power_display }}</text>
+{% endif %}
+
+<text x="310" y="{{ ry + 22 }}" font-size="{{ 10 if i.required_known else 9.5 }}" fill="{{ '#6b7280' if i.required_known else '#94a3b8' }}">{{ i.required_n }}</text>
+<text x="410" y="{{ ry + 22 }}" font-size="{{ 10 if i.current_known else 9.5 }}" fill="{{ '#6b7280' if i.current_known else '#94a3b8' }}">{{ i.current_n }}</text>
+<text x="500" y="{{ ry + 22 }}" font-size="10" font-weight="500" fill="#475569">{{ i.effect_size }}</text>
+
+{% if not i.powered_known %}
+{# NEEDS DATA is a finding: it says this intersection is too small to judge.
+   Nothing here was judged at all. #}
+<rect x="572" y="{{ ry + 8 }}" width="80" height="18" rx="9" fill="#f1f5f9"/>
+<text x="612" y="{{ ry + 21 }}" text-anchor="middle" font-size="7" font-weight="600" fill="#64748b">{{ could_not_check_text|default('COULD NOT CHECK', true) }}</text>
+{% elif i.is_powered %}
+<rect x="582" y="{{ ry + 8 }}" width="70" height="18" rx="9" fill="#ecfdf5"/>
+<text x="617" y="{{ ry + 21 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#059669">POWERED</text>
+{% else %}
+<rect x="582" y="{{ ry + 8 }}" width="70" height="18" rx="9" fill="#fef3c7"/>
+<text x="617" y="{{ ry + 21 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#f59e0b">NEEDS DATA</text>
+{% endif %}
+
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + table_row_h }}" x2="660" y2="{{ ry + table_row_h }}" stroke="#f1f5f9" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Power bar chart                                                    #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ chart_y }}" width="644" height="{{ chart_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ chart_y + 28 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">POWER BY INTERSECTION</text>
+
+{# 80% threshold line #}
+{% set threshold_y = bcb - (0.8 * bch)|int %}
+<line x1="{{ bcl }}" y1="{{ threshold_y }}" x2="{{ bcr }}" y2="{{ threshold_y }}" stroke="#059669" stroke-width="0.75" stroke-dasharray="4,3" opacity="0.6"/>
+<text x="{{ bcl - 8 }}" y="{{ threshold_y + 3 }}" text-anchor="end" font-size="7" fill="#059669">80%</text>
+
+{# X-axis #}
+<line x1="{{ bcl }}" y1="{{ bcb }}" x2="{{ bcr }}" y2="{{ bcb }}" stroke="#cbd5e1" stroke-width="1"/>
+{# Y-axis #}
+<line x1="{{ bcl }}" y1="{{ bct }}" x2="{{ bcl }}" y2="{{ bcb }}" stroke="#cbd5e1" stroke-width="1"/>
+
+{# Y ticks #}
+{% for i in range(6) %}
+{% set yp = bcb - (i * bch / 5)|int %}
+<text x="{{ bcl - 8 }}" y="{{ yp + 3 }}" text-anchor="end" font-size="7" fill="#94a3b8">{{ (i * 20)|int }}%</text>
+{% if i > 0 %}
+<line x1="{{ bcl }}" y1="{{ yp }}" x2="{{ bcr }}" y2="{{ yp }}" stroke="#f1f5f9" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# Bars #}
+{% if not measured %}
+{# Same distinction as the POWERED card above: rows can be supplied and     #}
+{# still carry nothing to plot. `measured` is false only when not one row   #}
+{# had a power value, so naming the power value here is exact.              #}
+<text x="{{ (bcl + bcr) / 2 }}" y="{{ (bct + bcb) / 2 }}" text-anchor="middle" font-size="9" fill="#94a3b8">{% if n_supplied %}no intersection carried a power value, so no power was plotted{% else %}no intersection was supplied, so no power was plotted{% endif %}</text>
+{% endif %}
+{% if intersections %}
+{% set n_bars = intersections|length %}
+{% set bar_gap = 8 %}
+{% set avail_w = bcw - (n_bars - 1) * bar_gap %}
+{% set bar_w_val = (avail_w / n_bars)|int %}
+{% if bar_w_val > 50 %}{% set bar_w_val = 50 %}{% endif %}
+{% if bar_w_val < 8 %}{% set bar_w_val = 8 %}{% endif %}
+{% set total_bars_w = n_bars * bar_w_val + (n_bars - 1) * bar_gap %}
+{% set start_x = bcl + ((bcw - total_bars_w) / 2)|int %}
+
+{% for i in intersections %}
+{% set bx = start_x + loop.index0 * (bar_w_val + bar_gap) %}
+{% set bar_h_val = (i.power * bch)|int %}
+{% if bar_h_val < 3 %}{% set bar_h_val = 3 %}{% endif %}
+{% set by = bcb - bar_h_val %}
+
+{# Background bar #}
+<rect x="{{ bx }}" y="{{ bct }}" width="{{ bar_w_val }}" height="{{ bch }}" rx="3" fill="#f1f5f9" opacity="0.5"/>
+{# Value bar. Only for a row that reported a power: the 3px minimum floor turned
+   an absent value into a visible red stub sitting on the axis, which reads as a
+   plotted measurement of zero power. #}
+{% if i.power_known %}
+<rect x="{{ bx }}" y="{{ by }}" width="{{ bar_w_val }}" height="{{ bar_h_val }}" rx="3" fill="{{ '#059669' if i.power >= 0.8 else '#f59e0b' if i.power >= 0.5 else '#dc2626' }}" opacity="0.8"/>
+{% endif %}
+
+{# Label #}
+<text x="{{ bx + bar_w_val / 2 }}" y="{{ bcb + 12 }}" text-anchor="middle" font-size="7" fill="#475569">{{ i.short_name|truncate_text(8) }}</text>
+{# Value on top #}
+{% if i.power_known %}
+<text x="{{ bx + bar_w_val / 2 }}" y="{{ by - 4 }}" text-anchor="middle" font-size="7" font-weight="600" fill="{{ '#059669' if i.power >= 0.8 else '#f59e0b' if i.power >= 0.5 else '#dc2626' }}">{{ i.power_display }}%</text>
+{% else %}
+<text x="{{ bx + bar_w_val / 2 }}" y="{{ bcb - 6 }}" text-anchor="middle" font-size="6.5" fill="#94a3b8">no power</text>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# MDE panel                                                          #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ mde_y }}" width="644" height="{{ mde_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ mde_y + 20 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">MINIMUM DETECTABLE EFFECT (MDE) AT 80% POWER</text>
+
+<text x="56" y="{{ mde_y + 46 }}" font-size="10" fill="#6b7280">α = {{ alpha }}</text>
+<text x="160" y="{{ mde_y + 46 }}" font-size="10" fill="#6b7280">1−β = {{ power_target }}</text>
+<text x="280" y="{{ mde_y + 46 }}" font-size="10" fill="#6b7280">Total N = {{ total_current_n }}</text>
+
+{% if mde_value %}
+<text x="440" y="{{ mde_y + 44 }}" font-size="10" fill="#6b7280">MDE (Cohen's d):</text>
+<text x="560" y="{{ mde_y + 44 }}" font-size="16" font-weight="700" fill="#3b82f6">{{ mde_value }}</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                  #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

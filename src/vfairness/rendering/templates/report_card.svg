@@ -1,0 +1,275 @@
+{# ── Fairness Report Card · PR Comment SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{# Resolved first because the recommendation panel grows a second line in the #}
+{# could-not-check state. See the CRITICAL note at the status-colour block. #}
+{% set verdict_given = (approved is defined and approved is not none) %}
+{# CRITICAL: the graded subset, split once and used by every count on this card.
+   A metric the gate never graded carries passed = None, and None is neither a
+   pass nor a failure. It used to be counted as a row evaluated, counted into the
+   PASS RATE denominator and badged a red FAIL, so this card rendered "2
+   evaluated / PASS RATE 1/2" beside DEPLOYMENT APPROVED for a run that measured
+   one metric. A denominator is a claim that that many checks happened. #}
+{% set _metrics = metrics if metrics else [] %}
+{% set _graded = _metrics|rejectattr('passed', 'none')|list %}
+{% set n_pass = _graded|selectattr('passed')|list|length %}
+{% set n_total = _graded|length %}
+{% set n_ungraded = _metrics|length - n_total %}
+{% set header_h = 140 %}
+{% set model_info_h = 70 %}
+{% set metrics_header_h = 40 %}
+{% set metrics_row_h = 30 %}
+{% set metrics_h = metrics_header_h + metrics|length * metrics_row_h + 10 %}
+{# A table with no rows still needs room for the sentence that says so. #}
+{% if not metrics %}{% set metrics_h = metrics_header_h + 34 %}{% endif %}
+
+{% set blocking_h = 0 %}
+{% if blocking_reasons %}{% set blocking_h = 48 + blocking_reasons|length * 20 %}{% endif %}
+
+{% set card_warnings_h = 0 %}
+{% if card_warnings %}{% set card_warnings_h = 48 + card_warnings|length * 20 %}{% endif %}
+
+{% set recommendation_h = 60 if (verdict_given and not n_ungraded) else 82 %}
+
+{% if explanation %}{% set _pre_exp = explanation|wordwrap(105) %}{% set exp_h = 44 + _pre_exp.split('\n')|length * 16 %}{% else %}{% set exp_h = 0 %}{% endif %}
+
+{% set info_y = header_h %}
+{% set metrics_y = info_y + model_info_h + 16 %}
+{% set blocking_y = metrics_y + metrics_h + 16 %}
+{% set warn_y = blocking_y + blocking_h + (16 if blocking_h else 0) %}
+{% set rec_y = warn_y + card_warnings_h + (16 if card_warnings_h else 0) %}
+{% set exp_y = rec_y + recommendation_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── Status colors ── #}
+{# CRITICAL: three states, never two. A card handed no gate decision must not #}
+{# print a deployment verdict. Until 2026-08-27 report_card_to_svg(None) fell #}
+{# back to a module-level demo fixture and this template rendered DEPLOYMENT   #}
+{# APPROVED next to a 3/3 PASS RATE for a model nobody had evaluated, on an    #}
+{# SVG that leaves the building and is shown to auditors. NEVER collapse the   #}
+{# first branch into the BLOCKED else: could-not-check is not a rejection      #}
+{# either, and reading it as one is the same fabrication in the other          #}
+{# direction. #}
+{% if not verdict_given %}
+{% set status_color = '#64748b' %}
+{% set status_bg = '#f1f5f9' %}
+{% set status_label = 'NOT CHECKED' %}
+{% set rec_text = 'Nothing was assessed: no gate decision was supplied, so no metric was evaluated.' %}
+{% set rec_text2 = 'This card is not an approval and not a rejection. Supply a decision to obtain a verdict.' %}
+{% elif approved %}
+{% set status_color = '#059669' %}
+{% set status_bg = '#ecfdf5' %}
+{% set status_label = 'APPROVED' %}
+{% set rec_text = 'Model meets fairness requirements and is approved for deployment.' %}
+{% elif status == 'conditional' %}
+{% set status_color = '#f59e0b' %}
+{% set status_bg = '#fffbeb' %}
+{% set status_label = 'CONDITIONAL' %}
+{% set rec_text = 'Model meets basic thresholds but has warnings requiring review.' %}
+{% else %}
+{% set status_color = '#dc2626' %}
+{% set status_bg = '#fef2f2' %}
+{% set status_label = 'BLOCKED' %}
+{% set rec_text = 'Model does not meet fairness requirements. Address blocking issues before resubmitting.' %}
+{% endif %}
+
+{# The verdict above is taken over the metrics that WERE graded, which keeps a
+   partly graded run useful. What it may never do is read as a statement about
+   every metric on the card, so an ungraded row is named in the recommendation
+   itself and not only in the table. #}
+{% if verdict_given and n_ungraded %}
+{% set rec_text2 = n_ungraded ~ ' metric(s) on this card were not graded, so this verdict covers the ' ~ n_total ~ ' that were. It says nothing about the rest.' %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" fill="url(#accent)"/>
+
+{# ── EXAMPLE band ── #}
+{# The demo fixture is reachable only through example=True, and when it is used #}
+{# the canvas has to say so where a reader looks, not only in the <desc>. An    #}
+{# unlabelled demo is indistinguishable from a finding once the file is         #}
+{# exported. DO NOT REMOVE: the band and the watermark are the only things      #}
+{# separating a sample from an audit artifact. #}
+{% if is_example %}
+<rect x="0" y="54" width="680" height="20" fill="#fef3c7"/>
+<text x="340" y="68" text-anchor="middle" font-size="9.5" font-weight="700" fill="#92400e" letter-spacing="0.8">EXAMPLE ONLY: SYNTHETIC DEMONSTRATION DATA, NOT A REAL EVALUATION</text>
+{% endif %}
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">Fairness report card for PR review: {{ model_name }}</text>
+
+{# ── Status badge ── #}
+<rect x="520" y="68" width="160" height="56" rx="10" fill="#ffffff"/>
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="{{ status_color }}"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">DEPLOYMENT</text>
+<rect x="536" y="90" width="120" height="26" rx="13" fill="{{ status_bg }}"/>
+<text x="596" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="{{ status_color }}">{{ status_label }}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Model Info Panel                                                  #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ info_y }}" width="644" height="{{ model_info_h }}" rx="10" fill="#ffffff"/>
+
+{# Model name #}
+<text x="56" y="{{ info_y + 22 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">MODEL</text>
+<text x="120" y="{{ info_y + 22 }}" font-size="11" font-weight="600" fill="#0f172a">{{ model_name }}</text>
+
+{# Metrics count #}
+{# "evaluated" is a claim about what ran, so the number in front of it is the
+   graded count, never the table's row count. #}
+<text x="56" y="{{ info_y + 46 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">METRICS</text>
+<text x="120" y="{{ info_y + 46 }}" font-size="11" fill="#0f172a">{{ n_total }} evaluated</text>
+{% if not metrics %}
+<text x="200" y="{{ info_y + 46 }}" font-size="10" fill="#64748b">(none supplied)</text>
+{% elif n_ungraded %}
+{# 120 is the label's left edge; "N evaluated" runs about 60px at font-size 11,
+   plus 7px for each extra digit, so the qualifier clears it instead of sitting
+   on top of it. #}
+<text x="{{ 186 + (n_total|string|length - 1) * 7 }}" y="{{ info_y + 46 }}" font-size="10" fill="#64748b">of {{ _metrics|length }} listed</text>
+{% endif %}
+
+{# Pass rate. The counts come from the graded split at the top of this file. #}
+<text x="320" y="{{ info_y + 22 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">PASS RATE</text>
+{# A rate over an empty table is 0/0, which reads as a measurement. It is not. #}
+<text x="400" y="{{ info_y + 22 }}" font-size="11" font-weight="600" fill="{{ status_color }}">{% if verdict_given and n_total %}{{ n_pass }}/{{ n_total }}{% else %}not measured{% endif %}</text>
+{% if n_ungraded %}
+<text x="{{ 440 if (verdict_given and n_total) else 470 }}" y="{{ info_y + 22 }}" font-size="9" font-weight="600" fill="#64748b">· {{ n_ungraded }} metric{{ 's' if n_ungraded != 1 else '' }} not graded, not in this rate</text>
+{% endif %}
+
+{# Groups #}
+{% if n_groups is defined %}
+<text x="320" y="{{ info_y + 46 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">GROUPS</text>
+<text x="400" y="{{ info_y + 46 }}" font-size="11" fill="#0f172a">{{ n_groups }}</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Metrics Table                                                     #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ metrics_y }}" width="644" height="{{ metrics_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">METRIC</text>
+<text x="320" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">VALUE</text>
+<text x="420" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">THRESHOLD</text>
+{% if has_baseline %}
+<text x="510" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">BASELINE</text>
+{% endif %}
+<text x="600" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">RESULT</text>
+<line x1="56" y1="{{ metrics_y + 32 }}" x2="660" y2="{{ metrics_y + 32 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for m in metrics %}
+{% set ry = metrics_y + metrics_header_h + loop.index0 * metrics_row_h %}
+{# CRITICAL: three states per row. This was PASS / blocking-FAIL / WARN, with no
+   branch for a metric the gate never graded, so an ungraded row (passed is None,
+   is_blocking True by default) was badged a red FAIL with the failure stripe
+   beside it, on a card that is pasted into a pull request. A metric that was not
+   measured has not breached anything. NEVER collapse the first branch away. #}
+{% if m.passed is not defined or m.passed is none %}{% set m_color = '#64748b' %}{% set m_bg = '#f1f5f9' %}{% set m_label = 'NOT GRADED' %}{% elif m.passed %}{% set m_color = '#059669' %}{% set m_bg = '#ecfdf5' %}{% set m_label = 'PASS' %}{% elif m.is_blocking %}{% set m_color = '#dc2626' %}{% set m_bg = '#fef2f2' %}{% set m_label = 'FAIL' %}{% else %}{% set m_color = '#f59e0b' %}{% set m_bg = '#fffbeb' %}{% set m_label = 'WARN' %}{% endif %}
+
+{# FAIL row highlight #}
+{% if m_label == 'FAIL' %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ metrics_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ metrics_row_h }}" fill="#dc2626"/>
+{% endif %}
+
+<text x="56" y="{{ ry + 19 }}" font-size="10" font-weight="500" fill="#0f172a">{{ m.name|truncate_text(35) }}</text>
+{# An ungraded row gets no number. |f4 prints N/A for a missing value, but in
+   the failure red that reads as a measured breach whose digits were lost. #}
+<text x="320" y="{{ ry + 19 }}" font-size="{{ 10 if m_label == 'NOT GRADED' else 12 }}" font-weight="700" fill="{{ m_color }}">{% if m_label == 'NOT GRADED' %}not measured{% else %}{{ m.value|f4 }}{% endif %}</text>
+<text x="420" y="{{ ry + 19 }}" font-size="10" fill="#6b7280">{% if m.threshold is not none %}{{ m.threshold|f4 }}{% else %}n/a{% endif %}</text>
+{% if has_baseline %}
+<text x="510" y="{{ ry + 19 }}" font-size="10" fill="#94a3b8">{% if m.baseline is not none %}{{ m.baseline|f4 }}{% else %}n/a{% endif %}</text>
+{% endif %}
+
+{# Status badge #}
+<rect x="{{ 574 if m_label == 'NOT GRADED' else 590 }}" y="{{ ry + 5 }}" width="{{ 66 if m_label == 'NOT GRADED' else 50 }}" height="18" rx="9" fill="{{ m_bg }}"/>
+<text x="{{ 607 if m_label == 'NOT GRADED' else 615 }}" y="{{ ry + 18 }}" text-anchor="middle" font-size="{{ 7 if m_label == 'NOT GRADED' else 8 }}" font-weight="600" fill="{{ m_color }}">{{ m_label }}</text>
+
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + metrics_row_h }}" x2="660" y2="{{ ry + metrics_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# An empty grid is silent, and silence beside a badge is read as agreement. #}
+{% if not metrics %}
+<text x="56" y="{{ metrics_y + metrics_header_h + 16 }}" font-size="10" fill="#64748b">No metric was evaluated on this run, so no row here passed and none failed.</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Blocking Issues                                                   #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if blocking_reasons %}
+<rect x="36" y="{{ blocking_y }}" width="644" height="{{ blocking_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ blocking_y }}" width="2.5" height="{{ blocking_h }}" rx="1" fill="#dc2626"/>
+<text x="56" y="{{ blocking_y + 20 }}" font-size="8" font-weight="600" fill="#dc2626" letter-spacing="0.5">BLOCKING ISSUES</text>
+<text x="180" y="{{ blocking_y + 20 }}" font-size="10.5" font-weight="600" fill="#0f172a">Must resolve before deployment</text>
+<line x1="56" y1="{{ blocking_y + 30 }}" x2="660" y2="{{ blocking_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+{% for reason in blocking_reasons %}
+<text x="66" y="{{ blocking_y + 46 + loop.index0 * 20 }}" font-size="9.5" fill="#dc2626">{{ reason|truncate_text(95) }}</text>
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Warnings                                                          #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if card_warnings %}
+<rect x="36" y="{{ warn_y }}" width="644" height="{{ card_warnings_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ warn_y }}" width="2.5" height="{{ card_warnings_h }}" rx="1" fill="#f59e0b"/>
+<text x="56" y="{{ warn_y + 20 }}" font-size="8" font-weight="600" fill="#f59e0b" letter-spacing="0.5">WARNINGS</text>
+<text x="140" y="{{ warn_y + 20 }}" font-size="10.5" font-weight="600" fill="#0f172a">Non-blocking concerns</text>
+<line x1="56" y1="{{ warn_y + 30 }}" x2="660" y2="{{ warn_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+{% for w in card_warnings %}
+<text x="66" y="{{ warn_y + 46 + loop.index0 * 20 }}" font-size="9.5" fill="#f59e0b">{{ w|truncate_text(95) }}</text>
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Recommendation                                                    #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ rec_y }}" width="644" height="{{ recommendation_h }}" rx="10" fill="{{ status_bg }}"/>
+<rect x="36" y="{{ rec_y }}" width="2.5" height="{{ recommendation_h }}" rx="1" fill="{{ status_color }}"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="8" font-weight="600" fill="{{ status_color }}" letter-spacing="0.5">RECOMMENDATION</text>
+<text x="56" y="{{ rec_y + 44 }}" font-size="10.5" fill="#0f172a">{{ rec_text }}</text>
+{% if rec_text2 is defined %}
+<text x="56" y="{{ rec_y + 64 }}" font-size="10.5" fill="#0f172a">{{ rec_text2 }}</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── EXAMPLE watermark, painted last so it survives every panel above it ── #}
+{# Repeated down a tall canvas so a crop or a screenshot of one section cannot #}
+{# lose the only mark that separates a sample from a finding. #}
+{% if is_example %}
+{% for _p in ([22, 50, 78] if total_h > 1100 else [50]) %}
+{% set _wy = (total_h * _p / 100)|int %}
+<text x="340" y="{{ _wy }}" text-anchor="middle" font-size="76" font-weight="800" fill="#92400e" opacity="0.12" letter-spacing="6" transform="rotate(-24 340 {{ _wy }})">EXAMPLE</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

@@ -1,0 +1,33 @@
+{
+  "use_case": "insurance",
+  "jurisdiction": "us-federal",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "genetic": {
+      "status": "forbidden",
+      "legal_basis": "GINA Title I (health insurance); ACA",
+      "notes": "Health-insurance carriers may not use genetic information for eligibility or pricing. Life / long-term-care / disability insurance is not federally covered but many states restrict."
+    },
+    "health": {
+      "status": "restricted",
+      "legal_basis": "ACA §1201 (community rating for individual / small-group health insurance)",
+      "notes": "ACA forbids health-status rating for health insurance. Allowed in life / disability with disclosure."
+    },
+    "ethnicity": {
+      "status": "restricted",
+      "legal_basis": "Unfair Trade Practices Acts (state); FHA (housing-related insurance)"
+    },
+    "gender": {
+      "status": "restricted",
+      "legal_basis": "ACA §1557 (sex non-discrimination for health insurance); auto/life vary by state"
+    },
+    "credit_score": {
+      "status": "restricted",
+      "legal_basis": "State insurance laws (varies; banned in CA, MA, HI for auto)"
+    },
+    "postcode": {
+      "status": "restricted",
+      "notes": "Auto-insurance redlining concerns; some states (e.g. CA Prop 103) restrict territorial rating."
+    }
+  }
+}

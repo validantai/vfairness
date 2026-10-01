@@ -1,0 +1,16 @@
+{
+  "use_case": "generic",
+  "jurisdiction": "ch",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "ethnicity": {"status": "restricted", "legal_basis": "FADP Art. 5(c)"},
+    "religion": {"status": "restricted", "legal_basis": "FADP Art. 5(c)"},
+    "political_opinion": {"status": "restricted", "legal_basis": "FADP Art. 5(c)"},
+    "union_membership": {"status": "restricted", "legal_basis": "FADP Art. 5(c)"},
+    "sexual_orientation": {"status": "restricted", "legal_basis": "FADP Art. 5(c)"},
+    "health": {"status": "restricted", "legal_basis": "FADP Art. 5(c)"},
+    "genetic": {"status": "restricted", "legal_basis": "FADP Art. 5(c); GUMG"},
+    "biometric": {"status": "restricted", "legal_basis": "FADP Art. 5(c) (identification)"},
+    "criminal_record": {"status": "restricted", "legal_basis": "FADP Art. 5(c)"}
+  }
+}

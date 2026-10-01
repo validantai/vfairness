@@ -1,0 +1,207 @@
+{# ── Reweighting Comparison Report · vfairness Design System v4 · 680-width ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set badges_h = 50 %}
+{% set table_header_h = 36 %}
+{% set table_row_h = 32 %}
+{% set ungraded = ungraded_methods|default([], true) %}
+{% set table_h = table_header_h + (methods|length + ungraded|length) * table_row_h + 16 %}
+{% set rec_header_h = 36 %}
+{% set rec_item_h = 24 %}
+{% set rec_h = rec_header_h + recommendations|length * rec_item_h + 16 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _pre_exp = explanation|wordwrap(105) %}
+{% set exp_h = 44 + _pre_exp.split('\n')|length * 16 %}
+{% endif %}
+
+{% set badges_y = header_h %}
+{% set table_y = badges_y + badges_h %}
+{% set rec_y = table_y + table_h + 16 %}
+{% set exp_y = rec_y + rec_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   With no method result the badge row and the comparison table go. The BEST
+   METHOD badge is drawn in emerald with a green left stripe whatever it holds,
+   so "N/A" arrived styled as a recommendation, and the recommendations panel
+   below it kept its heading over an empty list. #}
+{% if not_assessable %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = header_h %}
+{% set rec_y = na_y + na_h + 16 %}
+{% set exp_y = rec_y + rec_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}
+<text x="644" y="32" text-anchor="end" font-size="9" fill="#b0b8c4">{{ timestamp }}</text>
+{% endif %}
+<rect x="36" y="52" width="644" height="1.5" fill="url(#accent)"/>
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{% if not_assessable %}
+<text x="36" y="122" font-size="10" fill="#64748b">Prediction reweighting analysis: no method was applied</text>
+{% include '_could_not_check.svg' %}
+{% else %}
+{# Part (c) of the headline rule: the ungraded count belongs in the HEADLINE
+   band, not at the foot. "4 methods compared" counted four rows of which one
+   reported nothing at all, and a count reads as a measurement. The number is
+   now the GRADED count, and the rows that measured nothing are named beside it
+   rather than folded into it. #}
+<text x="36" y="122" font-size="10" fill="#64748b">Prediction reweighting analysis: {{ methods|length }} methods compared{% if n_ungraded %}, {{ n_ungraded }} reported nothing and {{ 'is' if n_ungraded == 1 else 'are' }} not graded{% endif %}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Stats badges                                                      #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ badges_y }}" width="190" height="40" rx="8" fill="#ffffff"/>
+<text x="56" y="{{ badges_y + 14 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.5" font-weight="600">SAMPLES</text>
+<text x="56" y="{{ badges_y + 30 }}" font-size="10" font-weight="600" fill="#0f172a">{{ n_samples }}</text>
+
+<rect x="238" y="{{ badges_y }}" width="190" height="40" rx="8" fill="#ffffff"/>
+<text x="258" y="{{ badges_y + 14 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.5" font-weight="600">GROUPS</text>
+<text x="258" y="{{ badges_y + 30 }}" font-size="10" font-weight="600" fill="#0f172a">{{ n_groups }}</text>
+
+{# The emerald stripe and the emerald name are a RECOMMENDATION. They may only
+   be painted over a method that has a graded row on the table below; a name
+   with nothing measured behind it is drawn in slate and says so. #}
+{% set best_graded = best_method_graded|default(true) %}
+<rect x="440" y="{{ badges_y }}" width="240" height="40" rx="8" fill="#ffffff"/>
+<rect x="440" y="{{ badges_y }}" width="2.5" height="40" rx="1" fill="{{ '#059669' if best_graded else '#94a3b8' }}"/>
+<text x="460" y="{{ badges_y + 14 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.5" font-weight="600">BEST METHOD</text>
+<text x="460" y="{{ badges_y + 30 }}" font-size="10" font-weight="700" fill="{{ '#059669' if best_graded else '#64748b' }}">{{ best_method }}{% if not best_graded %} (not graded here){% endif %}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Method comparison table                                           #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ table_y }}" width="644" height="{{ table_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">METHOD</text>
+<text x="220" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">FAIRNESS IMPR.</text>
+<text x="330" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">ACCURACY CHG.</text>
+<text x="440" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">CALIBRATION CHG.</text>
+<text x="576" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">TRADE-OFF</text>
+<line x1="56" y1="{{ table_y + 30 }}" x2="660" y2="{{ table_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for method in methods %}
+{% set ry = table_y + table_header_h + loop.index0 * table_row_h %}
+{% set is_best = method.name == best_method %}
+
+{# Best method highlight #}
+{% if is_best %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ table_row_h }}" fill="#ecfdf5" opacity="0.4"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ table_row_h }}" fill="#059669"/>
+{% endif %}
+
+<text x="56" y="{{ ry + 18 }}" font-size="10.5" font-weight="{{ '600' if is_best else '500' }}" fill="#0f172a">{{ method.name|truncate_text(22) }}</text>
+
+{# Every cell below is drawn ONLY when it was reported. A `.get(key, 0)` used to
+   fill each of them, and each default landed in the reassuring arm of its own
+   branch: 0 >= 0 is the emerald "+0.00%" accuracy arm, 0 <= 0 is the emerald
+   "0.000" calibration arm. A cell that measured nothing is slate and says so. #}
+
+{# Fairness improvement #}
+{% if method.fairness_improvement is not none %}
+<text x="220" y="{{ ry + 18 }}" font-size="10.5" font-weight="600" fill="#059669">+{{ (method.fairness_improvement * 100)|f1 }}%</text>
+{% else %}
+<text x="220" y="{{ ry + 18 }}" font-size="10.5" fill="#94a3b8">not measured</text>
+{% endif %}
+
+{# Accuracy change #}
+{% if method.accuracy_change is none %}
+<text x="330" y="{{ ry + 18 }}" font-size="10.5" fill="#94a3b8">not measured</text>
+{% elif method.accuracy_change >= 0 %}
+<text x="330" y="{{ ry + 18 }}" font-size="10.5" fill="#059669">+{{ (method.accuracy_change * 100)|f2 }}%</text>
+{% else %}
+<text x="330" y="{{ ry + 18 }}" font-size="10.5" fill="#f59e0b">{{ (method.accuracy_change * 100)|f2 }}%</text>
+{% endif %}
+
+{# Calibration change #}
+{% if method.calibration_change is none %}
+<text x="440" y="{{ ry + 18 }}" font-size="10.5" fill="#94a3b8">not measured</text>
+{% elif method.calibration_change <= 0 %}
+<text x="440" y="{{ ry + 18 }}" font-size="10.5" fill="#059669">{{ method.calibration_change|f3 }}</text>
+{% else %}
+<text x="440" y="{{ ry + 18 }}" font-size="10.5" fill="#f59e0b">+{{ method.calibration_change|f3 }}</text>
+{% endif %}
+
+{# Trade-off score with mini bar. The maximum that scales every bar is computed
+   in the adapter (see max_trade_off there), because a {% set %} made inside
+   this loop is neither testable nor stable, and because a row that reported no
+   score must not be inside the maximum it would be scaled against. #}
+{% if method.trade_off_score is not none %}
+{% set score_bar_w = (method.trade_off_score / max_trade_off * 60) if max_trade_off > 0 else 0 %}
+<rect x="576" y="{{ ry + 10 }}" width="{{ score_bar_w }}" height="8" rx="4" fill="{{ '#059669' if is_best else '#cbd5e1' }}" opacity="0.6"/>
+<text x="640" y="{{ ry + 18 }}" font-size="10.5" font-weight="{{ '700' if is_best else '500' }}" fill="{{ '#059669' if is_best else '#6b7280' }}">{{ method.trade_off_score|f3 }}</text>
+{% else %}
+{# At the bar's x, not the number's: the number sits at 640 and "not measured"
+   from there would run off the 680 canvas. #}
+<text x="576" y="{{ ry + 18 }}" font-size="10.5" fill="#94a3b8">not measured</text>
+{% endif %}
+
+{% if not loop.last or ungraded %}
+<line x1="56" y1="{{ ry + table_row_h }}" x2="660" y2="{{ ry + table_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ── Rows that reported nothing ──
+   They are listed so that a reader can see the method was named and never
+   measured, and they carry no number, no bar, no colour and no best-method
+   stripe. They are NOT in `methods`, so they are in no count above and in no
+   denominator in the accessible description. #}
+{% for m in ungraded %}
+{% set ry = table_y + table_header_h + (methods|length + loop.index0) * table_row_h %}
+<text x="56" y="{{ ry + 18 }}" font-size="10.5" font-weight="500" fill="#64748b">{{ m.name|truncate_text(22) }}</text>
+<rect x="216" y="{{ ry + 6 }}" width="132" height="18" rx="5" fill="#f1f5f9"/>
+<text x="224" y="{{ ry + 18 }}" font-size="8.5" font-weight="600" fill="#64748b">NOT MEASURED</text>
+<text x="360" y="{{ ry + 18 }}" font-size="9" fill="#94a3b8">no fairness, accuracy, calibration or trade-off number</text>
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + table_row_h }}" x2="660" y2="{{ ry + table_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+{% endif %}{# end: not not_assessable #}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Recommendations panel                                             #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ rec_y }}" width="644" height="{{ rec_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ rec_y }}" width="2.5" height="{{ rec_h }}" rx="1" fill="#3b82f6"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="8" font-weight="600" fill="#3b82f6" letter-spacing="0.5">RECOMMENDATIONS</text>
+<line x1="56" y1="{{ rec_y + 30 }}" x2="660" y2="{{ rec_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+
+{% for rec in recommendations %}
+<circle cx="64" cy="{{ rec_y + rec_header_h + 6 + loop.index0 * rec_item_h }}" r="2.5" fill="#3b82f6"/>
+<text x="76" y="{{ rec_y + rec_header_h + 10 + loop.index0 * rec_item_h }}" font-size="9.5" fill="#6b7280">{{ rec|truncate_text(100) }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

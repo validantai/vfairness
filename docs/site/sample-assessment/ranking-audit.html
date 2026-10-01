@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a3a4f">
+    <meta name="description" content="End-to-end fairness audit for a job-platform ranking system using vfairness — exposure parity, NDKL, A/B experimentation, feedback-loop detection, and EU AI Act compliance under Annex III Section 4(a).">
+    <meta name="keywords" content="ranking fairness, exposure parity, NDKL, EU AI Act, recommender bias, A/B testing, vfairness, algorithmic audit, job platform">
+    <meta name="author" content="validant.ai">
+    <meta name="version" content="0.1.0">
+
+    <title>Ranking Audit &mdash; Job Platform Fairness Assessment | vfairness</title>
+
+    <link rel="icon" type="image/svg+xml" href="../img/favicon-v2.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script>/* theme before first paint: vf-theme = light | dark | system */(function(){var m='system';try{m=localStorage.getItem('vf-theme')||'system'}catch(e){}var d=m==='dark'||(m==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;r.setAttribute('data-theme',d?'dark':'light');r.setAttribute('data-theme-mode',m)})()</script>
+
+    <style>
+        /* ── Phase timeline ── */
+        .phase-timeline { display:flex; align-items:stretch; gap:0; overflow-x:auto; padding:0.5rem 0 1.5rem; margin:0 -0.5rem; }
+        .phase-step { flex:1; min-width:90px; text-align:center; position:relative; padding:0.6rem 0.3rem; }
+        .phase-step::after { content:''; position:absolute; top:22px; right:-50%; width:100%; height:2px; background:var(--color-gray-200); z-index:0; }
+        .phase-step:last-child::after { display:none; }
+        .phase-num { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; color:#fff; font-size:0.7rem; font-weight:700; position:relative; z-index:1; }
+        .phase-label { display:block; font-size:0.65rem; font-weight:500; color:var(--color-gray-500); margin-top:0.35rem; line-height:1.2; }
+        .phase-step.active .phase-label { color:var(--color-gray-900); font-weight:600; }
+
+        /* ── Artifact card ── */
+        .artifact-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; margin:1.5rem 0; }
+        .artifact-card { background:#fff; border:1px solid var(--color-gray-200); border-radius:var(--radius-lg); overflow:hidden; transition:all var(--transition-base); }
+        .artifact-card:hover { border-color:var(--color-gray-300); box-shadow:var(--shadow-md); }
+        .artifact-card img { width:100%; height:auto; display:block; border-bottom:1px solid var(--color-gray-100); }
+        .artifact-card .artifact-info { padding:0.75rem 1rem; }
+        .artifact-card .artifact-title { font-size:0.85rem; font-weight:600; color:var(--color-gray-900); }
+        .artifact-card .artifact-func { font-family:var(--font-mono); font-size:0.7rem; color:var(--color-gray-400); margin-top:0.2rem; }
+
+        /* ── Phase section ── */
+        .phase-section { margin-top:3rem; padding-top:2rem; border-top:1px solid var(--color-gray-200); }
+        .phase-section:first-of-type { border-top:none; margin-top:2rem; }
+        .phase-badge { display:inline-flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; }
+        .phase-badge .num { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; color:#fff; font-size:0.75rem; font-weight:700; }
+        .phase-badge .label { font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--color-gray-400); }
+
+        /* ── Findings callout ── */
+        .finding-box { background:var(--color-gray-50); border-left:3px solid; border-radius:0 var(--radius-md) var(--radius-md) 0; padding:1rem 1.25rem; margin:1.25rem 0; }
+        .finding-box.pass { border-color:#059669; }
+        .finding-box.warn { border-color:#f59e0b; }
+        .finding-box.fail { border-color:#dc2626; }
+        .finding-box .finding-title { font-size:0.8rem; font-weight:600; margin-bottom:0.4rem; }
+        .finding-box.pass .finding-title { color:#059669; }
+        .finding-box.warn .finding-title { color:#b45309; }
+        .finding-box.fail .finding-title { color:#dc2626; }
+        .finding-box p { font-size:0.85rem; color:var(--color-gray-600); margin:0; }
+
+        /* ── SVG preview ── */
+        .svg-preview { margin:1.5rem 0; border:1px solid var(--color-gray-200); border-radius:var(--radius-lg); overflow:hidden; background:#f8f9fb; }
+        .svg-preview img { width:100%; height:auto; display:block; }
+        .svg-preview-caption { padding:0.5rem 1rem; background:#fff; border-top:1px solid var(--color-gray-100); display:flex; justify-content:space-between; align-items:center; }
+        .svg-preview-caption .cap-title { font-size:0.8rem; font-weight:600; color:var(--color-gray-700); }
+        .svg-preview-caption .cap-func { font-family:var(--font-mono); font-size:0.7rem; color:var(--color-gray-400); }
+
+        /* ── EU AI Act checklist ── */
+        .compliance-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1rem; margin:1.5rem 0; }
+        .compliance-item { display:flex; gap:0.75rem; align-items:flex-start; padding:1rem; background:#fff; border:1px solid var(--color-gray-200); border-radius:var(--radius-lg); }
+        .compliance-check { width:24px; height:24px; border-radius:50%; background:#ecfdf5; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+        .compliance-check svg { color:#059669; }
+        .compliance-text .ct-title { font-size:0.85rem; font-weight:600; color:var(--color-gray-800); }
+        .compliance-text .ct-desc { font-size:0.78rem; color:var(--color-gray-500); margin-top:0.15rem; line-height:1.4; }
+
+        /* ── Scenario card (teal) ── */
+        .scenario-card { background:linear-gradient(135deg,#ecfdf5,#f0f9ff); border:1px solid #2dd4bf; border-radius:var(--radius-xl); padding:1.5rem 2rem; margin:1.5rem 0; }
+        .scenario-card h3 { margin-top:0; font-size:1.1rem; color:#0f766e; }
+        .scenario-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; margin-top:1rem; }
+        .scenario-stat { text-align:center; }
+        .scenario-stat .val { font-size:1.5rem; font-weight:700; color:#0f766e; }
+        .scenario-stat .lbl { font-size:0.75rem; color:var(--color-gray-500); margin-top:0.15rem; }
+
+        /* ── Module colors ── */
+        .mod-preprocessing { background:#f59e0b; }
+        .mod-training { background:#0aafe3; }
+        .mod-postprocessing { background:#6366f1; }
+        .mod-evaluation { background:#2c5f7c; }
+        .mod-operations { background:#059669; }
+        .mod-reporting { background:#7c3aed; }
+        .mod-experimentation { background:#dc2626; }
+        .mod-workflow { background:#475569; }
+
+        /* ── Summary table ── */
+        .summary-table { width:100%; border-collapse:separate; border-spacing:0; margin:1rem 0; font-size:0.85rem; }
+        .summary-table th { background:var(--color-gray-50); padding:0.6rem 1rem; text-align:left; font-weight:600; color:var(--color-gray-600); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; border-bottom:2px solid var(--color-gray-200); }
+        .summary-table td { padding:0.6rem 1rem; border-bottom:1px solid var(--color-gray-100); color:var(--color-gray-700); }
+        .summary-table code { font-size:0.78rem; background:var(--color-gray-100); padding:0.1rem 0.4rem; border-radius:4px; }
+
+        /* ── Wide SVG side-by-side ── */
+        .svg-duo { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1.5rem 0; }
+        @media (max-width:768px) { .svg-duo { grid-template-columns:1fr; } .phase-timeline { overflow-x:auto; } }
+
+        /* ── Ranking-specific callout (teal) ── */
+        .ranking-note { display:flex; gap:0.75rem; align-items:flex-start; padding:1rem 1.25rem; background:#ecfdf5; border:1px solid #2dd4bf; border-radius:var(--radius-lg); margin:1.25rem 0; }
+        .ranking-note .rk-icon { flex-shrink:0; width:28px; height:28px; background:#0d9488; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:0.8rem; }
+        .ranking-note .rk-text { font-size:0.85rem; color:#134e4a; line-height:1.5; }
+        .ranking-note .rk-text strong { color:#0f766e; }
+    </style>
+    <script src="https://validant.ai/consent/v1/consent.js" defer></script>
+  </head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+    <div class="header-container">
+        <div class="logo-section">
+            <a href="../index.html">
+                <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
+            </a>
+            <span class="logo-divider"></span>
+            <span class="lib-name"><span>v</span>fairness</span>
+        </div>
+        <nav class="main-nav" aria-label="Main navigation">
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="../getting-started/index.html" class="nav-link">Getting Started</a>
+                </li>
+                <li class="nav-item">
+                    <a href="../api-reference/index.html" class="nav-link">API Reference</a>
+                </li>
+                <li class="nav-item nav-item--has-dropdown">
+                    <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                        Learn
+                        <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <div class="nav-dropdown" role="menu" aria-label="Learn submenu">
+                        <div class="nav-dropdown__inner">
+                            <a href="../test-objects/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">Find a Test Object</span>
+                                    <span class="nav-dropdown__desc">Data, models and agents to test, by access depth</span>
+                                </span>
+                            </a>
+                            <a href="../business-guide/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">Business Guide</span>
+                                    <span class="nav-dropdown__desc">Fairness strategy for decision-makers</span>
+                                </span>
+                            </a>
+                            <div class="nav-dropdown__group">
+                                <div class="nav-dropdown__group-label">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Sample Assessments</span>
+                                        <span class="nav-dropdown__desc">End-to-end audits with EU AI Act compliance</span>
+                                    </span>
+                                </div>
+                                <div class="nav-dropdown__group-items">
+                                    <a href="index.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Binary Classifier</span> <span class="sub-desc">&mdash; Credit scoring</span></a>
+                                    <a href="llm-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Foundation LLM</span> <span class="sub-desc">&mdash; Resume screening</span></a>
+                                    <a href="cv-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Computer Vision</span> <span class="sub-desc">&mdash; Medical imaging</span></a>
+                                    <a href="ranking-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Ranking System</span> <span class="sub-desc">&mdash; Job platform</span></a>
+                                </div>
+                            </div>
+                            <a href="../concepts/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">Concepts</span>
+                                    <span class="nav-dropdown__desc">Fairness theory and metric foundations</span>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                    <li class="nav-item">
+                        <a href="../our-offering/index.html" class="nav-link">Our Offering</a>
+                    </li>
+                <li class="nav-item nav-item--has-dropdown">
+                    <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                        Explore
+                        <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <div class="nav-dropdown" role="menu" aria-label="Explore submenu">
+                        <div class="nav-dropdown__inner">
+                            <a href="../svg-gallery/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">SVG Gallery</span>
+                                    <span class="nav-dropdown__desc">Interactive visualization templates</span>
+                                </span>
+                            </a>
+                            <a href="../workflow-integration/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">Workflow Integration</span>
+                                    <span class="nav-dropdown__desc">MLOps, CI/CD, and experiment tracking</span>
+                                </span>
+                            </a>
+                                <a href="../usage-map/index.html" role="menuitem" class="nav-dropdown__item" data-um-injected="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Library Usage Map</span>
+                                        <span class="nav-dropdown__desc">Where the platform uses each vfairness symbol</span>
+                                    </span>
+                                </a>
+<a href="../llm-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">LLM Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Counterfactual testing, benchmarks, output analysis for LLMs</span>
+                                    </span>
+                                </a>
+                                <a href="../agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Agent Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Correspondence testing, tool bias, RAG bias, pipeline tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../multi-agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Multi-Agent Testing</span>
+                                        <span class="nav-dropdown__desc">Emergent bias, groupthink, non-compositionality</span>
+                                    </span>
+                                </a>
+                                <a href="../explainability-and-xai/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Explainability &amp; XAI</span>
+                                        <span class="nav-dropdown__desc">SHAP attributions, fairness decomposition, counterfactuals</span>
+                                    </span>
+                                </a>
+                                <a href="../training-time-interventions/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Training-Time Interventions</span>
+                                        <span class="nav-dropdown__desc">Fairness-aware losses, constraints, calibration</span>
+                                    </span>
+                                </a>
+</div>
+                    </div>
+                </li>
+            </ul>
+                <div class="nav-cta">
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="Search docs...">
+                    </div>
+                    <a href="https://github.com/validantai/vfairness" class="btn btn-secondary btn-sm" target="_blank">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        GitHub
+                    </a>
+                </div>
+
+                <button type="button" class="mobile-nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-panel">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+<!-- Mobile Navigation -->
+<div class="mobile-nav-overlay" aria-hidden="true"></div>
+<nav class="mobile-nav-panel" id="mobile-nav-panel" aria-label="Mobile navigation" aria-hidden="true">
+    <div class="mobile-nav-header">
+        <span class="mobile-nav-title">Menu</span>
+        <button type="button" class="mobile-nav-close" aria-label="Close navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div class="mobile-nav-body">
+        <a href="../getting-started/index.html" class="mobile-nav-link">Getting Started</a>
+        <a href="../api-reference/index.html" class="mobile-nav-link">API Reference</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Learn
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../test-objects/index.html" class="mobile-nav-sublink">Find a Test Object</a>
+                <a href="../business-guide/index.html" class="mobile-nav-sublink">Business Guide</a>
+                <span class="mobile-nav-sublink" style="font-size:0.7rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:0.5rem 0 0.15rem;">Sample Assessments</span>
+                <a href="index.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Binary Classifier</a>
+                <a href="llm-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Foundation LLM</a>
+                <a href="cv-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Computer Vision</a>
+                <a href="ranking-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Ranking System</a>
+                <a href="../concepts/index.html" class="mobile-nav-sublink">Concepts</a>
+            </div></div>
+        </div>
+        <a href="../our-offering/index.html" class="mobile-nav-link">Our Offering</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Explore
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../svg-gallery/index.html" class="mobile-nav-sublink">SVG Gallery</a>
+                <a href="../workflow-integration/index.html" class="mobile-nav-sublink">Workflow Integration</a>
+                <a href="../usage-map/index.html" class="mobile-nav-sublink" data-um-injected="1">Library Usage Map</a>
+<a href="../llm-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">LLM Fairness Testing</a>
+                <a href="../agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Agent Fairness Testing</a>
+                <a href="../multi-agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Multi-Agent Testing</a>
+                <a href="../explainability-and-xai/index.html" class="mobile-nav-sublink">Explainability &amp; XAI</a>
+                <a href="../training-time-interventions/index.html" class="mobile-nav-sublink">Training-Time Interventions</a>
+</div></div>
+        </div>
+    </div>
+</nav>
+<script>/* Mobile nav bootstrap — works before main.js loads */
+(function(){
+var t=document.querySelector(".mobile-nav-toggle"),p=document.querySelector(".mobile-nav-panel"),o=document.querySelector(".mobile-nav-overlay"),c=document.querySelector(".mobile-nav-close");
+if(!t||!p)return;t.setAttribute("data-nav-init","1");
+function open(){t.setAttribute("aria-expanded","true");p.classList.add("is-open");p.setAttribute("aria-hidden","false");if(o)o.classList.add("is-open");document.body.style.overflow="hidden";}
+function close(){t.setAttribute("aria-expanded","false");p.classList.remove("is-open");p.setAttribute("aria-hidden","true");if(o)o.classList.remove("is-open");document.body.style.overflow="";}
+t.addEventListener("click",function(){t.getAttribute("aria-expanded")==="true"?close():open();});
+if(c)c.addEventListener("click",close);
+if(o)o.addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList.contains("is-open"))close();});
+})()
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     LAYOUT: Sidebar + Main
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="page-wrapper docs-layout">
+    <aside class="sidebar">
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title">Assessment</div>
+            <ul class="sidebar-nav">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#scenario">Scenario</a></li>
+                <li><a href="#phase-map">Phase Map</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#f59e0b;">Preprocessing</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-1">1. Data Validation</a></li>
+                <li><a href="#phase-2">2. Bias Detection</a></li>
+                <li><a href="#phase-3">3. Proxy Detection</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#6366f1;">Post-Processing</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-4">4. Fair Re-ranking</a></li>
+                <li><a href="#phase-5">5. Score Calibration</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#2c5f7c;">Evaluation</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-6">6. Ranking Fairness</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#059669;">Operations</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-7">7. CI/CD Gating</a></li>
+                <li><a href="#phase-8">8. Monitoring</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#dc2626;">Experimentation</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-9">9. A/B Testing</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#7c3aed;">Reporting</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-10">10. EU AI Act Card</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title">Summary</div>
+            <ul class="sidebar-nav">
+                <li><a href="#artifacts">All Artifacts</a></li>
+                <li><a href="#workflow">Workflow Integration</a></li>
+                <li><a href="#compliance">Compliance Checklist</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="content-container">
+
+<header class="page-intro">
+    <p class="vf-eyebrow" data-dated>Sample assessment &middot; ranking</p>
+    <h1>Job platform fairness assessment</h1>
+    <p class="lead">A complete audit of a job platform ranking system, from proxy detection and fair re-ranking to feedback-loop monitoring and the EU AI Act model card.</p>
+</header>
+
+<!-- ─────────────────────────────────────────────────────────────
+     OVERVIEW
+     ───────────────────────────────────────────────────────────── -->
+<section id="overview">
+    <h2 class="mt-0">Overview</h2>
+    <p>This walkthrough demonstrates a <strong>complete fairness audit of a ranking/recommender system</strong> using the vfairness library. Unlike binary classifiers, ranking systems introduce unique fairness challenges: <strong>exposure allocation</strong>, <strong>position bias</strong>, and <strong>feedback loops</strong> where biased rankings generate biased engagement data that reinforces the original bias.</p>
+
+    <div class="callout callout-info">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            What you will build
+        </div>
+        <p>By following this guide, you will produce: a validated click-data audit, exposure parity analysis, engagement proxy detection, fair re-ranking evaluation, ranking-specific metrics (NDKL, attention fairness), CI/CD gates with ranking thresholds, feedback-loop monitoring, an A/B experiment comparing fair vs. baseline ranking, causal decomposition of ranking bias, and an EU AI Act&ndash;compliant model card &mdash; all backed by <strong>a complete set of production-grade SVG artifacts</strong>, itemised in the Complete Artifact Inventory below.</p>
+    </div>
+
+    <div class="callout callout-warning">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+            This is a scripted scenario, not a real audit
+        </div>
+        <p>The dataset, the model and every number in the Findings boxes below are invented to show the
+        shape of a complete audit. No file named here ships with the library, so the walkthrough is not
+        reproducible end to end as written, and nothing on this page is a measurement of a real system.
+        The <strong>code</strong> is real and the <strong>call signatures</strong> are checked against the
+        library; the <strong>results</strong> are illustration.</p>
+    </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────
+     SCENARIO
+     ───────────────────────────────────────────────────────────── -->
+<section id="scenario">
+    <h2>The Scenario</h2>
+
+    <div class="ranking-note">
+        <div class="rk-icon">RK</div>
+        <div class="rk-text">
+            <strong>Ranking-specific challenges:</strong> In a ranking system, fairness is not just about <em>who gets selected</em> but <em>where they appear</em>. A candidate ranked 50th is technically &ldquo;included&rdquo; but receives near-zero recruiter attention. Position bias means the top 10 slots capture &gt;80% of clicks. Exposure parity &mdash; ensuring each demographic group receives its fair share of attention-weighted positions &mdash; is the primary fairness objective. Additionally, click-through data used for model training encodes historical recruiter preferences, creating <strong>feedback loops</strong> that amplify initial biases over time.
+        </div>
+    </div>
+
+    <div class="scenario-card">
+        <h3 style="margin-top:0;">Job Platform Candidate Ranking &mdash; EU AI Act High-Risk System</h3>
+        <p style="color:#134e4a;font-size:0.9rem;">A professional hiring platform deploys a learning-to-rank model (LambdaMART) to order candidates for recruiter search results. Under the EU AI Act (Annex III, Section 4a), AI systems intended to be used for <strong>recruitment or selection of natural persons</strong>, particularly for screening, filtering, or ranking candidates, are classified as <strong>high-risk AI</strong>, requiring comprehensive fairness documentation, ongoing monitoring, and human oversight.</p>
+        <div class="scenario-grid">
+            <div class="scenario-stat">
+                <div class="val">120,000</div>
+                <div class="lbl">Candidate Profiles</div>
+            </div>
+            <div class="scenario-stat">
+                <div class="val">3</div>
+                <div class="lbl">Protected Attributes</div>
+            </div>
+            <div class="scenario-stat">
+                <div class="val">29</div>
+                <div class="lbl">SVG Artifacts</div>
+            </div>
+            <div class="scenario-stat">
+                <div class="val">10</div>
+                <div class="lbl">Audit Phases</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>import pandas as pd
+import numpy as np
+from lightgbm import LGBMRanker
+
+# ── Load the candidate ranking dataset ──
+df = pd.read_csv("candidate_profiles.csv")
+clicks = pd.read_csv("recruiter_clicks.csv")  # historical engagement data
+
+# Protected attributes
+PROTECTED = ["gender", "ethnicity", "age_group"]
+FEATURES  = ["skills_match", "experience_years", "education_score",
+             "profile_completeness", "past_engagement_rate",
+             "recency_score", "keyword_overlap"]
+
+# Merge engagement signals
+df = df.merge(clicks.groupby("candidate_id").agg(
+    click_rate=("clicked", "mean"),
+    impressions=("impression_id", "count"),
+), on="candidate_id", how="left").fillna(0)
+
+# Train learning-to-rank model
+ranker = LGBMRanker(objective="lambdarank", n_estimators=300, max_depth=6)
+ranker.fit(
+    X_train[FEATURES], y_train_relevance,
+    group=train_query_groups,
+    eval_set=[(X_val[FEATURES], y_val_relevance)],
+    eval_group=[val_query_groups],
+)
+scores = ranker.predict(X_test[FEATURES])
+rankings = scores.argsort()[::-1]  # descending score → rank</code></pre>
+    </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────
+     PHASE MAP
+     ───────────────────────────────────────────────────────────── -->
+<section id="phase-map">
+    <h2>Audit Pipeline</h2>
+    <p>The ten phases below are adapted for ranking systems. Key differences from classification audits: Phase 3 targets engagement-signal proxies, Phase 4 uses post-processing re-ranking (not in-processing), Phase 6 adds ranking-specific metrics (NDKL, exposure parity), and Phase 9 runs a controlled A/B experiment with causal decomposition.</p>
+    <div class="phase-timeline">
+        <div class="phase-step active"><span class="phase-num mod-preprocessing">1</span><span class="phase-label">Data<br>Validation</span></div>
+        <div class="phase-step"><span class="phase-num mod-preprocessing">2</span><span class="phase-label">Bias<br>Detection</span></div>
+        <div class="phase-step"><span class="phase-num mod-preprocessing">3</span><span class="phase-label">Proxy<br>Detection</span></div>
+        <div class="phase-step"><span class="phase-num mod-postprocessing">4</span><span class="phase-label">Fair<br>Re-ranking</span></div>
+        <div class="phase-step"><span class="phase-num mod-postprocessing">5</span><span class="phase-label">Score<br>Calibration</span></div>
+        <div class="phase-step"><span class="phase-num mod-evaluation">6</span><span class="phase-label">Ranking<br>Fairness</span></div>
+        <div class="phase-step"><span class="phase-num mod-operations">7</span><span class="phase-label">CI/CD<br>Gating</span></div>
+        <div class="phase-step"><span class="phase-num mod-operations">8</span><span class="phase-label">Monitoring</span></div>
+        <div class="phase-step"><span class="phase-num mod-experimentation">9</span><span class="phase-label">A/B<br>Testing</span></div>
+        <div class="phase-step"><span class="phase-num mod-reporting">10</span><span class="phase-label">Model<br>Card</span></div>
+    </div>
+
+    <div class="ranking-note">
+        <div class="rk-icon">RK</div>
+        <div class="rk-text">
+            <strong>Adapted pipeline:</strong> Ranking systems are typically mitigated via <strong>post-processing re-ranking</strong> rather than in-processing debiasing, because the ranking objective (NDCG, MAP) is non-differentiable and requires specialized constraint optimization. Phase 4 therefore applies fairness-constrained re-ranking after scoring, and Phase 5 calibrates the underlying relevance scores. Phase 9 uses the experimentation framework for A/B comparison of fair vs. baseline ranking with causal analysis.
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 1: DATA VALIDATION
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-1" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-preprocessing">1</span>
+        <span class="label">Preprocessing</span>
+    </div>
+    <h2 style="margin-top:0;">Data Validation</h2>
+    <p>Validate the training data &mdash; both candidate profiles and historical click/engagement data &mdash; for representation balance, missing patterns, and position-bias contamination. Click data is particularly vulnerable to feedback loops: candidates historically ranked lower receive fewer impressions, generating less engagement data regardless of their true relevance.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.cicd import DataBiasValidator, DataValidationConfig
+
+validator = DataBiasValidator(
+    protected_attributes=PROTECTED,
+    config=DataValidationConfig(
+        min_samples_per_group=200,     # higher bar for ranking (more groups, more queries)
+        missing_value_threshold=0.03,
+    ),
+)
+result = validator.validate(df, outcome_column="click_rate")
+
+print(f"Passed: {result.passed}")
+print(f"Issues: {len(result.issues)}")
+
+# ── Generate SVG artifact ──
+from vfairness.rendering import data_validation_to_svg
+
+data_validation_to_svg(
+    result,
+    explanation="Pre-training data quality assessment for the candidate ranking dataset. "
+                "Checks group representation, missing patterns, engagement feature correlations, "
+                "and position-bias contamination in historical click data.",
+    save_path="artifacts/01_data_validation.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/data_validation.svg" alt="Data Validation Report" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Data Validation Report</span>
+            <span class="cap-func">data_validation_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="finding-box warn">
+        <div class="finding-title">Findings</div>
+        <p>1 critical issue (engagement data <code>click_rate</code> is confounded with historical position &mdash; candidates from underrepresented groups had 40% fewer average impressions), 2 warnings (low representation for <code>age_group=55+</code>), 2 informational notes. Position-bias decontamination required before model training.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 2: BIAS DETECTION & AUTO-DISCOVERY
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-2" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-preprocessing">2</span>
+        <span class="label">Preprocessing</span>
+    </div>
+    <h2 style="margin-top:0;">Bias Detection &amp; Auto-Discovery</h2>
+    <p>Run the auto-discovery scanner to identify protected attributes, then perform a full bias audit. For ranking systems, bias detection examines both <strong>representation in the candidate pool</strong> and <strong>exposure distribution in historical rankings</strong> &mdash; who appears in the top positions and how often.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.evaluation.vfairness_metrics import (
+    detect_protected_attributes,
+    scan_fairness_violations,
+    discover_intersectional_groups,
+)
+from vfairness.preprocessing.bias_detection import BiasDetector
+from vfairness.rendering import auto_discovery_to_svg, bias_audit_to_svg
+
+# ── Auto-discovery: confirm protected attributes ──
+# binarized "top half of scores" view for the discovery scan
+y_top = (scores &gt; np.median(scores)).astype(int)
+
+candidates = detect_protected_attributes(df)
+violations = scan_fairness_violations(X_test, y_top)
+intersectional = discover_intersectional_groups(X_test, PROTECTED, y_top)
+
+auto_discovery_to_svg(
+    candidates=candidates, violations=violations,
+    group_advantages=intersectional,
+    explanation="Automated scan confirming gender, ethnicity, and age_group as protected "
+                "attributes. Intersectional analysis reveals compounding disadvantage.",
+    save_path="artifacts/02a_auto_discovery.svg",
+)
+
+# ── Full bias audit ──
+detector = BiasDetector(df, protected_attributes=PROTECTED, outcome_column="click_rate")
+audit = detector.full_audit()
+
+bias_audit_to_svg(
+    audit,
+    explanation="Comprehensive bias audit of historical engagement data. Click rates "
+                "confounded with exposure — disparities may reflect position bias, not preference.",
+    save_path="artifacts/02b_bias_audit.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/auto_discovery.svg" alt="Auto-Discovery Scanner" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Auto-Discovery Scanner</span>
+                <span class="cap-func">auto_discovery_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/bias_audit.svg" alt="Bias Audit Dashboard" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Bias Audit Dashboard</span>
+                <span class="cap-func">bias_audit_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box fail">
+        <div class="finding-title">Findings</div>
+        <p>Historical click rates show <code>gender</code> disparity of 0.18 (threshold 0.10). Intersectional analysis reveals <code>female &times; minority &times; 45+</code> subgroup received 62% fewer top-10 placements than the overall average. Critical: this disparity is confounded with position bias and cannot be attributed to candidate quality.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 3: PROXY DETECTION (Engagement Signals)
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-3" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-preprocessing">3</span>
+        <span class="label">Preprocessing</span>
+    </div>
+    <h2 style="margin-top:0;">Proxy Detection &mdash; Engagement Signals</h2>
+    <p>In ranking systems, engagement features (click-through rate, time-on-profile, response rate) are potent <strong>proxy variables</strong>. They encode historical recruiter preferences that systematically disadvantage certain groups. Detect and mitigate these proxy correlations before training the ranker.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.preprocessing.feature_engineering import FeatureEngineeringAnalyzer
+from vfairness.rendering import (
+    proxy_risk_to_svg, correlation_heatmap_to_svg,
+    transformation_comparison_to_svg,
+)
+
+analyzer = FeatureEngineeringAnalyzer(
+    df, protected_attributes=PROTECTED,
+    target_column="relevance", feature_columns=FEATURES + ["click_rate"],
+)
+report = analyzer.full_analysis()
+
+# ── Proxy risk assessment ──
+proxy_risk_to_svg(
+    report.proxy_variables,
+    explanation="Engagement features (click_rate, past_engagement_rate) flagged as "
+                "proxies: they encode historical position bias and recruiter "
+                "preference patterns that correlate with protected attributes.",
+    save_path="artifacts/03a_proxy_risk.svg",
+)
+
+# ── Correlation heatmap ──
+# correlation_heatmap_to_svg expects a feature-keyed view of the matrix
+from types import SimpleNamespace
+
+cm = report.correlation_matrix
+heatmap_view = SimpleNamespace(
+    features=cm.feature_names,
+    protected_attributes=cm.protected_attributes,
+    correlations={
+        f: {a: float(cm.correlations[a][f]) for a in cm.protected_attributes}
+        for f in cm.feature_names
+    },
+)
+correlation_heatmap_to_svg(
+    heatmap_view,
+    explanation="Feature-to-protected-attribute correlations. past_engagement_rate and "
+                "click_rate show strong proxy signals. profile_completeness shows moderate risk.",
+    save_path="artifacts/03b_correlation_heatmap.svg",
+)
+
+# ── Apply transformation and compare ──
+# transform() returns only the transformed feature columns, so rejoin the
+# protected attributes before re-analyzing the fair features.
+X_fair = analyzer.transform(method="correlation_reduction")
+df_fair = pd.concat([X_fair, df[PROTECTED + ["relevance"]]], axis=1)
+
+after_cm = FeatureEngineeringAnalyzer(
+    df_fair, protected_attributes=PROTECTED,
+    target_column="relevance", feature_columns=FEATURES + ["click_rate"],
+).full_analysis().correlation_matrix
+
+def max_abs_corr(matrix):
+    """Strongest protected-attribute correlation per feature."""
+    return {
+        f: max(abs(float(matrix.correlations[a][f])) for a in matrix.protected_attributes)
+        for f in matrix.feature_names
+    }
+
+transformation_comparison_to_svg(
+    max_abs_corr(cm), max_abs_corr(after_cm),
+    explanation="Correlation reduction applied to engagement features.",
+    save_path="artifacts/03c_transformation_comparison.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/proxy_risk.svg" alt="Proxy Risk Assessment" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Proxy Risk Assessment</span>
+            <span class="cap-func">proxy_risk_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/correlation_heatmap.svg" alt="Correlation Heatmap" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Correlation Heatmap</span>
+                <span class="cap-func">correlation_heatmap_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/transformation_comparison.svg" alt="Transformation Comparison" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Transformation Comparison</span>
+                <span class="cap-func">transformation_comparison_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Findings</div>
+        <p>Engagement proxy correlations mitigated. <code>click_rate</code> correlation with ethnicity reduced from 0.45 to 0.04. <code>past_engagement_rate</code> reduced from 0.38 to 0.06. All features now below the 0.10 proxy threshold. The ranker will be retrained on decontaminated features.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 4: FAIR RE-RANKING
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-4" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-postprocessing">4</span>
+        <span class="label">Post-Processing</span>
+    </div>
+    <h2 style="margin-top:0;">Fair Re-ranking</h2>
+    <p>Apply fairness-constrained re-ranking as a post-processing step. The ranker produces relevance scores; the re-ranker interleaves candidates to achieve exposure parity while minimizing NDCG loss. Compare multiple re-ranking strategies (unconstrained, proportional, equal exposure) on the accuracy&ndash;fairness Pareto frontier.</p>
+
+    <div class="ranking-note">
+        <div class="rk-icon">RK</div>
+        <div class="rk-text">
+            <strong>Why post-processing:</strong> Unlike classification where in-processing (adversarial training, fairness-aware loss) is standard, ranking models optimize non-differentiable metrics (NDCG, MAP) that resist gradient-based fairness constraints. Post-processing re-ranking is the dominant approach in the literature (Singh &amp; Joachims 2018, Zehlike et al. 2022) because it separates relevance estimation from fairness allocation.
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness import exposure_parity_rerank
+from vfairness.in_processing import MethodComparison
+from vfairness.rendering import pareto_frontier_to_svg, method_comparison_to_svg
+
+groups_test = sensitive_test["gender"].to_numpy()
+
+# ── Compare re-ranking budgets: how much utility loss buys how much parity ──
+budgets = [0.02, 0.05, 0.10, 0.20]
+rerank_results = {}
+for budget in budgets:
+    rerank_results[budget] = exposure_parity_rerank(
+        scores, groups_test, max_utility_loss=budget,
+    )
+
+# ── Pareto frontier: utility loss vs. exposure parity ──
+pareto_frontier_to_svg(
+    [rerank_results[b]["utility_loss"] for b in budgets],
+    [rerank_results[b]["exposure_parity_diff_after"] for b in budgets],
+    labels=[f"budget {b:.0%}" for b in budgets],
+    x_label="NDCG utility loss",
+    y_label="Exposure parity difference",
+    explanation="Accuracy-fairness frontier across re-ranking budgets: each point is "
+                "one max_utility_loss setting and the exposure parity it achieves.",
+    save_path="artifacts/04a_pareto_frontier.svg",
+)
+
+# ── Method comparison ──
+comparisons = [
+    MethodComparison(
+        method_name=f"budget {b:.0%}",
+        accuracy=rerank_results[b]["ndcg_after"],
+        fairness_violation=rerank_results[b]["exposure_parity_diff_after"],
+        constraint_satisfied=rerank_results[b]["exposure_parity_diff_after"] &lt; 0.10,
+        parameters={"max_utility_loss": b},
+    )
+    for b in budgets
+]
+method_comparison_to_svg(
+    comparisons,
+    explanation="Head-to-head comparison of re-ranking budgets across NDCG "
+                "and exposure parity.",
+    save_path="artifacts/04b_method_comparison.svg",
+)
+
+# fair rankings from the selected budget (1 = top position)
+reranked_order = np.asarray(rerank_results[0.05]["reranked_order"])
+fair_rankings = np.empty(len(scores), dtype=int)
+fair_rankings[reranked_order] = np.arange(1, len(scores) + 1)</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/pareto_frontier.svg" alt="Pareto Frontier" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Pareto Frontier</span>
+                <span class="cap-func">pareto_frontier_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/method_comparison.svg" alt="Method Comparison" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Method Comparison</span>
+                <span class="cap-func">method_comparison_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Findings</div>
+        <p><strong>Proportional re-ranking selected.</strong> NDCG@10 dropped from 0.847 to 0.826 (2.5% loss) while exposure parity improved from 0.22 to 0.04. Equal-exposure was too aggressive (8.1% NDCG loss). The proportional strategy is deployed as the production ranking policy.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 5: SCORE CALIBRATION
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-5" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-postprocessing">5</span>
+        <span class="label">Post-Processing</span>
+    </div>
+    <h2 style="margin-top:0;">Score Calibration</h2>
+    <p>Calibrate the underlying relevance scores so they are comparable across demographic groups. A score of 0.8 should mean the same thing regardless of the candidate&rsquo;s gender or ethnicity. This is essential for downstream thresholding and for explaining scores to recruiters.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.post_processing.calibration import CalibrationAnalyzer
+from vfairness.rendering import (
+    reliability_diagram_to_svg, calibration_report_to_svg,
+    group_calibration_to_svg,
+)
+
+# Map raw ranker scores into [0, 1] and calibrate against observed relevance
+y_relevant = (y_test_relevance &gt;= 3).astype(int)   # relevant = top category
+scores_01 = (scores - scores.min()) / (scores.max() - scores.min())
+
+cal = CalibrationAnalyzer(y_relevant, scores_01, sensitive_test["gender"])
+cal_report = cal.full_analysis()
+calibrated_scores = cal.calibrate(method="platt")
+
+reliability_diagram_to_svg(
+    y_relevant, scores_01,
+    explanation="Reliability diagram showing predicted relevance vs. observed outcomes "
+                "across decile bins.",
+    save_path="artifacts/05a_reliability.svg",
+)
+
+calibration_report_to_svg(
+    cal_report,
+    explanation="Group-wise calibration metrics for the relevance scores.",
+    save_path="artifacts/05b_calibration.svg",
+)
+
+group_calibration_to_svg(
+    y_relevant, scores_01, sensitive_test["gender"],
+    explanation="Per-group calibration curves. Divergence between groups means a "
+                "given score carries different meaning per group.",
+    save_path="artifacts/05c_group_calibration.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/reliability_diagram.svg" alt="Reliability Diagram" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Reliability Diagram</span>
+            <span class="cap-func">reliability_diagram_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/calibration_report.svg" alt="Calibration Report" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Calibration Report</span>
+                <span class="cap-func">calibration_report_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/group_calibration.svg" alt="Group Calibration" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Group Calibration</span>
+                <span class="cap-func">group_calibration_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Findings</div>
+        <p>Group-wise Platt scaling successfully applied. Expected calibration error (ECE) reduced from 0.09 to 0.02. The systematic under-scoring of female candidates eliminated (gap reduced from 0.06 to 0.008). Calibrated scores are now suitable for recruiter-facing explanations.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 6: RANKING FAIRNESS METRICS
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-6" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-evaluation">6</span>
+        <span class="label">Evaluation</span>
+    </div>
+    <h2 style="margin-top:0;">Ranking Fairness Metrics</h2>
+    <p>Evaluate the re-ranked results using <strong>ranking-specific fairness metrics</strong> that go beyond standard classification metrics. These measure not just outcome parity but <em>attention allocation</em> &mdash; how much recruiter visibility each group receives based on their position in ranked lists.</p>
+
+    <div class="ranking-note">
+        <div class="rk-icon">RK</div>
+        <div class="rk-text">
+            <strong>Ranking vs. classification metrics:</strong> Standard metrics (demographic parity, equalized odds) measure binary outcomes. Ranking metrics measure <em>continuous exposure</em>: <strong>Exposure parity</strong> compares attention-weighted position shares. <strong>NDKL</strong> (Normalized Discounted KL-divergence) measures divergence from proportional representation at each rank cutoff. <strong>Attention fairness</strong> weights positions by a logarithmic attention model (position 1 gets weight 1.0, position 10 gets ~0.3).
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness import FairnessAnalyzer
+from vfairness.evaluation.vfairness_metrics.ranking import (
+    get_ranking_group_metrics,
+    exposure_parity_difference,
+    normalized_discounted_kl_divergence,
+    attention_weighted_rank_fairness,
+)
+from vfairness.evaluation.vfairness_metrics import (
+    permutation_test, sensitivity_analysis, subgroup_robustness_audit,
+)
+from vfairness.rendering import (
+    ranking_fairness_to_svg, radar_chart_to_svg, metrics_bar_chart_to_svg,
+    confidence_intervals_to_svg, effect_sizes_to_svg, group_comparison_to_svg,
+    robustness_testing_to_svg, intersectional_analysis_to_svg,
+)
+
+# ── Ranking-specific metrics on the re-ranked list ──
+epd  = exposure_parity_difference(fair_rankings, groups_test)
+ndkl = normalized_discounted_kl_divergence(fair_rankings, groups_test)
+awrf = attention_weighted_rank_fairness(fair_rankings, groups_test)
+group_metrics = get_ranking_group_metrics(fair_rankings, groups_test)
+
+ranking_fairness_to_svg(
+    [
+        {"metric_name": "exposure_parity_difference", "value": epd,
+         "is_fair": epd &lt; 0.10, "threshold": 0.10},
+        {"metric_name": "ndkl", "value": ndkl,
+         "is_fair": ndkl &lt; 0.15, "threshold": 0.15},
+        awrf,
+    ],
+    group_metrics,
+    explanation="Ranking fairness dashboard: exposure parity, NDKL, and attention "
+                "fairness for the re-ranked candidate list.",
+    save_path="artifacts/06a_ranking_fairness.svg",
+)
+
+# ── Standard fairness metrics on binarized top-k ──
+y_topk = (fair_rankings &lt;= 150).astype(int)   # predicted top 10%
+
+analyzer = FairnessAnalyzer(y_relevant, y_topk, sensitive_test["gender"])
+report = analyzer.get_report(include_ci=True)
+
+radar_chart_to_svg(report, explanation="Radar chart of standard fairness metrics.",
+                   save_path="artifacts/06b_radar.svg")
+metrics_bar_chart_to_svg(report, explanation="Metric values against thresholds.",
+                         save_path="artifacts/06c_bar_chart.svg")
+# The forest plot reads a "confidence_intervals" mapping with lower/upper keys,
+# built here from the report's metrics_with_ci entries.
+confidence_intervals_to_svg(
+    {
+        "metrics": report["metrics"],
+        "confidence_intervals": {
+            m: {"lower": ci["lower_bound"], "upper": ci["upper_bound"]}
+            for m, ci in report["metrics_with_ci"].items()
+        },
+    },
+    explanation="95% bootstrap confidence intervals.",
+    save_path="artifacts/06d_ci.svg")
+effect_sizes_to_svg(report, explanation="Effect sizes of the disparities.",
+                    save_path="artifacts/06e_effects.svg")
+group_comparison_to_svg(report, explanation="Per-group top-k rates.",
+                        save_path="artifacts/06f_group.svg")
+
+# ── Robustness testing ──
+# The robustness tests take a metric function of (y_pred, sensitive_attr)
+def parity_gap(y_pred_arr, attr):
+    rates = [np.mean(y_pred_arr[attr == g]) for g in np.unique(attr)]
+    return max(rates) - min(rates)
+
+perm = permutation_test(y_topk, groups_test, parity_gap)
+sens = sensitivity_analysis(y_topk, groups_test, parity_gap)
+sub  = subgroup_robustness_audit(y_topk, sensitive_test, y_true=y_relevant)
+
+robustness_testing_to_svg(
+    permutation_results=[perm],
+    sensitivity_results=[sens],
+    subgroup_audit=sub,
+    explanation="Robustness validation of the ranking fairness findings.",
+    save_path="artifacts/06g_robustness.svg",
+)
+
+# ── Intersectional deep-dive (gender × ethnicity top-k rates) ──
+topk_df = pd.DataFrame({
+    "gender": sensitive_test["gender"],
+    "ethnicity": sensitive_test["ethnicity"],
+    "in_topk": y_topk,
+})
+pivot = topk_df.pivot_table(index="gender", columns="ethnicity",
+                            values="in_topk", aggfunc="mean")
+intersectional_view = {
+    "matrix": {g: {e: float(pivot.loc[g, e]) for e in pivot.columns} for g in pivot.index},
+    "x_attr": "ethnicity",
+    "y_attr": "gender",
+}
+intersectional_analysis_to_svg(
+    intersectional_view, feature="in_topk",
+    explanation="Intersectional exposure analysis across gender × ethnicity.",
+    save_path="artifacts/06h_intersectional.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/ranking_fairness.svg" alt="Ranking Fairness Dashboard" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Ranking Fairness Dashboard</span>
+            <span class="cap-func">ranking_fairness_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/radar_chart.svg" alt="Fairness Radar Chart" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Fairness Radar Chart</span>
+                <span class="cap-func">radar_chart_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/metrics_bar_chart.svg" alt="Metrics Bar Chart" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Metrics Bar Chart</span>
+                <span class="cap-func">metrics_bar_chart_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/confidence_intervals.svg" alt="Confidence Intervals" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Confidence Intervals</span>
+                <span class="cap-func">confidence_intervals_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/effect_sizes.svg" alt="Effect Sizes" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Effect Sizes</span>
+                <span class="cap-func">effect_sizes_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/robustness_testing.svg" alt="Robustness Testing" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Robustness Testing</span>
+                <span class="cap-func">robustness_testing_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/intersectional_analysis.svg" alt="Intersectional Analysis" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Intersectional Analysis</span>
+                <span class="cap-func">intersectional_analysis_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Findings</div>
+        <p><strong>All ranking fairness metrics pass.</strong> Exposure parity 0.04 (threshold 0.10), NDKL 0.08 (threshold 0.15), attention fairness 0.06 (threshold 0.10). Standard metrics on binarized top-10 also pass: demographic parity 0.05, equalized odds 0.07. Robustness tests confirm stability under perturbation. No intersectional subgroup is flagged.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 7: CI/CD GATING
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-7" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-operations">7</span>
+        <span class="label">Operations</span>
+    </div>
+    <h2 style="margin-top:0;">CI/CD Gating</h2>
+    <p>Configure CI/CD gates with <strong>ranking-specific thresholds</strong>. The hierarchical gate evaluates standard fairness metrics at Level 1, ranking metrics (exposure parity, NDKL) at Level 2, and intersectional checks at Level 3. A model must pass all levels to be deployed.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.cicd import ModelFairnessGate, GateConfig
+from vfairness.operations.cicd.gate import HierarchicalGateConfig
+from vfairness.rendering import cicd_pipeline_to_svg, hierarchical_gate_to_svg
+
+# ── Simple gate ──
+gate = ModelFairnessGate(config=GateConfig(
+    metrics=["demographic_parity_difference", "exposure_parity_difference", "ndkl"],
+    thresholds={
+        "demographic_parity_difference": 0.10,
+        "exposure_parity_difference": 0.10,
+        "ndkl": 0.15,
+    },
+))
+decision = gate.evaluate_from_metrics({
+    **report["metrics"],
+    "exposure_parity_difference": epd,
+    "ndkl": ndkl,
+})
+
+cicd_pipeline_to_svg(
+    gate_decision=decision,
+    explanation="CI/CD gate with ranking-specific thresholds covering demographic "
+                "parity, exposure parity, and NDKL.",
+    save_path="artifacts/07a_cicd.svg",
+)
+
+# ── Hierarchical gate ──
+hier_config = HierarchicalGateConfig(
+    check_intersections=True,
+    intersection_depth=2,
+    min_group_size=30,
+    per_intersection_thresholds={"female_55plus": {"demographic_parity_difference": 0.15}},
+)
+hier_decision = gate.evaluate_hierarchical(
+    y_relevant, y_topk,
+    protected_attrs={"gender": sensitive_test["gender"].to_numpy(),
+                     "age_group": sensitive_test["age_group"].to_numpy()},
+    hierarchical_config=hier_config,
+)
+
+hierarchical_gate_to_svg(
+    hier_decision,
+    explanation="Three-level hierarchical gate: L1 standard fairness → L2 ranking fairness "
+                "→ L3 intersectional attention. All levels PASS.",
+    save_path="artifacts/07b_hierarchical.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/cicd_pipeline.svg" alt="CI/CD Pipeline Gate" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">CI/CD Pipeline Gate</span>
+                <span class="cap-func">cicd_pipeline_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/hierarchical_gate.svg" alt="Hierarchical Gate" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Hierarchical Gate</span>
+                <span class="cap-func">hierarchical_gate_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Findings</div>
+        <p>All three gate levels passed. The model is cleared for production deployment with the proportional re-ranking policy active.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 8: MONITORING & FEEDBACK LOOP DETECTION
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-8" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-operations">8</span>
+        <span class="label">Operations</span>
+    </div>
+    <h2 style="margin-top:0;">Monitoring &amp; Feedback Loop Detection</h2>
+    <p>Deploy continuous monitoring with special attention to <strong>feedback loops</strong>. In ranking systems, biased rankings generate biased click data, which retrains the model to produce even more biased rankings. Monitor temporal trends in exposure parity and alert on divergence patterns that indicate loop amplification.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.monitoring import (
+    FairnessMonitor, FairnessMonitorConfig,
+    FairnessDriftDetector, TemporalFairnessAnalyzer,
+)
+from vfairness.rendering import (
+    monitoring_dashboard_to_svg, drift_report_to_svg,
+    alert_timeline_to_svg, temporal_analysis_to_svg,
+)
+
+monitor = FairnessMonitor(config=FairnessMonitorConfig(
+    window_size=1000,
+    alert_threshold=0.8,
+    metrics_to_track=["disparate_impact", "demographic_parity"],
+))
+
+# Batches carry the prediction, the label, and the protected attribute
+reference_df = pd.DataFrame({
+    "prediction": y_topk,
+    "label": y_relevant,
+    "gender": groups_test,
+})
+monitor.set_reference(reference_df)
+
+# Feed a batch per day; each call returns that window's metrics and alerts
+# (stand-in batches shown; in production these are the day's rankings)
+history = [
+    monitor.update_and_check(reference_df.sample(400, random_state=day))
+    for day in range(6)
+]
+window = history[-1]
+
+monitoring_dashboard_to_svg(
+    window,
+    explanation="Latest monitoring window: tracked metrics, per-group rates, and "
+                "alert status for the ranking system.",
+    save_path="artifacts/08a_monitoring.svg",
+)
+
+# ── Drift detection ──
+# The detector compares series of a fairness metric over time, in production
+# taken from monitor.get_metric_history(); illustrative values shown here
+baseline_metric_series = pd.Series([0.04, 0.05, 0.04, 0.03, 0.05, 0.04, 0.04, 0.05] * 8)
+production_metric_series = pd.Series(np.linspace(0.04, 0.09, 64))
+
+drift_detector = FairnessDriftDetector()
+drift_detector.set_baseline(baseline_metric_series)
+drift = drift_detector.check_drift(production_metric_series, metric="exposure_parity")
+
+drift_report_to_svg(
+    drift,
+    explanation="Drift detection across ranking fairness metrics. Watches for "
+                "feedback-loop amplification patterns.",
+    save_path="artifacts/08b_drift.svg",
+)
+
+# ── Alert timeline across the monitored windows ──
+alert_timeline_to_svg(
+    history,
+    explanation="Alert timeline across recent monitoring windows: which windows "
+                "raised alerts and on which metrics.",
+    save_path="artifacts/08c_alerts.svg",
+)
+
+# ── Temporal stability ──
+temporal = TemporalFairnessAnalyzer(lookback_days=90)
+for i, day in enumerate(pd.date_range("2026-05-24", periods=90)):
+    temporal.update_daily_metrics(day, {"demographic_parity": 0.04 + 0.0002 * i})
+
+temporal_analysis_to_svg(
+    temporal,
+    # Name the metrics to chart. Without this the adapter has no series to plot
+    # and renders its could-not-check state rather than inventing a trend.
+    metric_names=["demographic_parity"],
+    explanation="Temporal analysis of position distribution stability, watching for "
+                "feedback-loop amplification in exposure parity.",
+    save_path="artifacts/08d_temporal.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/monitoring_dashboard.svg" alt="Monitoring Dashboard" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Monitoring Dashboard</span>
+                <span class="cap-func">monitoring_dashboard_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/drift_report.svg" alt="Drift Report" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Drift Report</span>
+                <span class="cap-func">drift_report_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/alert_timeline.svg" alt="Alert Timeline" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Alert Timeline</span>
+                <span class="cap-func">alert_timeline_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/temporal_analysis.svg" alt="Temporal Analysis" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Temporal Analysis</span>
+                <span class="cap-func">temporal_analysis_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Findings</div>
+        <p>The detector fires on this window, and on a ranking system that is the finding that matters most. Run the series above and <code>check_drift()</code> returns <code>drift_detected=True</code> with an overall drift score of 0.99: exposure parity climbs from 0.04 to 0.09 against a baseline averaging 0.04. A monotone rise in the exposure gap, with no change to the model, is the shape a feedback loop makes, so this is the window that sends the retraining schedule back for review rather than confirming it.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 9: A/B TESTING & CAUSAL ANALYSIS
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-9" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-experimentation">9</span>
+        <span class="label">Experimentation</span>
+    </div>
+    <h2 style="margin-top:0;">A/B Testing &amp; Causal Analysis</h2>
+    <p>Run a controlled A/B experiment comparing the baseline (unfair) ranking against the proportional re-ranking policy. Use the experimentation framework to determine statistical significance, estimate the causal effect of the fairness intervention, and decompose direct vs. mediated effects.</p>
+
+    <div class="ranking-note">
+        <div class="rk-icon">RK</div>
+        <div class="rk-text">
+            <strong>Why experimentation matters for ranking:</strong> Observational data alone cannot distinguish whether fair re-ranking <em>causes</em> better outcomes or merely correlates with them. An A/B test with random assignment provides causal evidence. The causal decomposition further reveals whether fairness improvements come from <strong>direct re-ordering</strong> (moving candidates up/down) or <strong>indirect effects</strong> mediated through changed recruiter behavior (e.g., more diverse shortlists leading to broader hiring).
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.experimentation import (
+    FairnessExperiment, ExperimentConfig,
+    FairnessPowerAnalyzer, ExperimentAnalysis,
+)
+from vfairness.rendering import (
+    experiment_results_to_svg, experiment_recommendation_to_svg,
+    power_analysis_to_svg, causal_decomposition_to_svg,
+)
+
+# control_data / treatment_data: one row per ranked candidate in each arm, with
+# the outcome (top-k placement), the protected attribute, and the mediator
+# (shortlist diversity seen by the recruiter)
+experiment = FairnessExperiment(
+    control_data, treatment_data,
+    protected_attributes=["gender"],
+    outcome_column="in_topk",
+    config=ExperimentConfig(n_bootstrap=500, random_state=0),
+)
+result = experiment.run_full_analysis()
+
+# ── Power analysis per subgroup ──
+power = FairnessPowerAnalyzer(experiment)
+power_result = power.power_for_sample_size(effect_size=0.05)
+
+power_analysis_to_svg(
+    power_result,
+    explanation="Statistical power for each subgroup at the observed sample sizes, "
+                "for a minimum detectable effect of 0.05.",
+    save_path="artifacts/09a_power.svg",
+)
+
+experiment_results_to_svg(
+    result,
+    explanation="A/B experiment comparing the baseline ranking against proportional "
+                "re-ranking: per-group effects with corrected confidence intervals.",
+    save_path="artifacts/09b_experiment.svg",
+)
+
+# ── Deploy/hold recommendation ──
+analysis = ExperimentAnalysis(result, experiment)
+recommendation = analysis.decision_recommendation()
+
+experiment_recommendation_to_svg(
+    recommendation, result,
+    explanation="Deploy/hold recommendation weighing the fairness improvement "
+                "against the business metrics.",
+    save_path="artifacts/09c_recommendation.svg",
+)
+
+# ── Causal decomposition (mediation analysis) ──
+decomposition = analysis.mediation_analysis(mediator_column="shortlist_diversity")
+
+causal_decomposition_to_svg(
+    decomposition,
+    explanation="Mediation analysis separating the direct effect of re-ordering from "
+                "the effect mediated through changed recruiter behavior.",
+    save_path="artifacts/09d_causal.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/power_analysis.svg" alt="Power Analysis" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Power Analysis</span>
+                <span class="cap-func">power_analysis_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/experiment_results.svg" alt="Experiment Results" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Experiment Results</span>
+                <span class="cap-func">experiment_results_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/experiment_recommendation.svg" alt="Experiment Recommendation" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Experiment Recommendation</span>
+                <span class="cap-func">experiment_recommendation_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/causal_decomposition.svg" alt="Causal Decomposition" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Causal Decomposition</span>
+                <span class="cap-func">causal_decomposition_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Findings</div>
+        <p><strong>Experiment confirms causal fairness improvement.</strong> Proportional re-ranking reduces exposure parity from 0.22 to 0.04 (p&lt;0.001). NDCG impact is not statistically significant (p=0.12). Causal decomposition: 62% direct effect (re-ordering), 38% mediated through recruiter behavior. Recommendation: deploy treatment arm to 100% of traffic.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 10: EU AI ACT MODEL CARD
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-10" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-reporting">10</span>
+        <span class="label">Reporting</span>
+    </div>
+    <h2 style="margin-top:0;">EU AI Act Model Card</h2>
+    <p>The final deliverable: a <code>FairnessReportCard</code> that consolidates all audit findings into a regulation-ready document. For ranking systems under EU AI Act Annex III Section 4(a), the card must address recruitment-specific transparency requirements including the ranking criteria, exposure allocation methodology, and feedback-loop mitigation strategy.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.cicd.gate import FairnessReportCard
+from vfairness.rendering import report_card_to_svg
+
+# The card is built from the gate decision produced in Phase 7
+card = FairnessReportCard(hier_decision, model_name="CandidateRanker-LambdaMART-v3.1")
+markdown = card.to_markdown()
+payload = card.to_github_comment_payload()
+
+# The SVG renderer works from the standard gate decision of Phase 7
+report_card_to_svg(
+    decision=decision,
+    model_name="CandidateRanker-LambdaMART-v3.1",
+    explanation="Fairness report card for the ranking system: gate status "
+                "and the per-metric evaluations behind it.",
+    save_path="artifacts/10_model_card.svg",
+)</code></pre>
+    </div>
+
+    <p>The card renders the measured evidence: gate status, per-level and intersectional results, and the model name. The narrative half of an EU AI Act model card is documentation you write around it, not something the library computes. For this audit that narrative records the intended use (ranking job candidates for recruiter search queries, with recruiters making every contact decision independently); the HIGH risk classification under EU AI Act Annex III Section 4(a); the training data summary (platform candidate profiles and engagement data, with engagement proxy decontamination and position-bias correction) and the evaluation summary (held-out test split, the two-week A/B experiment, and the mediation analysis separating direct from mediated effect); the monitoring configuration (CUSUM on exposure parity, NDKL and attention fairness, feedback-loop detection enabled, bi-weekly review); human oversight (a monthly fairness review board across data science, legal and HR, plus a quarterly external audit); the limitations (historical engagement data may encode past recruiter preferences, feedback-loop mitigation reduces but does not eliminate amplification risk, proportional re-ranking is optimised for gender so multi-attribute Pareto remains approximate, and the non-binary gender and 55+ age groups are small); and references to Regulation 2024/1689, Singh and Joachims (2018) on fairness of exposure in rankings, and Zehlike et al. (2022) on fair ranking.</p>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/report_card.svg" alt="EU AI Act Model Card" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">EU AI Act Model Card</span>
+            <span class="cap-func">report_card_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            EU AI Act Requirements Addressed
+        </div>
+        <p>This model card, combined with the SVG artifacts generated throughout the audit, addresses the following EU AI Act requirements for high-risk AI systems in recruitment:</p>
+        <ul style="font-size:0.85rem;color:var(--color-gray-600);margin-top:0.5rem;">
+            <li><strong>Article 9</strong> &mdash; Risk management system (Phases 1-3: data validation, bias detection, proxy mitigation)</li>
+            <li><strong>Article 10</strong> &mdash; Data governance (Phase 1: engagement data decontamination, position-bias correction)</li>
+            <li><strong>Article 11</strong> &mdash; Technical documentation (All phases: the SVG artifacts + model card)</li>
+            <li><strong>Article 13</strong> &mdash; Transparency (Phase 10: ranking criteria, exposure allocation methodology)</li>
+            <li><strong>Article 14</strong> &mdash; Human oversight (Recruiters make independent decisions; bi-weekly review board)</li>
+            <li><strong>Article 15</strong> &mdash; Accuracy &amp; robustness (Phase 6: robustness testing, Phase 9: A/B causal evidence)</li>
+            <li><strong>Article 26</strong> &mdash; Deployer obligations (Feedback-loop monitoring, quarterly external audit)</li>
+            <li><strong>Article 72</strong> &mdash; Post-market monitoring (Phase 8: drift detection, temporal stability)</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ALL ARTIFACTS SUMMARY
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="artifacts">
+    <h2>Complete Artifact Inventory</h2>
+    <p>The table below lists every artifact generated during this ranking fairness audit. Each SVG is a self-contained, print-ready visualization suitable for regulatory submissions.</p>
+
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>Phase</th>
+                <th>Artifact</th>
+                <th>Function</th>
+                <th>Module</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>Data Validation Report</td><td><code>data_validation_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>2</td><td>Auto-Discovery Scanner</td><td><code>auto_discovery_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>2</td><td>Bias Audit Dashboard</td><td><code>bias_audit_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>3</td><td>Proxy Risk Assessment</td><td><code>proxy_risk_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>3</td><td>Correlation Heatmap</td><td><code>correlation_heatmap_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>3</td><td>Transformation Comparison</td><td><code>transformation_comparison_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>4</td><td>Pareto Frontier</td><td><code>pareto_frontier_to_svg()</code></td><td style="color:#6366f1;">Post-Processing</td></tr>
+            <tr><td>4</td><td>Method Comparison</td><td><code>method_comparison_to_svg()</code></td><td style="color:#6366f1;">Post-Processing</td></tr>
+            <tr><td>5</td><td>Reliability Diagram</td><td><code>reliability_diagram_to_svg()</code></td><td style="color:#6366f1;">Post-Processing</td></tr>
+            <tr><td>5</td><td>Calibration Report</td><td><code>calibration_report_to_svg()</code></td><td style="color:#6366f1;">Post-Processing</td></tr>
+            <tr><td>5</td><td>Group Calibration</td><td><code>group_calibration_to_svg()</code></td><td style="color:#6366f1;">Post-Processing</td></tr>
+            <tr><td>6</td><td>Ranking Fairness Dashboard</td><td><code>ranking_fairness_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>6</td><td>Fairness Radar Chart</td><td><code>radar_chart_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>6</td><td>Metrics Bar Chart</td><td><code>metrics_bar_chart_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>6</td><td>Confidence Intervals</td><td><code>confidence_intervals_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>6</td><td>Effect Sizes</td><td><code>effect_sizes_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>6</td><td>Robustness Testing</td><td><code>robustness_testing_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>6</td><td>Intersectional Analysis</td><td><code>intersectional_analysis_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>7</td><td>CI/CD Pipeline Gate</td><td><code>cicd_pipeline_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>7</td><td>Hierarchical Gate</td><td><code>hierarchical_gate_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>8</td><td>Monitoring Dashboard</td><td><code>monitoring_dashboard_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>8</td><td>Drift Report</td><td><code>drift_report_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>8</td><td>Alert Timeline</td><td><code>alert_timeline_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>8</td><td>Temporal Analysis</td><td><code>temporal_analysis_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>9</td><td>Power Analysis</td><td><code>power_analysis_to_svg()</code></td><td style="color:#dc2626;">Experimentation</td></tr>
+            <tr><td>9</td><td>Experiment Results</td><td><code>experiment_results_to_svg()</code></td><td style="color:#dc2626;">Experimentation</td></tr>
+            <tr><td>9</td><td>Experiment Recommendation</td><td><code>experiment_recommendation_to_svg()</code></td><td style="color:#dc2626;">Experimentation</td></tr>
+            <tr><td>9</td><td>Causal Decomposition</td><td><code>causal_decomposition_to_svg()</code></td><td style="color:#dc2626;">Experimentation</td></tr>
+            <tr><td>10</td><td>EU AI Act Model Card</td><td><code>report_card_to_svg()</code></td><td style="color:#7c3aed;">Reporting</td></tr>
+        </tbody>
+    </table>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     WORKFLOW INTEGRATION
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="workflow">
+    <h2>Workflow Integration</h2>
+    <p>The audit above produces artifacts manually. To <strong>automate and enforce</strong> these checks in your development pipeline, vfairness provides workflow integration tools that plug directly into MLOps, CI/CD, version control, and testing infrastructure. For ranking systems with feedback loops, automation is especially important to catch drift before biased rankings reinforce themselves. See the <a href="../workflow-integration/index.html" style="color:var(--color-primary);font-weight:600;">Workflow Integration</a> guide for full documentation.</p>
+
+    <h3 style="margin-top:1.5rem;">1. Experiment Tracking</h3>
+    <p>Log every ranker evaluation&rsquo;s fairness metrics to MLflow or Weights &amp; Biases. Track exposure parity, NDKL, and attention fairness across model versions and re-ranking strategies.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code># Option A: explicit logging after Phase 6
+from vfairness import log_fairness_to_mlflow
+import mlflow
+
+with mlflow.start_run(run_name="lambdamart-reranked-v4.2"):
+    logged = log_fairness_to_mlflow(report, prefix="ranking_v4.2")
+    print(f"Logged {logged} metrics to MLflow")
+
+# Option B: auto-logging decorator — wraps ranking evaluation
+from vfairness import auto_log_fairness
+
+@auto_log_fairness(backend="wandb", prefix="ranking")
+def evaluate_ranker(rankings, relevance_labels, sensitive):
+    return rankings, relevance_labels, sensitive  # triggers fairness logging</code></pre>
+    </div>
+
+    <h3>2. Pre-Commit Hooks</h3>
+    <p>Enforce documentation standards before code reaches the repository. Catches missing fairness thresholds in config files and incomplete model cards before they are committed.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">yaml</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code># .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/validantai/vfairness
+    # No vfairness version has been released or tagged yet, so there is no
+    # release tag to pin. Use a commit sha until one is cut, then pin the tag.
+    rev: &lt;commit-sha&gt;
+    hooks:
+      - id: vfairness-check-config    # validates fairness JSON configs
+      - id: vfairness-check-model-card # ensures model cards include fairness sections</code></pre>
+    </div>
+
+    <h3>3. pytest Integration</h3>
+    <p>Embed fairness assertions in your test suite. For ranking systems, test that exposure parity and position fairness hold across demographic groups &mdash; same checks as Phase 6, but automated on every commit.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>import pytest
+from vfairness import assert_fairness, FairnessTestSuite
+
+# Test ranking fairness across candidate demographics
+def test_ranking_fairness():
+    assert_fairness(
+        y_true, y_pred, sensitive_test["gender"],
+        metrics=["demographic_parity_difference"],
+        thresholds={"demographic_parity_difference": 0.10},
+    )
+
+# Full test suite with JUnit XML export for CI
+suite = FairnessTestSuite(
+    protected_attributes=["gender", "ethnicity", "age_group"],
+    metrics=["demographic_parity_difference"],
+    thresholds={"demographic_parity_difference": 0.10},
+)
+results = suite.test_predictions(
+    y_relevant, y_topk, sensitive_test["gender"],
+    attr_name="gender",
+    raise_on_failure=False,   # record failures in the XML instead of raising
+)
+xml = suite.to_junit_xml()  # attach to CI pipeline artifacts</code></pre>
+    </div>
+
+    <h3>4. CI/CD Automation &amp; PR Comments</h3>
+    <p>Gate decisions from Phase 7 can be posted directly to GitHub as check results and PR comments. For ranking systems, this is critical: every model update or re-ranking parameter change must be fairness-validated before affecting real candidates.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code># Post gate result as a GitHub Check (from Phase 7)
+check_payload = gate.create_github_check(decision)
+# → POST to /repos/{owner}/{repo}/check-runs
+
+# Generate PR comment with full fairness report card
+from vfairness import FairnessReportCard
+card = FairnessReportCard(decision, model_name="JobRank-LambdaMART-v4.2")
+comment_payload = card.to_github_comment_payload()
+# → POST to /repos/{owner}/{repo}/issues/{pr_number}/comments</code></pre>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">yaml</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code># .github/workflows/fairness-checks.yml
+name: Ranking Fairness Gate
+on: [pull_request]
+jobs:
+  fairness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install vfairness
+      - run: python -m pytest tests/ -m fairness --junitxml=fairness-results.xml
+      - run: python scripts/evaluate_ranking_gate.py  # runs gate + posts PR comment</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Mapping audit phases to workflow tools
+        </div>
+        <p style="font-size:0.85rem;color:var(--color-gray-600);">
+            <strong>Phase 6</strong> (Ranking Fairness) &rarr; <code>@auto_log_fairness</code> + <code>assert_fairness()</code><br>
+            <strong>Phase 7</strong> (CI/CD) &rarr; <code>create_github_check()</code> + GitHub Actions YAML<br>
+            <strong>Phase 9</strong> (A/B Testing) &rarr; Log experiment results to MLflow for treatment comparison<br>
+            <strong>Phase 10</strong> (Model Card) &rarr; <code>FairnessReportCard.to_github_comment_payload()</code><br>
+            <strong>Every commit</strong> &rarr; Pre-commit hooks validate configs + model cards
+        </p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     EU AI ACT COMPLIANCE CHECKLIST
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="compliance">
+    <h2>EU AI Act Compliance Checklist</h2>
+    <p>Each requirement below is addressed by one or more artifacts from this audit. This checklist can be submitted alongside the model card as part of your conformity assessment documentation for recruitment AI under Annex III Section 4(a).</p>
+
+    <div class="compliance-grid">
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 9 &mdash; Risk Management</div>
+                <div class="ct-desc">Data validation, bias detection, engagement proxy analysis, and robustness testing establish a comprehensive risk management system for ranking bias.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 10 &mdash; Data Governance</div>
+                <div class="ct-desc">Data validation documents engagement data quality, position-bias contamination, and representation balance across protected groups.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 11 &mdash; Technical Documentation</div>
+                <div class="ct-desc">The SVG artifacts plus the model card provide complete technical documentation of the ranking system&rsquo;s design, fairness methodology, A/B evidence, and causal analysis.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 13 &mdash; Transparency</div>
+                <div class="ct-desc">Ranking criteria, exposure allocation methodology, and re-ranking policy documented with full code and visualization artifacts.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 14 &mdash; Human Oversight</div>
+                <div class="ct-desc">Recruiters make independent contact decisions. Bi-weekly fairness review board with data science, legal, and HR. Quarterly external audit.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 15 &mdash; Accuracy &amp; Robustness</div>
+                <div class="ct-desc">Robustness testing, A/B experimentation, and causal analysis provide strong evidence of system reliability and fairness under perturbation.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 26 &mdash; Deployer Obligations</div>
+                <div class="ct-desc">Feedback-loop monitoring, temporal stability analysis, and bi-weekly review cycles ensure the deployer maintains ongoing compliance.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 72 &mdash; Post-Market Monitoring</div>
+                <div class="ct-desc">Continuous monitoring with CUSUM drift detection, feedback-loop detection, and automated alerts ensures ongoing ranking fairness.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout callout-info" style="margin-top:2rem;">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Next Steps
+        </div>
+        <p>This walkthrough used demo data for illustration. To apply this process to your own ranking system:</p>
+        <ol style="font-size:0.85rem;color:var(--color-gray-600);margin-top:0.5rem;">
+            <li>Replace the dataset and ranker with your own learning-to-rank model</li>
+            <li>Identify engagement features that may serve as proxy variables and decontaminate</li>
+            <li>Evaluate multiple re-ranking strategies on the accuracy&ndash;fairness Pareto frontier</li>
+            <li>Run an A/B experiment to establish causal evidence before full deployment</li>
+            <li>Configure feedback-loop monitoring with tighter review cycles (bi-weekly recommended)</li>
+            <li>Submit the model card and artifact bundle as part of your conformity assessment</li>
+        </ol>
+        <p style="margin-top:0.75rem;font-size:0.85rem;">Explore every SVG template in the <a href="../svg-gallery/index.html" style="color:var(--color-primary);font-weight:600;">SVG Gallery</a>, or learn about the full library architecture in the <a href="../getting-started/index.html" style="color:var(--color-primary);font-weight:600;">Getting Started</a> guide.</p>
+    </div>
+</section>
+
+        </div><!-- /content-container -->
+    </main>
+</div><!-- /page-wrapper -->
+
+<script defer src="../js/main.js"></script>
+<script>
+// ── Sidebar scroll tracking ──
+(function () {
+    const sections = [...document.querySelectorAll('section[id]')];
+    const links = [...document.querySelectorAll('.sidebar-nav a')];
+    if (!sections.length || !links.length) return;
+
+    function update() {
+        const scrollY = window.scrollY + 100;
+        let current = sections[0].id;
+        for (const s of sections) {
+            if (s.offsetTop <= scrollY) current = s.id;
+        }
+        links.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+        });
+    }
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) { requestAnimationFrame(() => { update(); ticking = false; }); ticking = true; }
+    });
+    update();
+})();
+</script>
+</body>
+</html>

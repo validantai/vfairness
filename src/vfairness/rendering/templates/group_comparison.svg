@@ -1,0 +1,142 @@
+{# ── Fairness Metrics · Group Comparison Bar Chart ── #}
+{# ── vfairness G1 Design System ── #}
+
+{# ── Height computation ── #}
+{% set badge_h = 36 %}
+{% set bar_h = min(38, (260 / max(1, bars|length))|int) %}
+{% set bar_gap = 8 %}
+{% set chart_h = 30 + bars|length * (bar_h + bar_gap) + 30 %}
+{% set finding_h = 56 %}
+{% set content_h = badge_h + 16 + chart_h + 16 + finding_h %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% endif %}
+{% set exp_y = 140 + content_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 {{ total_h }}" font-family="'Inter','Segoe UI',system-ui,sans-serif">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ── Disparity badge ── #}
+{% set badge_y = 140 %}
+{% if max_disparity is not none %}
+<rect x="36" y="{{ badge_y }}" width="220" height="{{ badge_h }}" rx="10" fill="{{ disparity_bg }}"/>
+<text x="56" y="{{ badge_y + 22 }}" font-size="11" font-weight="700" fill="{{ disparity_color }}">{{ disparity_icon }} {{ disparity_label }} disparity: {{ max_disparity|f3 }}</text>
+{% else %}
+<rect x="36" y="{{ badge_y }}" width="160" height="{{ badge_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ badge_y + 22 }}" font-size="11" font-weight="700" fill="#64748b">{{ metric_label }}</text>
+{% endif %}
+
+{# The gap is banded over the groups that reported a rate. That keeps a partly
+   measured run useful, but it must never be read as an all-clear over the whole
+   attribute, so the number of groups NOT in the gap sits beside the badge, on
+   the canvas, and not only in the subtitle or the <desc>. #}
+{% if n_ungraded_groups %}
+<text x="{{ 272 if max_disparity is not none else 212 }}" y="{{ badge_y + 22 }}" font-size="10" font-weight="600" fill="#64748b">· {{ n_ungraded_groups }} group{{ 's' if n_ungraded_groups != 1 else '' }} not measured, not in this gap</text>
+{% endif %}
+
+{# ── Horizontal bar chart ── #}
+{% set chart_y = badge_y + badge_h + 16 %}
+{% set bar_x = 160 %}
+{% set bar_area_w = 400 %}
+
+{# Table header #}
+<text x="36" y="{{ chart_y + 10 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.8">GROUP</text>
+<text x="{{ bar_x }}" y="{{ chart_y + 10 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.8">{{ metric_label|upper|truncate_text(30) }}</text>
+<line x1="36" y1="{{ chart_y + 16 }}" x2="680" y2="{{ chart_y + 16 }}" stroke="#cbd5e1" stroke-width="0.5"/>
+
+{% for bar in bars %}
+{% set by = chart_y + 22 + loop.index0 * (bar_h + bar_gap) %}
+
+{# Row separator #}
+{% if not loop.first %}
+<line x1="36" y1="{{ by - bar_gap // 2 }}" x2="680" y2="{{ by - bar_gap // 2 }}" stroke="#cbd5e1" stroke-width="0.25"/>
+{% endif %}
+
+{# Group label #}
+<text x="150" y="{{ by + bar_h // 2 + 4 }}" text-anchor="end" font-size="10" font-weight="500" fill="#0f172a">{{ bar.group|truncate_text(20) }}</text>
+
+{# Bar background #}
+<rect x="{{ bar_x }}" y="{{ by }}" width="{{ bar_area_w }}" height="{{ bar_h }}" rx="4" fill="#f8f9fb" stroke="#cbd5e1" stroke-width="0.25"/>
+
+{# Value bar #}
+{# A row that reported no rate gets no bar and no number. The minimum bar width
+   is 4px, so the old numeric default drew a visible stub labelled "0%" for a
+   group nobody measured, and on a selection-rate chart that reads as a group
+   the model never selects. The third state is drawn as words, in slate, with
+   nothing on the axis. #}
+{% if bar.rate is not none %}
+{# Finite guard BEFORE |int: Infinity|int raises OverflowError. Clamping the
+   raw rate into [0, 1] first maps +inf -> full bar, -inf/NaN -> empty bar. #}
+{% set bw = min(bar_area_w, max(4, (min(1.0, max(0.0, bar.rate)) * bar_area_w)|int)) %}
+<rect x="{{ bar_x }}" y="{{ by }}" width="{{ bw }}" height="{{ bar_h }}" rx="4" fill="{{ bar.color }}" opacity="0.75"/>
+
+{# Value label #}
+<text x="{{ bar_x + bw + 8 }}" y="{{ by + bar_h // 2 + 1 }}" font-size="13" font-weight="700" fill="{{ bar.color }}">{{ bar.display_value }}</text>
+{% else %}
+{% set bw = 0 %}
+<text x="{{ bar_x + 8 }}" y="{{ by + bar_h // 2 + 1 }}" font-size="11" font-weight="600" fill="#64748b">· not measured</text>
+{% endif %}
+
+{# Sample size #}
+{# "n=0" is a measured count, and a row with no size key reported none. #}
+{% if bar.n is not none %}
+<text x="{{ bar_x + bw + 8 }}" y="{{ by + bar_h // 2 + 13 }}" font-size="8" fill="#94a3b8">n={{ bar.n }}</text>
+{% else %}
+<text x="{{ bar_x + 8 }}" y="{{ by + bar_h // 2 + 13 }}" font-size="8" fill="#94a3b8">n not reported</text>
+{% endif %}
+{% endfor %}
+
+{# Overall average line #}
+{% if overall_rate is not none %}
+{# Same finite guard as the value bars: clamp before |int so Infinity cannot overflow #}
+{% set avg_x = bar_x + min(bar_area_w, max(0, (min(1.0, max(0.0, overall_rate)) * bar_area_w)|int)) %}
+<line x1="{{ avg_x }}" y1="{{ chart_y + 16 }}" x2="{{ avg_x }}" y2="{{ chart_y + 22 + bars|length * (bar_h + bar_gap) }}" stroke="#0f172a" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="{{ avg_x }}" y="{{ chart_y + 22 + bars|length * (bar_h + bar_gap) + 14 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#0f172a">Avg: {{ overall_display }}</text>
+{% endif %}
+
+{# ── Disparity finding panel ── #}
+{% set finding_y = chart_y + chart_h + 16 %}
+{% if max_disparity is not none %}
+<rect x="36" y="{{ finding_y }}" width="644" height="{{ finding_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ finding_y + 22 }}" font-size="10" fill="#64748b">Max disparity</text>
+<text x="56" y="{{ finding_y + 42 }}" font-size="13" font-weight="700" fill="{{ disparity_color }}">{{ max_disparity|f3 }}</text>
+{% set n_rate_rows = bars|rejectattr('rate', 'none')|list|length %}
+<text x="150" y="{{ finding_y + 42 }}" font-size="10" fill="#6b7280">between {{ best_group }} and {{ worst_group }}{% if n_ungraded_groups %}, over the {{ n_rate_rows }} group{{ 's' if n_rate_rows != 1 else '' }} that reported a rate{% endif %}</text>
+<rect x="500" y="{{ finding_y + 16 }}" width="160" height="26" rx="13" fill="{{ disparity_bg }}"/>
+<text x="580" y="{{ finding_y + 34 }}" text-anchor="middle" font-size="10" font-weight="700" fill="{{ disparity_color }}">{{ disparity_icon }} {{ disparity_label }}</text>
+{% endif %}
+
+{# ── Explanation panel ── #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+
+</svg>

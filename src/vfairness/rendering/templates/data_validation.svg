@@ -1,0 +1,157 @@
+{# ── Data Validation Report SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set banner_h = 56 %}
+{% set issue_header_h = 34 %}
+{% set issue_row_h = 44 %}
+{% set issue_h = issue_header_h + issues|length * issue_row_h + 10 %}
+{# A could-not-check table still needs room for the sentence that says so. The #}
+{# ASSESSED empty table is left exactly as it rendered before: a report that   #}
+{# ran its checks and raised nothing is a real result, and it is not the case  #}
+{# this branch exists for. #}
+{% if not issues and not_assessable %}{% set issue_h = issue_header_h + 34 %}{% endif %}
+{% set metric_h = 80 %}
+{% set rec_h = 34 + recommendations|length * 18 + 10 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}
+{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 40 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{% set banner_y = header_h %}
+{% set issue_y = banner_y + banner_h + 16 %}
+{% set metric_y = issue_y + issue_h + 16 %}
+{% set rec_y = metric_y + metric_h + 16 %}
+{% set exp_y = rec_y + rec_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── EXAMPLE band ── #}
+{# The demo fixture is reachable only through example=True, and when it is used #}
+{# the canvas has to say so where a reader looks, not only in the <desc>. An    #}
+{# unlabelled demo is indistinguishable from a real data-quality finding once   #}
+{# the file is exported. DO NOT REMOVE: the band and the watermark are the only #}
+{# things separating a sample from an audit artifact. #}
+{% if is_example %}
+<rect x="0" y="54" width="680" height="20" fill="#fef3c7"/>
+<text x="340" y="68" text-anchor="middle" font-size="9.5" font-weight="700" fill="#92400e" letter-spacing="0.8">EXAMPLE ONLY: SYNTHETIC DEMONSTRATION DATA, NOT A REAL EVALUATION</text>
+{% endif %}
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ summary }}</text>
+
+{# ── Pass/Fail Banner ── #}
+{# Three states, never two. A report handed no validation result must not print #}
+{# a verdict, and it must not print a tally either: "0 critical, 0 warn, 0      #}
+{# info" is the SAME line a clean dataset prints, and nothing here was counted. #}
+{# The word NOT CHECKED needs the smaller size to stay inside the 160-wide box. #}
+{% set _verdict_size = 13 if not_assessable else 22 %}
+<rect x="520" y="68" width="160" height="56" rx="10" fill="#ffffff"/>
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="{{ pass_color }}"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">VALIDATION</text>
+<text x="536" y="108" font-size="{{ _verdict_size }}" font-weight="700" fill="{{ pass_color }}">{{ pass_label }}</text>
+{% if not_assessable %}
+<text x="536" y="120" font-size="9" fill="#94a3b8">no issue was counted</text>
+{% else %}
+<text x="536" y="120" font-size="9" fill="#94a3b8">{{ n_critical }} critical · {{ n_warning }} warn · {{ n_info }} info</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Issues Table                                                     #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ issue_y }}" width="644" height="{{ issue_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ issue_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">SEV</text>
+<text x="100" y="{{ issue_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">TYPE</text>
+<text x="230" y="{{ issue_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">MESSAGE</text>
+<text x="560" y="{{ issue_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">AFFECTED</text>
+<line x1="56" y1="{{ issue_y + 30 }}" x2="660" y2="{{ issue_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for iss in issues %}
+{% set ry = issue_y + issue_header_h + loop.index0 * issue_row_h %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ issue_row_h }}" fill="{{ iss.bg }}" opacity="0.25"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ issue_row_h }}" fill="{{ iss.color }}"/>
+
+{# Severity badge #}
+<rect x="52" y="{{ ry + 8 }}" width="36" height="18" rx="9" fill="{{ iss.bg }}"/>
+<text x="70" y="{{ ry + 20 }}" text-anchor="middle" font-size="8" font-weight="700" fill="{{ iss.color }}">{{ iss.icon }}</text>
+
+<text x="100" y="{{ ry + 18 }}" font-size="9.5" font-weight="600" fill="#0f172a">{{ iss.type }}</text>
+<text x="100" y="{{ ry + 32 }}" font-size="8" fill="#94a3b8">{{ iss.severity }}</text>
+<text x="230" y="{{ ry + 22 }}" font-size="9" fill="#475569">{{ iss.message }}</text>
+<text x="560" y="{{ ry + 22 }}" font-size="9" fill="#64748b">{{ iss.affected }}</text>
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + issue_row_h }}" x2="660" y2="{{ ry + issue_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# An empty grid is silent, and silence beside a banner is read as agreement. #}
+{# "No check ran" and "the checks raised nothing" are two different results,  #}
+{# and only the first one is a claim this page must refuse to make silently.  #}
+{% if not issues and not_assessable %}
+<text x="56" y="{{ issue_y + issue_header_h + 16 }}" font-size="10" fill="#64748b">Nothing was validated on this run, so no issue here was raised and none was ruled out.</text>
+{% endif %}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Data Quality Metrics                                             #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ metric_y }}" width="644" height="{{ metric_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ metric_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Data Quality Metrics</text>
+{% for mc in metric_cards %}
+{% set mx = 56 + (loop.index0 % 3) * 210 %}
+{% set my = metric_y + 34 + (loop.index0 // 3) * 36 %}
+<text x="{{ mx }}" y="{{ my }}" font-size="8" fill="#94a3b8" letter-spacing="0.3">{{ mc.label|upper }}</text>
+<text x="{{ mx }}" y="{{ my + 16 }}" font-size="12" font-weight="700" fill="#0f172a">{{ mc.value }}</text>
+{% endfor %}
+
+{# The figures a reader takes away from this page. When nothing was validated #}
+{# there are none, and the empty panel has to say that rather than look like a #}
+{# report whose metrics happened not to be interesting. #}
+{% if not metric_cards and not_assessable %}
+<text x="56" y="{{ metric_y + 46 }}" font-size="10" fill="#64748b">No data-quality figure was measured on this run.</text>
+{% endif %}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Recommendations                                                  #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ rec_y }}" width="644" height="{{ rec_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Recommendations</text>
+{% for r in recommendations %}
+<text x="56" y="{{ rec_y + 42 + loop.index0 * 18 }}" font-size="9.5" fill="#6b7280">{{ loop.index }}. {{ r }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── EXAMPLE watermark, painted last so it survives every panel above it ── #}
+{# Repeated down a tall canvas so a crop or a screenshot of one section cannot #}
+{# lose the only mark that separates a sample from a finding. #}
+{% if is_example %}
+{% for _p in ([22, 50, 78] if total_h > 1100 else [50]) %}
+{% set _wy = (total_h * _p / 100)|int %}
+<text x="340" y="{{ _wy }}" text-anchor="middle" font-size="76" font-weight="800" fill="#92400e" opacity="0.12" letter-spacing="6" transform="rotate(-24 340 {{ _wy }})">EXAMPLE</text>
+{% endfor %}
+{% endif %}
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

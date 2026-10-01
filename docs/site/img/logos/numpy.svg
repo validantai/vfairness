@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105 40" height="40">
+  <g transform="translate(4,4)">
+    <path d="M16 2L30 10L30 26L16 34L2 26L2 10Z" fill="none" stroke="#4DABCF" stroke-width="2"/>
+    <path d="M2 10L16 18L30 10" fill="none" stroke="#4DABCF" stroke-width="2"/>
+    <path d="M16 18L16 34" fill="none" stroke="#4DABCF" stroke-width="2"/>
+    <path d="M9 6L23 14" fill="none" stroke="#4DABCF" stroke-width="1.5" opacity="0.5"/>
+  </g>
+  <text x="40" y="26" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="600" fill="#4DABCF">NumPy</text>
+</svg>

@@ -1,0 +1,14 @@
+{
+  "coverage_pct": 81,
+  "kind": "line and branch combined",
+  "statements": 41685,
+  "branches": 15058,
+  "uncovered_statements": 6955,
+  "uncovered_branches": 2036,
+  "ci_floor_pct": 55,
+  "diff_floor_pct": 80,
+  "as_of": "2026-09-11",
+  "commit": "8559dda",
+  "source": "https://github.com/validantai/vfairness/actions/runs/34574015532",
+  "note": "Measured by CI with pytest --cov across the full dependency matrix on three interpreters. It is not recomputed on every docs build, so it is published AS OF the date above rather than as a live figure. The fix for a stale number is a date, not a silent refresh."
+}

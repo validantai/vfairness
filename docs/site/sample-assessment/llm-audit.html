@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a3a4f">
+    <meta name="description" content="End-to-end fairness audit for foundation model (LLM) deployments where training data is not available. Output-level evaluation, prompt fairness testing, and EU AI Act GPAI compliance using vfairness.">
+    <meta name="keywords" content="LLM fairness, foundation model audit, EU AI Act, GPAI, prompt fairness, bias testing, vfairness, algorithmic audit">
+    <meta name="author" content="validant.ai">
+    <meta name="version" content="0.1.0">
+
+    <title>LLM Audit &mdash; Foundation Model Fairness Assessment | vfairness</title>
+
+    <link rel="icon" type="image/svg+xml" href="../img/favicon-v2.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script>/* theme before first paint: vf-theme = light | dark | system */(function(){var m='system';try{m=localStorage.getItem('vf-theme')||'system'}catch(e){}var d=m==='dark'||(m==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;r.setAttribute('data-theme',d?'dark':'light');r.setAttribute('data-theme-mode',m)})()</script>
+
+    <style>
+        /* ── Phase timeline ── */
+        .phase-timeline {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            overflow-x: auto;
+            padding: 0.5rem 0 1.5rem;
+            margin: 0 -0.5rem;
+        }
+        .phase-step {
+            flex: 1;
+            min-width: 90px;
+            text-align: center;
+            position: relative;
+            padding: 0.6rem 0.3rem;
+        }
+        .phase-step::after {
+            content: '';
+            position: absolute;
+            top: 22px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: var(--color-gray-200);
+            z-index: 0;
+        }
+        .phase-step:last-child::after { display: none; }
+        .phase-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+        .phase-label {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: var(--color-gray-500);
+            margin-top: 0.35rem;
+            line-height: 1.2;
+        }
+        .phase-step.active .phase-label { color: var(--color-gray-900); font-weight: 600; }
+
+        /* ── Artifact card ── */
+        .artifact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .artifact-card {
+            background: #fff;
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: all var(--transition-base);
+        }
+        .artifact-card:hover {
+            border-color: var(--color-gray-300);
+            box-shadow: var(--shadow-md);
+        }
+        .artifact-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-bottom: 1px solid var(--color-gray-100);
+        }
+        .artifact-card .artifact-info {
+            padding: 0.75rem 1rem;
+        }
+        .artifact-card .artifact-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--color-gray-900);
+        }
+        .artifact-card .artifact-func {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--color-gray-400);
+            margin-top: 0.2rem;
+        }
+
+        /* ── Phase section ── */
+        .phase-section {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--color-gray-200);
+        }
+        .phase-section:first-of-type { border-top: none; margin-top: 2rem; }
+
+        .phase-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .phase-badge .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .phase-badge .label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--color-gray-400);
+        }
+
+        /* ── Findings callout ── */
+        .finding-box {
+            background: var(--color-gray-50);
+            border-left: 3px solid;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            padding: 1rem 1.25rem;
+            margin: 1.25rem 0;
+        }
+        .finding-box.pass { border-color: #059669; }
+        .finding-box.warn { border-color: #f59e0b; }
+        .finding-box.fail { border-color: #dc2626; }
+        .finding-box .finding-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+        .finding-box.pass .finding-title { color: #059669; }
+        .finding-box.warn .finding-title { color: #b45309; }
+        .finding-box.fail .finding-title { color: #dc2626; }
+        .finding-box p { font-size: 0.85rem; color: var(--color-gray-600); margin: 0; }
+
+        /* ── SVG preview ── */
+        .svg-preview {
+            margin: 1.5rem 0;
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: #f8f9fb;
+        }
+        .svg-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .svg-preview-caption {
+            padding: 0.5rem 1rem;
+            background: #fff;
+            border-top: 1px solid var(--color-gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .svg-preview-caption .cap-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--color-gray-700);
+        }
+        .svg-preview-caption .cap-func {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--color-gray-400);
+        }
+
+        /* ── EU AI Act checklist ── */
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .compliance-item {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 1rem;
+            background: #fff;
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-lg);
+        }
+        .compliance-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #ecfdf5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .compliance-check svg { color: #059669; }
+        .compliance-text .ct-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--color-gray-800);
+        }
+        .compliance-text .ct-desc {
+            font-size: 0.78rem;
+            color: var(--color-gray-500);
+            margin-top: 0.15rem;
+            line-height: 1.4;
+        }
+
+        /* ── Scenario card ── */
+        .scenario-card {
+            background: linear-gradient(135deg, #fef3c7, #fdf2f8);
+            border: 1px solid #fbbf24;
+            border-radius: var(--radius-xl);
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+        }
+        .scenario-card h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: #92400e;
+        }
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .scenario-stat {
+            text-align: center;
+        }
+        .scenario-stat .val {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #92400e;
+        }
+        .scenario-stat .lbl {
+            font-size: 0.75rem;
+            color: var(--color-gray-500);
+            margin-top: 0.15rem;
+        }
+
+        /* ── Module colors ── */
+        .mod-preprocessing { background: #f59e0b; }
+        .mod-training { background: #0aafe3; }
+        .mod-postprocessing { background: #6366f1; }
+        .mod-evaluation { background: #2c5f7c; }
+        .mod-operations { background: #059669; }
+        .mod-reporting { background: #7c3aed; }
+        .mod-experimentation { background: #dc2626; }
+        .mod-workflow { background: #475569; }
+
+        /* ── Summary table ── */
+        .summary-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+        }
+        .summary-table th {
+            background: var(--color-gray-50);
+            padding: 0.6rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--color-gray-600);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--color-gray-200);
+        }
+        .summary-table td {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid var(--color-gray-100);
+            color: var(--color-gray-700);
+        }
+        .summary-table code {
+            font-size: 0.78rem;
+            background: var(--color-gray-100);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        /* ── Wide SVG side-by-side ── */
+        .svg-duo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        @media (max-width: 768px) {
+            .svg-duo { grid-template-columns: 1fr; }
+            .phase-timeline { overflow-x: auto; }
+        }
+
+        /* ── LLM-specific: black-box callout ── */
+        .blackbox-note {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 1rem 1.25rem;
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: var(--radius-lg);
+            margin: 1.25rem 0;
+        }
+        .blackbox-note .bb-icon {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            background: #f59e0b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+        .blackbox-note .bb-text {
+            font-size: 0.85rem;
+            color: #78350f;
+            line-height: 1.5;
+        }
+        .blackbox-note .bb-text strong { color: #92400e; }
+    </style>
+    <script src="https://validant.ai/consent/v1/consent.js" defer></script>
+  </head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+    <div class="header-container">
+        <div class="logo-section">
+            <a href="../index.html">
+                <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
+            </a>
+            <span class="logo-divider"></span>
+            <span class="lib-name"><span>v</span>fairness</span>
+        </div>
+        <nav class="main-nav" aria-label="Main navigation">
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="../getting-started/index.html" class="nav-link">Getting Started</a>
+                </li>
+                <li class="nav-item">
+                    <a href="../api-reference/index.html" class="nav-link">API Reference</a>
+                </li>
+                <li class="nav-item nav-item--has-dropdown">
+                    <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                        Learn
+                        <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <div class="nav-dropdown" role="menu" aria-label="Learn submenu">
+                        <div class="nav-dropdown__inner">
+                            <a href="../test-objects/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">Find a Test Object</span>
+                                    <span class="nav-dropdown__desc">Data, models and agents to test, by access depth</span>
+                                </span>
+                            </a>
+                            <a href="../business-guide/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">Business Guide</span>
+                                    <span class="nav-dropdown__desc">Fairness strategy for decision-makers</span>
+                                </span>
+                            </a>
+                            <div class="nav-dropdown__group">
+                                <div class="nav-dropdown__group-label">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Sample Assessments</span>
+                                        <span class="nav-dropdown__desc">End-to-end audits with EU AI Act compliance</span>
+                                    </span>
+                                </div>
+                                <div class="nav-dropdown__group-items">
+                                    <a href="index.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Binary Classifier</span> <span class="sub-desc">— Credit scoring</span></a>
+                                    <a href="llm-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Foundation LLM</span> <span class="sub-desc">— Resume screening</span></a>
+                                    <a href="cv-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Computer Vision</span> <span class="sub-desc">— Medical imaging</span></a>
+                                    <a href="ranking-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Ranking System</span> <span class="sub-desc">&mdash; Job platform</span></a>
+                                </div>
+                            </div>
+                            <a href="../concepts/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">Concepts</span>
+                                    <span class="nav-dropdown__desc">Fairness theory and metric foundations</span>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                    <li class="nav-item">
+                        <a href="../our-offering/index.html" class="nav-link">Our Offering</a>
+                    </li>
+                <li class="nav-item nav-item--has-dropdown">
+                    <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                        Explore
+                        <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <div class="nav-dropdown" role="menu" aria-label="Explore submenu">
+                        <div class="nav-dropdown__inner">
+                            <a href="../svg-gallery/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">SVG Gallery</span>
+                                    <span class="nav-dropdown__desc">Interactive visualization templates</span>
+                                </span>
+                            </a>
+                            <a href="../workflow-integration/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">Workflow Integration</span>
+                                    <span class="nav-dropdown__desc">MLOps, CI/CD, and experiment tracking</span>
+                                </span>
+                            </a>
+                                <a href="../usage-map/index.html" role="menuitem" class="nav-dropdown__item" data-um-injected="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Library Usage Map</span>
+                                        <span class="nav-dropdown__desc">Where the platform uses each vfairness symbol</span>
+                                    </span>
+                                </a>
+<a href="../llm-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">LLM Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Counterfactual testing, benchmarks, output analysis for LLMs</span>
+                                    </span>
+                                </a>
+                                <a href="../agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Agent Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Correspondence testing, tool bias, RAG bias, pipeline tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../multi-agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Multi-Agent Testing</span>
+                                        <span class="nav-dropdown__desc">Emergent bias, groupthink, non-compositionality</span>
+                                    </span>
+                                </a>
+                                <a href="../explainability-and-xai/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Explainability &amp; XAI</span>
+                                        <span class="nav-dropdown__desc">SHAP attributions, fairness decomposition, counterfactuals</span>
+                                    </span>
+                                </a>
+                                <a href="../training-time-interventions/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Training-Time Interventions</span>
+                                        <span class="nav-dropdown__desc">Fairness-aware losses, constraints, calibration</span>
+                                    </span>
+                                </a>
+</div>
+                    </div>
+                </li>
+            </ul>
+                <div class="nav-cta">
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="Search docs...">
+                    </div>
+                    <a href="https://github.com/validantai/vfairness" class="btn btn-secondary btn-sm" target="_blank">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        GitHub
+                    </a>
+                </div>
+
+                <button type="button" class="mobile-nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-panel">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+<!-- Mobile Navigation -->
+<div class="mobile-nav-overlay" aria-hidden="true"></div>
+<nav class="mobile-nav-panel" id="mobile-nav-panel" aria-label="Mobile navigation" aria-hidden="true">
+    <div class="mobile-nav-header">
+        <span class="mobile-nav-title">Menu</span>
+        <button type="button" class="mobile-nav-close" aria-label="Close navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div class="mobile-nav-body">
+        <a href="../getting-started/index.html" class="mobile-nav-link">Getting Started</a>
+        <a href="../api-reference/index.html" class="mobile-nav-link">API Reference</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Learn
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../test-objects/index.html" class="mobile-nav-sublink">Find a Test Object</a>
+                <a href="../business-guide/index.html" class="mobile-nav-sublink">Business Guide</a>
+                <span class="mobile-nav-sublink" style="font-size:0.7rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:0.5rem 0 0.15rem;">Sample Assessments</span>
+                <a href="index.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Binary Classifier</a>
+                <a href="llm-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Foundation LLM</a>
+                <a href="cv-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Computer Vision</a>
+                <a href="ranking-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Ranking System</a>
+                <a href="../concepts/index.html" class="mobile-nav-sublink">Concepts</a>
+            </div></div>
+        </div>
+        <a href="../our-offering/index.html" class="mobile-nav-link">Our Offering</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Explore
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../svg-gallery/index.html" class="mobile-nav-sublink">SVG Gallery</a>
+                <a href="../workflow-integration/index.html" class="mobile-nav-sublink">Workflow Integration</a>
+                <a href="../usage-map/index.html" class="mobile-nav-sublink" data-um-injected="1">Library Usage Map</a>
+<a href="../llm-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">LLM Fairness Testing</a>
+                <a href="../agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Agent Fairness Testing</a>
+                <a href="../multi-agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Multi-Agent Testing</a>
+                <a href="../explainability-and-xai/index.html" class="mobile-nav-sublink">Explainability &amp; XAI</a>
+                <a href="../training-time-interventions/index.html" class="mobile-nav-sublink">Training-Time Interventions</a>
+</div></div>
+        </div>
+    </div>
+</nav>
+<script>/* Mobile nav bootstrap — works before main.js loads */
+(function(){
+var t=document.querySelector(".mobile-nav-toggle"),p=document.querySelector(".mobile-nav-panel"),o=document.querySelector(".mobile-nav-overlay"),c=document.querySelector(".mobile-nav-close");
+if(!t||!p)return;t.setAttribute("data-nav-init","1");
+function open(){t.setAttribute("aria-expanded","true");p.classList.add("is-open");p.setAttribute("aria-hidden","false");if(o)o.classList.add("is-open");document.body.style.overflow="hidden";}
+function close(){t.setAttribute("aria-expanded","false");p.classList.remove("is-open");p.setAttribute("aria-hidden","true");if(o)o.classList.remove("is-open");document.body.style.overflow="";}
+t.addEventListener("click",function(){t.getAttribute("aria-expanded")==="true"?close():open();});
+if(c)c.addEventListener("click",close);
+if(o)o.addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList.contains("is-open"))close();});
+})()
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     LAYOUT: Sidebar + Main
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="page-wrapper docs-layout">
+    <aside class="sidebar">
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title">LLM Assessment</div>
+            <ul class="sidebar-nav">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#scenario">Scenario</a></li>
+                <li><a href="#phase-map">Phase Map</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#f59e0b;">Preprocessing</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-1">1. Output Data Validation</a></li>
+                <li><a href="#phase-2">2. Bias Detection</a></li>
+                <li><a href="#phase-3">3. Prompt Fairness Probes</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#6366f1;">Post-Processing</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-4">4. Output Calibration</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#2c5f7c;">Evaluation</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-5">5. Metrics &amp; Testing</a></li>
+                <li><a href="#phase-6">6. Regression Fairness</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#059669;">Operations</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-7">7. CI/CD Gating</a></li>
+                <li><a href="#phase-8">8. Monitoring</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#7c3aed;">Reporting</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-9">9. Dashboards</a></li>
+                <li><a href="#phase-10">10. EU AI Act Card</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title">Summary</div>
+            <ul class="sidebar-nav">
+                <li><a href="#artifacts">All Artifacts</a></li>
+                <li><a href="#workflow">Workflow Integration</a></li>
+                <li><a href="#compliance">Compliance Checklist</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="content-container">
+
+<header class="page-intro">
+    <p class="vf-eyebrow" data-dated>Sample assessment &middot; large language model</p>
+    <h1>Foundation model fairness assessment</h1>
+    <p class="lead">A complete audit of a language model, from output validation and counterfactual prompt probes to the EU AI Act model card.</p>
+</header>
+
+<!-- ─────────────────────────────────────────────────────────────
+     OVERVIEW
+     ───────────────────────────────────────────────────────────── -->
+<section id="overview">
+    <h2 class="mt-0">Overview</h2>
+    <p>This walkthrough demonstrates a <strong>complete fairness audit of a foundation model (LLM) deployment</strong> where training data is not available. Unlike the <a href="index.html" style="color:var(--color-primary);font-weight:600;">credit scoring case</a>, this audit operates entirely at the <strong>output level</strong> &mdash; evaluating the model as a black box through systematic prompt testing, output analysis, and regression-based fairness metrics.</p>
+
+    <div class="blackbox-note">
+        <div class="bb-icon">!</div>
+        <div class="bb-text">
+            <strong>Black-box constraint:</strong> When you deploy a third-party foundation model (GPT-4, Claude, Gemini, Llama, etc.), you typically have no access to training data, model weights, or internal representations. The entire audit must be conducted through <strong>input-output evaluation</strong> &mdash; systematically probing the model with controlled prompts and measuring fairness across its outputs. This fundamentally changes which vfairness modules apply.
+        </div>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            What you will build
+        </div>
+        <p>By following this guide, you will produce: an output-level data validation, auto-discovery bias scan, prompt fairness probes, output calibration analysis, comprehensive fairness metrics with confidence intervals, regression fairness evaluation, CI/CD gate decisions, monitoring dashboards, multi-tier reports, and an EU AI Act&ndash;compliant model card for a GPAI-based high-risk system &mdash; all backed by <strong>23 production-grade SVG artifacts</strong>.</p>
+    </div>
+
+    <div class="callout callout-warning">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+            This is a scripted scenario, not a real audit
+        </div>
+        <p>The dataset, the model and every number in the Findings boxes below are invented to show the
+        shape of a complete audit. No file named here ships with the library, so the walkthrough is not
+        reproducible end to end as written, and nothing on this page is a measurement of a real system.
+        The <strong>code</strong> is real and the <strong>call signatures</strong> are checked against the
+        library; the <strong>results</strong> are illustration.</p>
+    </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────
+     SCENARIO
+     ───────────────────────────────────────────────────────────── -->
+<section id="scenario">
+    <h2>The Scenario</h2>
+    <div class="scenario-card">
+        <h3 style="margin-top:0;">LLM-Powered Resume Screening &mdash; EU AI Act High-Risk System</h3>
+        <p style="color:#78350f;font-size:0.9rem;">A recruitment platform deploys a foundation model API to screen and rank job applicants. The LLM reads each resume, produces a suitability score (0&ndash;100) and a narrative summary. Under the EU AI Act (Annex III, Section 4a), AI systems used in recruitment and selection of workers are classified as <strong>high-risk AI</strong>. Additionally, the use of a GPAI model triggers <strong>Article 51&ndash;56</strong> obligations for the GPAI provider, while the deployer retains full responsibility for the downstream application.</p>
+        <div class="scenario-grid">
+            <div class="scenario-stat">
+                <div class="val">5,000</div>
+                <div class="lbl">Evaluation Resumes</div>
+            </div>
+            <div class="scenario-stat">
+                <div class="val">3</div>
+                <div class="lbl">Protected Attributes</div>
+            </div>
+            <div class="scenario-stat">
+                <div class="val">23</div>
+                <div class="lbl">SVG Artifacts</div>
+            </div>
+            <div class="scenario-stat">
+                <div class="val">10</div>
+                <div class="lbl">Audit Phases</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>import pandas as pd
+import numpy as np
+
+# ── Load the evaluation dataset ──
+# Each resume was scored by the LLM API; we collected outputs + demographic metadata
+df = pd.read_csv("resume_screening_outputs.csv")
+
+# Columns: applicant_id, llm_score (0-100), llm_decision (shortlisted/rejected),
+#           gender, ethnicity, age_group, job_category, years_experience, ...
+
+PROTECTED   = ["gender", "ethnicity", "age_group"]
+SCORE_COL   = "llm_score"         # Continuous output (0-100)
+OUTCOME_COL = "llm_decision"      # Binary: shortlisted=1, rejected=0
+FEATURES    = [c for c in df.columns if c not in PROTECTED + [OUTCOME_COL, SCORE_COL, "applicant_id"]]
+
+# Convert binary decision
+df["shortlisted"] = (df[OUTCOME_COL] == "shortlisted").astype(int)
+
+# Extract subsets for analysis
+y_true     = df["shortlisted"]       # LLM decisions as binary labels
+y_scores   = df[SCORE_COL] / 100.0   # Normalize to [0, 1] for probability-like analysis
+sensitive  = df[PROTECTED]
+
+print(f"Dataset: {len(df)} resumes, {df['shortlisted'].mean():.1%} shortlisted")
+print(f"Protected attributes: {PROTECTED}")</code></pre>
+    </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────
+     PHASE MAP
+     ───────────────────────────────────────────────────────────── -->
+<section id="phase-map">
+    <h2>Audit Pipeline</h2>
+    <p>The ten phases below are adapted for a black-box foundation model deployment. Phases that depend on training data (feature engineering, fair training) are replaced with output-level equivalents: prompt fairness probes and regression fairness analysis.</p>
+    <div class="phase-timeline">
+        <div class="phase-step active"><span class="phase-num mod-preprocessing">1</span><span class="phase-label">Output<br>Validation</span></div>
+        <div class="phase-step"><span class="phase-num mod-preprocessing">2</span><span class="phase-label">Bias<br>Detection</span></div>
+        <div class="phase-step"><span class="phase-num mod-preprocessing">3</span><span class="phase-label">Prompt<br>Probes</span></div>
+        <div class="phase-step"><span class="phase-num mod-postprocessing">4</span><span class="phase-label">Output<br>Calibration</span></div>
+        <div class="phase-step"><span class="phase-num mod-evaluation">5</span><span class="phase-label">Metrics &amp;<br>Testing</span></div>
+        <div class="phase-step"><span class="phase-num mod-evaluation">6</span><span class="phase-label">Regression<br>Fairness</span></div>
+        <div class="phase-step"><span class="phase-num mod-operations">7</span><span class="phase-label">CI/CD<br>Gating</span></div>
+        <div class="phase-step"><span class="phase-num mod-operations">8</span><span class="phase-label">Monitoring</span></div>
+        <div class="phase-step"><span class="phase-num mod-reporting">9</span><span class="phase-label">Dashboards</span></div>
+        <div class="phase-step"><span class="phase-num mod-reporting">10</span><span class="phase-label">Model<br>Card</span></div>
+    </div>
+
+    <div class="blackbox-note">
+        <div class="bb-icon">!</div>
+        <div class="bb-text">
+            <strong>Adapted pipeline:</strong> Without access to training data, we skip traditional feature engineering and in-processing debiasing. Instead, Phase 3 uses <strong>counterfactual prompt testing</strong> (swapping demographic indicators in otherwise identical resumes) and Phase 6 adds <strong>regression fairness</strong> to evaluate the continuous score output. All other phases apply with minor adaptations.
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 1: OUTPUT DATA VALIDATION
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-1" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-preprocessing">1</span>
+        <span class="label">Preprocessing</span>
+    </div>
+    <h2 style="margin-top:0;">Output Data Validation</h2>
+    <p>Before analyzing fairness, validate the LLM output dataset for completeness, group representation, and anomalous score distributions. With foundation models, common issues include inconsistent output formats, refusal-to-score for certain demographics, and uneven evaluation coverage.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.cicd import DataBiasValidator, DataValidationConfig
+
+# Validate the collected LLM outputs — same tool, different context
+validator = DataBiasValidator(
+    protected_attributes=PROTECTED,
+    config=DataValidationConfig(
+        min_group_fraction=0.05,
+        min_samples_per_group=50,
+        missing_value_threshold=0.05,
+    ),
+)
+result = validator.validate(df, outcome_column="shortlisted")
+
+print(f"Passed: {result.passed}")        # True / False
+print(f"Issues: {len(result.issues)}")
+
+# ── Generate SVG artifact ──
+from vfairness.rendering import data_validation_to_svg
+
+data_validation_to_svg(
+    result,
+    explanation="Output data quality assessment for the LLM resume screening evaluation "
+                "dataset. Checks demographic group representation, missing scores, and "
+                "distribution anomalies across 5,000 scored resumes.",
+    save_path="artifacts/01_data_validation.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/data_validation.svg" alt="Data Validation Report" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Data Validation Report</span>
+            <span class="cap-func">data_validation_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="finding-box warn">
+        <div class="finding-title">Findings</div>
+        <p>1 warning: <code>age_group=55+</code> has only 62 resumes (1.2% of dataset) &mdash; borderline representation. 1 informational: 2.1% of LLM outputs had parsing errors (missing scores recovered from narrative). No critical issues blocking the audit.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 2: BIAS DETECTION & AUTO-DISCOVERY
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-2" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-preprocessing">2</span>
+        <span class="label">Preprocessing</span>
+    </div>
+    <h2 style="margin-top:0;">Bias Detection &amp; Auto-Discovery</h2>
+    <p>Run the auto-discovery scanner on the output dataset to identify which demographic attributes correlate with LLM decisions. Then perform a full bias audit to detect disparate impact in shortlisting rates, score distributions, and intersectional patterns.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.evaluation.vfairness_metrics import (
+    detect_protected_attributes,
+    scan_fairness_violations,
+    discover_intersectional_groups,
+)
+from vfairness.preprocessing.bias_detection import BiasDetector
+from vfairness.rendering import auto_discovery_to_svg, bias_audit_to_svg
+
+# ── Auto-discovery on LLM outputs ──
+y_pred_binary = (y_scores > 0.5).astype(int).to_numpy()
+
+candidates = detect_protected_attributes(df)
+violations = scan_fairness_violations(df, y_pred_binary, y_true=y_true.to_numpy())
+intersectional = discover_intersectional_groups(df, PROTECTED, y_pred_binary)
+
+auto_discovery_to_svg(
+    candidates=candidates,
+    violations=violations,
+    group_advantages=intersectional,
+    explanation="Automated scan of LLM outputs confirming gender, ethnicity, and age_group "
+                "as attributes correlated with screening decisions. Note: these correlations "
+                "exist in the model's outputs, not its training data (which is unavailable).",
+    save_path="artifacts/02a_auto_discovery.svg",
+)
+
+# ── Full bias audit on output data ──
+detector = BiasDetector(df, protected_attributes=PROTECTED, outcome_column="shortlisted")
+audit = detector.full_audit()
+
+bias_audit_to_svg(
+    audit,
+    explanation="Comprehensive output-level bias audit. Since training data is unavailable, "
+                "this audit focuses on outcome disparities, score distribution differences, "
+                "and intersectional patterns in the LLM's decisions.",
+    save_path="artifacts/02b_bias_audit.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/auto_discovery.svg" alt="Auto-Discovery Scanner" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Auto-Discovery Scanner</span>
+                <span class="cap-func">auto_discovery_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/bias_audit.svg" alt="Bias Audit Dashboard" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Bias Audit Dashboard</span>
+                <span class="cap-func">bias_audit_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box fail">
+        <div class="finding-title">Findings</div>
+        <p>Significant shortlisting rate disparity for <code>gender</code> (male: 42%, female: 31%). Intersectional analysis reveals <code>female &times; age_group=55+</code> has the lowest shortlisting rate (18%) &mdash; 2.3&times; lower than <code>male &times; age_group=25-34</code>. Two high-severity violations flagged.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 3: PROMPT FAIRNESS PROBES
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-3" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-preprocessing">3</span>
+        <span class="label">Preprocessing</span>
+    </div>
+    <h2 style="margin-top:0;">Prompt Fairness Probes (Counterfactual Testing)</h2>
+    <p>Since we cannot inspect or modify the model&rsquo;s internal features, we probe its behavior using <strong>counterfactual pairs</strong>: identical resumes where only demographic signals vary. This is the LLM equivalent of feature engineering analysis &mdash; instead of removing proxy features, we measure how much demographic signals influence outputs.</p>
+
+    <div class="blackbox-note">
+        <div class="bb-icon">!</div>
+        <div class="bb-text">
+            <strong>Counterfactual methodology:</strong> For each test resume, generate demographic variants (e.g., changing name from &ldquo;James&rdquo; to &ldquo;Aisha&rdquo;, or removing age-indicating graduation years). Score all variants through the LLM API. The score delta between matched pairs quantifies the model&rsquo;s sensitivity to demographic signals.
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.evaluation.vfairness_metrics import compute_effect_sizes
+from vfairness.rendering import (
+    disparity_heatmap_to_svg,
+    effect_sizes_to_svg,
+    intersectional_analysis_to_svg,
+)
+from vfairness import FairnessAnalyzer
+
+# ── Counterfactual probe results ──
+# df_probes contains paired scores: original vs demographic-swapped resumes
+# Columns: pair_id, original_score, swapped_score, attribute_swapped, delta
+df_probes = pd.read_csv("counterfactual_probe_results.csv")
+
+# Aggregate deltas per attribute into a disparity measure
+probe_results = {}
+for attr in PROTECTED:
+    subset = df_probes[df_probes["attribute_swapped"] == attr]
+    probe_results[attr] = {
+        "mean_delta": subset["delta"].mean(),
+        "max_delta": subset["delta"].abs().max(),
+        "significant_pairs": (subset["delta"].abs() > 5).sum(),  # > 5 point swing
+    }
+
+# ── Disparity heatmap (metric × group grid from an analyzer report) ──
+probe_report = FairnessAnalyzer(y_true, y_pred_binary, sensitive["gender"]).get_report()
+
+disparity_heatmap_to_svg(
+    probe_report,
+    explanation="Disparate impact heatmap across demographic groups. "
+                "Darker cells indicate higher outcome disparity between groups.",
+    save_path="artifacts/03a_disparity_heatmap.svg",
+)
+
+# ── Effect sizes for the shortlisting-rate gap ──
+effects = compute_effect_sizes(y_true, y_pred_binary, sensitive["gender"])
+
+effect_sizes_to_svg(
+    {"metrics": {pair: es["cohens_d_positive_rate"] for pair, es in effects.items()}},
+    explanation="Cohen's d effect sizes for the shortlisting-rate gap between groups, "
+                "measuring the practical significance of the disparities that the "
+                "counterfactual probes surfaced.",
+    save_path="artifacts/03b_effect_sizes.svg",
+)
+
+# ── Intersectional analysis (gender × ethnicity shortlisting rates) ──
+pivot = df.pivot_table(index="gender", columns="ethnicity",
+                       values="shortlisted", aggfunc="mean")
+intersectional_view = {
+    "matrix": {g: {e: float(pivot.loc[g, e]) for e in pivot.columns} for g in pivot.index},
+    "x_attr": "ethnicity",
+    "y_attr": "gender",
+}
+intersectional_analysis_to_svg(
+    intersectional_view, feature="shortlisted",
+    explanation="Intersectional group analysis showing how combined demographic attributes "
+                "(e.g., female × age 55+) amplify or attenuate screening disparities.",
+    save_path="artifacts/03c_intersectional_analysis.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/disparity_heatmap.svg" alt="Disparity Heatmap" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Disparity Heatmap</span>
+            <span class="cap-func">disparity_heatmap_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/effect_sizes.svg" alt="Counterfactual Effect Sizes" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Counterfactual Effect Sizes</span>
+                <span class="cap-func">effect_sizes_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/intersectional_analysis.svg" alt="Intersectional Analysis" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Intersectional Analysis</span>
+                <span class="cap-func">intersectional_analysis_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box fail">
+        <div class="finding-title">Findings</div>
+        <p>Counterfactual probes reveal a mean score delta of 4.7 points for <code>gender</code> swaps and 6.2 points for <code>ethnicity</code> swaps. 23% of pairs show >5-point swings &mdash; the LLM is sensitive to demographic signals embedded in names and biographical details. <code>age_group</code> shows the largest effect size (d=0.31).</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 4: OUTPUT CALIBRATION
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-4" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-postprocessing">4</span>
+        <span class="label">Post-Processing</span>
+    </div>
+    <h2 style="margin-top:0;">Output Calibration</h2>
+    <p>LLM-generated scores are not inherently calibrated &mdash; a score of &ldquo;75&rdquo; for one demographic group may correspond to a different true suitability than &ldquo;75&rdquo; for another. Calibration analysis checks whether scores have consistent meaning across groups, and post-hoc calibration can correct systematic biases.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.post_processing.calibration import CalibrationAnalyzer
+from vfairness.rendering import (
+    reliability_diagram_to_svg,
+    calibration_report_to_svg,
+    group_calibration_to_svg,
+)
+
+# Use human reviewer decisions as ground truth for calibration
+# y_human: binary labels from human panel review of 1,000 resumes
+y_human = df.loc[:999, "human_decision"]
+
+cal = CalibrationAnalyzer(y_human, y_scores[:1000], sensitive.loc[:999, "gender"])
+cal_report = cal.full_analysis()
+
+# ── Reliability diagram ──
+reliability_diagram_to_svg(
+    y_human, y_scores[:1000],
+    explanation="Reliability diagram comparing LLM scores to human reviewer decisions. "
+                "Deviation from the diagonal shows where the LLM over- or under-estimates "
+                "candidate suitability relative to human judgment.",
+    save_path="artifacts/04a_reliability_diagram.svg",
+)
+
+# ── Full calibration report with group analysis ──
+calibration_report_to_svg(
+    cal_report,
+    explanation="Group-wise calibration analysis comparing LLM score reliability across "
+                "demographic groups. ECE per group reveals differential calibration quality.",
+    save_path="artifacts/04b_calibration_report.svg",
+)
+
+# ── Per-group calibration curves ──
+group_calibration_to_svg(
+    y_human, y_scores[:1000], sensitive.loc[:999, "gender"],
+    explanation="Overlay of group-specific calibration curves. Groups diverging from "
+                "the overall curve indicate the LLM assigns scores with different meaning "
+                "for different demographics.",
+    save_path="artifacts/04c_group_calibration.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/calibration_report.svg" alt="Calibration Report" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Calibration Report</span>
+            <span class="cap-func">calibration_report_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/reliability_diagram.svg" alt="Reliability Diagram" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Reliability Diagram</span>
+                <span class="cap-func">reliability_diagram_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/group_calibration.svg" alt="Group Calibration" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Group Calibration Curves</span>
+                <span class="cap-func">group_calibration_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box warn">
+        <div class="finding-title">Findings</div>
+        <p>Overall ECE = 0.091 (moderate miscalibration). The LLM systematically overestimates suitability for <code>male</code> candidates (ECE = 0.061) while underestimating for <code>female</code> candidates (ECE = 0.124). Group calibration disparity = 0.063, exceeding the 0.02 threshold. Post-hoc isotonic calibration reduces group ECE disparity to 0.015.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 5: METRICS & TESTING
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-5" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-evaluation">5</span>
+        <span class="label">Evaluation</span>
+    </div>
+    <h2 style="margin-top:0;">Comprehensive Metrics &amp; Robustness Testing</h2>
+    <p>Compute all standard fairness metrics on the LLM&rsquo;s binary decisions (shortlisted/rejected), with statistical confidence intervals. Run robustness tests to verify that findings are stable across data perturbations and subgroup splits.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness import FairnessAnalyzer
+from vfairness.evaluation.vfairness_metrics import (
+    permutation_test, sensitivity_analysis, subgroup_robustness_audit,
+)
+from vfairness.rendering import (
+    radar_chart_to_svg,
+    metrics_bar_chart_to_svg,
+    confidence_intervals_to_svg,
+    group_comparison_to_svg,
+    robustness_testing_to_svg,
+)
+
+# ── Full fairness analysis on LLM decisions ──
+analyzer = FairnessAnalyzer(
+    y_true, y_pred_binary, sensitive["gender"],
+    y_prob=y_scores,
+    fair_explainer=True,
+)
+report = analyzer.get_report(include_ci=True, include_explanations=True)
+
+# ── Radar chart: all metrics at a glance ──
+radar_chart_to_svg(
+    report,
+    explanation="Multi-metric radar chart for LLM resume screening outputs. Shows "
+                "demographic parity, equalized odds, and predictive parity.",
+    save_path="artifacts/05a_radar_chart.svg",
+)
+
+# ── Bar chart with pass/fail thresholds ──
+metrics_bar_chart_to_svg(
+    report,
+    explanation="Fairness metric values against regulatory thresholds for the LLM's "
+                "binary shortlisting decisions.",
+    save_path="artifacts/05b_metrics_bar_chart.svg",
+)
+
+# ── Confidence intervals ──
+# The forest plot reads a "confidence_intervals" mapping with lower/upper keys,
+# built here from the report's metrics_with_ci entries.
+confidence_intervals_to_svg(
+    {
+        "metrics": report["metrics"],
+        "confidence_intervals": {
+            m: {"lower": ci["lower_bound"], "upper": ci["upper_bound"]}
+            for m, ci in report["metrics_with_ci"].items()
+        },
+    },
+    explanation="95% bootstrap confidence intervals for each fairness metric. Wider "
+                "intervals reflect higher uncertainty in the LLM's output consistency.",
+    save_path="artifacts/05c_confidence_intervals.svg",
+)
+
+# ── Group comparison ──
+group_comparison_to_svg(
+    report,
+    explanation="Side-by-side comparison of shortlisting rates "
+                "across demographic groups.",
+    save_path="artifacts/05d_group_comparison.svg",
+)
+
+# ── Robustness testing ──
+# The robustness tests take a metric function of (y_pred, sensitive_attr)
+def parity_gap(y_pred_arr, attr):
+    rates = [np.mean(y_pred_arr[attr == g]) for g in np.unique(attr)]
+    return max(rates) - min(rates)
+
+gender_arr = sensitive["gender"].to_numpy()
+perm = permutation_test(y_pred_binary, gender_arr, parity_gap)
+sens = sensitivity_analysis(y_pred_binary, gender_arr, parity_gap)
+audit = subgroup_robustness_audit(y_pred_binary, sensitive, y_true=y_true.to_numpy())
+
+robustness_testing_to_svg(
+    permutation_results=[perm],
+    sensitivity_results=[sens],
+    subgroup_audit=audit,
+    explanation="Robustness validation for LLM output fairness. Permutation tests confirm "
+                "that observed disparities are statistically significant and not artifacts "
+                "of sampling variation.",
+    save_path="artifacts/05e_robustness_testing.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/radar_chart.svg" alt="Fairness Radar Chart" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Fairness Radar Chart</span>
+            <span class="cap-func">radar_chart_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/metrics_bar_chart.svg" alt="Metrics Bar Chart" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Metrics Bar Chart</span>
+                <span class="cap-func">metrics_bar_chart_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/confidence_intervals.svg" alt="Confidence Intervals" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Confidence Intervals</span>
+                <span class="cap-func">confidence_intervals_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/group_comparison.svg" alt="Group Comparison" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Group Comparison</span>
+                <span class="cap-func">group_comparison_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/robustness_testing.svg" alt="Robustness Testing" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Robustness Testing Dashboard</span>
+                <span class="cap-func">robustness_testing_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box warn">
+        <div class="finding-title">Findings</div>
+        <p>Demographic parity difference = 0.11 (FAIL, threshold 0.10). Equalized odds difference = 0.08 (PASS). Permutation tests confirm statistical significance (p &lt; 0.001). Robustness score = 0.68 (MARGINAL). The demographic parity violation is consistent across sensitivity perturbations, indicating a systematic pattern in the LLM&rsquo;s outputs.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 6: REGRESSION FAIRNESS
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-6" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-evaluation">6</span>
+        <span class="label">Evaluation</span>
+    </div>
+    <h2 style="margin-top:0;">Regression Fairness (Continuous Scores)</h2>
+    <p>The LLM produces continuous suitability scores (0&ndash;100), not just binary decisions. <strong>Regression fairness</strong> metrics evaluate whether score distributions, prediction errors, and effect sizes are equitable across groups &mdash; capturing biases that binary metrics may miss.</p>
+
+    <div class="blackbox-note">
+        <div class="bb-icon">!</div>
+        <div class="bb-text">
+            <strong>Why regression fairness matters for LLMs:</strong> A model may pass binary fairness checks (shortlisting rates) while assigning systematically lower scores to certain groups &mdash; creating a &ldquo;glass floor&rdquo; where shortlisted candidates from disadvantaged groups are ranked lower and less likely to advance in subsequent hiring stages.
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.evaluation.vfairness_metrics.regression import (
+    get_group_metrics,
+    compute_regression_effect_sizes,
+    mae_parity_difference,
+    mean_prediction_difference,
+)
+from vfairness.rendering import regression_fairness_to_svg
+
+# Use human panel scores as ground truth for a subset
+y_human_scores = df.loc[:999, "human_score"] / 100.0  # Normalized to [0, 1]
+y_llm_scores   = y_scores[:1000]
+sensitive_sub   = sensitive.loc[:999, "gender"]
+
+# ── Group-level regression metrics ──
+group_metrics = get_group_metrics(y_human_scores, y_llm_scores, sensitive_sub)
+effects       = compute_regression_effect_sizes(y_human_scores, y_llm_scores, sensitive_sub)
+mae_parity    = mae_parity_difference(y_human_scores, y_llm_scores, sensitive_sub)
+mean_pred     = mean_prediction_difference(y_human_scores, y_llm_scores, sensitive_sub)
+
+print(f"MAE parity difference: {mae_parity:.3f}")
+print(f"Mean prediction difference: {mean_pred:.3f}")
+
+regression_fairness_to_svg(
+    group_metrics=group_metrics,
+    disparities={
+        "mae_parity_difference": mae_parity,
+        "mean_prediction_difference": mean_pred,
+    },
+    effect_sizes=effects,
+    explanation="Regression fairness analysis of the LLM's continuous suitability scores. "
+                "Compares group-level error and prediction patterns. Human panel scores "
+                "serve as ground truth for 1,000 calibration resumes.",
+    save_path="artifacts/06_regression_fairness.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/regression_fairness.svg" alt="Regression Fairness" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Regression Fairness Dashboard</span>
+            <span class="cap-func">regression_fairness_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="finding-box fail">
+        <div class="finding-title">Findings</div>
+        <p>MAE parity difference = 0.14 (FAIL, threshold 0.10). The LLM produces higher prediction errors for <code>female</code> candidates (MAE = 0.18) vs <code>male</code> (MAE = 0.11). Mean prediction difference = 0.09, indicating systematic under-scoring. Cohen&rsquo;s d = 0.28 (small-to-medium effect), confirming the &ldquo;glass floor&rdquo; pattern in continuous scores.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 7: CI/CD GATING
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-7" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-operations">7</span>
+        <span class="label">Operations</span>
+    </div>
+    <h2 style="margin-top:0;">CI/CD Gating</h2>
+    <p>Even when the foundation model is a third-party API, the deployment pipeline should enforce fairness gates. This protects against regressions when the LLM provider updates their model (which can happen without notice), or when your prompt templates change.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.cicd import ModelFairnessGate, GateConfig
+from vfairness.operations.cicd.gate import HierarchicalGateConfig
+from vfairness.rendering import cicd_pipeline_to_svg, hierarchical_gate_to_svg
+
+# ── Standard gate on LLM outputs ──
+gate = ModelFairnessGate(config=GateConfig(
+    thresholds={
+        "demographic_parity_difference": 0.10,
+        "equalized_odds_difference": 0.10,
+    },
+))
+decision = gate.evaluate(y_true, y_pred_binary, sensitive["gender"])
+
+cicd_pipeline_to_svg(
+    gate_decision=decision,
+    explanation="CI/CD fairness gate for the LLM resume screening deployment. "
+                "Triggers on every prompt template update or LLM API version change. "
+                "Current status: CONDITIONAL — demographic parity exceeds threshold.",
+    save_path="artifacts/07a_cicd_pipeline.svg",
+)
+
+# ── Hierarchical intersectional gate ──
+hier_config = HierarchicalGateConfig(
+    check_intersections=True,
+    intersection_depth=2,
+    min_group_size=30,
+    per_intersection_thresholds={
+        "female_55+": {"demographic_parity_difference": 0.15},
+    },
+)
+hier_decision = gate.evaluate_hierarchical(
+    y_true.to_numpy(), y_pred_binary,
+    protected_attrs={"gender": sensitive["gender"].to_numpy(),
+                     "age_group": sensitive["age_group"].to_numpy()},
+    hierarchical_config=hier_config,
+)
+
+hierarchical_gate_to_svg(
+    hier_decision,
+    explanation="Hierarchical gate evaluating LLM outputs at global, per-group, and "
+                "intersectional levels. Flags vulnerable subgroups identified in Phase 2.",
+    save_path="artifacts/07b_hierarchical_gate.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/cicd_pipeline.svg" alt="CI/CD Pipeline Gate" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">CI/CD Pipeline Gate</span>
+                <span class="cap-func">cicd_pipeline_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/hierarchical_gate.svg" alt="Hierarchical Gate" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Hierarchical Gate</span>
+                <span class="cap-func">hierarchical_gate_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box warn">
+        <div class="finding-title">Gate Decision: CONDITIONAL</div>
+        <p>Demographic parity difference (0.11) marginally exceeds the 0.10 threshold. The gate recommends: (1) apply post-hoc calibration from Phase 4, (2) add demographic-blind prompt template, (3) re-evaluate before production deployment. Equalized odds passes.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 8: MONITORING
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-8" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-operations">8</span>
+        <span class="label">Operations</span>
+    </div>
+    <h2 style="margin-top:0;">Production Monitoring</h2>
+    <p>Foundation model monitoring is critical because the underlying model can change without notice. LLM providers regularly update models, and even minor version changes can alter fairness profiles. Continuous monitoring detects these regressions automatically.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.monitoring import FairnessMonitor, FairnessMonitorConfig
+from vfairness.operations.monitoring import FairnessDriftDetector
+from vfairness.rendering import monitoring_dashboard_to_svg, drift_report_to_svg
+
+# ── Initialize monitor for LLM outputs ──
+monitor = FairnessMonitor(config=FairnessMonitorConfig(
+    window_size=1000,          # rows retained in the sliding window
+    alert_threshold=0.8,       # minimum acceptable disparate impact ratio
+    metrics_to_track=["disparate_impact", "demographic_parity", "equalized_odds"],
+))
+
+# Batches are DataFrames carrying the prediction, the label, and the
+# protected-attribute columns (in production this runs on every batch)
+reference_df = pd.DataFrame({
+    "prediction": y_pred_binary,
+    "label": y_true.to_numpy(),
+    "gender": df["gender"].to_numpy(),
+})
+# stand-in for the next batch of screening decisions: same columns, fresh rows
+production_batch_df = reference_df.sample(500, random_state=7)
+
+monitor.set_reference(reference_df)
+window = monitor.update_and_check(production_batch_df)
+
+monitoring_dashboard_to_svg(
+    window,
+    explanation="Fairness monitoring snapshot for the LLM resume screener: tracked "
+                "metrics, per-group rates, and alert status. Sudden shifts may "
+                "indicate an upstream model update by the LLM provider.",
+    save_path="artifacts/08a_monitoring_dashboard.svg",
+)
+
+# ── Drift detection (critical for third-party LLMs) ──
+# The detector compares series of a fairness metric over time, in production
+# taken from monitor.get_metric_history(); illustrative values shown here
+baseline_metric_series = pd.Series([0.11, 0.10, 0.12, 0.11, 0.10, 0.11, 0.12, 0.11] * 8)
+production_metric_series = pd.Series(np.linspace(0.11, 0.19, 64))
+
+detector = FairnessDriftDetector()
+detector.set_baseline(baseline_metric_series)
+drift = detector.check_drift(production_metric_series, metric="demographic_parity")
+
+drift_report_to_svg(
+    drift,
+    explanation="Drift analysis comparing current LLM outputs against the audit baseline. "
+                "Sudden metric shifts may indicate the LLM provider deployed a model update.",
+    save_path="artifacts/08b_drift_report.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/monitoring_dashboard.svg" alt="Monitoring Dashboard" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Monitoring Dashboard</span>
+                <span class="cap-func">monitoring_dashboard_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/drift_report.svg" alt="Drift Report" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Drift Report</span>
+                <span class="cap-func">drift_report_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Findings</div>
+        <p>The detector fires on this window. Run the series above and <code>check_drift()</code> returns <code>drift_detected=True</code> with an overall drift score of 0.99: demographic parity climbs from 0.11 to 0.19 against a baseline averaging 0.11. On a third-party model that is the signature to take seriously, because a silent provider-side update is exactly what a rising series with no code change on your side looks like. Alerts are configured to fire on a threshold breach or on a sudden shift greater than 0.05 within one window.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 9: REPORTING DASHBOARDS
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-9" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-reporting">9</span>
+        <span class="label">Reporting</span>
+    </div>
+    <h2 style="margin-top:0;">Multi-Tier Reporting</h2>
+    <p>Generate three report tiers for different stakeholders. For LLM deployments, the executive report must explicitly address the <strong>third-party model dependency</strong> and the additional GPAI obligations under the EU AI Act.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.reporting import (
+    ReportGenerator, ReportConfig, MetricsStore, ReportTier, OutputFormat,
+)
+from vfairness.rendering import reporting_dashboard_to_svg
+
+store = MetricsStore()
+store.ingest_window_metrics(window)   # Phase 8 monitoring window
+store.ingest_from_monitor(monitor)    # full monitor history
+store.ingest_drift_result(drift)
+
+generator = ReportGenerator(store, config=ReportConfig(
+    custom_title="LLM Resume Screening Fairness Report",
+))
+
+# ── Executive report ──
+exec_report = generator.generate(tier=ReportTier.EXECUTIVE, output_format=OutputFormat.MARKDOWN)
+reporting_dashboard_to_svg(
+    exec_report, tier="executive",
+    explanation="Board-level summary: overall fairness health, key risk indicators, "
+                "and third-party model dependency status for EU AI Act compliance.",
+    save_path="artifacts/09a_executive_dashboard.svg",
+)
+
+# ── Operational report ──
+ops_report = generator.generate(tier=ReportTier.OPERATIONAL, output_format=OutputFormat.MARKDOWN)
+reporting_dashboard_to_svg(
+    ops_report, tier="operational",
+    explanation="Team-level dashboard with LLM output trends, counterfactual probe "
+                "results, and recommendations for prompt template adjustments.",
+    save_path="artifacts/09b_operational_dashboard.svg",
+)
+
+# ── Technical report ──
+tech_report = generator.generate(tier=ReportTier.TECHNICAL, output_format=OutputFormat.JSON)
+reporting_dashboard_to_svg(
+    tech_report, tier="technical",
+    explanation="Full statistical evidence including confidence intervals, regression "
+                "fairness metrics, calibration analysis, and robustness test results.",
+    save_path="artifacts/09c_technical_dashboard.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/reporting_dashboard_executive.svg" alt="Executive Dashboard" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Executive Dashboard</span>
+            <span class="cap-func">reporting_dashboard_to_svg(tier="executive")</span>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/reporting_dashboard_operational.svg" alt="Operational Dashboard" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Operational Dashboard</span>
+                <span class="cap-func">reporting_dashboard_to_svg(tier="operational")</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/reporting_dashboard_technical.svg" alt="Technical Dashboard" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Technical Dashboard</span>
+                <span class="cap-func">reporting_dashboard_to_svg(tier="technical")</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 10: EU AI ACT MODEL CARD
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-10" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-reporting">10</span>
+        <span class="label">Compliance</span>
+    </div>
+    <h2 style="margin-top:0;">EU AI Act Model Card (GPAI + High-Risk)</h2>
+    <p>For a foundation model deployment in a high-risk context, the model card must address <strong>dual obligations</strong>: (1) deployer obligations under the high-risk AI provisions (Articles 9&ndash;15), and (2) GPAI-specific provisions (Articles 51&ndash;56) that apply to the model provider. The deployer must document what information the GPAI provider has &mdash; and has not &mdash; made available.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.cicd.gate import FairnessReportCard
+from vfairness.rendering import report_card_to_svg
+
+# The card is built from the hierarchical gate decision produced in Phase 7
+card = FairnessReportCard(hier_decision, model_name="ResumeScreen-LLM-v1.0")
+markdown = card.to_markdown()
+payload = card.to_github_comment_payload()
+
+# The SVG renderer works from the standard gate decision of Phase 7
+report_card_to_svg(
+    decision=decision,
+    model_name="ResumeScreen-LLM-v1.0",
+    explanation="Fairness report card for the LLM screening deployment: gate status "
+                "and the per-metric evaluations behind it. Accompanies the narrative "
+                "GPAI documentation described below.",
+    save_path="artifacts/10_model_card.svg",
+)</code></pre>
+    </div>
+
+    <p>The card carries the measured evidence: gate status, per-level and intersectional results, and the model name. The narrative half of an EU AI Act model card is documentation you write around it, not something the library can compute. For this audit that narrative records: intended use (pre-screening of job applications for shortlisting, human recruiter review required for every decision, no fully automated rejection); risk classification HIGH under EU AI Act Annex III Section 4 (employment); the training data summary (unknown, third-party foundation model; the GPAI provider has not disclosed training data composition, so post-hoc calibration is applied at deployment level); the evaluation summary (5,000 scored resumes, 1,000 human-validated, 500 counterfactual probes, bootstrap confidence intervals at the 95% level); monitoring (drift detection enabled, weekly review cadence elevated due to the third-party dependency, API version tracking per request); human oversight (recruiter review of all decisions, quarterly fairness review board, monthly counterfactual re-probing); limitations (no access to model weights or training data, output-level evaluation only, small 55+ age group sample, provider may update the model without notice); and references to Regulation (EU) 2024/1689 Annex III Section 4, Articles 51 to 56 (general-purpose AI), and Article 25 (responsibilities along the AI value chain).</p>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/report_card.svg" alt="EU AI Act Model Card" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">EU AI Act Model Card (GPAI)</span>
+            <span class="cap-func">report_card_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            EU AI Act: Dual Obligation Framework
+        </div>
+        <p>When deploying a GPAI model in a high-risk context, compliance responsibilities are shared:</p>
+        <ul style="font-size:0.85rem;color:var(--color-gray-600);margin-top:0.5rem;">
+            <li><strong>GPAI Provider (Articles 51&ndash;56)</strong> &mdash; Must provide model card, technical documentation, training data summary, and downstream evaluation capabilities</li>
+            <li><strong>Deployer (Articles 9&ndash;15)</strong> &mdash; Responsible for the full high-risk AI compliance stack: risk management, data governance, testing, transparency, human oversight, monitoring</li>
+            <li><strong>Article 25</strong> &mdash; If the GPAI provider does not supply sufficient information, the deployer must document this gap and compensate through enhanced output-level evaluation (exactly what this audit demonstrates)</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ALL ARTIFACTS SUMMARY
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="artifacts">
+    <h2>Complete Artifact Inventory</h2>
+    <p>The table below lists every artifact generated during this LLM audit. Each SVG is a self-contained, print-ready visualization suitable for regulatory submissions.</p>
+
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>Phase</th>
+                <th>Artifact</th>
+                <th>Function</th>
+                <th>Module</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>Data Validation Report</td><td><code>data_validation_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>2</td><td>Auto-Discovery Scanner</td><td><code>auto_discovery_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>2</td><td>Bias Audit Dashboard</td><td><code>bias_audit_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>3</td><td>Disparity Heatmap</td><td><code>disparity_heatmap_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>3</td><td>Counterfactual Effect Sizes</td><td><code>effect_sizes_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>3</td><td>Intersectional Analysis</td><td><code>intersectional_analysis_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>4</td><td>Reliability Diagram</td><td><code>reliability_diagram_to_svg()</code></td><td style="color:#6366f1;">Post-Processing</td></tr>
+            <tr><td>4</td><td>Calibration Report</td><td><code>calibration_report_to_svg()</code></td><td style="color:#6366f1;">Post-Processing</td></tr>
+            <tr><td>4</td><td>Group Calibration Curves</td><td><code>group_calibration_to_svg()</code></td><td style="color:#6366f1;">Post-Processing</td></tr>
+            <tr><td>5</td><td>Fairness Radar Chart</td><td><code>radar_chart_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>5</td><td>Metrics Bar Chart</td><td><code>metrics_bar_chart_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>5</td><td>Confidence Intervals</td><td><code>confidence_intervals_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>5</td><td>Group Comparison</td><td><code>group_comparison_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>5</td><td>Robustness Testing</td><td><code>robustness_testing_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>6</td><td>Regression Fairness</td><td><code>regression_fairness_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>7</td><td>CI/CD Pipeline Gate</td><td><code>cicd_pipeline_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>7</td><td>Hierarchical Gate</td><td><code>hierarchical_gate_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>8</td><td>Monitoring Dashboard</td><td><code>monitoring_dashboard_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>8</td><td>Drift Report</td><td><code>drift_report_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>9</td><td>Executive Dashboard</td><td><code>reporting_dashboard_to_svg()</code></td><td style="color:#7c3aed;">Reporting</td></tr>
+            <tr><td>9</td><td>Operational Dashboard</td><td><code>reporting_dashboard_to_svg()</code></td><td style="color:#7c3aed;">Reporting</td></tr>
+            <tr><td>9</td><td>Technical Dashboard</td><td><code>reporting_dashboard_to_svg()</code></td><td style="color:#7c3aed;">Reporting</td></tr>
+            <tr><td>10</td><td>EU AI Act Model Card (GPAI)</td><td><code>report_card_to_svg()</code></td><td style="color:#7c3aed;">Reporting</td></tr>
+        </tbody>
+    </table>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     WORKFLOW INTEGRATION
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="workflow">
+    <h2>Workflow Integration</h2>
+    <p>The audit above produces artifacts manually. To <strong>automate and enforce</strong> these checks in your development pipeline, vfairness provides workflow integration tools that plug directly into MLOps, CI/CD, version control, and testing infrastructure. See the <a href="../workflow-integration/index.html" style="color:var(--color-primary);font-weight:600;">Workflow Integration</a> guide for full documentation.</p>
+
+    <h3 style="margin-top:1.5rem;">1. Experiment Tracking</h3>
+    <p>Log every LLM evaluation run&rsquo;s fairness metrics to MLflow or Weights &amp; Biases so you can compare across prompt versions, model providers, and API updates.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code># Option A: explicit logging after Phase 5 evaluation
+from vfairness import log_fairness_to_mlflow
+import mlflow
+
+with mlflow.start_run(run_name="gpt4o-resume-prompt-v3"):
+    logged = log_fairness_to_mlflow(report, prefix="llm_resume")
+    print(f"Logged {logged} metrics to MLflow")
+
+# Option B: auto-logging decorator — wraps LLM evaluation functions
+from vfairness import auto_log_fairness
+
+@auto_log_fairness(backend="wandb", prefix="llm_resume")
+def evaluate_llm_fairness(predictions, ground_truth, sensitive):
+    # predictions from counterfactual prompt evaluation
+    return predictions, ground_truth, sensitive</code></pre>
+    </div>
+
+    <h3>2. Pre-Commit Hooks</h3>
+    <p>Enforce documentation standards before code reaches the repository. Particularly important for LLM deployments where prompt templates and evaluation configs change frequently.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">yaml</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code># .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/validantai/vfairness
+    # No vfairness version has been released or tagged yet, so there is no
+    # release tag to pin. Use a commit sha until one is cut, then pin the tag.
+    rev: &lt;commit-sha&gt;
+    hooks:
+      - id: vfairness-check-config    # validates fairness JSON configs
+      - id: vfairness-check-model-card # ensures model cards include fairness sections</code></pre>
+    </div>
+
+    <h3>3. pytest Integration</h3>
+    <p>Embed fairness assertions in your test suite. For LLM audits, this is especially valuable for testing counterfactual prompt pairs and regression-style output scoring &mdash; same checks as Phases 5&ndash;6, but automated on every commit.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>import pytest
+from vfairness import assert_fairness, FairnessTestSuite
+
+# Test counterfactual fairness of LLM output scores
+def test_llm_resume_fairness():
+    assert_fairness(
+        scores_ground_truth, scores_predicted, sensitive_test["gender"],
+        metrics=["demographic_parity_difference", "equalized_odds_difference"],
+        thresholds={"demographic_parity_difference": 0.10, "equalized_odds_difference": 0.15},
+    )
+
+# Full test suite with JUnit XML export for CI
+suite = FairnessTestSuite(
+    protected_attributes=["gender", "ethnicity", "age_group"],
+    metrics=["demographic_parity_difference"],
+    thresholds={"demographic_parity_difference": 0.10},
+)
+results = suite.test_predictions(
+    y_true, y_pred_binary, sensitive["gender"],
+    attr_name="gender",
+    raise_on_failure=False,   # record failures in the XML instead of raising
+)
+xml = suite.to_junit_xml()  # attach to CI pipeline artifacts</code></pre>
+    </div>
+
+    <h3>4. CI/CD Automation &amp; PR Comments</h3>
+    <p>Gate decisions from Phase 7 can be posted directly to GitHub as check results and PR comments. For GPAI deployments, this ensures that prompt template or evaluation pipeline changes are fairness-validated before merge.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code># Post gate result as a GitHub Check (from Phase 7)
+check_payload = gate.create_github_check(decision)
+# → POST to /repos/{owner}/{repo}/check-runs
+
+# Generate PR comment with full fairness report card
+from vfairness import FairnessReportCard
+card = FairnessReportCard(decision, model_name="GPT-4o-Resume-Screener-v3")
+comment_payload = card.to_github_comment_payload()
+# → POST to /repos/{owner}/{repo}/issues/{pr_number}/comments</code></pre>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">yaml</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code># .github/workflows/fairness-checks.yml
+name: LLM Fairness Gate
+on: [pull_request]
+jobs:
+  fairness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install vfairness
+      - run: python -m pytest tests/ -m fairness --junitxml=fairness-results.xml
+      - run: python scripts/evaluate_llm_gate.py  # runs gate + posts PR comment</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Mapping audit phases to workflow tools
+        </div>
+        <p style="font-size:0.85rem;color:var(--color-gray-600);">
+            <strong>Phase 5</strong> (Evaluation) &rarr; <code>@auto_log_fairness</code> + <code>assert_fairness()</code><br>
+            <strong>Phase 7</strong> (CI/CD) &rarr; <code>create_github_check()</code> + GitHub Actions YAML<br>
+            <strong>Phase 10</strong> (GPAI Model Card) &rarr; <code>FairnessReportCard.to_github_comment_payload()</code><br>
+            <strong>Every commit</strong> &rarr; Pre-commit hooks validate configs + model cards
+        </p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     EU AI ACT COMPLIANCE CHECKLIST
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="compliance">
+    <h2>EU AI Act Compliance Checklist</h2>
+    <p>Each requirement below is addressed by one or more artifacts from this audit. For GPAI deployments, the checklist includes both deployer obligations and documentation of GPAI provider information availability.</p>
+
+    <div class="compliance-grid">
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 9 &mdash; Risk Management</div>
+                <div class="ct-desc">Output validation, bias detection, counterfactual probing, and robustness testing form the risk management system. LLM-specific risks (model updates, prompt sensitivity) documented.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 10 &mdash; Data Governance</div>
+                <div class="ct-desc">Training data unavailable from GPAI provider (documented). Evaluation dataset governance fully documented: 5,000 resumes with demographic metadata, 1,000-resume human validation panel.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 11 &mdash; Technical Documentation</div>
+                <div class="ct-desc">22 SVG artifacts plus model card provide comprehensive technical documentation. Black-box constraints explicitly documented per Article 25 requirements.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 12 &mdash; Record-Keeping</div>
+                <div class="ct-desc">MetricsStore logs all fairness metrics with timestamps. API response headers tracked to detect silent model updates by the GPAI provider.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 13 &mdash; Transparency</div>
+                <div class="ct-desc">Multi-tier reporting provides stakeholder-appropriate transparency. Third-party model dependency and its limitations are prominently disclosed.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 14 &mdash; Human Oversight</div>
+                <div class="ct-desc">All shortlisting decisions reviewed by human recruiters. No fully automated rejections. Monthly counterfactual re-probing and quarterly fairness review board.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 15 &mdash; Accuracy &amp; Robustness</div>
+                <div class="ct-desc">Calibration analysis, permutation tests, regression fairness, and sensitivity analysis demonstrate output reliability. LLM-specific robustness risks (prompt injection, model drift) addressed.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 25 &mdash; Value Chain</div>
+                <div class="ct-desc">Responsibilities between GPAI provider and deployer explicitly documented. Information gaps from the provider compensated through enhanced output-level evaluation.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 51&ndash;56 &mdash; GPAI Obligations</div>
+                <div class="ct-desc">Provider obligations documented: model card availability, technical documentation status, copyright compliance status, and training data summary disclosure (or lack thereof).</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 72 &mdash; Post-Market Monitoring</div>
+                <div class="ct-desc">Continuous monitoring with drift detection and automated alerts. Weekly review cadence (elevated due to third-party dependency). API version tracking for silent model updates.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout callout-info" style="margin-top:2rem;">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Next Steps
+        </div>
+        <p>This walkthrough used demo data for illustration. To apply this process to your own LLM deployment:</p>
+        <ol style="font-size:0.85rem;color:var(--color-gray-600);margin-top:0.5rem;">
+            <li>Build a demographically diverse evaluation dataset with ground-truth labels</li>
+            <li>Design counterfactual probes tailored to your use case and protected attributes</li>
+            <li>Request the GPAI provider&rsquo;s model card and technical documentation (Article 53)</li>
+            <li>Adjust thresholds per your organization&rsquo;s risk appetite and domain regulations</li>
+            <li>Implement API response header logging to detect silent model updates</li>
+            <li>Schedule weekly re-probing and monthly full re-audits for third-party LLM deployments</li>
+        </ol>
+        <p style="margin-top:0.75rem;font-size:0.85rem;">Compare this with the <a href="index.html" style="color:var(--color-primary);font-weight:600;">Credit Scoring Audit</a> (full training data access), explore all 44 SVG templates in the <a href="../svg-gallery/index.html" style="color:var(--color-primary);font-weight:600;">SVG Gallery</a>, or learn about the full library architecture in the <a href="../getting-started/index.html" style="color:var(--color-primary);font-weight:600;">Getting Started</a> guide.</p>
+    </div>
+</section>
+
+        </div><!-- /content-container -->
+    </main>
+</div><!-- /page-wrapper -->
+
+<script defer src="../js/main.js"></script>
+<script>
+// ── Sidebar scroll tracking ──
+(function () {
+    const sections = [...document.querySelectorAll('section[id]')];
+    const links = [...document.querySelectorAll('.sidebar-nav a')];
+    if (!sections.length || !links.length) return;
+
+    function update() {
+        const scrollY = window.scrollY + 100;
+        let current = sections[0].id;
+        for (const s of sections) {
+            if (s.offsetTop <= scrollY) current = s.id;
+        }
+        links.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+        });
+    }
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) { requestAnimationFrame(() => { update(); ticking = false; }); ticking = true; }
+    });
+    update();
+})();
+</script>
+</body>
+</html>

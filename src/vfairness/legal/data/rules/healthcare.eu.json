@@ -1,0 +1,39 @@
+{
+  "use_case": "healthcare",
+  "jurisdiction": "eu",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "health": {
+      "status": "allowed",
+      "legal_basis": "GDPR Art. 9(2)(h) (medical diagnosis, healthcare provision)",
+      "notes": "Lawful basis exists for clinical use under a health professional or equivalent confidentiality obligation."
+    },
+    "genetic": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9; Member State law often adds additional restrictions",
+      "carve_out": "art_9_2_h"
+    },
+    "biometric": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9 (when used for identification)"
+    },
+    "ethnicity": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9",
+      "carve_out": "ai_act_art_10_5",
+      "notes": "Several MS discourage ethnic-monitoring data collection (e.g. France: no ethnic statistics in principle)."
+    },
+    "religion": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9"
+    },
+    "sexual_orientation": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9"
+    },
+    "disability": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9; UN CRPD"
+    }
+  }
+}

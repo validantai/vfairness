@@ -1,0 +1,93 @@
+{
+  "use_case": "recruitment",
+  "jurisdiction": "us-federal",
+  "source_revision": "2026-05-20",
+  "reviewed_by": "validant-legal-curation",
+  "rules": {
+    "genetic": {
+      "status": "forbidden",
+      "legal_basis": "GINA Title II §202 (42 USC §2000ff-1)",
+      "notes": "Employers may not request, require, or purchase genetic information about employees or applicants. Flat ban with narrow wellness exception. Drop the column or document an explicit GINA-compliant exception."
+    },
+    "health": {
+      "status": "forbidden",
+      "lifecycle": "pre_offer",
+      "legal_basis": "ADA §102(d)(2) (42 USC §12112(d)(2))",
+      "notes": "Pre-offer medical inquiries or examinations prohibited. Permitted only after a conditional job offer."
+    },
+    "disability": {
+      "status": "forbidden",
+      "lifecycle": "pre_offer",
+      "legal_basis": "ADA §102(d)(2)",
+      "notes": "Pre-offer disability inquiries prohibited; reasonable-adjustment discussion is allowed."
+    },
+    "ethnicity": {
+      "status": "monitoring_only",
+      "legal_basis": "Title VII (42 USC §2000e-2); EEO-1 reporting",
+      "carve_out": "eeo_monitoring",
+      "notes": "Protected class. Collection lawful for EEO-1 monitoring or affirmative-action reporting only; never as a decision feature."
+    },
+    "gender": {
+      "status": "monitoring_only",
+      "legal_basis": "Title VII (incl. Bostock v. Clayton County for orientation/identity)",
+      "carve_out": "eeo_monitoring"
+    },
+    "religion": {
+      "status": "monitoring_only",
+      "legal_basis": "Title VII",
+      "carve_out": "eeo_monitoring"
+    },
+    "age": {
+      "status": "restricted",
+      "legal_basis": "ADEA (29 USC §621 et seq.)",
+      "notes": "Protected for applicants/employees age 40+. Date of birth pre-hire creates ADEA risk; collect only when essential."
+    },
+    "dob": {
+      "status": "restricted",
+      "legal_basis": "ADEA",
+      "notes": "Same risk as age column; prefer post-hire collection."
+    },
+    "pregnancy": {
+      "status": "forbidden",
+      "legal_basis": "Pregnancy Discrimination Act (42 USC §2000e(k))",
+      "notes": "Cannot be a basis for hiring decisions; pre-hire questions create per-se Title VII risk."
+    },
+    "marital_status": {
+      "status": "restricted",
+      "legal_basis": "EEOC guidance; varies by state",
+      "notes": "Not a federal protected class but pre-hire inquiries treated as sex-discrimination proxies."
+    },
+    "veteran_status": {
+      "status": "restricted",
+      "legal_basis": "USERRA; VEVRAA",
+      "notes": "Collectable; cannot be the basis of adverse action."
+    },
+    "nationality": {
+      "status": "restricted",
+      "legal_basis": "IRCA §274B; Title VII national-origin",
+      "notes": "I-9 collection lawful at hire; broader citizenship questions create national-origin-discrimination risk."
+    },
+    "criminal_record": {
+      "status": "restricted",
+      "legal_basis": "EEOC Enforcement Guidance 2012 (Title VII disparate-impact); state ban-the-box laws",
+      "notes": "Federal disparate-impact risk; many states forbid pre-offer collection (see state-specific packs)."
+    },
+    "salary_history": {
+      "status": "allowed",
+      "legal_basis": "No federal ban (state bans apply, see us-ca, us-ny, us-co, etc.)"
+    },
+    "photo": {
+      "status": "restricted",
+      "legal_basis": "EEOC Pre-Employment Inquiries guidance",
+      "notes": "Treated as a proxy for race/age/gender/national-origin; do not collect pre-hire."
+    },
+    "name": {
+      "status": "allowed",
+      "notes": "Necessary identifier, but flagged as proxy for ethnicity/gender by Pulse's proxy detector."
+    },
+    "postcode": {
+      "status": "allowed",
+      "notes": "Often a strong proxy for race/SES. Pulse's proxy detector should evaluate."
+    }
+  }
+}

@@ -1,0 +1,179 @@
+{# ── Calibration · Calibration Disparity Analysis ── #}
+{# ── vfairness Design System G1 ── #}
+
+{# ── Height computation ── #}
+{% set content_start = 140 %}
+{% set stats_h = 70 %}
+{% set stats_y = content_start %}
+{% set stats_end = stats_y + stats_h %}
+{% set bar_row_h = 36 %}
+{% set bar_panel_y = stats_end + 16 %}
+{% set bar_panel_h = 40 + groups|length * bar_row_h %}
+{% set bar_panel_end = bar_panel_y + bar_panel_h %}
+{% set finding_y = bar_panel_end + 16 %}
+{% set finding_h = 80 %}
+{% set finding_end = finding_y + finding_h %}
+{% set rec_y = finding_end + 16 %}
+{% set rec_h = 60 %}
+{% set rec_end = rec_y + rec_h %}
+{% set exp_y = rec_end + 20 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% else %}
+{% set exp_h = 0 %}
+{% endif %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 {{ total_h }}" font-family="'Inter','Segoe UI',system-ui,-apple-system,sans-serif">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header ── #}
+<rect x="0" y="0" width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ── Ungraded count, in the HEADLINE BAND ──
+   The headline of this chart is the ECE DISPARITY tile and the worst/best pair
+   right below, and all three are computed over the groups that reported an
+   error. The count of the ones that did not was stated only in the
+   recommendation panel at the foot of the canvas, and only on two of its four
+   branches, so on a partly measured run with a real disparity the reader met
+   the number and never met its coverage. Absent for a fully measured run, so a
+   healthy canvas is byte-identical. #}
+{% if n_ungraded_groups|default(0) > 0 %}
+<rect x="404" y="102" width="276" height="24" rx="12" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+<text x="420" y="118" font-size="9.5" font-weight="700" fill="#64748b">COULD NOT CHECK: {{ n_ungraded_groups }} of {{ n_groups }} group(s) ungraded</text>
+{% endif %}
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Stats Area: Overall ECE, Disparity, Ratio                         #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ stats_y }}" width="204" height="{{ stats_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ stats_y + 18 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">OVERALL ECE</text>
+<text x="56" y="{{ stats_y + 46 }}" font-size="22" font-weight="700" fill="{{ overall_ece_color }}">{{ overall_ece|f3 }}</text>
+
+<rect x="256" y="{{ stats_y }}" width="204" height="{{ stats_h }}" rx="10" fill="#ffffff"/>
+<text x="276" y="{{ stats_y + 18 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">ECE DISPARITY</text>
+<text x="276" y="{{ stats_y + 46 }}" font-size="22" font-weight="700" fill="{{ ece_disparity_color }}">{{ ece_disparity|f3 }}</text>
+
+<rect x="476" y="{{ stats_y }}" width="204" height="{{ stats_h }}" rx="10" fill="#ffffff"/>
+<text x="496" y="{{ stats_y + 18 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">DISPARITY RATIO</text>
+{# The adapter formats this one: an unmeasured ratio is "N/A", never "N/Ax",  #}
+{# and a value past the 99.9 display cap says so instead of printing the cap. #}
+<text x="496" y="{{ stats_y + 46 }}" font-size="22" font-weight="700" fill="{{ ratio_color }}">{{ disparity_ratio_text }}</text>
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Horizontal Bar Chart: Group ECE Values                            #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ bar_panel_y }}" width="644" height="{{ bar_panel_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ bar_panel_y + 22 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">CALIBRATION ERROR BY GROUP</text>
+
+{% set bar_max = 360 %}
+{% set bar_label_x = 56 %}
+{% set bar_start_x = 200 %}
+
+{% for g in groups %}
+{% set gy = bar_panel_y + 36 + loop.index0 * bar_row_h %}
+
+{# Group label #}
+<text x="{{ bar_label_x }}" y="{{ gy + 16 }}" font-size="10.5" fill="#0f172a">{{ g.label|truncate_text(18) }}</text>
+
+{# Background track #}
+<rect x="{{ bar_start_x }}" y="{{ gy + 2 }}" width="{{ bar_max }}" height="20" rx="4" fill="#f1f5f9"/>
+
+{# Value bar #}
+{% set bw = max(4, (g.ece_scaled * bar_max)|int) %}
+<rect x="{{ bar_start_x }}" y="{{ gy + 2 }}" width="{{ bw }}" height="20" rx="4" fill="{{ g.color }}" opacity="0.85"/>
+
+{# Value text #}
+<text x="{{ bar_start_x + bw + 8 }}" y="{{ gy + 17 }}" font-size="10.5" font-weight="700" fill="{{ g.color }}">{{ g.ece|f3 }}</text>
+{% endfor %}
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Best / Worst Group Finding Panel                                   #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# A named group earns the green or red stripe. An unnamed one gets neither,  #}
+{# so a slate "N/A" is never framed as a best or worst result.                #}
+<rect x="36" y="{{ finding_y }}" width="310" height="{{ finding_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ finding_y }}" width="3" height="{{ finding_h }}" rx="1.5" fill="{{ best_color }}"/>
+<text x="56" y="{{ finding_y + 22 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">BEST CALIBRATED</text>
+<text x="56" y="{{ finding_y + 44 }}" font-size="13" font-weight="700" fill="{{ best_color }}">{{ best_group }}</text>
+<text x="56" y="{{ finding_y + 64 }}" font-size="10.5" fill="#6b7280">ECE = {{ best_ece|f3 }}</text>
+
+<rect x="370" y="{{ finding_y }}" width="310" height="{{ finding_h }}" rx="10" fill="#ffffff"/>
+<rect x="370" y="{{ finding_y }}" width="3" height="{{ finding_h }}" rx="1.5" fill="{{ worst_color }}"/>
+<text x="390" y="{{ finding_y + 22 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">WORST CALIBRATED</text>
+<text x="390" y="{{ finding_y + 44 }}" font-size="13" font-weight="700" fill="{{ worst_color }}">{{ worst_group }}</text>
+<text x="390" y="{{ finding_y + 64 }}" font-size="10.5" fill="#6b7280">ECE = {{ worst_ece|f3 }}</text>
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Recommendation Panel                                               #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ rec_y }}" width="644" height="{{ rec_h }}" rx="10" fill="#ffffff"/>
+{% if has_significant_disparity %}
+<rect x="36" y="{{ rec_y }}" width="3" height="{{ rec_h }}" rx="1.5" fill="#dc2626"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="7.5" font-weight="700" fill="#dc2626" letter-spacing="0.8">SIGNIFICANT DISPARITY</text>
+<text x="56" y="{{ rec_y + 42 }}" font-size="10.5" fill="#0f172a" font-weight="600">{{ recommendation }}</text>
+<text x="56" y="{{ rec_y + 56 }}" font-size="8.5" fill="#6b7280">Strategy: {{ strategy }}</text>
+{% elif not_assessable %}
+{# Could-not-check, on the canvas and not only in the desc. It sits after the #}
+{# caller's own disparity flag, so a real warning is never suppressed, and    #}
+{# before the green branch, which may never be reached without a comparison.  #}
+<rect x="36" y="{{ rec_y }}" width="3" height="{{ rec_h }}" rx="1.5" fill="{{ unknown_color }}"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="7.5" font-weight="700" fill="{{ unknown_color }}" letter-spacing="0.8">{{ not_assessable_text }}</text>
+<text x="56" y="{{ rec_y + 42 }}" font-size="10.5" fill="#0f172a" font-weight="600">Cannot compare groups: {{ not_assessable_reason }}</text>
+<text x="56" y="{{ rec_y + 56 }}" font-size="8.5" fill="#6b7280">{{ n_measured_groups }} of {{ n_groups }} group(s) had a supplied calibration error.</text>
+{% elif not has_significant_disparity_known %}
+{# The third state of the VERDICT, as opposed to the third state of the data.  #}
+{# Every group here reported an error and the spread was measured, but no      #}
+{# caller ever judged it significant, and until 2026-08-27 that fell through   #}
+{# to the green branch below: an all-clear assembled out of a missing key.     #}
+{# The measured spread is stated, and left ungraded, because inventing a       #}
+{# threshold to grade it against would trade a fabricated all-clear for a      #}
+{# fabricated breach. #}
+<rect x="36" y="{{ rec_y }}" width="3" height="{{ rec_h }}" rx="1.5" fill="{{ unknown_color }}"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="7.5" font-weight="700" fill="{{ unknown_color }}" letter-spacing="0.8">DISPARITY VERDICT NOT SUPPLIED</text>
+<text x="56" y="{{ rec_y + 42 }}" font-size="10.5" fill="#0f172a" font-weight="600">Spread measured at {{ ece_disparity|f3 }} across {{ n_measured_groups }} group(s), not graded.</text>
+<text x="56" y="{{ rec_y + 56 }}" font-size="8.5" fill="#6b7280">No significance verdict was supplied, so this is not a finding of no disparity.</text>
+{% else %}
+<rect x="36" y="{{ rec_y }}" width="3" height="{{ rec_h }}" rx="1.5" fill="#059669"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="7.5" font-weight="700" fill="#059669" letter-spacing="0.8">NO SIGNIFICANT DISPARITY</text>
+{# The all-clear is only ever unqualified when every supplied group was        #}
+{# measured. "All groups calibrated within acceptable bounds" over a group     #}
+{# that reported no error at all is a claim about a group nobody checked. #}
+{% if n_ungraded_groups|default(0) > 0 %}
+<text x="56" y="{{ rec_y + 42 }}" font-size="10.5" fill="#0f172a" font-weight="600">The {{ n_measured_groups }} measured group(s) are calibrated within acceptable bounds.</text>
+<text x="56" y="{{ rec_y + 56 }}" font-size="8.5" fill="#6b7280">{{ n_ungraded_groups }} of {{ n_groups }} group(s) reported no calibration error and were not covered by this verdict.</text>
+{% else %}
+<text x="56" y="{{ rec_y + 42 }}" font-size="10.5" fill="#0f172a" font-weight="600">All groups calibrated within acceptable bounds.</text>
+{% endif %}
+{% endif %}
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                  #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

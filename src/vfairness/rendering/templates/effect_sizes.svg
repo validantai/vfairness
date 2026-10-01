@@ -1,0 +1,129 @@
+{# ── Fairness Metrics · Effect Sizes (Cohen's d) ── #}
+{# ── vfairness G1 Design System ── #}
+
+{# ── Height computation ── #}
+{% set badge_h = 36 %}
+{% set row_h = min(42, (260 / max(1, effects|length))|int) %}
+{% set chart_h = 40 + effects|length * row_h + 30 %}
+{% set content_h = badge_h + 16 + chart_h %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% endif %}
+{% set exp_y = 140 + content_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 {{ total_h }}" font-family="'Inter','Segoe UI',system-ui,sans-serif">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ── Stats badges ── #}
+{% set badge_y = 140 %}
+<rect x="36" y="{{ badge_y }}" width="160" height="{{ badge_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ badge_y + 14 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.8">MAX EFFECT</text>
+<text x="56" y="{{ badge_y + 30 }}" font-size="13" font-weight="700" fill="{{ max_effect_color }}">{{ max_effect|f3 }} ({{ max_effect_interpretation }})</text>
+
+<rect x="206" y="{{ badge_y }}" width="140" height="{{ badge_h }}" rx="10" fill="#ffffff"/>
+<text x="226" y="{{ badge_y + 14 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.8">AVG |d|</text>
+<text x="226" y="{{ badge_y + 30 }}" font-size="13" font-weight="700" fill="{{ avg_effect_color }}">{{ avg_effect|f3 }}</text>
+
+{# ── Ungraded count, in the HEADLINE BAND, beside the two tiles it qualifies ──
+   MAX EFFECT is a maximum, and a maximum taken over four of six metrics is not
+   the maximum; AVG |d| is a mean over the same partial set. Both tiles are up
+   here and the count of the metrics behind neither of them was appended to the
+   subtitle, which `_fit_subtitle` trims to the 644px line, so a longer caveat
+   (the "Not an effect size: ..." prefix the adapter puts FIRST) can push it off
+   the canvas entirely. A chip cannot be trimmed. Absent for a fully measured
+   run, so a healthy canvas is byte-identical. #}
+{% if n_unmeasured %}
+<rect x="356" y="{{ badge_y }}" width="220" height="{{ badge_h }}" rx="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+<text x="376" y="{{ badge_y + 14 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.8">COULD NOT CHECK</text>
+<text x="376" y="{{ badge_y + 30 }}" font-size="11" font-weight="700" fill="#64748b">{{ n_unmeasured }} metric(s) not plotted</text>
+{% endif %}
+
+{# ── Diverging chart ── #}
+{% set chart_y = badge_y + badge_h + 16 %}
+{% set zero_x = 380 %}
+{% set px_per_unit = 120 %}
+
+{# Reference zones #}
+{% set small_w = (0.2 * px_per_unit)|int %}
+<rect x="{{ zero_x - small_w }}" y="{{ chart_y }}" width="{{ small_w * 2 }}" height="{{ effects|length * row_h + 30 }}" fill="#d1fae5" opacity="0.2" rx="4"/>
+
+{# Zone boundary lines #}
+{% set med_w = (0.5 * px_per_unit)|int %}
+<line x1="{{ zero_x - med_w }}" y1="{{ chart_y }}" x2="{{ zero_x - med_w }}" y2="{{ chart_y + effects|length * row_h + 30 }}" stroke="#f59e0b" stroke-width="0.5" stroke-dasharray="4,3"/>
+<line x1="{{ zero_x + med_w }}" y1="{{ chart_y }}" x2="{{ zero_x + med_w }}" y2="{{ chart_y + effects|length * row_h + 30 }}" stroke="#f59e0b" stroke-width="0.5" stroke-dasharray="4,3"/>
+
+{% set large_w = (0.8 * px_per_unit)|int %}
+<line x1="{{ zero_x - large_w }}" y1="{{ chart_y }}" x2="{{ zero_x - large_w }}" y2="{{ chart_y + effects|length * row_h + 30 }}" stroke="#dc2626" stroke-width="0.5" stroke-dasharray="4,3"/>
+<line x1="{{ zero_x + large_w }}" y1="{{ chart_y }}" x2="{{ zero_x + large_w }}" y2="{{ chart_y + effects|length * row_h + 30 }}" stroke="#dc2626" stroke-width="0.5" stroke-dasharray="4,3"/>
+
+{# Zero line #}
+<line x1="{{ zero_x }}" y1="{{ chart_y }}" x2="{{ zero_x }}" y2="{{ chart_y + effects|length * row_h + 30 }}" stroke="#0f172a" stroke-width="1"/>
+
+{# Zone labels #}
+<text x="{{ zero_x }}" y="{{ chart_y + 10 }}" text-anchor="middle" font-size="7.5" font-weight="600" fill="#059669" letter-spacing="0.8">NEGLIGIBLE</text>
+<text x="{{ zero_x - (0.35 * px_per_unit)|int }}" y="{{ chart_y + 10 }}" text-anchor="middle" font-size="7" fill="#f59e0b">SMALL</text>
+<text x="{{ zero_x + (0.35 * px_per_unit)|int }}" y="{{ chart_y + 10 }}" text-anchor="middle" font-size="7" fill="#f59e0b">SMALL</text>
+
+{# Scale labels #}
+{% set scale_y = chart_y + effects|length * row_h + 26 %}
+{% for val in [-0.8, -0.5, -0.2, 0, 0.2, 0.5, 0.8] %}
+{% set sx = zero_x + (val * px_per_unit)|int %}
+<text x="{{ sx }}" y="{{ scale_y }}" text-anchor="middle" font-size="7.5" fill="#94a3b8">{{ val }}</text>
+{% endfor %}
+
+{# ── Effect lollipops ── #}
+{% for eff in effects %}
+{% set ey = chart_y + 18 + loop.index0 * row_h %}
+
+{# Label #}
+<text x="36" y="{{ ey + 14 }}" font-size="10" font-weight="500" fill="#0f172a">{{ eff.label|truncate_text(24) }}</text>
+
+{# Lollipop stick #}
+{% set eff_x = zero_x + eff.px_offset %}
+<line x1="{{ zero_x }}" y1="{{ ey + 10 }}" x2="{{ eff_x }}" y2="{{ ey + 10 }}" stroke="{{ eff.color }}" stroke-width="2"/>
+<circle cx="{{ eff_x }}" cy="{{ ey + 10 }}" r="6" fill="{{ eff.color }}" stroke="#ffffff" stroke-width="1.5"/>
+<text x="{{ eff_x }}" y="{{ ey + 13 }}" text-anchor="middle" font-size="7" font-weight="700" fill="#ffffff">{{ eff.label_short }}</text>
+
+{# Value #}
+{% set val_side = 1 if eff.value >= 0 else -1 %}
+<text x="{{ eff_x + val_side * 16 }}" y="{{ ey + 14 }}" text-anchor="{{ 'start' if val_side == 1 else 'end' }}" font-size="9" font-weight="700" fill="{{ eff.color }}">{{ eff.value|f3 }}</text>
+
+{# Interpretation badge #}
+<rect x="590" y="{{ ey + 1 }}" width="80" height="18" rx="9" fill="{{ eff.badge_bg }}"/>
+<text x="630" y="{{ ey + 14 }}" text-anchor="middle" font-size="8" font-weight="600" fill="{{ eff.badge_color }}">{{ eff.interpretation }}</text>
+{% endfor %}
+
+{# ── Explanation panel ── #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+
+</svg>

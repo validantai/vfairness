@@ -1,0 +1,239 @@
+name: Fairness Checks
+
+# ROOT-RELATIVE BY DESIGN, like every other workflow in this directory: it lives
+# in the vfairness/ subtree of the private development monorepo and becomes
+# active only in the PUBLIC repo (validantai/vfairness), where that subtree IS
+# the repo root.
+#
+# `push` was added on 2026-08-28. Until then this ran on pull_request ONLY, so a
+# commit pushed straight to main passed through no fairness gate at all, and the
+# release snapshot lands exactly that way. Meanwhile docs/RELEASE_PIPELINE.md
+# told readers the standing gates run on every push and pull request. Do not
+# narrow this back to pull_request without correcting that claim in the same
+# change.
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+# Least privilege, declared rather than inherited. The default GITHUB_TOKEN
+# permissions differ between repositories and can be changed in settings, so a
+# workflow with no block at all is a workflow whose privileges nobody stated.
+permissions:
+  contents: read
+
+jobs:
+  fairness-gate:
+    name: Fairness Gate Evaluation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # For the report comment below. Job-level permissions REPLACE the
+      # workflow-level block, so contents:read is repeated here.
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          # Torch first, from the CPU-only index. The default PyPI wheel on
+          # Linux drags in the CUDA runtime (~2.5 GB installed) for a runner
+          # that has no GPU; the cpu index is ~200 MB. The extras install below
+          # then sees the requirement already satisfied and does not re-resolve
+          # it. Keep this line ahead of the extras install.
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          # Every extra the test suite actually exercises. jinja2 for the SVG
+          # rendering tests, matplotlib/seaborn for viz, PyWavelets for the
+          # monitoring tests, xai + training for the explainability and
+          # in-processing batteries, parity for the fairlearn/aif360 reference
+          # comparison.
+          #
+          # DO NOT TRIM THIS LIST to shorten the job. Until 2026-08-27 it read
+          # "[dev,rendering,viz,monitoring]" under a comment claiming the full
+          # suite ran. It did not: 41 tests importorskip'd on torch, shap,
+          # captum, lime, dice-ml and anchor, and 19 more on fairlearn/aif360,
+          # in every environment including this one. Skips are invisible in the
+          # summary line, so the run stayed green while the entire xai
+          # subsystem, the torch fairness losses, and the regression pins for
+          # two CRITICAL audit fixes had never once executed. The
+          # VFAIRNESS_REQUIRE_BACKENDS gate below now turns any such gap into a
+          # failure, but only if the backend is genuinely meant to be here.
+          #
+          # cicd added 2026-08-27: it carries PyYAML, which the shipped
+          # `vfairness-precommit check-config` hook parses YAML fairness gate
+          # configs with. Without it the two positive-path tests in
+          # tests/test_packaging_hygiene.py importorskip, so the only thing CI
+          # would prove about that hook is that it refuses to run.
+          pip install -e ".[dev,rendering,viz,monitoring,xai,training,parity,cicd]"
+
+      - name: Run test suite with coverage
+        env:
+          # Asserts every optional backend the suite gates on is importable, so
+          # a missing one FAILS by name (tests/test_optional_backends_present.py)
+          # instead of silently subtracting tests from this run.
+          VFAIRNESS_REQUIRE_BACKENDS: "1"
+        run: |
+          # Run the WHOLE suite (no '-m fairness' filter: that marker is carried
+          # by zero tests, so it used to select nothing). Branch coverage is on
+          # (branch=true in pyproject); --cov-fail-under sits just under the
+          # measured baseline so coverage ratchets up over time.
+          # -rs prints the reason for every skip, so an unreachable battery is
+          # readable in the log rather than hidden behind the summary count.
+          #
+          # The gate was 40 while measured coverage was above 50, so it ratcheted
+          # nothing: half the package could have stopped being tested without the
+          # job noticing. Re-measured over the full suite on 2026-08-27:
+          # 52.38% line+branch locally, 51.67% recomputed with the causal
+          # subsystem removed (which approximates the extras installed here).
+          # 48 keeps a few points of headroom for platform variance while
+          # actually catching a regression. Re-measure and raise it when the
+          # figure moves up; do not lower it to make a red run green.
+          # tests/test_packaging_hygiene.py pins this number.
+          python -m pytest --tb=short -rs --junitxml=fairness-results.xml \
+            --cov=vfairness --cov-report=term-missing --cov-report=xml \
+            --cov-fail-under=48
+
+      - name: Run fairness gate
+        id: gate
+        run: |
+          python -c "
+          from vfairness import ModelFairnessGate, FairnessReportCard
+          import json, sys
+
+          # Load test data and model predictions
+          # (customize this section for your project)
+          # Example with mock data for demonstration:
+          import numpy as np
+          np.random.seed(42)
+          n = 1000
+          y_true = np.random.randint(0, 2, n)
+          y_pred = np.random.randint(0, 2, n)
+          protected = np.random.choice(['A', 'B'], n)
+
+          gate = ModelFairnessGate(
+              metrics=['demographic_parity_difference', 'equalized_odds_difference'],
+              thresholds={
+                  'demographic_parity_difference': 0.1,
+                  'equalized_odds_difference': 0.1,
+              },
+          )
+
+          decision = gate.evaluate(y_true, y_pred, protected)
+          card = FairnessReportCard(decision, model_name='PR Model')
+          report = card.to_markdown()
+
+          # Write report for PR comment
+          with open('fairness-report.md', 'w') as f:
+              f.write(report)
+
+          # Set output for status check
+          if not decision.approved:
+              print('::error::Fairness gate BLOCKED — see report')
+              sys.exit(1)
+          else:
+              print(f'Fairness gate: {decision.status.value}')
+          "
+
+      - name: Comment PR with fairness report
+        # pull_request ONLY. `context.issue.number` is undefined on a push, so
+        # on a push run this step would throw and turn an otherwise green
+        # fairness gate red for a reason that has nothing to do with fairness.
+        # That is the trap the `push` trigger added on 2026-08-28 opens up.
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b  # v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body;
+            try {
+              body = fs.readFileSync('fairness-report.md', 'utf8');
+            } catch (e) {
+              body = '## Fairness Report\n\nFairness gate could not generate report.';
+            }
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body,
+            });
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: fairness-results
+          path: |
+            fairness-results.xml
+            coverage.xml
+
+  # Resolves the DECLARED floors instead of whatever pip happens to pick today.
+  #
+  # DO NOT DELETE THIS JOB. Until 2026-08-27 pyproject declared
+  # `scikit-learn>=1.0` and CI installed only the latest resolution, so the floor
+  # was an assertion nobody ever ran. It was wrong: with sklearn 1.1.3 / 1.2.2 /
+  # 1.3.2 the ExponentiatedGradient mitigation misses its own demographic-parity
+  # constraint (violation 0.0516 against a 0.05 tolerance) and reports it as
+  # enforced, and the suite's own pin says so. pandas was floored the same way:
+  # below 2.2.1 the agent memory-contamination screen raises IndexError and
+  # degrades to "could not be computed". The floors are now numpy 1.23.2,
+  # pandas 2.2.1, scipy 1.9.2, scikit-learn 1.4.0, requests 2.25.0, and this job is
+  # what keeps them honest: a floor that silently breaks a fairness guarantee
+  # cannot ship again. Verified on this exact resolution 2026-08-27: no test fails
+  # at the floor that does not also fail at the latest resolution.
+  #
+  # Only the core dependency set is floored. The optional extras are deliberately
+  # NOT installed here: several of their own floors (matplotlib 3.5, torch 1.9)
+  # predate cp311 wheels, so a lowest-direct resolution of them would fail to
+  # build rather than tell us anything. Tests that need those backends
+  # importorskip, and -rs prints each one.
+  dependency-floor:
+    name: Lowest declared dependency versions
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          # The floor of requires-python, so the oldest declared dependency
+          # versions are actually installable.
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
+
+      - name: Install at the lowest declared direct versions
+        run: |
+          uv pip install --system --resolution lowest-direct -e .
+          # Test tooling is not part of the contract under test, so it resolves
+          # normally. Neither pytest nor networkx depends on the scientific stack,
+          # so this cannot lift the floors installed above.
+          #
+          # networkx is here because tests/unit/test_causal_graph.py imports the
+          # causal graph directly instead of guarding on importorskip, so without
+          # it those 7 tests fail for a reason that has nothing to do with
+          # dependency floors. The main job above gets networkx transitively via
+          # torch; this job installs no torch, so it has to ask.
+          uv pip install --system pytest networkx
+          python - <<'PY'
+          import numpy, pandas, scipy, sklearn, requests
+          print("resolved floor:",
+                "numpy", numpy.__version__,
+                "pandas", pandas.__version__,
+                "scipy", scipy.__version__,
+                "scikit-learn", sklearn.__version__,
+                "requests", requests.__version__)
+          PY
+
+      - name: Run test suite at the dependency floor
+        run: python -m pytest --tb=short -rs -q

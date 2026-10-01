@@ -1,0 +1,242 @@
+{# ── Intersectional Disparity · Ranked Bar Chart ── #}
+{# ── vfairness G1 Design System ── #}
+
+{# ── Layout constants ── #}
+{% set bar_max_w = 260 %}
+{% set row_h = 20 %}
+{% set n_groups = groups|length %}
+{% set ungraded = ungraded_groups|default([], true) %}
+{% set n_rows = n_groups + ungraded|length %}
+{% set cards_h = 76 %}
+{% set bars_header_h = 28 %}
+{% set bars_h = n_rows * row_h + 14 %}
+{% set legend_h = 22 %}
+{% set n_insights = insights|length if insights else 0 %}
+{% set insights_h = n_insights * 32 + (18 if n_insights > 0 else 0) %}
+{% set content_h = cards_h + 20 + bars_header_h + bars_h + legend_h + 14 + insights_h %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% endif %}
+{% set exp_y = 140 + content_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   The two comparison cards, the DISPARITY band between them, the ranked bars
+   and the insight list all go. The severity default of "medium" printed a
+   banded "DISPARITY: MEDIUM" beside "0.0pp" and two cards both labelled N/A: a
+   band is a verdict about a measured gap, and N/A on both sides of it says the
+   gap had no operands. #}
+{% if not_assessable %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = 138 %}
+{% set exp_y = na_y + na_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 {{ total_h }}" font-family="'Inter','Segoe UI',system-ui,sans-serif">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{% if not_assessable %}
+<text x="36" y="122" font-size="10" fill="#64748b">No intersectional subgroup was compared</text>
+{% include '_could_not_check.svg' %}
+{% else %}
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# Part (c) of the headline rule: the ungraded count belongs in the HEADLINE
+   band, beside the count it is NOT part of. "7 subgroups analysed" over a table
+   in which two rows carry no rate at all reads as seven measurements, and a
+   reader has no way to tell the graded subset from the whole without this. #}
+{% if n_ungraded %}
+<rect x="470" y="106" width="174" height="20" rx="6" fill="#f1f5f9"/>
+<text x="482" y="120" font-size="8.5" font-weight="600" fill="#64748b">{{ n_ungraded }} subgroup(s) not graded</text>
+{% endif %}
+
+{# ── Comparison cards ── #}
+{% set card_y = 138 %}
+{% set card_w = 220 %}
+{% set card_gap = 130 %}
+{% set card_lx = 36 %}
+{% set card_rx = 680 - 36 - card_w %}
+{% set arrow_cx = card_lx + card_w + (card_rx - card_lx - card_w) // 2 %}
+
+{# Privileged group card (left) #}
+<rect x="{{ card_lx }}" y="{{ card_y }}" width="{{ card_w }}" height="{{ cards_h }}" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<text x="{{ card_lx + 12 }}" y="{{ card_y + 15 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.5">MOST ADVANTAGED</text>
+<text x="{{ card_lx + 12 }}" y="{{ card_y + 30 }}" font-size="11" font-weight="700" fill="#0f172a">{{ privileged.group|truncate_text(26) }}</text>
+<text x="{{ card_lx + 12 }}" y="{{ card_y + 48 }}" font-size="16" font-weight="700" fill="#0f172a">{{ privileged.rate|pct1 }}</text>
+<text x="{{ card_lx + 84 }}" y="{{ card_y + 48 }}" font-size="9" fill="#94a3b8">positive rate</text>
+<text x="{{ card_lx + 12 }}" y="{{ card_y + 62 }}" font-size="7.5" fill="#94a3b8">{{ privileged.predicted|pct1 }} predicted | {{ privileged.actual|pct1 }} actual</text>
+<text x="{{ card_lx + 12 }}" y="{{ card_y + 72 }}" font-size="7.5" fill="#cbd5e1">n={{ privileged.n if privileged.n is not none else 'N/A' }}</text>
+
+{# Disparity indicator (center) #}
+{# Dashed lines: two segments around the pill #}
+<line x1="{{ card_lx + card_w + 4 }}" y1="{{ card_y + cards_h // 2 }}" x2="{{ arrow_cx - 34 }}" y2="{{ card_y + cards_h // 2 }}" stroke="{{ severity_color }}" stroke-width="1" stroke-dasharray="4,3" opacity="0.3"/>
+<line x1="{{ arrow_cx + 34 }}" y1="{{ card_y + cards_h // 2 }}" x2="{{ card_rx - 4 }}" y2="{{ card_y + cards_h // 2 }}" stroke="{{ severity_color }}" stroke-width="1" stroke-dasharray="4,3" opacity="0.3"/>
+
+{# Pill + labels, vertically centered in card #}
+{% set pill_y = card_y + (cards_h // 2) - 28 %}
+<rect x="{{ arrow_cx - 32 }}" y="{{ pill_y }}" width="64" height="22" rx="6" fill="{{ severity_color }}10" stroke="{{ severity_color }}25" stroke-width="0.75"/>
+<text x="{{ arrow_cx }}" y="{{ pill_y + 15 }}" text-anchor="middle" font-size="11" font-weight="700" fill="{{ severity_color }}">{{ disparity_pp|f1 }}pp</text>
+<text x="{{ arrow_cx }}" y="{{ pill_y + 32 }}" text-anchor="middle" font-size="7" font-weight="600" fill="#94a3b8" letter-spacing="0.3">DISPARITY</text>
+{# The band under the gap is a JUDGEMENT. It is drawn whatever it holds, so a
+   defaulted "MEDIUM" was indistinguishable from a graded one; when no severity
+   was reported the pill says NOT GRADED and is drawn in slate, which is not a
+   point on the severity scale. #}
+{% set sev_graded = severity_graded|default(true) %}
+{% set sev_pill_w = 44 if sev_graded else 62 %}
+<rect x="{{ arrow_cx - (sev_pill_w // 2) }}" y="{{ pill_y + 37 }}" width="{{ sev_pill_w }}" height="13" rx="4" fill="{{ severity_color }}15"/>
+<text x="{{ arrow_cx }}" y="{{ pill_y + 47 }}" text-anchor="middle" font-size="6.5" font-weight="700" fill="{{ severity_color }}">{{ severity }}</text>
+
+{# Disadvantaged group card (right) #}
+<rect x="{{ card_rx }}" y="{{ card_y }}" width="{{ card_w }}" height="{{ cards_h }}" rx="8" fill="#ffffff" stroke="{{ severity_color }}40" stroke-width="1.5"/>
+<text x="{{ card_rx + 12 }}" y="{{ card_y + 15 }}" font-size="7.5" font-weight="600" fill="{{ severity_color }}" letter-spacing="0.5">MOST DISADVANTAGED</text>
+<text x="{{ card_rx + 12 }}" y="{{ card_y + 30 }}" font-size="11" font-weight="700" fill="#0f172a">{{ disadvantaged.group|truncate_text(26) }}</text>
+<text x="{{ card_rx + 12 }}" y="{{ card_y + 48 }}" font-size="16" font-weight="700" fill="{{ severity_color }}">{{ disadvantaged.rate|pct1 }}</text>
+<text x="{{ card_rx + 84 }}" y="{{ card_y + 48 }}" font-size="9" fill="#94a3b8">positive rate</text>
+<text x="{{ card_rx + 12 }}" y="{{ card_y + 62 }}" font-size="7.5" fill="#94a3b8">{{ disadvantaged.predicted|pct1 }} predicted | {{ disadvantaged.actual|pct1 }} actual</text>
+<text x="{{ card_rx + 12 }}" y="{{ card_y + 72 }}" font-size="7.5" fill="#cbd5e1">n={{ disadvantaged.n if disadvantaged.n is not none else 'N/A' }}</text>
+
+{# vs single-attr badge #}
+{% if single_attr_max_pp %}
+<text x="644" y="{{ card_y + cards_h + 12 }}" text-anchor="end" font-size="7.5" fill="#94a3b8">vs single-attr max: {{ single_attr_max_pp|f1 }}pp</text>
+{% endif %}
+
+{# ── Ranked bars section ── #}
+{% set bars_y = card_y + cards_h + 20 %}
+<text x="36" y="{{ bars_y + 14 }}" font-size="13" font-weight="600" fill="#0f172a">All Subgroups</text>
+<text x="160" y="{{ bars_y + 14 }}" font-size="9" fill="#94a3b8">{{ n_groups }} groups ranked by positive rate</text>
+
+{% set bar_start_y = bars_y + bars_header_h %}
+{% set bar_x = 220 %}
+{% set rate_x = bar_x + bar_max_w + 12 %}
+{% set delta_x = rate_x + 50 %}
+{% set n_x = delta_x + 40 %}
+
+{% for g in groups %}
+{% set ry = bar_start_y + loop.index0 * row_h %}
+{% set bar_w = (g.rate * bar_max_w / max_rate)|int if max_rate > 0 else 0 %}
+{# The ground-truth bar is drawn ONLY from a reported ground truth. It used to
+   default to the PREDICTED rate, which lays the grey bar exactly under the
+   coloured one and reads as "prediction matches reality", an all-clear nobody
+   measured. #}
+{% set gt_w = (g.ground_truth * bar_max_w / max_rate)|int if (g.ground_truth is not none and max_rate > 0) else 0 %}
+
+{# Alternating row background #}
+{% if loop.index0 % 2 == 0 %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ row_h }}" rx="4" fill="#ffffff" opacity="0.5"/>
+{% endif %}
+
+{# Rank number #}
+<text x="44" y="{{ ry + row_h // 2 + 4 }}" font-size="8" fill="#94a3b8" text-anchor="end">{{ g.rank }}</text>
+
+{# Severity dot. A filled dot is a graded severity; a hollow ring is a row whose
+   severity nobody reported, and it must not be confusable with a graded LOW. #}
+{% if g.severity_graded|default(true) %}
+<circle cx="56" cy="{{ ry + row_h // 2 }}" r="3.5" fill="{{ g.dot_color }}"/>
+{% else %}
+<circle cx="56" cy="{{ ry + row_h // 2 }}" r="3" fill="none" stroke="#cbd5e1" stroke-width="1.25"/>
+{% endif %}
+
+{# Group name #}
+<text x="68" y="{{ ry + row_h // 2 + 4 }}" font-size="9" font-weight="500" fill="#0f172a">{{ g.name|truncate_text(22) }}</text>
+
+{# Ground truth bar (behind, lighter) #}
+{% if gt_w > 0 %}
+<rect x="{{ bar_x }}" y="{{ ry + 4 }}" width="{{ gt_w }}" height="{{ row_h - 8 }}" rx="2.5" fill="#e2e8f0"/>
+{% endif %}
+
+{# Prediction bar (front, colored) #}
+{% if bar_w > 0 %}
+<rect x="{{ bar_x }}" y="{{ ry + 4 }}" width="{{ bar_w }}" height="{{ row_h - 8 }}" rx="2.5" fill="{{ g.bar_color }}" opacity="0.85"/>
+{% endif %}
+
+{# Rate value #}
+<text x="{{ rate_x }}" y="{{ ry + row_h // 2 + 4 }}" font-size="9" font-weight="600" fill="#0f172a">{{ g.rate|pct1 }}</text>
+
+{# Delta. "0.0pp" for an unreported delta says the prediction and the ground
+   truth agree exactly, which is a measurement; N/A says nobody measured it. #}
+{% if g.delta_pp is not none %}
+<text x="{{ delta_x }}" y="{{ ry + row_h // 2 + 4 }}" font-size="8" fill="#94a3b8">{{ g.delta_pp|f1 }}pp</text>
+{% else %}
+<text x="{{ delta_x }}" y="{{ ry + row_h // 2 + 4 }}" font-size="8" fill="#cbd5e1">N/A</text>
+{% endif %}
+
+{# Sample size. n=0 is a claim about the data, and it was the default. #}
+<text x="{{ n_x }}" y="{{ ry + row_h // 2 + 4 }}" font-size="8" fill="#cbd5e1">n={{ g.n if g.n is not none else 'N/A' }}</text>
+
+{% endfor %}
+
+{# ── Subgroups that reported no positive rate ──
+   Listed so the reader can see the subgroup was named and never measured. No
+   rank, because they were not ranked; no bar, because there is nothing to
+   plot; no severity dot, because a severity here would be manufactured. They
+   are not in `groups`, so they are in no count and in no bar scale. #}
+{% for u in ungraded %}
+{% set ry = bar_start_y + (n_groups + loop.index0) * row_h %}
+{% if (n_groups + loop.index0) % 2 == 0 %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ row_h }}" rx="4" fill="#ffffff" opacity="0.5"/>
+{% endif %}
+<text x="44" y="{{ ry + row_h // 2 + 4 }}" font-size="8" fill="#cbd5e1" text-anchor="end">-</text>
+<circle cx="56" cy="{{ ry + row_h // 2 }}" r="3" fill="none" stroke="#cbd5e1" stroke-width="1.25"/>
+<text x="68" y="{{ ry + row_h // 2 + 4 }}" font-size="9" font-weight="500" fill="#64748b">{{ u.name|truncate_text(22) }}</text>
+<text x="{{ bar_x }}" y="{{ ry + row_h // 2 + 4 }}" font-size="8" font-weight="600" fill="#94a3b8">NOT MEASURED, no positive rate reported</text>
+<text x="{{ rate_x }}" y="{{ ry + row_h // 2 + 4 }}" font-size="9" font-weight="600" fill="#cbd5e1">N/A</text>
+<text x="{{ delta_x }}" y="{{ ry + row_h // 2 + 4 }}" font-size="8" fill="#cbd5e1">N/A</text>
+<text x="{{ n_x }}" y="{{ ry + row_h // 2 + 4 }}" font-size="8" fill="#cbd5e1">n={{ u.n if u.n is not none else 'N/A' }}</text>
+{% endfor %}
+
+{# ── Legend ── #}
+{% set legend_y = bar_start_y + n_rows * row_h + 10 %}
+<circle cx="44" cy="{{ legend_y + 6 }}" r="4" fill="#e2e8f0"/>
+<text x="54" y="{{ legend_y + 10 }}" font-size="8" fill="#64748b">Ground truth</text>
+<circle cx="134" cy="{{ legend_y + 6 }}" r="4" fill="#64748b"/>
+<text x="144" y="{{ legend_y + 10 }}" font-size="8" fill="#64748b">Prediction</text>
+<text x="644" y="{{ legend_y + 10 }}" text-anchor="end" font-size="8" fill="#94a3b8">Delta = prediction minus ground truth</text>
+
+{# ── Key Insights ── #}
+{% if insights and insights|length > 0 %}
+{% set insights_y = legend_y + legend_h + 12 %}
+<text x="36" y="{{ insights_y + 12 }}" font-size="11" font-weight="600" fill="#0f172a">Key Insights</text>
+<text x="120" y="{{ insights_y + 12 }}" font-size="8" fill="#94a3b8">{{ insights|length }} insight{{ 's' if insights|length != 1 }}</text>
+
+{% for ins in insights %}
+{% set iy = insights_y + 20 + loop.index0 * 32 %}
+<rect x="44" y="{{ iy }}" width="600" height="26" rx="5" fill="{{ ins.bg }}"/>
+<rect x="44" y="{{ iy }}" width="3" height="26" rx="1.5" fill="{{ ins.color }}"/>
+<text x="58" y="{{ iy + 17 }}" font-size="8.5" fill="#334155">{{ ins.text|truncate_text(105) }}</text>
+{% endfor %}
+{% endif %}
+{% endif %}{# end: not not_assessable #}
+
+{# ── Explanation panel ── #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+
+</svg>

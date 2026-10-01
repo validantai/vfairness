@@ -1,0 +1,139 @@
+name: Quality
+
+# Lint + type gate for vfairness (VB-LINT-1, VB-LINT-2, VB-TYPE-1, VB-TYPE-2).
+#
+# ROOT-RELATIVE BY DESIGN. This file lives in the vfairness/ subtree of the
+# private development monorepo and becomes active only in the PUBLIC repo
+# (validantai/vfairness), where that subtree IS the repo root: pyproject.toml,
+# src/ and tests/ sit at the top level. So there is no `vfairness/` path prefix
+# and no `defaults.run.working-directory` here, unlike the monorepo's own copy
+# of this gate. release.yml carries the same transformation.
+#
+# Ruff and mypy are both BLOCKING: the tree is lint-clean under the E/F/I/N/W
+# rule set, and the type-error burndown (VB-TYPE-1) reached zero, so `mypy src`
+# is enforced too. `ruff format --check` is enforced as well: src and tests are
+# ruff-formatted (VB-LINT-2). A PR-only diff-cover job requires the lines a PR
+# adds or changes to be tested.
+#
+# SCOPE IS `src tests scripts`, NOT `.`, AND THAT IS DELIBERATE. Measured
+# 2026-08-28 with ruff 0.16.2, `ruff check .` reported findings in scripts/ (and
+# in docs/, notebooks/ and spikes/, which the export drops anyway), so the scope
+# was `src tests` and this comment said: clean scripts/ first, then widen, in
+# that order.
+#
+# scripts/ is clean as of READINESS-6, 2026-09-10, and the scope is widened here.
+# That is not cosmetic. scripts/ holds the RELEASE TOOLING, including
+# build_verdict_ledger.py, and leaving it outside the gate meant the code that
+# decides what ships was the only Python in the repo nothing checked. The
+# cleanup found a real defect that no style rule would have reported on its own:
+# synth_single_bias_datasets.py seeded each variant with
+# `hash(builder.__name__)`, and Python salts str hashing per process, so a
+# script whose own comment promised reproducible re-runs emitted different data
+# under the same filenames on every run. F841 on a dead `rng` two lines away is
+# what put a reader in front of it.
+#
+# docs/, notebooks/ and spikes/ stay OUT: the export drops them, and a gate that
+# is red on material nobody ships gets switched off.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: this workflow only reads the repo and runs static checks.
+permissions:
+  contents: read
+
+jobs:
+  ruff:
+    name: Ruff (lint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.12'
+      - name: Install ruff (pinned for reproducible findings)
+        run: pip install ruff==0.16.2
+      - name: Ruff lint (src + tests)
+        run: ruff check src tests scripts
+      - name: Ruff format check (src + tests)
+        run: ruff format --check src tests scripts
+
+  mypy:
+    name: mypy (types)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.12'
+      - name: Install library + type deps
+        # Install the same optional extras the test job uses so third-party
+        # stubs (numpy / pandas / scikit-learn) resolve; without them mypy
+        # checks a different, smaller surface. mypy is pinned so the
+        # zero-error gate stays reproducible across runs.
+        #
+        # numpy is NOT pinned here and the gate is sensitive to which one pip
+        # picks. Measured 2026-08-28: with numpy 2.4.6 `mypy src` reports
+        # "Success: no issues found in 221 source files"; with numpy 2.5.2 the
+        # same tree fails, first on numpy's own stubs under the
+        # `python_version = "3.11"` setting in pyproject, then on six
+        # float64-vs-float invariance errors. If this job goes red without a
+        # source change, read the resolved numpy version before touching src/.
+        run: |
+          pip install -e '.[dev,rendering,viz,monitoring,causal]'
+          pip install 'mypy==2.3.0'
+      - name: mypy (src)
+        run: mypy src
+
+  diff-cover:
+    name: New-code coverage (diff-cover)
+    # PR-only: diff-cover needs a base branch to diff against. Direct pushes to
+    # main have no meaningful "new lines" base, so this is skipped there. It
+    # requires the lines a PR adds or changes to be tested, without waiting for
+    # GLOBAL coverage to reach the same bar.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.12'
+      - name: Install library + coverage tooling
+        run: |
+          pip install -e '.[dev,rendering,viz,monitoring,causal]'
+          pip install diff-cover
+      - name: Run suite with coverage
+        run: python -m pytest -q --cov=vfairness --cov-report=xml
+      - name: New code must be at least 80% covered
+        run: |
+          git fetch --no-tags origin "${{ github.base_ref }}"
+          diff-cover coverage.xml --compare-branch=FETCH_HEAD --fail-under=80
+
+  published-docs:
+    name: Published documents match the repo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.12'
+      - name: Install library
+        run: pip install -e '.[dev,rendering,viz,monitoring,causal]'
+      # WHY THIS IS ITS OWN JOB. The suite already fails on a stale document, but it
+      # fails as an assertion inside one of several hundred test files, and what a
+      # reader of that failure learns is that a span holds the wrong digits. This job
+      # names the GENERATOR that was not run, which is the actual fix. On 2026-09-29
+      # six figures on the hardening page were wrong at once, including B2 published
+      # as a Fail with 64 open months after it passed with zero, and every one of them
+      # was a generator nobody had run rather than a number somebody typed wrong.
+      - name: Every generated document is current
+        run: ./scripts/refresh-docs.sh --check

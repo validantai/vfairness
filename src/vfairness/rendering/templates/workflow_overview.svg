@@ -1,0 +1,194 @@
+{# ── Workflow Integration Overview · SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set pipeline_h = 130 %}
+{% set tracking_h = 50 + integrations|length * 24 %}
+{% set vcs_h = 50 + vcs_tools|length * 24 %}
+{% set testing_h = 50 + test_types|length * 24 %}
+{% if explanation %}{% set _pre_exp = explanation|wordwrap(105) %}{% set exp_h = 44 + _pre_exp.split('\n')|length * 16 %}{% else %}{% set exp_h = 0 %}{% endif %}
+
+{% set pipe_y = header_h %}
+{% set track_y = pipe_y + pipeline_h + 16 %}
+{% set vcs_y = track_y + tracking_h + 16 %}
+{% set test_y = vcs_y + vcs_h + 16 %}
+{% set exp_y = test_y + testing_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   The five-stage pipeline diagram and all three section panels go. Each panel
+   keeps its coloured heading whatever its list holds, so an empty call rendered
+   three confident section headers over nothing, and until 2026-08-27 it did not
+   even render empty: it rendered the library's own reference integrations,
+   ACTIVE badges and all, as though they were the caller's pipeline. #}
+{% if not_assessable %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = header_h %}
+{% set exp_y = na_y + na_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" fill="url(#accent)"/>
+
+{# ── EXAMPLE band ── #}
+{# The built-in reference integrations are reachable only through example=True, #}
+{# and when they are used the canvas has to say so where a reader looks, not    #}
+{# only in the <desc>. DO NOT REMOVE: the band is the only thing separating the #}
+{# library's own sample pipeline from a map of the reader's real one. #}
+{% if is_example %}
+<rect x="0" y="54" width="680" height="20" fill="#fef3c7"/>
+<text x="340" y="68" text-anchor="middle" font-size="9.5" font-weight="700" fill="#92400e" letter-spacing="0.8">EXAMPLE ONLY: SYNTHETIC DEMONSTRATION DATA, NOT A REAL EVALUATION</text>
+{% endif %}
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{% if not_assessable %}
+<text x="36" y="122" font-size="10" fill="#64748b">No workflow integration was described</text>
+{% include '_could_not_check.svg' %}
+{% else %}
+<text x="36" y="122" font-size="10" fill="#64748b">Development workflow integration: fairness at every stage</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Pipeline Flow                                                     #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ pipe_y }}" width="644" height="{{ pipeline_h }}" rx="10" fill="#ffffff"/>
+
+{# Stage boxes (5 stages) #}
+{% set stages = [
+    {"label": "Experiment\nTracking", "icon": "E", "color": "#3b82f6"},
+    {"label": "Version\nControl", "icon": "V", "color": "#8b5cf6"},
+    {"label": "CI/CD\nGates", "icon": "G", "color": "#059669"},
+    {"label": "Automated\nTesting", "icon": "T", "color": "#f59e0b"},
+    {"label": "Collaborative\nReview", "icon": "R", "color": "#ec4899"}
+] %}
+
+{% set stage_w = 100 %}
+{% set stage_gap = 22 %}
+{% set stage_start_x = 54 %}
+
+{% for stage in stages %}
+{% set sx = stage_start_x + loop.index0 * (stage_w + stage_gap) %}
+{% set sy = pipe_y + 20 %}
+{# Stage card #}
+<rect x="{{ sx }}" y="{{ sy }}" width="{{ stage_w }}" height="90" rx="8" fill="{{ stage.color }}10"/>
+<rect x="{{ sx }}" y="{{ sy }}" width="{{ stage_w }}" height="3" rx="1.5" fill="{{ stage.color }}"/>
+{# Icon circle #}
+<circle cx="{{ sx + 50 }}" cy="{{ sy + 30 }}" r="14" fill="{{ stage.color }}20"/>
+<text x="{{ sx + 50 }}" y="{{ sy + 35 }}" text-anchor="middle" font-size="13" font-weight="700" fill="{{ stage.color }}">{{ stage.icon }}</text>
+{# Label (split lines) #}
+{% set lines = stage.label.split('\n') %}
+{% for line in lines %}
+<text x="{{ sx + 50 }}" y="{{ sy + 58 + loop.index0 * 13 }}" text-anchor="middle" font-size="9.5" font-weight="600" fill="#0f172a">{{ line }}</text>
+{% endfor %}
+
+{# Arrow connector #}
+{% if not loop.last %}
+<line x1="{{ sx + stage_w + 2 }}" y1="{{ sy + 45 }}" x2="{{ sx + stage_w + stage_gap - 2 }}" y2="{{ sy + 45 }}" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+{% endif %}
+{% endfor %}
+
+{# Define arrowhead marker #}
+<defs>
+<marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+<polygon points="0 0, 6 3, 0 6" fill="#cbd5e1"/>
+</marker>
+</defs>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Experiment Tracking Section                                       #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ track_y }}" width="644" height="{{ tracking_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ track_y }}" width="2.5" height="{{ tracking_h }}" rx="1" fill="#3b82f6"/>
+<text x="56" y="{{ track_y + 20 }}" font-size="8" font-weight="600" fill="#3b82f6" letter-spacing="0.5">EXPERIMENT TRACKING</text>
+<text x="200" y="{{ track_y + 20 }}" font-size="10.5" font-weight="600" fill="#0f172a">MLOps Integration</text>
+<line x1="56" y1="{{ track_y + 30 }}" x2="660" y2="{{ track_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+
+{% for integ in integrations %}
+{% set iy = track_y + 44 + loop.index0 * 24 %}
+<circle cx="66" cy="{{ iy - 3 }}" r="3" fill="{{ integ.color|default('#3b82f6') }}"/>
+<text x="80" y="{{ iy }}" font-size="10" font-weight="600" fill="#0f172a">{{ integ.name }}</text>
+<text x="200" y="{{ iy }}" font-size="9.5" fill="#64748b">{{ integ.description|truncate_text(65) }}</text>
+{% if integ.status is defined %}
+{% if integ.status == 'active' %}
+<rect x="580" y="{{ iy - 10 }}" width="60" height="16" rx="8" fill="#ecfdf5"/>
+<text x="610" y="{{ iy }}" text-anchor="middle" font-size="8" font-weight="600" fill="#059669">ACTIVE</text>
+{% else %}
+<rect x="580" y="{{ iy - 10 }}" width="60" height="16" rx="8" fill="#f1f5f9"/>
+<text x="610" y="{{ iy }}" text-anchor="middle" font-size="8" font-weight="600" fill="#94a3b8">OPTIONAL</text>
+{% endif %}
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Version Control Section                                           #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ vcs_y }}" width="644" height="{{ vcs_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ vcs_y }}" width="2.5" height="{{ vcs_h }}" rx="1" fill="#8b5cf6"/>
+<text x="56" y="{{ vcs_y + 20 }}" font-size="8" font-weight="600" fill="#8b5cf6" letter-spacing="0.5">VERSION CONTROL</text>
+<text x="200" y="{{ vcs_y + 20 }}" font-size="10.5" font-weight="600" fill="#0f172a">Pre-commit &amp; PR Templates</text>
+<line x1="56" y1="{{ vcs_y + 30 }}" x2="660" y2="{{ vcs_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+
+{% for tool in vcs_tools %}
+{% set vy = vcs_y + 44 + loop.index0 * 24 %}
+<circle cx="66" cy="{{ vy - 3 }}" r="3" fill="#8b5cf6"/>
+<text x="80" y="{{ vy }}" font-size="10" font-weight="600" fill="#0f172a">{{ tool.name }}</text>
+<text x="200" y="{{ vy }}" font-size="9.5" fill="#64748b">{{ tool.description|truncate_text(65) }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Testing Section                                                   #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ test_y }}" width="644" height="{{ testing_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ test_y }}" width="2.5" height="{{ testing_h }}" rx="1" fill="#f59e0b"/>
+<text x="56" y="{{ test_y + 20 }}" font-size="8" font-weight="600" fill="#f59e0b" letter-spacing="0.5">TESTING &amp; AUTOMATION</text>
+<text x="200" y="{{ test_y + 20 }}" font-size="10.5" font-weight="600" fill="#0f172a">pytest Plugin &amp; Test Suites</text>
+<line x1="56" y1="{{ test_y + 30 }}" x2="660" y2="{{ test_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+
+{% for tt in test_types %}
+{% set ty = test_y + 44 + loop.index0 * 24 %}
+<circle cx="66" cy="{{ ty - 3 }}" r="3" fill="#f59e0b"/>
+<text x="80" y="{{ ty }}" font-size="10" font-weight="600" fill="#0f172a">{{ tt.name }}</text>
+<text x="200" y="{{ ty }}" font-size="9.5" fill="#64748b">{{ tt.description|truncate_text(65) }}</text>
+{% endfor %}
+
+{# ── EXAMPLE watermark ── #}
+{# Repeated so a crop or a screenshot of one section cannot lose the only mark #}
+{# that separates the sample pipeline from the reader's own. #}
+{% if is_example %}
+{% for _p in ([30, 70] if total_h > 800 else [50]) %}
+{% set _wy = (total_h * _p / 100)|int %}
+<text x="340" y="{{ _wy }}" text-anchor="middle" font-size="76" font-weight="800" fill="#92400e" opacity="0.12" letter-spacing="6" transform="rotate(-24 340 {{ _wy }})">EXAMPLE</text>
+{% endfor %}
+{% endif %}
+{% endif %}{# end: not not_assessable #}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

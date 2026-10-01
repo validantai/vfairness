@@ -1,0 +1,421 @@
+{
+ "date": "2026-10-01",
+ "check1_correct_on_normal_data": {
+  "state": "ran",
+  "entries": 110,
+  "with_reference": 34,
+  "agree": 34,
+  "differ": [],
+  "no_reference": 76,
+  "rows": [
+   {
+    "name": "demographic_parity_difference",
+    "reference": "fairlearn",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "demographic_parity_ratio",
+    "reference": "fairlearn",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "disparate_impact_ratio",
+    "reference": "fairlearn min/max selection rate",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "equal_opportunity_difference",
+    "reference": "fairlearn",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "equalized_odds_difference",
+    "reference": "fairlearn",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "fpr_parity_difference",
+    "reference": "fairlearn",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "fnr_parity_difference",
+    "reference": "fairlearn",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "accuracy_parity_difference",
+    "reference": "fairlearn MetricFrame + sklearn",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "predictive_parity_difference",
+    "reference": "fairlearn MetricFrame + sklearn",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "negative_predictive_value_difference",
+    "reference": "fairlearn MetricFrame, NPV from counts",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "worst_group_accuracy",
+    "reference": "fairlearn MetricFrame group_min",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "auroc_parity",
+    "reference": "fairlearn MetricFrame + sklearn",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "mae_parity_difference",
+    "reference": "fairlearn MetricFrame + sklearn",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "rmse_parity_difference",
+    "reference": "fairlearn MetricFrame + sklearn",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "r2_parity_difference",
+    "reference": "fairlearn MetricFrame + sklearn",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "mean_prediction_difference",
+    "reference": "fairlearn mean_prediction",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "demographic_parity_difference_with_ci",
+    "reference": "fairlearn, point estimate",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "disparate_impact_ratio_with_ci",
+    "reference": "fairlearn, point estimate",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "equal_opportunity_difference_with_ci",
+    "reference": "fairlearn, point estimate",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "equalized_odds_difference_with_ci",
+    "reference": "fairlearn, point estimate",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "fpr_parity_difference_with_ci",
+    "reference": "fairlearn, point estimate",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "predictive_parity_difference_with_ci",
+    "reference": "fairlearn MetricFrame, point estimate",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "negative_predictive_value_difference_with_ci",
+    "reference": "fairlearn MetricFrame, point estimate",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "FairnessAnalyzer",
+    "reference": "fairlearn, three methods",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "brier_score",
+    "reference": "sklearn brier_score_loss",
+    "tolerance": 1e-12,
+    "agree": true
+   },
+   {
+    "name": "calibration_curve",
+    "reference": "sklearn calibration_curve",
+    "tolerance": 1e-12,
+    "agree": true
+   },
+   {
+    "name": "calibration_slope",
+    "reference": "statsmodels logistic recalibration slope",
+    "tolerance": 1e-05,
+    "agree": true
+   },
+   {
+    "name": "calibration_in_the_large",
+    "reference": "statsmodels intercept with logit offset",
+    "tolerance": 1e-05,
+    "agree": true
+   },
+   {
+    "name": "bayesian_proportion_ci",
+    "reference": "scipy beta posterior, uniform prior",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "bonferroni_correction",
+    "reference": "statsmodels multipletests",
+    "tolerance": 1e-12,
+    "agree": true
+   },
+   {
+    "name": "benjamini_hochberg_correction",
+    "reference": "statsmodels multipletests",
+    "tolerance": 1e-12,
+    "agree": true
+   },
+   {
+    "name": "compute_effect_sizes",
+    "reference": "statsmodels Cohen's h, risk and odds ratio from counts",
+    "tolerance": 1e-09,
+    "agree": true
+   },
+   {
+    "name": "permutation_test",
+    "reference": "scipy permutation_test, Monte Carlo",
+    "tolerance": 0.02,
+    "agree": true
+   },
+   {
+    "name": "bootstrap_ci",
+    "reference": "scipy bootstrap percentile, Monte Carlo",
+    "tolerance": 0.02,
+    "agree": true
+   }
+  ],
+  "no_reference_names": [
+   "ActionBiasAnalyzer",
+   "AdversarialCollusionDetector",
+   "AnchorsExplainer",
+   "BenchmarkRunner",
+   "CausalFairnessGraph",
+   "CoTFaithfulnessAnalyzer",
+   "CompositionalityAnalyzer",
+   "CorrespondenceTester",
+   "CounterfactualTester",
+   "DecodingTrustRunner",
+   "DelegationRoutingAuditor",
+   "DiceCounterfactualExplainer",
+   "EmbeddingBiasDetector",
+   "EmergentBiasDetector",
+   "FairExplAIner",
+   "FairnessExplainer",
+   "FeatureAttributionExplainer",
+   "GroupthinkDetector",
+   "IntegratedGradientsExplainer",
+   "IntersectionalAnalyzer",
+   "KernelShapExplainer",
+   "LimeExplainer",
+   "LinearShapExplainer",
+   "NegotiationFairnessTracker",
+   "NonDeterminismAnalyzer",
+   "OutputAnalyzer",
+   "PipelineTracker",
+   "RAGBiasAnalyzer",
+   "TemporalTracker",
+   "TextFairnessAnalyzer",
+   "ToolBiasAuditor",
+   "TreeShapExplainer",
+   "attention_weighted_rank_fairness",
+   "bias_amplification",
+   "brier_score_decomposition",
+   "calibration_disparity",
+   "classification_fairness_report",
+   "comprehensive_fairness_test",
+   "conditional_adverse_impact",
+   "conditional_demographic_disparity",
+   "conditional_demographic_disparity_with_ci",
+   "counterfactual_fairness",
+   "detect_protected_attributes",
+   "diagnose_local_attribution",
+   "discover_intersectional_groups",
+   "expected_calibration_error",
+   "exposure_parity_difference",
+   "exposure_parity_ratio",
+   "fairness_decomposition",
+   "generate_recourse",
+   "group_calibration_metrics",
+   "identify_privileged_groups",
+   "integrated_calibration_index",
+   "integrated_calibration_index_with_ci",
+   "intersectional_disparity_analysis",
+   "judge_is_subject",
+   "lundberg_fairness_decomposition",
+   "maximum_calibration_error",
+   "multicalibration",
+   "multicalibration_with_ci",
+   "ndkl",
+   "net_benefit_parity",
+   "noise_floor_from_runs",
+   "normalized_discounted_kl_divergence",
+   "pricing_disparity",
+   "pricing_disparity_with_ci",
+   "proxy_score",
+   "representation_severity",
+   "residual_bias",
+   "route_explainer",
+   "scan_fairness_violations",
+   "sensitivity_analysis",
+   "skew",
+   "stress_test_fairness",
+   "subgroup_robustness_audit"
+  ],
+  "fixtures": [
+   "three_groups_700_250_120",
+   "two_groups_600_400"
+  ]
+ },
+ "check2_honest_on_broken_data": {
+  "state": "ran",
+  "entries": 110,
+  "pass": 109,
+  "fabricates": 0,
+  "over_refuses": 0,
+  "not_a_measurement": 1,
+  "not_covered": 0,
+  "failing": [],
+  "not_covered_names": [],
+  "verdicts": {
+   "ActionBiasAnalyzer": "PASS",
+   "AdversarialCollusionDetector": "PASS",
+   "AnchorsExplainer": "PASS",
+   "BenchmarkRunner": "PASS",
+   "CausalFairnessGraph": "PASS",
+   "CoTFaithfulnessAnalyzer": "PASS",
+   "CompositionalityAnalyzer": "PASS",
+   "CorrespondenceTester": "PASS",
+   "CounterfactualTester": "PASS",
+   "DecodingTrustRunner": "PASS",
+   "DelegationRoutingAuditor": "PASS",
+   "DiceCounterfactualExplainer": "PASS",
+   "EmbeddingBiasDetector": "PASS",
+   "EmergentBiasDetector": "PASS",
+   "FairExplAIner": "PASS",
+   "FairnessAnalyzer": "PASS",
+   "FairnessExplainer": "PASS",
+   "FeatureAttributionExplainer": "PASS",
+   "GroupthinkDetector": "PASS",
+   "IntegratedGradientsExplainer": "PASS",
+   "IntersectionalAnalyzer": "PASS",
+   "KernelShapExplainer": "PASS",
+   "LimeExplainer": "PASS",
+   "LinearShapExplainer": "PASS",
+   "NegotiationFairnessTracker": "PASS",
+   "NonDeterminismAnalyzer": "PASS",
+   "OutputAnalyzer": "PASS",
+   "PipelineTracker": "PASS",
+   "RAGBiasAnalyzer": "PASS",
+   "TemporalTracker": "PASS",
+   "TextFairnessAnalyzer": "PASS",
+   "ToolBiasAuditor": "PASS",
+   "TreeShapExplainer": "PASS",
+   "accuracy_parity_difference": "PASS",
+   "attention_weighted_rank_fairness": "PASS",
+   "auroc_parity": "PASS",
+   "bayesian_proportion_ci": "PASS",
+   "benjamini_hochberg_correction": "PASS",
+   "bias_amplification": "PASS",
+   "bonferroni_correction": "PASS",
+   "bootstrap_ci": "PASS",
+   "brier_score": "PASS",
+   "brier_score_decomposition": "PASS",
+   "calibration_curve": "PASS",
+   "calibration_disparity": "PASS",
+   "calibration_in_the_large": "PASS",
+   "calibration_slope": "PASS",
+   "classification_fairness_report": "PASS",
+   "comprehensive_fairness_test": "PASS",
+   "compute_effect_sizes": "PASS",
+   "conditional_adverse_impact": "PASS",
+   "conditional_demographic_disparity": "PASS",
+   "conditional_demographic_disparity_with_ci": "PASS",
+   "counterfactual_fairness": "PASS",
+   "demographic_parity_difference": "PASS",
+   "demographic_parity_difference_with_ci": "PASS",
+   "demographic_parity_ratio": "PASS",
+   "detect_protected_attributes": "PASS",
+   "diagnose_local_attribution": "PASS",
+   "discover_intersectional_groups": "PASS",
+   "disparate_impact_ratio": "PASS",
+   "disparate_impact_ratio_with_ci": "PASS",
+   "equal_opportunity_difference": "PASS",
+   "equal_opportunity_difference_with_ci": "PASS",
+   "equalized_odds_difference": "PASS",
+   "equalized_odds_difference_with_ci": "PASS",
+   "expected_calibration_error": "PASS",
+   "exposure_parity_difference": "PASS",
+   "exposure_parity_ratio": "PASS",
+   "fairness_decomposition": "PASS",
+   "fnr_parity_difference": "PASS",
+   "fpr_parity_difference": "PASS",
+   "fpr_parity_difference_with_ci": "PASS",
+   "generate_recourse": "PASS",
+   "group_calibration_metrics": "PASS",
+   "identify_privileged_groups": "PASS",
+   "integrated_calibration_index": "PASS",
+   "integrated_calibration_index_with_ci": "PASS",
+   "intersectional_disparity_analysis": "PASS",
+   "judge_is_subject": "PASS",
+   "lundberg_fairness_decomposition": "PASS",
+   "mae_parity_difference": "PASS",
+   "maximum_calibration_error": "PASS",
+   "mean_prediction_difference": "PASS",
+   "multicalibration": "PASS",
+   "multicalibration_with_ci": "PASS",
+   "ndkl": "PASS",
+   "negative_predictive_value_difference": "PASS",
+   "negative_predictive_value_difference_with_ci": "PASS",
+   "net_benefit_parity": "PASS",
+   "noise_floor_from_runs": "PASS",
+   "normalized_discounted_kl_divergence": "PASS",
+   "permutation_test": "PASS",
+   "predictive_parity_difference": "PASS",
+   "predictive_parity_difference_with_ci": "PASS",
+   "pricing_disparity": "PASS",
+   "pricing_disparity_with_ci": "PASS",
+   "proxy_score": "PASS",
+   "r2_parity_difference": "PASS",
+   "representation_severity": "PASS",
+   "residual_bias": "PASS",
+   "rmse_parity_difference": "PASS",
+   "route_explainer": "NOT A MEASUREMENT",
+   "scan_fairness_violations": "PASS",
+   "sensitivity_analysis": "PASS",
+   "skew": "PASS",
+   "stress_test_fairness": "PASS",
+   "subgroup_robustness_audit": "PASS",
+   "worst_group_accuracy": "PASS"
+  }
+ },
+ "gate_passes": true
+}

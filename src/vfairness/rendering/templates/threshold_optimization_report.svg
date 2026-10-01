@@ -1,0 +1,234 @@
+{# ── Threshold Optimization Report · vfairness Design System v4 · 680-width ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set badge_h = 50 %}
+{% set stats_h = 50 %}
+{% set table_header_h = 36 %}
+{% set table_row_h = 32 %}
+{% set table_h = table_header_h + groups|length * table_row_h + 16 %}
+{% set fairness_h = 90 %}
+{% set accuracy_h = 70 %}
+{% set rec_h = 70 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _pre_exp = explanation|wordwrap(105) %}
+{% set exp_h = 44 + _pre_exp.split('\n')|length * 16 %}
+{% endif %}
+
+{% set badge_y = header_h %}
+{% set stats_y = badge_y + badge_h %}
+{% set table_y = stats_y + stats_h %}
+{% set fairness_y = table_y + table_h + 16 %}
+{% set accuracy_y = fairness_y + fairness_h + 16 %}
+{% set rec_y = accuracy_y + accuracy_h + 16 %}
+{% set exp_y = rec_y + rec_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}
+<text x="644" y="32" text-anchor="end" font-size="9" fill="#b0b8c4">{{ timestamp }}</text>
+{% endif %}
+<rect x="36" y="52" width="644" height="1.5" fill="url(#accent)"/>
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{# The configuration row below is read as a record of the run. When the caller
+   supplied none of it, that is said here as well, so the three withheld cells
+   read as an absence rather than as a rendering fault. #}
+{# "N groups evaluated" counted every row in the table, including the rows that
+   reported no rate and no size, i.e. the groups nothing was measured for. A row
+   built from group_thresholds alone is exactly that, and ThresholdResult
+   carries nothing else, so every real run overstated its own scope on the one
+   line a reader takes the scope from. The count is now the EVALUATED subset,
+   and the ungraded remainder is named right here in the headline band. #}
+{% set _n_eval = n_groups_evaluated if n_groups_evaluated is defined else groups|length %}
+<text x="36" y="122" font-size="10" fill="#64748b">Group-specific threshold optimization: {{ _n_eval }} group{{ '' if _n_eval == 1 else 's' }} evaluated{% if not config_known %} · no constraint, tolerance or objective was supplied{% endif %}</text>
+{% if n_groups_unevaluated is defined and n_groups_unevaluated %}
+<text x="36" y="136" font-size="9" fill="#94a3b8">{{ n_groups_unevaluated }} further group{{ '' if n_groups_unevaluated == 1 else 's' }} reported no rate and no size and {{ 'was' if n_groups_unevaluated == 1 else 'were' }} not evaluated: {{ unevaluated_group_names }}</text>
+{% endif %}
+
+{# ── Feasibility badge ── #}
+{# Three states, never two. Feasibility is a verdict the optimiser reaches; a
+   result that carries none has not reached it, and neither the green nor the
+   red badge may stand in for that. #}
+{% if is_feasible is none %}
+<rect x="520" y="72" width="160" height="28" rx="14" fill="#f1f5f9"/>
+<text x="600" y="90" text-anchor="middle" font-size="10" font-weight="700" fill="#64748b">NOT ESTABLISHED</text>
+{% elif is_feasible %}
+<rect x="520" y="72" width="160" height="28" rx="14" fill="#ecfdf5"/>
+<text x="600" y="90" text-anchor="middle" font-size="10" font-weight="700" fill="#059669">FEASIBLE</text>
+{% else %}
+<rect x="520" y="72" width="160" height="28" rx="14" fill="#fef2f2"/>
+<text x="600" y="90" text-anchor="middle" font-size="10" font-weight="700" fill="#dc2626">INFEASIBLE</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Stats row                                                         #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Three cells of CONFIGURATION, each printed only when the caller supplied it.
+   A library default rendered here is not a record of the run: it says the
+   optimiser was set up this way, it survives export into an audit file, and it
+   can contradict the run it is printed beside (ThresholdResult.to_dict()
+   carries none of these keys, so an equalized_odds run at tolerance 0.10 read
+   as demographic_parity at 0.05). #}
+<rect x="36" y="{{ stats_y }}" width="200" height="40" rx="8" fill="#ffffff"/>
+<text x="56" y="{{ stats_y + 14 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.5" font-weight="600">CONSTRAINT</text>
+{% if constraint_known %}
+<text x="56" y="{{ stats_y + 30 }}" font-size="10" font-weight="600" fill="#0f172a">{{ constraint_type }}</text>
+{% else %}
+<text x="56" y="{{ stats_y + 30 }}" font-size="10" font-weight="600" fill="#94a3b8">not supplied</text>
+{% endif %}
+
+<rect x="248" y="{{ stats_y }}" width="200" height="40" rx="8" fill="#ffffff"/>
+<text x="268" y="{{ stats_y + 14 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.5" font-weight="600">TOLERANCE</text>
+{% if tolerance_known %}
+<text x="268" y="{{ stats_y + 30 }}" font-size="10" font-weight="600" fill="#0f172a">{{ tolerance|f2 }}</text>
+{% else %}
+<text x="268" y="{{ stats_y + 30 }}" font-size="10" font-weight="600" fill="#94a3b8">not supplied</text>
+{% endif %}
+
+<rect x="460" y="{{ stats_y }}" width="220" height="40" rx="8" fill="#ffffff"/>
+<text x="480" y="{{ stats_y + 14 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.5" font-weight="600">OBJECTIVE</text>
+{% if objective_known %}
+<text x="480" y="{{ stats_y + 30 }}" font-size="10" font-weight="600" fill="#0f172a">{{ objective }}</text>
+{% else %}
+<text x="480" y="{{ stats_y + 30 }}" font-size="10" font-weight="600" fill="#94a3b8">not supplied</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Group thresholds table                                            #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ table_y }}" width="644" height="{{ table_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">GROUP</text>
+<text x="220" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">THRESHOLD</text>
+<text x="330" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">ORIG RATE</text>
+<text x="440" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">OPT RATE</text>
+<text x="560" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">SIZE</text>
+<line x1="56" y1="{{ table_y + 30 }}" x2="660" y2="{{ table_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for group in groups %}
+{% set ry = table_y + table_header_h + loop.index0 * table_row_h %}
+
+<text x="56" y="{{ ry + 18 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ group.name|truncate_text(20) }}</text>
+<text x="220" y="{{ ry + 18 }}" font-size="10.5" font-weight="600" fill="#3b82f6">{{ group.threshold|f3 }}</text>
+<text x="330" y="{{ ry + 18 }}" font-size="10.5" fill="#6b7280">{{ group.original_rate|pct1 }}</text>
+{# Green is the improvement colour on this row, so an absent optimised rate is
+   printed in neutral slate: N/A must not read as a good outcome. #}
+<text x="440" y="{{ ry + 18 }}" font-size="10.5" fill="{{ '#059669' if group.optimized_rate is not none else '#94a3b8' }}">{{ group.optimized_rate|pct1 }}</text>
+{# A group whose size the result does not carry is not a group of 0 members. #}
+<text x="560" y="{{ ry + 18 }}" font-size="{{ 10.5 if group.size is not none else 8.5 }}" fill="{{ '#6b7280' if group.size is not none else '#94a3b8' }}">{{ group.size if group.size is not none else 'not reported' }}</text>
+
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + table_row_h }}" x2="660" y2="{{ ry + table_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Fairness improvement panel                                        #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% set fi = fairness_improvement %}
+{# A disparity that was never supplied is not a disparity of 0.000, and an
+   unmeasured reduction is not a reduction of 0%. When the figures are absent
+   the whole panel goes slate and states that, rather than drawing an empty
+   green bar against a "100% reduction" scale. #}
+{% set _fi_known = fi.reduction_pct is not none %}
+{% set fi_color = '#059669' if _fi_known else '#64748b' %}
+<rect x="36" y="{{ fairness_y }}" width="644" height="{{ fairness_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ fairness_y }}" width="2.5" height="{{ fairness_h }}" rx="1" fill="{{ fi_color }}"/>
+<text x="56" y="{{ fairness_y + 22 }}" font-size="8" font-weight="600" fill="{{ fi_color }}" letter-spacing="0.5">FAIRNESS IMPROVEMENT</text>
+<line x1="56" y1="{{ fairness_y + 30 }}" x2="660" y2="{{ fairness_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+
+<text x="56" y="{{ fairness_y + 52 }}" font-size="10" fill="#6b7280">Disparity:</text>
+<text x="120" y="{{ fairness_y + 52 }}" font-size="13" font-weight="700" fill="{{ '#dc2626' if _fi_known else '#64748b' }}">{{ fi.original|f3 }}</text>
+<text x="176" y="{{ fairness_y + 52 }}" font-size="11" fill="#94a3b8">&#8594;</text>
+<text x="196" y="{{ fairness_y + 52 }}" font-size="13" font-weight="700" fill="{{ '#059669' if _fi_known else '#64748b' }}">{{ fi.optimized|f3 }}</text>
+
+{% if _fi_known %}
+<rect x="280" y="{{ fairness_y + 38 }}" width="100" height="22" rx="11" fill="#ecfdf5"/>
+<text x="330" y="{{ fairness_y + 53 }}" text-anchor="middle" font-size="10" font-weight="700" fill="#059669">&#8595; {{ fi.reduction_pct|f1 }}%</text>
+{% else %}
+<rect x="280" y="{{ fairness_y + 38 }}" width="120" height="22" rx="11" fill="#f1f5f9"/>
+<text x="340" y="{{ fairness_y + 53 }}" text-anchor="middle" font-size="10" font-weight="700" fill="#64748b">NOT MEASURED</text>
+{% endif %}
+
+{# Progress bar #}
+<rect x="56" y="{{ fairness_y + 68 }}" width="600" height="6" rx="3" fill="#e2e8f0"/>
+{% if _fi_known %}
+{% set bar_w = 600 * (1 - fi.optimized / fi.original) if fi.original > 0 else 0 %}
+<rect x="56" y="{{ fairness_y + 68 }}" width="{{ bar_w }}" height="6" rx="3" fill="#059669" opacity="0.8"/>
+<text x="56" y="{{ fairness_y + 84 }}" font-size="8" fill="#94a3b8">0%</text>
+<text x="640" y="{{ fairness_y + 84 }}" font-size="8" fill="#94a3b8" text-anchor="end">100% reduction</text>
+{% else %}
+<text x="56" y="{{ fairness_y + 84 }}" font-size="8" fill="#64748b">no disparity figure was supplied, so no reduction was measured</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Accuracy change panel                                             #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% set ac = accuracy_change %}
+{# An accuracy cost that was never computed is not a cost of +0.00%. #}
+{% set _ac_known = ac.change is not none %}
+{% set acc_color = '#64748b' if not _ac_known else ('#059669' if ac.change >= 0 else '#f59e0b') %}
+<rect x="36" y="{{ accuracy_y }}" width="644" height="{{ accuracy_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ accuracy_y }}" width="2.5" height="{{ accuracy_h }}" rx="1" fill="{{ acc_color }}"/>
+<text x="56" y="{{ accuracy_y + 22 }}" font-size="8" font-weight="600" fill="{{ acc_color }}" letter-spacing="0.5">ACCURACY CHANGE</text>
+<line x1="56" y1="{{ accuracy_y + 30 }}" x2="660" y2="{{ accuracy_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+
+<text x="56" y="{{ accuracy_y + 52 }}" font-size="10" fill="#6b7280">Accuracy:</text>
+<text x="120" y="{{ accuracy_y + 52 }}" font-size="13" font-weight="700" fill="{{ '#0f172a' if _ac_known else '#64748b' }}">{{ ac.original|f3 }}</text>
+<text x="176" y="{{ accuracy_y + 52 }}" font-size="11" fill="#94a3b8">&#8594;</text>
+<text x="196" y="{{ accuracy_y + 52 }}" font-size="13" font-weight="700" fill="{{ '#0f172a' if _ac_known else '#64748b' }}">{{ ac.optimized|f3 }}</text>
+
+{% if not _ac_known %}
+<rect x="280" y="{{ accuracy_y + 38 }}" width="120" height="22" rx="11" fill="#f1f5f9"/>
+<text x="340" y="{{ accuracy_y + 53 }}" text-anchor="middle" font-size="10" font-weight="700" fill="#64748b">NOT MEASURED</text>
+{% elif ac.change >= 0 %}
+<rect x="280" y="{{ accuracy_y + 38 }}" width="100" height="22" rx="11" fill="#ecfdf5"/>
+<text x="330" y="{{ accuracy_y + 53 }}" text-anchor="middle" font-size="10" font-weight="700" fill="#059669">+{{ (ac.change * 100)|f2 }}%</text>
+{% else %}
+<rect x="280" y="{{ accuracy_y + 38 }}" width="100" height="22" rx="11" fill="#fef3c7"/>
+<text x="330" y="{{ accuracy_y + 53 }}" text-anchor="middle" font-size="10" font-weight="700" fill="#f59e0b">{{ (ac.change * 100)|f2 }}%</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Recommendation panel                                              #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ rec_y }}" width="644" height="{{ rec_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ rec_y }}" width="2.5" height="{{ rec_h }}" rx="1" fill="#3b82f6"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="8" font-weight="600" fill="#3b82f6" letter-spacing="0.5">RECOMMENDATION</text>
+<line x1="56" y1="{{ rec_y + 30 }}" x2="660" y2="{{ rec_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+{% set _rec = recommendation|wordwrap(110) %}
+{% set _rec_lines = _rec.split('\n') %}
+{% for _line in _rec_lines %}
+<text x="56" y="{{ rec_y + 48 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

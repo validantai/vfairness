@@ -1,0 +1,259 @@
+{# ── TemporalFairnessAnalyzer · Trend Report SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set n_cards = metric_summaries|length %}
+{% set card_h = 110 if n_cards > 0 else 0 %}
+{% set weekly_h = 170 if weekly_pattern else 0 %}
+{% set trends_header_h = 36 %}
+{% set trends_row_h = 36 %}
+{% set trends_h = trends_header_h + trends|length * trends_row_h + 16 if trends else 0 %}
+{% set deg_header_h = 36 %}
+{% set deg_row_h = 30 %}
+{% set deg_h = deg_header_h + degradations|length * deg_row_h + 16 if degradations else 0 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}
+{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 40 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{% set cards_y = header_h %}
+{% set weekly_y = cards_y + card_h + (16 if n_cards > 0 else 0) %}
+{% set trends_y = weekly_y + weekly_h + (16 if weekly_pattern else 0) %}
+{% set deg_y = trends_y + trends_h + (16 if trends else 0) %}
+{% set exp_y = deg_y + deg_h + (16 if degradations else 0) %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   Every section here already self-suppresses on an empty list, which is exactly
+   the problem: with no metric tracked the canvas fell silent and only the
+   subtitle spoke, reading "0 metrics · temporal trend and pattern analysis" as
+   though a period had been watched and found steady. #}
+{% if not_assessable %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = header_h %}
+{% set exp_y = na_y + na_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{% if not_assessable %}
+<text x="36" y="122" font-size="10" fill="#64748b">No metric history was available for trend analysis</text>
+{% include '_could_not_check.svg' %}
+{% else %}
+{# The metric count is a count of names ASKED FOR, and a count reads as a
+   measurement, so the untracked ones are named right here rather than left for
+   the reader to assume were watched. #}
+<text x="36" y="122" font-size="10" fill="#64748b">{{ metric_summaries|length }} metric{{ 's' if metric_summaries|length != 1 }}{% if n_untracked %} ({{ n_untracked }} never tracked){% endif %} · temporal trend and pattern analysis</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Metric Summary Cards (up to 3 side by side)                      #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% for m in metric_summaries %}
+{% if n_cards == 1 %}
+{% set cw = 644 %}
+{% elif n_cards == 2 %}
+{% set cw = 314 %}
+{% else %}
+{% set cw = 204 %}
+{% endif %}
+{% set cx = 36 + loop.index0 * (cw + 16) %}
+<rect x="{{ cx }}" y="{{ cards_y }}" width="{{ cw }}" height="{{ card_h }}" rx="10" fill="#ffffff"/>
+
+{# CRITICAL, per row: a metric the analyzer never tracked gets no statistic, no #}
+{# trend chip, no slope and no coloured range bar. Until 2026-08-28 all six     #}
+{# came out of .get defaults on an EMPTY summary dict, so an untracked metric   #}
+{# name drew five 0.000s under a GREEN STABLE chip, which is the calmest        #}
+{# reading this card has, produced entirely by absence. #}
+{# CRITICAL, and the cascade this replaced is why. Its {% else %} arm mapped    #}
+{# EVERY direction other than 'increasing'/'decreasing' to STABLE in the pass   #}
+{# green, so a trend the analyzer explicitly REFUSED to fit was certified       #}
+{# stable and no adapter value could change it. Measured 2026-09-27 on a real   #}
+{# TemporalFairnessAnalyzer over 3 days, where detect_trend warns and returns   #}
+{# ('not_assessed', nan): the chip drew ('#41ba1b', 'STABLE') while the row     #}
+{# below it correctly read "Slope/day not measured". A card that contradicts    #}
+{# its own table is read at the chip, which is the largest thing on it.         #}
+{#                                                                             #}
+{# The adapter computes all three values now, reproducing this cascade exactly  #}
+{# including 'NOT TRACKED', plus the fourth state it could not express. A       #}
+{# template is the wrong place for a verdict: it has no access to whether the   #}
+{# fit happened, only to the word that came out of it.                          #}
+<rect x="{{ cx }}" y="{{ cards_y }}" width="2.5" height="{{ card_h }}" rx="1" fill="{{ m.trend_color }}"/>
+
+{# Card header #}
+<text x="{{ cx + 20 }}" y="{{ cards_y + 20 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">{{ m.name|truncate_text(24) }}</text>
+<rect x="{{ cx + cw - 80 }}" y="{{ cards_y + 8 }}" width="68" height="18" rx="9" fill="{{ '#f1f5f9' if not m.tracked or not m.trend_fitted else '#fef2f2' if m.trend == 'increasing' else '#eff6ff' if m.trend == 'decreasing' else '#ecfdf5' }}"/>
+<text x="{{ cx + cw - 46 }}" y="{{ cards_y + 21 }}" text-anchor="middle" font-size="7.5" font-weight="600" fill="{{ m.trend_color }}">{{ m.trend_label }}</text>
+
+{% if not m.tracked %}
+<text x="{{ cx + 20 }}" y="{{ cards_y + 52 }}" font-size="10" fill="#64748b">No history was recorded for this metric,</text>
+<text x="{{ cx + 20 }}" y="{{ cards_y + 68 }}" font-size="10" fill="#64748b">so nothing about it was measured.</text>
+{% else %}
+{# Stats row #}
+<text x="{{ cx + 20 }}" y="{{ cards_y + 44 }}" font-size="8" fill="#94a3b8">Mean</text>
+<text x="{{ cx + 20 }}" y="{{ cards_y + 60 }}" font-size="16" font-weight="700" fill="#0f172a">{{ m.mean|f3 }}</text>
+
+{% if cw > 210 %}
+<text x="{{ cx + 90 }}" y="{{ cards_y + 44 }}" font-size="8" fill="#94a3b8">Std</text>
+<text x="{{ cx + 90 }}" y="{{ cards_y + 60 }}" font-size="12" font-weight="600" fill="#475569">{{ m.std|f3 }}</text>
+
+<text x="{{ cx + 150 }}" y="{{ cards_y + 44 }}" font-size="8" fill="#94a3b8">Slope/day</text>
+<text x="{{ cx + 150 }}" y="{{ cards_y + 60 }}" font-size="12" font-weight="600" fill="{{ m.slope_color }}">{{ m.slope_display }}</text>
+{% endif %}
+
+{# Range bar #}
+<rect x="{{ cx + 20 }}" y="{{ cards_y + 76 }}" width="{{ cw - 40 }}" height="6" rx="3" fill="#e2e8f0"/>
+<rect x="{{ cx + 20 + m.min_x }}" y="{{ cards_y + 76 }}" width="{{ min(cw - 40, m.range_w) }}" height="6" rx="3" fill="{{ m.range_color }}" opacity="0.5"/>
+<text x="{{ cx + 20 }}" y="{{ cards_y + 98 }}" font-size="7" fill="#94a3b8">min {{ m.min_val|f3 }}</text>
+<text x="{{ cx + cw - 20 }}" y="{{ cards_y + 98 }}" font-size="7" fill="#94a3b8" text-anchor="end">max {{ m.max_val|f3 }}</text>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Weekly Pattern Bar Chart                                          #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if weekly_pattern %}
+<rect x="36" y="{{ weekly_y }}" width="644" height="{{ weekly_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ weekly_y + 24 }}" font-size="11" font-weight="700" fill="#0f172a">Weekly Pattern</text>
+<text x="56" y="{{ weekly_y + 40 }}" font-size="9" fill="#94a3b8">{{ weekly_metric }}</text>
+
+{# 7-day bar chart #}
+{% set day_labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] %}
+{% set chart_base_y = weekly_y + weekly_h - 24 %}
+{% set bar_area_w = 560 %}
+{% set bar_gap = bar_area_w / 7 %}
+{% for d in weekly_pattern %}
+{% set dx = 72 + loop.index0 * bar_gap %}
+<rect x="{{ dx }}" y="{{ chart_base_y - d.bar_h }}" width="{{ bar_gap - 16 }}" height="{{ d.bar_h }}" rx="4" fill="{{ d.color }}" opacity="0.7"/>
+<text x="{{ dx + (bar_gap - 16) / 2 }}" y="{{ chart_base_y + 14 }}" text-anchor="middle" font-size="8" font-weight="500" fill="#64748b">{{ day_labels[loop.index0] }}</text>
+<text x="{{ dx + (bar_gap - 16) / 2 }}" y="{{ chart_base_y - d.bar_h - 6 }}" text-anchor="middle" font-size="7" fill="#475569">{{ d.value|f3 }}</text>
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Trend Summary Table                                               #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if trends %}
+<rect x="36" y="{{ trends_y }}" width="644" height="{{ trends_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ trends_y + 24 }}" font-size="11" font-weight="700" fill="#0f172a">Trend Summary</text>
+
+{% for t in trends %}
+{% set ty = trends_y + trends_header_h + loop.index0 * trends_row_h %}
+
+{# Metric name #}
+<text x="56" y="{{ ty + 18 }}" font-size="10" font-weight="500" fill="#0f172a">{{ t.name|truncate_text(28) }}</text>
+
+{# Direction + slope info #}
+{# CRITICAL, per row: detect_trend answers ("stable", 0.0) for a metric it has  #}
+{# no column for, so an untracked name drew "slope: 0.0000/day, 0 days" beside  #}
+{# a green "stable" chip. A trend nobody fitted is not a flat trend. #}
+{% if t.tracked %}
+<text x="310" y="{{ ty + 18 }}" font-size="9" fill="#94a3b8">slope: {{ t.slope|f4 }}/day · {{ t.n_days }} days</text>
+{% else %}
+<text x="310" y="{{ ty + 18 }}" font-size="9" font-style="italic" fill="#94a3b8">no history recorded, so no trend was fitted</text>
+{% endif %}
+
+{# Direction badge #}
+{% if not t.tracked %}
+<rect x="566" y="{{ ty + 4 }}" width="72" height="20" rx="10" fill="#f1f5f9"/>
+<text x="602" y="{{ ty + 18 }}" text-anchor="middle" font-size="7.5" font-weight="600" fill="#64748b">NOT TRACKED</text>
+{% elif t.direction == 'increasing' %}
+<rect x="566" y="{{ ty + 4 }}" width="72" height="20" rx="10" fill="#fef2f2"/>
+<text x="602" y="{{ ty + 18 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#dc2626">{{ t.direction }}</text>
+{% elif t.direction == 'decreasing' %}
+<rect x="566" y="{{ ty + 4 }}" width="72" height="20" rx="10" fill="#eff6ff"/>
+<text x="602" y="{{ ty + 18 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#3b82f6">{{ t.direction }}</text>
+{% else %}
+<rect x="566" y="{{ ty + 4 }}" width="72" height="20" rx="10" fill="#ecfdf5"/>
+<text x="602" y="{{ ty + 18 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#059669">{{ t.direction }}</text>
+{% endif %}
+
+{# Row separator #}
+{% if not loop.last %}
+<line x1="56" y1="{{ ty + trends_row_h }}" x2="660" y2="{{ ty + trends_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Degradation Checks                                               #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if degradations %}
+<rect x="36" y="{{ deg_y }}" width="644" height="{{ deg_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ deg_y + 24 }}" font-size="11" font-weight="700" fill="#0f172a">Weekly Degradation Checks</text>
+
+{% for d in degradations %}
+{% set dy = deg_y + deg_header_h + loop.index0 * deg_row_h %}
+
+{# FAIL row background for degraded #}
+{% if d.degraded %}
+<rect x="36" y="{{ dy }}" width="644" height="{{ deg_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ dy }}" width="2.5" height="{{ deg_row_h }}" fill="#dc2626"/>
+{% endif %}
+
+{# Metric name #}
+<text x="56" y="{{ dy + 18 }}" font-size="10" font-weight="500" fill="{{ '#dc2626' if d.degraded else '#0f172a' }}">{{ d.name }}</text>
+
+{# Worst day info #}
+{# CRITICAL, per row: detect_weekly_degradation returns (False, nan) when it    #}
+{# REFUSES to run, on too little history or on a metric it does not hold, and   #}
+{# False is the branch that paints the green STABLE chip. So a check that never #}
+{# ran certified the metric as steady, with "worst day mean: nan" beside it.    #}
+{# A check that did not run is neither a pass nor a finding. #}
+{% if d.ran %}
+<text x="310" y="{{ dy + 18 }}" font-size="9" fill="#6b7280">worst day mean: {{ d.worst_day|f3 }}</text>
+{% else %}
+<text x="310" y="{{ dy + 18 }}" font-size="9" font-style="italic" fill="#94a3b8">the weekly check did not run, so no week was compared</text>
+{% endif %}
+
+{# Status badge #}
+{% if not d.ran %}
+<rect x="566" y="{{ dy + 4 }}" width="72" height="20" rx="10" fill="#f1f5f9"/>
+<text x="602" y="{{ dy + 18 }}" text-anchor="middle" font-size="7.5" font-weight="600" fill="#64748b">NOT CHECKED</text>
+{% elif d.degraded %}
+<rect x="566" y="{{ dy + 4 }}" width="72" height="20" rx="10" fill="#fef2f2"/>
+<text x="602" y="{{ dy + 18 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#dc2626">DEGRADED</text>
+{% else %}
+<rect x="566" y="{{ dy + 4 }}" width="72" height="20" rx="10" fill="#ecfdf5"/>
+<text x="602" y="{{ dy + 18 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#059669">STABLE</text>
+{% endif %}
+
+{# Row separator #}
+{% if not loop.last %}
+<line x1="56" y1="{{ dy + deg_row_h }}" x2="660" y2="{{ dy + deg_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

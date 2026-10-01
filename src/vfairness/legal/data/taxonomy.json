@@ -1,0 +1,135 @@
+{
+  "revision": "2026-05-20",
+  "attributes": [
+    {
+      "id": "gender",
+      "label": "Gender / sex",
+      "aliases": ["gender", "sex", "geschlecht", "genre"]
+    },
+    {
+      "id": "age",
+      "label": "Age",
+      "aliases": ["age", "alter", "edad"]
+    },
+    {
+      "id": "dob",
+      "label": "Date of birth",
+      "aliases": ["dob", "date_of_birth", "birthdate", "birthday", "geburtsdatum"]
+    },
+    {
+      "id": "ethnicity",
+      "label": "Race / ethnicity",
+      "aliases": ["race", "ethnicity", "ethnic_group", "ethnic_origin", "herkunft"]
+    },
+    {
+      "id": "nationality",
+      "label": "Nationality / citizenship",
+      "aliases": ["nationality", "citizenship", "country_of_citizenship", "passport_country", "staatsangehoerigkeit"]
+    },
+    {
+      "id": "religion",
+      "label": "Religion / belief",
+      "aliases": ["religion", "faith", "belief", "religious_affiliation", "konfession"]
+    },
+    {
+      "id": "political_opinion",
+      "label": "Political opinion",
+      "aliases": ["politics", "political_view", "political_opinion", "party"]
+    },
+    {
+      "id": "union_membership",
+      "label": "Trade-union membership",
+      "aliases": ["union", "trade_union", "union_member", "gewerkschaft"]
+    },
+    {
+      "id": "sexual_orientation",
+      "label": "Sexual orientation",
+      "aliases": ["orientation", "sexual_orientation", "lgbt", "lgbtq"]
+    },
+    {
+      "id": "gender_identity",
+      "label": "Gender identity",
+      "aliases": ["gender_identity", "transgender", "trans_status"]
+    },
+    {
+      "id": "marital_status",
+      "label": "Marital / family status",
+      "aliases": ["marital_status", "married", "civil_status", "family_status", "familienstand"]
+    },
+    {
+      "id": "pregnancy",
+      "label": "Pregnancy / maternity",
+      "aliases": ["pregnancy", "pregnant", "maternity", "schwanger"]
+    },
+    {
+      "id": "disability",
+      "label": "Disability",
+      "aliases": ["disability", "disabled", "handicap", "behinderung"]
+    },
+    {
+      "id": "health",
+      "label": "Health / medical condition",
+      "aliases": ["health", "medical", "diagnosis", "condition", "illness", "gesundheit"]
+    },
+    {
+      "id": "genetic",
+      "label": "Genetic data",
+      "aliases": ["genetic", "genome", "dna", "genetic_marker", "genetic_test"]
+    },
+    {
+      "id": "biometric",
+      "label": "Biometric identifier",
+      "aliases": ["biometric", "fingerprint", "face_embedding", "iris", "voiceprint"]
+    },
+    {
+      "id": "criminal_record",
+      "label": "Criminal record / conviction",
+      "aliases": ["criminal", "conviction", "criminal_record", "felony", "background_check"]
+    },
+    {
+      "id": "salary_history",
+      "label": "Salary / compensation history",
+      "aliases": ["salary_history", "previous_salary", "prior_salary", "prev_comp", "last_salary"]
+    },
+    {
+      "id": "credit_score",
+      "label": "Credit score / financial history",
+      "aliases": ["credit_score", "fico", "schufa", "credit_history"]
+    },
+    {
+      "id": "postcode",
+      "label": "Postcode / ZIP (geographic proxy)",
+      "aliases": ["zip", "zipcode", "postcode", "postal_code", "plz"]
+    },
+    {
+      "id": "name",
+      "label": "Name (proxy for ethnicity / gender)",
+      "aliases": ["name", "first_name", "last_name", "surname", "full_name", "given_name", "family_name"]
+    },
+    {
+      "id": "photo",
+      "label": "Photo / headshot (proxy)",
+      "aliases": ["photo", "headshot", "image", "profile_picture", "avatar"]
+    },
+    {
+      "id": "language",
+      "label": "Native language / accent",
+      "aliases": ["language", "native_language", "mother_tongue", "accent", "muttersprache"]
+    },
+    {
+      "id": "veteran_status",
+      "label": "Veteran / military status",
+      "aliases": ["veteran", "military_status", "armed_forces"]
+    },
+    {
+      "id": "social_origin",
+      "label": "Social origin / class",
+      "aliases": ["social_class", "social_origin", "caste"]
+    },
+    {
+      "id": "address",
+      "label": "Home address",
+      "aliases": ["address", "street", "home_address", "anschrift"]
+    }
+  ]
+}

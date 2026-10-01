@@ -1,0 +1,216 @@
+{# ── Pareto Frontier Scatter Plot ── #}
+{# ── vfairness Design System G1 ── #}
+
+{# ── Layout constants ── #}
+{% set W = 780 %}
+{% set pad = 36 %}
+{% set inner = W - 2 * pad %}
+
+{# ── Height computation ── #}
+{% set content_start = 160 %}
+{% set chart_h_block = 440 %}
+{% set chart_end = content_start + chart_h_block %}
+{% set legend_y = chart_end + 14 %}
+{% set legend_h = 36 %}
+{% set legend_end = legend_y + legend_h %}
+{% set summary_y = legend_end + 12 %}
+{% set summary_h = 52 %}
+{% set summary_end = summary_y + summary_h %}
+{% set exp_y = summary_end + 16 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(115) %}
+{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% else %}
+{% set exp_h = 0 %}
+{% endif %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ W }} {{ total_h }}" font-family="'Inter','Segoe UI',system-ui,-apple-system,sans-serif">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="{{ W }}" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header ── #}
+<rect x="0" y="0" width="{{ W }}" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="{{ pad }}" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="{{ W - pad }}" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="{{ pad }}" y="52" width="{{ inner }}" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="{{ pad }}" y="82" font-size="16" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="{{ pad }}" y="100" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ── Stats badges ── #}
+{# Three states, never two. With nothing plottable the counts are WITHHELD,    #}
+{# not printed as zeros: "0 configurations | 0 Pareto-optimal" reads as a      #}
+{# search that ran and found nothing, and a count of zero is not a finding of  #}
+{# zero. The slate is neither the frontier red nor a pass green, because       #}
+{# could-not-check is not a rejection either. The reason is on the subtitle    #}
+{# line above and repeated in the summary panel below, so it is never only in  #}
+{# the <desc>. #}
+{% set stat_color = unknown_color|default('#64748b') if not_assessable else '#dc2626' %}
+{% set badge_y = 112 %}
+<rect x="{{ pad }}" y="{{ badge_y }}" width="100" height="40" rx="8" fill="#ffffff"/>
+<text x="{{ pad + 14 }}" y="{{ badge_y + 15 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">POINTS</text>
+<text x="{{ pad + 14 }}" y="{{ badge_y + 32 }}" font-size="16" font-weight="700" fill="{{ stat_color if not_assessable else '#0f172a' }}">{% if not_assessable %}N/A{% else %}{{ n_points }}{% endif %}</text>
+
+<rect x="{{ pad + 112 }}" y="{{ badge_y }}" width="220" height="40" rx="8" fill="#ffffff"/>
+<rect x="{{ pad + 112 }}" y="{{ badge_y }}" width="2.5" height="40" rx="1" fill="{{ stat_color }}"/>
+<text x="{{ pad + 128 }}" y="{{ badge_y + 15 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">PARETO FRONTIER</text>
+<text x="{{ pad + 128 }}" y="{{ badge_y + 32 }}" font-size="16" font-weight="700" fill="{{ stat_color }}">{% if not_assessable %}{{ not_assessable_text|default('NOT ASSESSABLE') }}{% else %}{{ n_frontier }}{% if best_label %} · {{ best_label|truncate_text(16) }}{% endif %}{% endif %}</text>
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Scatter Plot                                                        #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+<rect x="{{ pad }}" y="{{ content_start }}" width="{{ inner }}" height="{{ chart_h_block }}" rx="10" fill="#ffffff"/>
+
+{% set chart_ox = pad - 16 %}
+{% set chart_oy = content_start + 10 %}
+<g transform="translate({{ chart_ox }},{{ chart_oy }})">
+  {% set cl = 80 %}
+  {% set cr = 690 %}
+  {% set ct = 30 %}
+  {% set cb = 390 %}
+  {% set cw = cr - cl %}
+  {% set ch = cb - ct %}
+
+  {# Grid lines #}
+  {% for i in range(5) %}
+  {% set gx = cl + (i + 1) * (cw // 5) %}
+  {% set gy = ct + i * (ch // 4) %}
+  <line x1="{{ gx }}" y1="{{ ct }}" x2="{{ gx }}" y2="{{ cb }}" stroke="#f1f5f9" stroke-width="0.5"/>
+  <line x1="{{ cl }}" y1="{{ gy }}" x2="{{ cr }}" y2="{{ gy }}" stroke="#f1f5f9" stroke-width="0.5"/>
+  {% endfor %}
+
+  {# Pass zone: visible grey-green tint below threshold #}
+  {% if threshold_px %}
+  <rect x="{{ cl }}" y="{{ threshold_px }}" width="{{ cw }}" height="{{ cb - threshold_px }}" fill="#e2e8f0" opacity="0.45" rx="0"/>
+  <text x="{{ cr - 10 }}" y="{{ cb - 8 }}" text-anchor="end" font-size="8.5" font-weight="700" fill="#6b8f71" opacity="0.6" letter-spacing="0.5">PASS ZONE</text>
+  {# Fail zone label #}
+  <text x="{{ cl + 8 }}" y="{{ ct + 16 }}" font-size="8.5" font-weight="700" fill="#b91c1c" opacity="0.3" letter-spacing="0.5">ABOVE THRESHOLD</text>
+  {% endif %}
+
+  {# Axes #}
+  <line x1="{{ cl }}" y1="{{ ct }}" x2="{{ cl }}" y2="{{ cb }}" stroke="#cbd5e1" stroke-width="1"/>
+  <line x1="{{ cl }}" y1="{{ cb }}" x2="{{ cr }}" y2="{{ cb }}" stroke="#cbd5e1" stroke-width="1"/>
+
+  {# Axis titles #}
+  <text x="{{ (cl + cr) // 2 }}" y="{{ cb + 38 }}" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">{{ x_label }}</text>
+  <text x="{{ cl - 50 }}" y="{{ (ct + cb) // 2 }}" text-anchor="middle" font-size="11" font-weight="600" fill="#475569" transform="rotate(-90,{{ cl - 50 }},{{ (ct + cb) // 2 }})">{{ y_label }}</text>
+
+  {# Axis scale labels #}
+  {% for tick in x_ticks %}
+  <text x="{{ tick.px }}" y="{{ cb + 18 }}" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="'JetBrains Mono','SF Mono',monospace">{{ tick.label }}</text>
+  {% endfor %}
+  {% for tick in y_ticks %}
+  <text x="{{ cl - 10 }}" y="{{ tick.px + 3 }}" text-anchor="end" font-size="9" fill="#94a3b8" font-family="'JetBrains Mono','SF Mono',monospace">{{ tick.label }}</text>
+  {% endfor %}
+
+  {# Fairness threshold line #}
+  {% if threshold_px %}
+  <line x1="{{ cl }}" y1="{{ threshold_px }}" x2="{{ cr }}" y2="{{ threshold_px }}" stroke="#d97706" stroke-width="1.5" stroke-dasharray="8,4" opacity="0.7"/>
+  <rect x="{{ cr - 94 }}" y="{{ threshold_px - 15 }}" width="92" height="18" rx="4" fill="#ffffff" stroke="#d97706" stroke-width="0.5" opacity="0.95"/>
+  <text x="{{ cr - 48 }}" y="{{ threshold_px - 3 }}" text-anchor="middle" font-size="8.5" font-weight="600" fill="#d97706">Threshold {{ threshold_label }}</text>
+  {% endif %}
+
+  {# Pareto frontier line #}
+  {% if frontier_points %}
+  <polyline points="{{ frontier_points }}" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,3" opacity="0.5"/>
+  {% endif %}
+
+  {# Data points + annotations #}
+  {% for pt in points %}
+  {% if pt.is_baseline %}
+  {# Baseline: diamond #}
+  <g transform="translate({{ pt.x }},{{ pt.y }})">
+    <polygon points="0,-10 10,0 0,10 -10,0" fill="#0f172a" stroke="#ffffff" stroke-width="2.5"/>
+  </g>
+  {% elif pt.is_frontier %}
+  <circle cx="{{ pt.x }}" cy="{{ pt.y }}" r="7" fill="#dc2626" stroke="#ffffff" stroke-width="2"/>
+  {% else %}
+  <circle cx="{{ pt.x }}" cy="{{ pt.y }}" r="4" fill="#94a3b8" stroke="#ffffff" stroke-width="1.5" opacity="0.45"/>
+  {% endif %}
+
+  {# Label + value annotation for labeled points #}
+  {% if pt.label %}
+  <text x="{{ pt.x + 14 }}" y="{{ pt.y + (pt.label_y_offset|default(0)) }}" font-size="{{ '10' if pt.is_baseline else '9.5' if pt.is_frontier else '9' }}" font-weight="{{ '700' if pt.is_baseline else '600' if pt.is_frontier else '400' }}" fill="{{ '#0f172a' if pt.is_baseline else '#dc2626' if pt.is_frontier else '#94a3b8' }}">{{ pt.label|truncate_text(22) }}</text>
+  {# Coordinate annotation: only for frontier/baseline to reduce clutter #}
+  {% if pt.show_values|default(true) %}
+  <text x="{{ pt.x + 14 }}" y="{{ pt.y + (pt.label_y_offset|default(0)) + 12 }}" font-size="7.5" fill="#94a3b8" font-family="'JetBrains Mono','SF Mono',monospace">{{ pt.x_val }}, {{ pt.y_val }}</text>
+  {% endif %}
+  {% endif %}
+  {% endfor %}
+</g>
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Legend                                                              #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+<rect x="{{ pad }}" y="{{ legend_y }}" width="{{ inner }}" height="{{ legend_h }}" rx="8" fill="#ffffff"/>
+{% set lcy = legend_y + legend_h // 2 %}
+{# A legend keys marks that are on the chart. With nothing plotted it keys     #}
+{# nothing, and its red "Pareto-optimal" dot is the frontier colour on a       #}
+{# canvas where no frontier was found: the third state borrows neither         #}
+{# palette, so the keys are replaced rather than greyed. #}
+{% if not_assessable %}
+<text x="{{ pad + 20 }}" y="{{ lcy + 4 }}" font-size="10" fill="{{ unknown_color|default('#64748b') }}">No configuration was plotted, so there is no frontier and no dominated set to key.</text>
+{% else %}
+{# Baseline diamond #}
+<g transform="translate({{ pad + 20 }},{{ lcy }})"><polygon points="0,-5 5,0 0,5 -5,0" fill="#0f172a"/></g>
+<text x="{{ pad + 32 }}" y="{{ lcy + 4 }}" font-size="10" fill="#475569">Baseline</text>
+{# Pareto-optimal #}
+<circle cx="{{ pad + 110 }}" cy="{{ lcy }}" r="5" fill="#dc2626"/>
+<text x="{{ pad + 122 }}" y="{{ lcy + 4 }}" font-size="10" fill="#475569">Pareto-optimal</text>
+{# Dominated #}
+<circle cx="{{ pad + 240 }}" cy="{{ lcy }}" r="4" fill="#94a3b8" opacity="0.45"/>
+<text x="{{ pad + 252 }}" y="{{ lcy + 4 }}" font-size="10" fill="#475569">Dominated</text>
+{# Threshold #}
+{% if threshold_px %}
+<line x1="{{ pad + 340 }}" y1="{{ lcy }}" x2="{{ pad + 370 }}" y2="{{ lcy }}" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4,2"/>
+<text x="{{ pad + 378 }}" y="{{ lcy + 4 }}" font-size="10" fill="#475569">Threshold</text>
+{# Pass zone #}
+<rect x="{{ pad + 450 }}" y="{{ lcy - 6 }}" width="12" height="12" rx="2" fill="#e2e8f0" opacity="0.7"/>
+<text x="{{ pad + 468 }}" y="{{ lcy + 4 }}" font-size="10" fill="#475569">Pass zone</text>
+{% endif %}
+{% endif %}
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Summary Panel                                                      #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+<rect x="{{ pad }}" y="{{ summary_y }}" width="{{ inner }}" height="{{ summary_h }}" rx="10" fill="#ffffff"/>
+<text x="{{ pad + 20 }}" y="{{ summary_y + 20 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">SUMMARY</text>
+{% if not_assessable %}
+{# Fixed wording, not the reason: this line is a single row in a 52px panel   #}
+{# and is CLIPPED, not wrapped, past roughly 690px. The reason varies in      #}
+{# length (it names the supplied count), and the longer form ran off the      #}
+{# right edge mid-sentence. The subtitle above carries the reason in full at  #}
+{# the full canvas width, and the <desc> carries it again, so nothing here    #}
+{# depends on the clip. #}
+<text x="{{ pad + 20 }}" y="{{ summary_y + 40 }}" font-size="10.5" fill="#6b7280">Nothing was plotted, so this chart recommends no configuration and rules none out.</text>
+{% else %}
+<text x="{{ pad + 20 }}" y="{{ summary_y + 40 }}" font-size="10.5" fill="#6b7280">{{ n_points }} configurations  |  {{ n_frontier }} Pareto-optimal</text>
+{% endif %}
+{% if best_label %}
+<text x="380" y="{{ summary_y + 40 }}" font-size="10.5" fill="#6b7280">Best trade-off:</text>
+<text x="480" y="{{ summary_y + 40 }}" font-size="13" font-weight="700" fill="#dc2626">{{ best_label }}</text>
+{% endif %}
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                  #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(115) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="{{ pad }}" y="{{ exp_y }}" width="{{ inner }}" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="{{ pad + 20 }}" y="{{ exp_y }}" width="{{ inner - 40 }}" height="0.5" fill="#475569"/>
+<text x="{{ pad + 20 }}" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="{{ pad + 20 }}" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="{{ pad }}" y="{{ total_h - 14 }}" width="{{ inner - 26 }}" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="{{ W - pad - 22 }}" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

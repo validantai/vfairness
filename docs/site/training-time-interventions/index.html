@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a3a4f">
+    <meta name="description" content="Fairness-aware model training with the vfairness in_processing module: fairness-constrained losses, regularizers, and constraints that intervene during learning.">
+    <title>Training-Time Interventions | vfairness Documentation</title>
+
+    <link rel="icon" type="image/svg+xml" href="../img/favicon-v2.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script>/* theme before first paint: vf-theme = light | dark | system */(function(){var m='system';try{m=localStorage.getItem('vf-theme')||'system'}catch(e){}var d=m==='dark'||(m==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;r.setAttribute('data-theme',d?'dark':'light');r.setAttribute('data-theme-mode',m)})()</script>
+
+    <style>
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0;
+        }
+        .feature-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: box-shadow 0.2s;
+        }
+        .feature-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .feature-card h4 { margin: 0 0 0.5rem; color: #0f172a; font-size: 0.95rem; }
+        .feature-card p { margin: 0; color: #64748b; font-size: 0.85rem; line-height: 1.5; }
+        .feature-card code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+        .api-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+        .api-table th { background: #f8fafc; text-align: left; padding: 0.6rem 0.8rem; border-bottom: 2px solid #e2e8f0; }
+        .api-table td { padding: 0.6rem 0.8rem; border-bottom: 1px solid #f1f5f9; }
+        .api-table code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+        .gap-badge {
+            display: inline-block;
+            background: #dcfce7;
+            color: #166534;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+    </style>
+    <script src="https://validant.ai/consent/v1/consent.js" defer></script>
+  </head>
+
+<body>
+    <!-- ── Header ── -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="../index.html">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
+                </a>
+                <span class="logo-divider"></span>
+                <span class="lib-name"><span>v</span>fairness</span>
+            </div>
+            <nav class="main-nav" aria-label="Main navigation">
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="../getting-started/index.html" class="nav-link">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../api-reference/index.html" class="nav-link">API Reference</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Learn
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Learn submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../test-objects/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Find a Test Object</span>
+                                        <span class="nav-dropdown__desc">Data, models and agents to test, by access depth</span>
+                                    </span>
+                                </a>
+                                <a href="../business-guide/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Business Guide</span>
+                                        <span class="nav-dropdown__desc">Fairness strategy for decision-makers</span>
+                                    </span>
+                                </a>
+                                <div class="nav-dropdown__group">
+                                    <div class="nav-dropdown__group-label">
+                                        <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+                                        <span class="nav-dropdown__text">
+                                            <span class="nav-dropdown__label">Sample Assessments</span>
+                                            <span class="nav-dropdown__desc">End-to-end audits with EU AI Act compliance</span>
+                                        </span>
+                                    </div>
+                                    <div class="nav-dropdown__group-items">
+                                        <a href="../sample-assessment/index.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Binary Classifier</span> <span class="sub-desc">— Credit scoring</span></a>
+                                        <a href="../sample-assessment/llm-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Foundation LLM</span> <span class="sub-desc">— Resume screening</span></a>
+                                        <a href="../sample-assessment/cv-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Computer Vision</span> <span class="sub-desc">— Medical imaging</span></a>
+                                        <a href="../sample-assessment/ranking-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Ranking System</span> <span class="sub-desc">&mdash; Job platform</span></a>
+                                    </div>
+                                </div>
+                                <a href="../concepts/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Concepts</span>
+                                        <span class="nav-dropdown__desc">Fairness theory and metric foundations</span>
+                                    </span>
+                                </a>
+                                <a href="../quality-and-hardening/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Quality &amp; Hardening</span>
+                                        <span class="nav-dropdown__desc">Testing, security, and the road to beta</span>
+                                    </span>
+                                </a>
+                                <a href="../release-pipeline/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M12 22V12"/><path d="M3.3 7l8.7 5 8.7-5"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Releasing</span>
+                                        <span class="nav-dropdown__desc">How new versions ship to PyPI</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../our-offering/index.html" class="nav-link">Our Offering</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Explore
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Explore submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../svg-gallery/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">SVG Gallery</span>
+                                        <span class="nav-dropdown__desc">Interactive visualization templates</span>
+                                    </span>
+                                </a>
+                                <a href="../workflow-integration/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Workflow Integration</span>
+                                        <span class="nav-dropdown__desc">MLOps, CI/CD, and experiment tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../usage-map/index.html" role="menuitem" class="nav-dropdown__item" data-um-injected="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Library Usage Map</span>
+                                        <span class="nav-dropdown__desc">Where the platform uses each vfairness symbol</span>
+                                    </span>
+                                </a>
+<a href="../llm-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">LLM Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Counterfactual testing, benchmarks, output analysis for LLMs</span>
+                                    </span>
+                                </a>
+                                <a href="../agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Agent Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Correspondence testing, tool bias, RAG bias, pipeline tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../multi-agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Multi-Agent Testing</span>
+                                        <span class="nav-dropdown__desc">Emergent bias, groupthink, non-compositionality</span>
+                                    </span>
+                                </a>
+                                <a href="../explainability-and-xai/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Explainability &amp; XAI</span>
+                                        <span class="nav-dropdown__desc">SHAP attributions, fairness decomposition, counterfactuals</span>
+                                    </span>
+                                </a>
+                                <a href="../training-time-interventions/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Training-Time Interventions</span>
+                                        <span class="nav-dropdown__desc">Fairness-aware losses, constraints, calibration</span>
+                                    </span>
+                                </a>
+</div>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="nav-cta">
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="Search docs...">
+                    </div>
+                    <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+
+                <button type="button" class="mobile-nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-panel">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+<!-- Mobile Navigation -->
+<div class="mobile-nav-overlay" aria-hidden="true"></div>
+<nav class="mobile-nav-panel" id="mobile-nav-panel" aria-label="Mobile navigation" aria-hidden="true">
+    <div class="mobile-nav-header">
+        <span class="mobile-nav-title">Menu</span>
+        <button type="button" class="mobile-nav-close" aria-label="Close navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div class="mobile-nav-body">
+        <a href="../getting-started/index.html" class="mobile-nav-link">Getting Started</a>
+        <a href="../api-reference/index.html" class="mobile-nav-link">API Reference</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Learn
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../test-objects/index.html" class="mobile-nav-sublink">Find a Test Object</a>
+                <a href="../business-guide/index.html" class="mobile-nav-sublink">Business Guide</a>
+                <span class="mobile-nav-sublink" style="font-size:0.7rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:0.5rem 0 0.15rem;">Sample Assessments</span>
+                <a href="../sample-assessment/index.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Binary Classifier</a>
+                <a href="../sample-assessment/llm-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Foundation LLM</a>
+                <a href="../sample-assessment/cv-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Computer Vision</a>
+                <a href="../sample-assessment/ranking-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Ranking System</a>
+                <a href="../concepts/index.html" class="mobile-nav-sublink">Concepts</a>
+                <a href="../quality-and-hardening/index.html" class="mobile-nav-sublink">Quality &amp; Hardening</a>
+                <a href="../release-pipeline/index.html" class="mobile-nav-sublink">Releasing</a>
+            </div></div>
+        </div>
+        <a href="../our-offering/index.html" class="mobile-nav-link">Our Offering</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Explore
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../svg-gallery/index.html" class="mobile-nav-sublink">SVG Gallery</a>
+                <a href="../workflow-integration/index.html" class="mobile-nav-sublink">Workflow Integration</a>
+                <a href="../usage-map/index.html" class="mobile-nav-sublink" data-um-injected="1">Library Usage Map</a>
+<a href="../llm-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">LLM Fairness Testing</a>
+                <a href="../agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Agent Fairness Testing</a>
+                <a href="../multi-agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Multi-Agent Testing</a>
+                <a href="../explainability-and-xai/index.html" class="mobile-nav-sublink">Explainability &amp; XAI</a>
+                <a href="../training-time-interventions/index.html" class="mobile-nav-sublink">Training-Time Interventions</a>
+</div></div>
+        </div>
+    </div>
+    <div class="mobile-nav-footer">
+        <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            GitHub
+        </a>
+    </div>
+</nav>
+<script>/* Mobile nav bootstrap — works before main.js loads */
+(function(){
+var t=document.querySelector(".mobile-nav-toggle"),p=document.querySelector(".mobile-nav-panel"),o=document.querySelector(".mobile-nav-overlay"),c=document.querySelector(".mobile-nav-close");
+if(!t||!p)return;t.setAttribute("data-nav-init","1");
+function open(){t.setAttribute("aria-expanded","true");p.classList.add("is-open");p.setAttribute("aria-hidden","false");if(o)o.classList.add("is-open");document.body.style.overflow="hidden";}
+function close(){t.setAttribute("aria-expanded","false");p.classList.remove("is-open");p.setAttribute("aria-hidden","true");if(o)o.classList.remove("is-open");document.body.style.overflow="";}
+t.addEventListener("click",function(){t.getAttribute("aria-expanded")==="true"?close():open();});
+if(c)c.addEventListener("click",close);
+if(o)o.addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList.contains("is-open"))close();});
+})()
+</script>
+
+    <!-- ── Page Layout ── -->
+    <div class="page-wrapper docs-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Training-Time Interventions</div>
+                <ul class="sidebar-nav">
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#fairness-aware-loss-functions">Fairness-Aware Loss Functions</a></li>
+                    <li><a href="#constraint-based-training">Constraint-Based Training</a></li>
+                    <li><a href="#fairness-regularizers">Fairness Regularizers</a></li>
+                    <li><a href="#group-specific-calibrators">Group-Specific Calibrators</a></li>
+                    <li><a href="#scikit-learn-wrappers">Scikit-Learn Wrappers</a></li>
+                    <li><a href="#fairness-training-analyzer">FairnessTrainingAnalyzer</a></li>
+                    <li><a href="#best-practices">Best Practices</a></li>
+                    <li><a href="#mathematical-background">Mathematical Background</a></li>
+                    <li><a href="#references">References</a></li>
+                    <li><a href="#api-reference-summary">API Reference Summary</a></li>
+                    <li><a href="#integration-with-vfairness-pipeline">Integration with vfairness Pipeline</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-container">
+
+                <!-- Overview -->
+                <section id="overview">
+                    <p class="vf-eyebrow" data-dated>Explore &middot; Training-time interventions</p>
+                    <h1>Training-Time Fairness Interventions</h1>
+                    <p class="lead">
+                        This documentation covers the <code>vfairness.in_processing</code> module, which provides comprehensive tools for fairness-aware model training. These in-processing techniques intervene directly during the machine learning training process to produce models that are fair by design.
+                    </p>
+                    <p>
+                        Standard model training is fairness-blind. Optimization algorithms like gradient descent only seek to minimize prediction error, which can amplify spurious correlations between sensitive attributes and outcomes. Training-time interventions address this by modifying the learning process to incorporate fairness objectives.
+                    </p>
+
+                    <h3>Quick Start</h3>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code># Scikit-learn compatible approach
+from sklearn.ensemble import RandomForestClassifier
+from vfairness.in_processing import FairClassifier
+
+clf = FairClassifier(
+    base_estimator=RandomForestClassifier(),
+    fairness_constraint='demographic_parity',
+    tolerance=0.05
+)
+clf.fit(X_train, y_train, sensitive_attr=gender)
+y_pred = clf.predict(X_test)
+print(f"Constraint satisfied: {clf.fairness_result_.constraint_satisfied}")</code></pre>
+                    </div>
+
+                    <p>The <code>in_processing</code> module offers five main approaches:</p>
+                    <ol>
+                        <li><strong>Fairness-Aware Loss Functions</strong> - PyTorch losses that penalize fairness violations</li>
+                        <li><strong>Constraint-Based Training</strong> - Algorithms that enforce hard fairness constraints</li>
+                        <li><strong>Fairness Regularizers</strong> - Penalty terms that can be added to any loss</li>
+                        <li><strong>Group-Specific Calibrators</strong> - Trainable calibration for group-wise probability calibration</li>
+                        <li><strong>Scikit-Learn Wrappers</strong> - Easy-to-use wrappers for standard ML workflows</li>
+                    </ol>
+                </section>
+
+                <!-- 1. Fairness-Aware Loss Functions -->
+                <section id="fairness-aware-loss-functions">
+                    <h2>1. Fairness-Aware Loss Functions</h2>
+
+                    <blockquote>
+                        <p><strong>Requires PyTorch.</strong> The loss classes in this section need <code>torch</code>, which is not part of the base install: <code>pip install "vfairness[training]"</code> (or <code>pip install torch</code>). Constructing any of them without torch raises an <code>ImportError</code> that points you to <code>pip install torch</code>.</p>
+                    </blockquote>
+
+                    <h3>Concept</h3>
+                    <p>Fairness-aware loss functions incorporate fairness penalties directly into the training objective:</p>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">text</span></div>
+                        <pre><code>L_total = L_task + λ * L_fairness</code></pre>
+                    </div>
+                    <p>Where:</p>
+                    <ul>
+                        <li><code>L_task</code> is the primary prediction loss (e.g., BCE, MSE)</li>
+                        <li><code>L_fairness</code> measures fairness violations</li>
+                        <li><code>λ</code> controls the accuracy-fairness trade-off</li>
+                    </ul>
+
+                    <h3>Available Loss Functions</h3>
+
+                    <h4>Group Fairness Losses</h4>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Loss Function</th><th>Criterion</th><th>Use Case</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>DemographicParityLoss</code></td><td>Equal positive prediction rates</td><td>When outcome should be independent of group</td></tr>
+                            <tr><td><code>EqualizedOddsLoss</code></td><td>Equal TPR and FPR</td><td>When error rates should be equal</td></tr>
+                            <tr><td><code>EqualOpportunityLoss</code></td><td>Equal TPR (true positive rates)</td><td>When qualifying individuals should have equal chances</td></tr>
+                            <tr><td><code>FalsePositiveRateParityLoss</code></td><td>Equal FPR</td><td>When false accusations should be equally rare</td></tr>
+                            <tr><td><code>BoundedGroupLoss</code></td><td>Bounded worst-group loss</td><td>For minimax fairness</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Adversarial Losses</h4>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Loss Function</th><th>Mechanism</th><th>Use Case</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>AdversarialDebiasingLoss</code></td><td>Adversary predicts sensitive attr</td><td>When you want to remove information leakage</td></tr>
+                            <tr><td><code>ProjectedAdversarialLoss</code></td><td>Gradient projection</td><td>For more stable adversarial training</td></tr>
+                            <tr><td><code>FairRepresentationLoss</code></td><td>Fair representation learning</td><td>When learning intermediate representations</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Counterfactual Losses</h4>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Loss Function</th><th>Criterion</th><th>Use Case</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>CounterfactualFairnessLoss</code></td><td>Same prediction under intervention</td><td>When causal fairness is required</td></tr>
+                            <tr><td><code>IndividualFairnessLoss</code></td><td>Similar individuals, similar predictions</td><td>For individual-level fairness</td></tr>
+                            <tr><td><code>CausalFairnessLoss</code></td><td>Block unfair causal pathways</td><td>When causal structure is known</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Usage Examples</h3>
+
+                    <h4>Basic Usage with Demographic Parity</h4>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>import torch
+from vfairness.in_processing.loss_functions import DemographicParityLoss
+
+# Create loss function
+loss_fn = DemographicParityLoss(
+    lambda_fairness=0.1,  # Trade-off parameter
+    warmup_epochs=5       # Epochs before applying fairness penalty
+)
+
+# Training loop
+model = YourModel()
+optimizer = torch.optim.Adam(model.parameters())
+
+for epoch in range(num_epochs):
+    loss_fn.set_epoch(epoch)
+
+    for x, y, sensitive_attr in dataloader:
+        optimizer.zero_grad()
+
+        # Forward pass
+        y_pred = torch.sigmoid(model(x))
+
+        # Compute fairness-aware loss
+        loss = loss_fn(y_pred, y, sensitive_attr)
+
+        # Backward pass
+        loss.backward()
+        optimizer.step()
+
+    # End of epoch tracking
+    metrics = loss_fn.end_epoch()
+    print(f"Epoch {epoch}: Loss={metrics.avg_total_loss:.4f}")</code></pre>
+                    </div>
+
+                    <h4>Equalized Odds with Custom Weights</h4>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from vfairness.in_processing.loss_functions import EqualizedOddsLoss
+
+loss_fn = EqualizedOddsLoss(
+    lambda_fairness=0.15,
+    tpr_weight=1.0,    # Weight for TPR component
+    fpr_weight=0.5,    # Weight for FPR component
+)</code></pre>
+                    </div>
+
+                    <h4>Adversarial Debiasing</h4>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from vfairness.in_processing.loss_functions import AdversarialDebiasingLoss
+
+loss_fn = AdversarialDebiasingLoss(
+    lambda_fairness=1.0,
+    adversary_hidden_dims=[64, 32],
+    n_groups=2,
+    use_gradient_reversal=True
+)
+
+# Move to GPU if available
+loss_fn = loss_fn.to(device)
+
+# Training loop
+for x, y, sensitive_attr in dataloader:
+    y_pred = torch.sigmoid(model(x))
+
+    # Main model loss (includes adversarial penalty)
+    loss = loss_fn(y_pred, y, sensitive_attr)
+    loss.backward()
+    optimizer.step()
+
+    # Monitor adversary accuracy (lower is more fair)
+    adv_acc = loss_fn.get_adversary_accuracy(y_pred.detach(), sensitive_attr)</code></pre>
+                    </div>
+                </section>
+
+                <!-- 2. Constraint-Based Training -->
+                <section id="constraint-based-training">
+                    <h2>2. Constraint-Based Training</h2>
+
+                    <h3>The Reductions Approach</h3>
+                    <p>The constraint-based approach from Agarwal et al. (2018) reduces fair classification to a sequence of cost-sensitive classification problems. This enables using any standard classifier while achieving fairness guarantees.</p>
+
+                    <h3>Available Algorithms</h3>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Algorithm</th><th>Description</th><th>Best For</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>ExponentiatedGradient</code></td><td>Lagrangian saddle-point optimization</td><td>General-purpose constrained training</td></tr>
+                            <tr><td><code>GridSearch</code></td><td>Grid search over Lagrange multipliers</td><td>Quick exploration of trade-offs</td></tr>
+                            <tr><td><code>ThresholdOptimizer</code></td><td>Post-processing threshold optimization</td><td>When model is already trained</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Constraints</h3>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Constraint</th><th>Mathematical Definition</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>DemographicParityConstraint</code></td><td>|P(ŷ=1|G=a) - P(ŷ=1|G=b)| ≤ ε</td></tr>
+                            <tr><td><code>EqualizedOddsConstraint</code></td><td>|TPR_a - TPR_b| ≤ ε AND |FPR_a - FPR_b| ≤ ε</td></tr>
+                            <tr><td><code>EqualOpportunityConstraint</code></td><td>|TPR_a - TPR_b| ≤ ε</td></tr>
+                            <tr><td><code>BoundedGroupLossConstraint</code></td><td>L_g ≤ (1+ε) * L_overall for all g</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Usage Examples</h3>
+
+                    <h4>Exponentiated Gradient Algorithm</h4>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from sklearn.linear_model import LogisticRegression
+from vfairness.in_processing.constraints import (
+    ExponentiatedGradient,
+    DemographicParityConstraint,
+)
+
+# Create constraint
+constraint = DemographicParityConstraint(tolerance=0.05)
+
+# Create algorithm
+eg = ExponentiatedGradient(
+    base_estimator=LogisticRegression(),
+    constraint=constraint,
+    max_iterations=50,
+    verbose=True
+)
+
+# Fit
+result = eg.fit(X_train, y_train, sensitive_attr=gender)
+
+# Predict
+y_pred = eg.predict(X_test)
+
+# Check results
+print(f"Accuracy: {result.accuracy:.4f}")
+print(f"Violation: {result.final_violation:.4f}")
+print(f"Satisfied: {result.optimization_result.converged}")</code></pre>
+                    </div>
+
+                    <h4>Threshold Optimization</h4>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from sklearn.ensemble import RandomForestClassifier
+from vfairness.in_processing.constraints import (
+    ThresholdOptimizer,
+    EqualOpportunityConstraint,
+)
+
+# First train a standard classifier
+base_clf = RandomForestClassifier()
+base_clf.fit(X_train, y_train)
+
+# Get probabilities
+y_prob_val = base_clf.predict_proba(X_val)[:, 1]
+
+# Optimize thresholds for fairness
+optimizer = ThresholdOptimizer(
+    constraint=EqualOpportunityConstraint(tolerance=0.05),
+    grid_size=100
+)
+optimizer.fit(y_prob_val, y_val, sensitive_attr=gender_val)
+
+# Apply to test data
+y_prob_test = base_clf.predict_proba(X_test)[:, 1]
+y_pred_fair = optimizer.predict(y_prob_test, gender_test)
+
+# Get the learned thresholds
+print("Thresholds per group:", optimizer.get_thresholds())</code></pre>
+                    </div>
+                </section>
+
+                <!-- 3. Fairness Regularizers -->
+                <section id="fairness-regularizers">
+                    <h2>3. Fairness Regularizers</h2>
+
+                    <h3>Concept</h3>
+                    <p>Regularizers provide a modular way to add fairness penalties to any differentiable loss function. The regularizer classes construct without PyTorch installed, but calling them (as in the training loops below) operates on torch tensors, so the loops need <code>torch</code> as well:</p>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>total_loss = task_loss + regularizer(y_pred, sensitive_attr)</code></pre>
+                    </div>
+
+                    <h3>Available Regularizers</h3>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Regularizer</th><th>What It Measures</th><th>Use Case</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>StatisticalParityRegularizer</code></td><td>Difference in mean predictions</td><td>Demographic parity</td></tr>
+                            <tr><td><code>ConditionalIndependenceRegularizer</code></td><td>Conditional dependence given y</td><td>Equalized odds</td></tr>
+                            <tr><td><code>GroupFairnessRegularizer</code></td><td>Configurable group metrics</td><td>Flexible fairness criteria</td></tr>
+                            <tr><td><code>HilbertSchmidtRegularizer</code></td><td>HSIC-based independence</td><td>Non-linear dependence</td></tr>
+                            <tr><td><code>CorrelationPenalty</code></td><td>Pearson correlation</td><td>Simple linear dependence</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Usage Examples</h3>
+
+                    <h4>Statistical Parity Regularizer</h4>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from vfairness.in_processing.regularizers import StatisticalParityRegularizer
+
+regularizer = StatisticalParityRegularizer(strength=0.1)
+
+# In training loop
+for x, y, sensitive_attr in dataloader:
+    y_pred = torch.sigmoid(model(x))
+
+    # Task loss
+    task_loss = F.binary_cross_entropy(y_pred, y)
+
+    # Fairness penalty
+    fairness_penalty = regularizer(y_pred, sensitive_attr)
+
+    # Combined loss
+    total_loss = task_loss + fairness_penalty
+    total_loss.backward()</code></pre>
+                    </div>
+
+                    <h4>HSIC Regularizer for Non-Linear Independence</h4>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from vfairness.in_processing.regularizers import HilbertSchmidtRegularizer
+
+regularizer = HilbertSchmidtRegularizer(
+    strength=0.1,
+    kernel='rbf',
+    sigma=1.0
+)
+
+# HSIC captures non-linear statistical dependence
+penalty = regularizer(y_pred, sensitive_attr)</code></pre>
+                    </div>
+                </section>
+
+                <!-- 4. Group-Specific Calibrators -->
+                <section id="group-specific-calibrators">
+                    <h2>4. Group-Specific Calibrators</h2>
+
+                    <blockquote>
+                        <p><strong>Requires PyTorch.</strong> <code>TrainableGroupCalibrator</code> and <code>CalibrationAwareTrainer</code> need <code>torch</code>, which is not part of the base install: <code>pip install "vfairness[training]"</code> (or <code>pip install torch</code>).</p>
+                    </blockquote>
+
+                    <h3>Concept</h3>
+                    <p>Group-specific calibrators learn separate calibration parameters for each demographic group, ensuring that probability predictions have the same meaning across groups.</p>
+
+                    <h3>Available Calibrators</h3>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Calibrator</th><th>Parameters</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>TemperatureScalingCalibrator</code></td><td>T per group</td><td>Divides logits by temperature</td></tr>
+                            <tr><td><code>PlattScalingCalibrator</code></td><td>(a, b) per group</td><td>Linear transform in log-odds space</td></tr>
+                            <tr><td><code>BetaCalibrator</code></td><td>(c, d, e) per group</td><td>More flexible beta calibration</td></tr>
+                            <tr><td><code>FocalCalibrator</code></td><td>γ per group</td><td>Focal-loss inspired calibration</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Usage Example</h3>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from vfairness.in_processing.calibrators import (
+    TrainableGroupCalibrator,
+    CalibrationAwareTrainer,
+)
+
+# Create calibrator
+calibrator = TrainableGroupCalibrator(
+    n_groups=2,
+    method='temperature',
+    learnable=True
+)
+
+# Integrate with model training
+trainer = CalibrationAwareTrainer(model, calibrator)
+
+# Training step
+losses = trainer.train_step(
+    x, y, group_ids,
+    optimizer,
+    task_loss_fn=F.cross_entropy,
+    include_calibration=True
+)
+
+print(f"Task loss: {losses['task_loss']:.4f}")
+print(f"Calibration loss: {losses['calibration_loss']:.4f}")</code></pre>
+                    </div>
+                </section>
+
+                <!-- 5. Scikit-Learn Wrappers -->
+                <section id="scikit-learn-wrappers">
+                    <h2>5. Scikit-Learn Wrappers</h2>
+
+                    <h3>FairClassifier</h3>
+                    <p>The <code>FairClassifier</code> wrapper makes it easy to add fairness constraints to any scikit-learn classifier.</p>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from sklearn.ensemble import RandomForestClassifier
+from vfairness.in_processing.wrappers import FairClassifier
+
+# Create fair classifier
+clf = FairClassifier(
+    base_estimator=RandomForestClassifier(n_estimators=100),
+    fairness_constraint='equalized_odds',
+    tolerance=0.05,
+    method='reductions'  # or 'threshold', 'grid_search'
+)
+
+# Fit (requires sensitive_attr)
+clf.fit(X_train, y_train, sensitive_attr=gender)
+
+# Predict
+y_pred = clf.predict(X_test)
+
+# Check fairness results
+print(f"Accuracy: {clf.fairness_result_.accuracy:.4f}")
+print(f"Violation: {clf.fairness_result_.fairness_violation:.4f}")
+print(f"Satisfied: {clf.fairness_result_.constraint_satisfied}")</code></pre>
+                    </div>
+
+                    <h3>FairRegressor</h3>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from sklearn.linear_model import Ridge
+from vfairness.in_processing.wrappers import FairRegressor
+
+reg = FairRegressor(
+    base_estimator=Ridge(),
+    fairness_constraint='mean_parity',   # the only constraint implemented
+    tolerance=0.1
+)
+
+reg.fit(X_train, y_train, sensitive_attr=group)
+
+# mean_parity is enforced by a PER-GROUP offset, so applying it needs the
+# sensitive attribute. reg.predict(X_test) returns the UNADJUSTED base
+# predictions and warns: it has no group information to apply the offset with.
+y_pred = reg.predict_with_sensitive_attr(X_test, group_test)</code></pre>
+                    </div>
+                    <p>Measured on a 1000-row synthetic set where the group is a feature, with <code>tolerance=0.1</code>: <code>predict()</code> left a group mean gap of <strong>4.97</strong>, while <code>predict_with_sensitive_attr()</code> produced <strong>0.08</strong>. Reach for <code>predict()</code> only when you deliberately want the unmitigated baseline to compare against.</p>
+                </section>
+
+                <!-- 6. FairnessTrainingAnalyzer -->
+                <section id="fairness-training-analyzer">
+                    <h2>6. FairnessTrainingAnalyzer</h2>
+
+                    <h3>Comprehensive Analysis</h3>
+                    <p>The <code>FairnessTrainingAnalyzer</code> provides end-to-end analysis of fairness-aware training options.</p>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from sklearn.linear_model import LogisticRegression
+from vfairness.in_processing import FairnessTrainingAnalyzer
+
+# Create analyzer
+analyzer = FairnessTrainingAnalyzer(
+    X=X_train, y=y_train, sensitive_attr=gender,
+    fairness_constraint='demographic_parity',
+    tolerance=0.05
+)
+
+# Full analysis
+report = analyzer.full_analysis(
+    base_estimator=LogisticRegression(),
+    include_comparisons=True,
+    include_tradeoffs=True
+)
+
+# Print summary
+print(report.summary())
+
+# Export to JSON
+report.to_json('training_analysis.json')
+
+# Render as SVG
+report.to_svg('training_report.svg')</code></pre>
+                    </div>
+
+                    <h3>Report Contents</h3>
+                    <p>The analysis report includes:</p>
+                    <ul>
+                        <li><strong>Baseline Performance</strong>: Accuracy and fairness metrics without constraints</li>
+                        <li><strong>Method Comparisons</strong>: Side-by-side comparison of different approaches</li>
+                        <li><strong>Trade-off Analysis</strong>: Pareto frontier of accuracy vs. fairness</li>
+                        <li><strong>Recommendation</strong>: Suggested method with rationale</li>
+                        <li><strong>Critical Issues</strong>: Problems that need attention</li>
+                        <li><strong>Action Items</strong>: Prioritized next steps</li>
+                    </ul>
+                </section>
+
+                <!-- Best Practices -->
+                <section id="best-practices">
+                    <h2>Best Practices</h2>
+
+                    <h3>Choosing a Method</h3>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Scenario</th><th>Recommended Approach</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>PyTorch deep learning</td><td>Fairness-aware loss functions</td></tr>
+                            <tr><td>Scikit-learn classifier</td><td>FairClassifier with reductions</td></tr>
+                            <tr><td>Need hard constraint guarantee</td><td>ExponentiatedGradient</td></tr>
+                            <tr><td>Quick exploration</td><td>GridSearch or ThresholdOptimizer</td></tr>
+                            <tr><td>Non-linear feature dependence</td><td>HSIC regularizer</td></tr>
+                            <tr><td>Want representation-level fairness</td><td>AdversarialDebiasingLoss</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Setting λ (Lambda)</h3>
+                    <p>The <code>lambda_fairness</code> parameter controls the accuracy-fairness trade-off:</p>
+                    <ul>
+                        <li><strong>λ = 0</strong>: Pure accuracy optimization (unfair)</li>
+                        <li><strong>λ = 0.01-0.1</strong>: Light fairness penalty</li>
+                        <li><strong>λ = 0.1-0.5</strong>: Moderate penalty</li>
+                        <li><strong>λ = 0.5-1.0</strong>: Strong fairness emphasis</li>
+                        <li><strong>λ &gt; 1.0</strong>: Fairness dominates (may hurt accuracy)</li>
+                    </ul>
+                    <p><strong>Recommendation</strong>: Start with λ = 0.1 and use <code>FairnessTrainingAnalyzer</code> to explore the trade-off curve.</p>
+
+                    <h3>Warmup Strategy</h3>
+                    <p>For loss functions, use <code>warmup_epochs</code> to stabilize early training:</p>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>loss_fn = DemographicParityLoss(
+    lambda_fairness=0.1,
+    warmup_epochs=5  # No fairness penalty for first 5 epochs
+)</code></pre>
+                    </div>
+
+                    <h3>Monitoring Training</h3>
+                    <p>Track both accuracy and fairness during training:</p>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code># After each epoch
+metrics = loss_fn.end_epoch()
+print(f"Epoch {epoch}")
+print(f"  Task Loss: {metrics.avg_task_loss:.4f}")
+print(f"  Fairness Loss: {metrics.avg_fairness_loss:.4f}")
+print(f"  Total Loss: {metrics.avg_total_loss:.4f}")</code></pre>
+                    </div>
+                </section>
+
+                <!-- Mathematical Background -->
+                <section id="mathematical-background">
+                    <h2>Mathematical Background</h2>
+
+                    <h3>Lagrangian Formulation</h3>
+                    <p>Constrained fair classification can be written as:</p>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">text</span></div>
+                        <pre><code>min_θ max_λ≥0 L(θ) + Σᵢ λᵢ * gᵢ(θ)</code></pre>
+                    </div>
+                    <p>Where:</p>
+                    <ul>
+                        <li><code>L(θ)</code> is the prediction loss</li>
+                        <li><code>gᵢ(θ)</code> are constraint violations</li>
+                        <li><code>λᵢ</code> are Lagrange multipliers</li>
+                    </ul>
+                    <p>The ExponentiatedGradient algorithm solves this using:</p>
+                    <ol>
+                        <li><strong>Primal update</strong>: Train classifier with cost-sensitive weights</li>
+                        <li><strong>Dual update</strong>: Update λ using multiplicative weights</li>
+                    </ol>
+
+                    <h3>Differentiable Fairness Metrics</h3>
+                    <p>Since hard metrics like TPR are non-differentiable, we use soft approximations:</p>
+                    <p><strong>Soft TPR</strong>:</p>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">text</span></div>
+                        <pre><code>TPR_soft = E[ŷ | y=1] ≈ mean(ŷ[y==1])</code></pre>
+                    </div>
+                    <p><strong>Soft FPR</strong>:</p>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">text</span></div>
+                        <pre><code>FPR_soft = E[ŷ | y=0] ≈ mean(ŷ[y==0])</code></pre>
+                    </div>
+                    <p>These soft metrics are differentiable and can be optimized with gradient descent.</p>
+                </section>
+
+                <!-- References -->
+                <section id="references">
+                    <h2>References</h2>
+                    <ol>
+                        <li>Hardt, M., Price, E., &amp; Srebro, N. (2016). Equality of Opportunity in Supervised Learning. NeurIPS.</li>
+                        <li>Agarwal, A., Beygelzimer, A., Dudík, M., Langford, J., &amp; Wallach, H. (2018). A Reductions Approach to Fair Classification. ICML.</li>
+                        <li>Zhang, B. H., Lemoine, B., &amp; Mitchell, M. (2018). Mitigating Unwanted Biases with Adversarial Learning. AIES.</li>
+                        <li>Kusner, M. J., Loftus, J., Russell, C., &amp; Silva, R. (2017). Counterfactual Fairness. NeurIPS.</li>
+                        <li>Zafar, M. B., Valera, I., Gomez Rodriguez, M., &amp; Gummadi, K. P. (2017). Fairness Constraints: Mechanisms for Fair Classification. AISTATS.</li>
+                        <li>Guo, C., Pleiss, G., Sun, Y., &amp; Weinberger, K. Q. (2017). On Calibration of Modern Neural Networks. ICML.</li>
+                    </ol>
+                </section>
+
+                <!-- API Reference Summary -->
+                <section id="api-reference-summary">
+                    <h2>API Reference Summary</h2>
+
+                    <h3>Loss Functions (<code>vfairness.in_processing.loss_functions</code>)</h3>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Class</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>DemographicParityLoss</code></td><td>Penalizes differences in positive prediction rates</td></tr>
+                            <tr><td><code>EqualizedOddsLoss</code></td><td>Penalizes differences in TPR and FPR</td></tr>
+                            <tr><td><code>EqualOpportunityLoss</code></td><td>Penalizes differences in TPR only</td></tr>
+                            <tr><td><code>FalsePositiveRateParityLoss</code></td><td>Penalizes differences in FPR only</td></tr>
+                            <tr><td><code>BoundedGroupLoss</code></td><td>Bounds worst-group loss (minimax fairness)</td></tr>
+                            <tr><td><code>AdversarialDebiasingLoss</code></td><td>Adversarial training for fair representations</td></tr>
+                            <tr><td><code>ProjectedAdversarialLoss</code></td><td>Gradient projection adversarial approach</td></tr>
+                            <tr><td><code>FairRepresentationLoss</code></td><td>Fair representation learning loss</td></tr>
+                            <tr><td><code>CounterfactualFairnessLoss</code></td><td>Counterfactual fairness penalties</td></tr>
+                            <tr><td><code>IndividualFairnessLoss</code></td><td>Lipschitz-based individual fairness</td></tr>
+                            <tr><td><code>CausalFairnessLoss</code></td><td>Causal pathway fairness</td></tr>
+                            <tr><td><code>create_fairness_loss()</code></td><td>Factory function for creating losses</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Constraints (<code>vfairness.in_processing.constraints</code>)</h3>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Class</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>DemographicParityConstraint</code></td><td>Constraint for demographic parity</td></tr>
+                            <tr><td><code>EqualizedOddsConstraint</code></td><td>Constraint for equalized odds</td></tr>
+                            <tr><td><code>EqualOpportunityConstraint</code></td><td>Constraint for equal opportunity</td></tr>
+                            <tr><td><code>FalsePositiveRateParityConstraint</code></td><td>Constraint for FPR parity</td></tr>
+                            <tr><td><code>BoundedGroupLossConstraint</code></td><td>Constraint for bounded group loss</td></tr>
+                            <tr><td><code>ExponentiatedGradient</code></td><td>Main reductions algorithm</td></tr>
+                            <tr><td><code>GridSearch</code></td><td>Grid search over Lagrange multipliers</td></tr>
+                            <tr><td><code>ThresholdOptimizer</code></td><td>Post-processing threshold optimization</td></tr>
+                            <tr><td><code>create_constraint()</code></td><td>Factory function for creating constraints</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Regularizers (<code>vfairness.in_processing.regularizers</code>)</h3>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Class</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>StatisticalParityRegularizer</code></td><td>Penalizes mean prediction differences</td></tr>
+                            <tr><td><code>ConditionalIndependenceRegularizer</code></td><td>Enforces ŷ ⊥ a | y</td></tr>
+                            <tr><td><code>GroupFairnessRegularizer</code></td><td>Flexible group fairness penalty</td></tr>
+                            <tr><td><code>HilbertSchmidtRegularizer</code></td><td>HSIC-based independence</td></tr>
+                            <tr><td><code>CorrelationPenalty</code></td><td>Simple Pearson correlation penalty</td></tr>
+                            <tr><td><code>create_regularizer()</code></td><td>Factory function for creating regularizers</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Calibrators (<code>vfairness.in_processing.calibrators</code>)</h3>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Class</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>TemperatureScalingCalibrator</code></td><td>Group-specific temperature scaling</td></tr>
+                            <tr><td><code>PlattScalingCalibrator</code></td><td>Group-specific Platt scaling</td></tr>
+                            <tr><td><code>BetaCalibrator</code></td><td>Group-specific beta calibration</td></tr>
+                            <tr><td><code>FocalCalibrator</code></td><td>Group-specific focal calibration</td></tr>
+                            <tr><td><code>TrainableGroupCalibrator</code></td><td>Unified trainable calibrator</td></tr>
+                            <tr><td><code>CalibrationAwareTrainer</code></td><td>Helper for joint model-calibration training</td></tr>
+                            <tr><td><code>create_group_calibrator()</code></td><td>Factory function for creating calibrators</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Wrappers (<code>vfairness.in_processing.wrappers</code>)</h3>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Class</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>FairClassifier</code></td><td>Sklearn-compatible fairness-aware classifier</td></tr>
+                            <tr><td><code>FairRegressor</code></td><td>Sklearn-compatible fairness-aware regressor</td></tr>
+                            <tr><td><code>make_fair_classifier()</code></td><td>Factory function for classifiers</td></tr>
+                            <tr><td><code>make_fair_regressor()</code></td><td>Factory function for regressors</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Analyzer (<code>vfairness.in_processing</code>)</h3>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>Class</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>FairnessTrainingAnalyzer</code></td><td>Comprehensive training analysis</td></tr>
+                            <tr><td><code>FairnessTrainingReport</code></td><td>Analysis report with <code>summary()</code>, <code>to_dict()</code>, <code>to_json()</code>, <code>to_svg()</code></td></tr>
+                            <tr><td><code>MethodComparison</code></td><td>Comparison results for training methods</td></tr>
+                            <tr><td><code>TrainingRecommendation</code></td><td>Training method recommendation</td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Integration with vfairness Pipeline -->
+                <section id="integration-with-vfairness-pipeline">
+                    <h2>Integration with vfairness Pipeline</h2>
+                    <p>The <code>in_processing</code> module integrates seamlessly with the broader vfairness fairness pipeline:</p>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">text</span></div>
+                        <pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│                        vfairness Pipeline                           │
+├─────────────────────────────────────────────────────────────────────┤
+│  1. PRE-PROCESSING         │  Bias Detection &amp; Feature Engineering │
+│  ─────────────────────────────────────────────────────────────────  │
+│  2. IN-PROCESSING  ←──────── This module (training interventions)  │
+│  ─────────────────────────────────────────────────────────────────  │
+│  3. POST-PROCESSING        │  Calibration &amp; Threshold Adjustment   │
+│  ─────────────────────────────────────────────────────────────────  │
+│  4. EVALUATION             │  Fairness Metrics &amp; Auditing          │
+│  ─────────────────────────────────────────────────────────────────  │
+│  5. CI/CD INTEGRATION      │  Automated Fairness Testing           │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+                    </div>
+
+                    <h3>Example: Full Pipeline</h3>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from vfairness.preprocessing.bias_detection import BiasDetector
+from vfairness.in_processing import FairClassifier, FairnessTrainingAnalyzer
+from vfairness.evaluation import FairnessAnalyzer
+
+# 1. Pre-processing: Detect bias
+detector = BiasDetector(df, protected_attributes=["gender"], outcome_column="approved")
+audit_report = detector.full_audit()
+
+# 2. In-processing: Fair training
+clf = FairClassifier(
+    base_estimator=LogisticRegression(),
+    fairness_constraint='demographic_parity'
+)
+clf.fit(X_train, y_train, sensitive_attr=gender_train)
+
+# 3. Evaluation: Assess fairness
+y_pred = clf.predict(X_test)
+evaluator = FairnessAnalyzer(y_test, y_pred, sensitive_attr=gender_test)
+eval_report = evaluator.get_report(include_ci=True)
+print(eval_report["metrics"])</code></pre>
+                    </div>
+                </section>
+
+                <!-- Navigation -->
+                <div class="flex justify-between mt-12 py-8" style="border-top: 1px solid var(--color-gray-200);"><a href="../api-reference/index.html" class="btn btn-secondary">&larr; API Reference</a><a href="../concepts/index.html" class="btn btn-primary">Concepts &rarr;</a></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ── Footer ── -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="brand-logo">
+                    <p>Systems for Trust & Agency. Building tools for responsible AI development.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Documentation</h4>
+                        <ul>
+                            <li><a href="../getting-started/index.html">Getting Started</a></li>
+                            <li><a href="../business-guide/index.html">Business Guide</a></li>
+                            <li><a href="../api-reference/index.html">API Reference</a></li>
+                            <li><a href="../concepts/index.html">Concepts</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="../concepts/references.html">Academic References</a></li>
+                            <li><a href="../concepts/changelog.html">Changelog</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="https://validant.ai" target="_blank">validant.ai</a></li>
+                            <li><a href="https://validant.ai/imprint#publisher" target="_blank">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 validant.ai. vfairness is licensed under the Apache License 2.0.</p>
+                <div class="footer-legal">
+                    <a href="../legal/index.html">Legal</a>
+                    <span class="footer-dot">&middot;</span>
+                    <a href="../legal/index.html#ai-usage" title="AI-Assisted Development Disclosure">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/></svg>AI-Assisted
+                    </a>
+                </div>
+            </div>
+            <div class="footer-github-mobile">
+                <a href="https://github.com/validantai/vfairness" class="btn" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; vertical-align: -2px;"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="../js/main.js"></script>
+    <script>
+    (function() {
+        'use strict';
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        window.addEventListener('scroll', function() {
+            let current = '';
+            sections.forEach(function(section) {
+                const top = section.offsetTop - 120;
+                if (pageYOffset >= top) current = section.getAttribute('id');
+            });
+            navLinks.forEach(function(link) {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+            });
+        });
+    })();
+    </script>
+</body>
+</html>

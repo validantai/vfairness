@@ -1,0 +1,178 @@
+{# ── Calibration · Group Calibration Comparison ── #}
+{# ── vfairness Design System G1 ── #}
+
+{# ── Height computation ── #}
+{% set content_start = 140 %}
+{% set chart_h_block = 400 %}
+{% set chart_end = content_start + chart_h_block %}
+{% set legend_h = 20 + n_groups * 20 %}
+{% set legend_y = chart_end + 16 %}
+{% set legend_end = legend_y + legend_h %}
+{% set finding_y = legend_end + 16 %}
+{% set finding_h = 80 %}
+{% set finding_end = finding_y + finding_h %}
+{% set summary_y = finding_end + 16 %}
+{% set summary_h = 52 %}
+{% set summary_end = summary_y + summary_h %}
+{% set exp_y = summary_end + 20 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% else %}
+{% set exp_h = 0 %}
+{% endif %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 {{ total_h }}" font-family="'Inter','Segoe UI',system-ui,-apple-system,sans-serif">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header ── #}
+<rect x="0" y="0" width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ── Stats badges (top right) ── #}
+<rect x="400" y="72" width="130" height="52" rx="10" fill="#ffffff"/>
+<text x="420" y="90" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">OVERALL ECE</text>
+<text x="420" y="112" font-size="18" font-weight="700" fill="{{ overall_ece_color }}">{{ overall_ece|f3 }}</text>
+
+<rect x="544" y="72" width="136" height="52" rx="10" fill="#ffffff"/>
+<text x="564" y="90" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">DISPARITY</text>
+{# Three states, never two: the adapter decides the colour, because a green   #}
+{# "not has_disparity" is also true of a run that compared nothing.           #}
+<text x="564" y="112" font-size="18" font-weight="700" fill="{{ disparity_color }}">{{ ece_disparity|f3 }}</text>
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Multi-Group Reliability Diagram                                    #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ content_start }}" width="644" height="{{ chart_h_block }}" rx="10" fill="#ffffff"/>
+
+{# Chart area, adapter uses: cl=80, cr=420, ct=80, cb=390 #}
+{# We translate to position the adapter coords within our panel      #}
+{% set chart_ox = 56 %}
+{% set chart_oy = content_start + 10 %}
+<g transform="translate({{ chart_ox }},{{ chart_oy }})">
+  {% set cl = 80 %}
+  {% set cr = 420 %}
+  {% set ct = 80 %}
+  {% set cb = 390 %}
+  {% set cw = cr - cl %}
+  {% set ch = cb - ct %}
+
+  {# Grid lines #}
+  {% for i in range(5) %}
+  {% set gy = ct + i * (ch // 4) %}
+  <line x1="{{ cl }}" y1="{{ gy }}" x2="{{ cr }}" y2="{{ gy }}" stroke="#f1f5f9" stroke-width="0.5"/>
+  {% endfor %}
+
+  {# Axes #}
+  <line x1="{{ cl }}" y1="{{ ct }}" x2="{{ cl }}" y2="{{ cb }}" stroke="#cbd5e1" stroke-width="1"/>
+  <line x1="{{ cl }}" y1="{{ cb }}" x2="{{ cr }}" y2="{{ cb }}" stroke="#cbd5e1" stroke-width="1"/>
+
+  {# Perfect calibration diagonal #}
+  <line x1="{{ cl }}" y1="{{ cb }}" x2="{{ cr }}" y2="{{ ct }}" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="{{ cr - 4 }}" y="{{ ct + 14 }}" text-anchor="end" font-size="7.5" fill="#94a3b8" letter-spacing="0.8">PERFECT</text>
+
+  {# Y axis labels #}
+  {% for i in range(6) %}
+  {% set val = (i * 0.2)|f2 %}
+  <text x="{{ cl - 8 }}" y="{{ cb - (i * ch / 5)|int + 3 }}" text-anchor="end" font-size="8.5" fill="#94a3b8">{{ val }}</text>
+  {% endfor %}
+
+  {# X axis labels #}
+  {% for i in range(6) %}
+  {% set val = (i * 0.2)|f2 %}
+  <text x="{{ cl + (i * cw / 5)|int }}" y="{{ cb + 16 }}" text-anchor="middle" font-size="8.5" fill="#94a3b8">{{ val }}</text>
+  {% endfor %}
+
+  {# Axis titles #}
+  <text x="{{ (cl + cr) // 2 }}" y="{{ cb + 34 }}" text-anchor="middle" font-size="10" fill="#64748b">Predicted Probability</text>
+  <text x="{{ cl - 40 }}" y="{{ (ct + cb) // 2 }}" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90,{{ cl - 40 }},{{ (ct + cb) // 2 }})">Actual Positive Rate</text>
+
+  {# Group calibration curves #}
+  {% for g in groups %}
+  {% if g.curve_points %}
+  <polyline points="{{ g.curve_points }}" fill="none" stroke="{{ g.color }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  {% for pt in g.dots %}
+  <circle cx="{{ pt.x }}" cy="{{ pt.y }}" r="3.5" fill="{{ g.color }}" stroke="#ffffff" stroke-width="1"/>
+  {% endfor %}
+  {% endif %}
+  {% endfor %}
+</g>
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Legend                                                             #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ legend_y }}" width="644" height="{{ legend_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ legend_y + 16 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">GROUPS</text>
+{% for g in groups %}
+{% set ly = legend_y + 26 + loop.index0 * 20 %}
+<line x1="56" y1="{{ ly }}" x2="76" y2="{{ ly }}" stroke="{{ g.color }}" stroke-width="2.5"/>
+<circle cx="66" cy="{{ ly }}" r="2.5" fill="{{ g.color }}"/>
+<text x="84" y="{{ ly + 4 }}" font-size="10.5" fill="#0f172a">{{ g.label|truncate_text(18) }}</text>
+<text x="260" y="{{ ly + 4 }}" font-size="10.5" font-weight="700" fill="{{ g.color }}">ECE = {{ g.ece|f3 }}</text>
+<text x="352" y="{{ ly + 4 }}" font-size="9" fill="{% if g.comparable %}#94a3b8{% else %}#b45309{% endif %}">n = {{ g.n }}{% if not g.comparable %} (too few to compare){% endif %}</text>
+{% endfor %}
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Disparity Finding Panel                                            #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ finding_y }}" width="644" height="{{ finding_h }}" rx="10" fill="#ffffff"/>
+{% if has_disparity %}
+<rect x="36" y="{{ finding_y }}" width="3" height="{{ finding_h }}" rx="1.5" fill="#dc2626"/>
+<text x="56" y="{{ finding_y + 22 }}" font-size="11" font-weight="700" fill="#dc2626">Calibration Disparity Detected</text>
+<text x="56" y="{{ finding_y + 42 }}" font-size="9.5" fill="#6b7280">Best group: {{ best_group }}  |  Worst group: {{ worst_group }}  |  Disparity: {{ ece_disparity|f3 }}</text>
+<text x="56" y="{{ finding_y + 60 }}" font-size="9.5" fill="#6b7280">{{ recommendation }}</text>
+{% elif not_assessable %}
+{# Could-not-check, on the canvas and not only in the desc. This branch sits  #}
+{# between the two verdicts so a measured disparity is still reported, while  #}
+{# the reassuring branch below can never be reached without a measurement.    #}
+<rect x="36" y="{{ finding_y }}" width="3" height="{{ finding_h }}" rx="1.5" fill="{{ unknown_color }}"/>
+<text x="56" y="{{ finding_y + 22 }}" font-size="11" font-weight="700" fill="{{ unknown_color }}">{{ not_assessable_text }}</text>
+<text x="56" y="{{ finding_y + 42 }}" font-size="9.5" fill="#6b7280">Cannot compare groups: {{ not_assessable_reason }}</text>
+<text x="56" y="{{ finding_y + 60 }}" font-size="9.5" fill="#6b7280">{{ n_measured_groups }} of {{ n_groups }} group(s) had a measurable calibration error.</text>
+{% else %}
+<rect x="36" y="{{ finding_y }}" width="3" height="{{ finding_h }}" rx="1.5" fill="#059669"/>
+<text x="56" y="{{ finding_y + 22 }}" font-size="11" font-weight="700" fill="#059669">Well Calibrated Across Groups</text>
+<text x="56" y="{{ finding_y + 42 }}" font-size="9.5" fill="#6b7280">All groups show consistent calibration. Max group ECE: {{ max_ece|f3 }}</text>
+<text x="56" y="{{ finding_y + 60 }}" font-size="9.5" fill="#6b7280">ECE disparity: {{ ece_disparity|f3 }}</text>
+{% endif %}
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Summary Stats                                                      #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ summary_y }}" width="644" height="{{ summary_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ summary_y + 20 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">SUMMARY</text>
+<!-- measured of supplied, never the supplied count alone; see the adapter -->
+<text x="56" y="{{ summary_y + 40 }}" font-size="10.5" fill="#6b7280">{% if n_measured_groups == n_groups %}{{ n_groups }} group{{ 's' if n_groups != 1 else '' }} analyzed{% else %}{{ n_measured_groups }} of {{ n_groups }} group{{ 's' if n_groups != 1 else '' }} measured{% endif %}  |  Overall ECE: </text>
+<text x="260" y="{{ summary_y + 40 }}" font-size="13" font-weight="700" fill="{{ overall_ece_color }}">{{ overall_ece|f3 }}</text>
+<text x="330" y="{{ summary_y + 40 }}" font-size="10.5" fill="#6b7280">Max group ECE: </text>
+<text x="460" y="{{ summary_y + 40 }}" font-size="13" font-weight="700" fill="{{ max_ece_color }}">{{ max_ece|f3 }}</text>
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                  #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

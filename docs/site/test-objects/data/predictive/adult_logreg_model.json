@@ -1,0 +1,126 @@
+{
+  "model": "logistic regression, sklearn 1.8.0",
+  "trained_on": "UCI Adult adult.data, rows with no missing value",
+  "features_numeric": [
+    "age",
+    "education_num",
+    "capital_gain",
+    "capital_loss",
+    "hours_per_week"
+  ],
+  "features_categorical": [
+    "workclass",
+    "marital_status",
+    "occupation",
+    "relationship"
+  ],
+  "not_used": [
+    "sex",
+    "race",
+    "native_country",
+    "fnlwgt",
+    "education"
+  ],
+  "scaler_mean": {
+    "age": 38.437901995888865,
+    "education_num": 10.12131158411246,
+    "capital_gain": 1092.0078575691268,
+    "capital_loss": 88.37248856176646,
+    "hours_per_week": 40.93123798156621
+  },
+  "scaler_scale": {
+    "age": 13.134447039742295,
+    "education_num": 2.549952646857945,
+    "capital_gain": 7406.223719548601,
+    "capital_loss": 404.2916683160687,
+    "hours_per_week": 11.979785633632552
+  },
+  "categories": {
+    "workclass": [
+      "Federal-gov",
+      "Local-gov",
+      "Private",
+      "Self-emp-inc",
+      "Self-emp-not-inc",
+      "State-gov",
+      "Without-pay"
+    ],
+    "marital_status": [
+      "Divorced",
+      "Married-AF-spouse",
+      "Married-civ-spouse",
+      "Married-spouse-absent",
+      "Never-married",
+      "Separated",
+      "Widowed"
+    ],
+    "occupation": [
+      "Adm-clerical",
+      "Armed-Forces",
+      "Craft-repair",
+      "Exec-managerial",
+      "Farming-fishing",
+      "Handlers-cleaners",
+      "Machine-op-inspct",
+      "Other-service",
+      "Priv-house-serv",
+      "Prof-specialty",
+      "Protective-serv",
+      "Sales",
+      "Tech-support",
+      "Transport-moving"
+    ],
+    "relationship": [
+      "Husband",
+      "Not-in-family",
+      "Other-relative",
+      "Own-child",
+      "Unmarried",
+      "Wife"
+    ]
+  },
+  "intercept": -1.8629753418813855,
+  "coefficients": {
+    "num__age": 0.34334854726145286,
+    "num__education_num": 0.7260934139877354,
+    "num__capital_gain": 2.3348697488832113,
+    "num__capital_loss": 0.25955278790684533,
+    "num__hours_per_week": 0.36548599463802073,
+    "cat__workclass_Federal-gov": 0.4343019773972064,
+    "cat__workclass_Local-gov": -0.2830757386900338,
+    "cat__workclass_Private": -0.04786469395898243,
+    "cat__workclass_Self-emp-inc": 0.15796691296353527,
+    "cat__workclass_Self-emp-not-inc": -0.5039201854834523,
+    "cat__workclass_State-gov": -0.36885900002733124,
+    "cat__workclass_Without-pay": -0.7178412094991841,
+    "cat__marital_status_Divorced": -0.7238708827596443,
+    "cat__marital_status_Married-AF-spouse": 1.5019692343168412,
+    "cat__marital_status_Married-civ-spouse": 1.2480298456754182,
+    "cat__marital_status_Married-spouse-absent": -0.7646888097215447,
+    "cat__marital_status_Never-married": -1.1504956319637152,
+    "cat__marital_status_Separated": -0.7205717251958185,
+    "cat__marital_status_Widowed": -0.7196639676497013,
+    "cat__occupation_Adm-clerical": -0.02410811279068951,
+    "cat__occupation_Armed-Forces": -0.17576724997355164,
+    "cat__occupation_Craft-repair": 0.13458579983724453,
+    "cat__occupation_Exec-managerial": 0.8363130846096846,
+    "cat__occupation_Farming-fishing": -0.9730380487020333,
+    "cat__occupation_Handlers-cleaners": -0.6142879698497499,
+    "cat__occupation_Machine-op-inspct": -0.23044668680341562,
+    "cat__occupation_Other-service": -0.8184060344502285,
+    "cat__occupation_Priv-house-serv": -1.708600122602323,
+    "cat__occupation_Prof-specialty": 0.5702654016360468,
+    "cat__occupation_Protective-serv": 0.6973088649013416,
+    "cat__occupation_Sales": 0.3303268883932008,
+    "cat__occupation_Tech-support": 0.6545318522039237,
+    "cat__occupation_Transport-moving": -0.007969603707599308,
+    "cat__relationship_Husband": 0.09878373046540266,
+    "cat__relationship_Not-in-family": 0.07485270590410287,
+    "cat__relationship_Other-relative": -0.7715117671216705,
+    "cat__relationship_Own-child": -1.009146716005486,
+    "cat__relationship_Unmarried": -0.2974230034171376,
+    "cat__relationship_Wife": 0.5751531128766608
+  },
+  "threshold": 0.5,
+  "how_to_predict": "z = intercept + sum(coef * feature), numeric features standardised with scaler_mean / scaler_scale, categorical one-hot; y_prob = 1 / (1 + exp(-z)); y_pred = y_prob >= threshold"
+}

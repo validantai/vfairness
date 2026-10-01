@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use vfairness in your work, please cite the software and the underlying paper."
+title: vfairness
+abstract: >-
+  A fairness, non-discrimination and explainability library for machine learning:
+  classification, regression and ranking fairness metrics with statistical
+  validation, bias detection, pre/in/post-processing interventions, and reporting.
+type: software
+authors:
+  - name: "Glinz & Company GmbH"
+    website: "https://validant.ai"
+license: Apache-2.0
+version: 0.1.0
+# Filled in by scripts/cut_release.py at the cut, never ahead of it: this file is
+# what an academic citation is generated from, and it once carried "2026-08-23",
+# a date on which nothing had been released.
+date-released: 2026-10-01
+repository-code: "https://github.com/validantai/vfairness"
+url: "https://vfairness.validant.ai"
+keywords:
+  - fairness
+  - machine-learning
+  - bias
+  - ai-fairness
+  - explainability
+preferred-citation:
+  type: conference-paper
+  title: "The Architecture of Digital Trust: A Multi-Level Framework for Bridging the AI Value Gap"
+  year: 2026
+  collection-title: "2026 IEEE Swiss Conference on Data Science and AI (SDS)"
+  doi: "10.1109/SDS70563.2026.00016"
+  start: 60
+  end: 67
+  authors:
+    - name: "Glinz & Company GmbH"

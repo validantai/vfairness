@@ -1,0 +1,264 @@
+{# ── Causal Decomposition Analysis SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set flow_h = 90 %}
+{% set decomp_h = 80 %}
+{% set gauge_h = 80 %}
+{% set bk_h = 34 + bk_steps|length * 28 + 10 %}
+{% set temp_h = 0 %}
+{% if temporal %}
+{% set temp_h = 110 %}
+{% endif %}
+{% set rec_h = 34 + recommendations|length * 18 + 10 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}
+{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 40 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{% set flow_y = header_h %}
+{% set decomp_y = flow_y + flow_h + 16 %}
+{% set gauge_y = decomp_y + decomp_h + 16 %}
+{% set bk_y = gauge_y + gauge_h + 16 %}
+{% set temp_y = bk_y + bk_h + 16 %}
+{% set rec_y = temp_y + temp_h + (16 if temp_h else 0) %}
+{% set exp_y = rec_y + rec_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# COULD NOT CHECK                                                   #}
+{# CRITICAL: three states, never two. A canvas handed no decomposition must   #}
+{# not print an effect, a mediated proportion or a Baron-Kenny tick. Until    #}
+{# 2026-08-27 causal_decomposition_to_svg(None) fell back to a module-level   #}
+{# demo fixture and rendered "Partial mediation (38%) through                 #}
+{# 'score_calibration'" with direct 0.0280 / indirect 0.0170 / total 0.0450   #}
+{# and 4/4 steps satisfied, for an analysis nobody had run. The empty dict    #}
+{# was the mirror failure: 0.0000 effects, a 0% gauge and four red crosses,   #}
+{# so a run that never happened read as mediation TESTED AND NOT FOUND, which #}
+{# is a stronger claim than an absence. This branch collapses the whole       #}
+{# verdict stack to one panel that states the absence; a supplied temporal    #}
+{# series is still drawn, because the caller measured it. #}
+{% set notice_h = 96 %}
+{% if not measured %}
+{% set notice_y = header_h %}
+{% set temp_y = notice_y + notice_h + 16 %}
+{% set rec_y = temp_y + temp_h + (16 if temp_h else 0) %}
+{% set exp_y = rec_y + rec_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── EXAMPLE band ── #}
+{# The demo fixture is reachable only through example=True, and when it is used #}
+{# the canvas has to say so where a reader looks, not only in the <desc>. DO    #}
+{# NOT REMOVE: the band is the only thing separating a sample from an audit     #}
+{# artifact once the SVG is exported. #}
+{% if is_example %}
+<rect x="0" y="54" width="680" height="20" fill="#fef3c7"/>
+<text x="340" y="68" text-anchor="middle" font-size="9.5" font-weight="700" fill="#92400e" letter-spacing="0.8">EXAMPLE ONLY: SYNTHETIC DEMONSTRATION DATA, NOT A REAL EVALUATION</text>
+{% endif %}
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{% if not measured %}
+<text x="36" y="122" font-size="10" fill="#64748b">Nothing was decomposed: no effect estimate and no Baron-Kenny step was supplied</text>
+{% else %}
+{# The headline band states what was NOT graded, next to the count, because a  #}
+{# reader takes this line before anything below it and "2/4 satisfied" reads   #}
+{# as two steps tested and failed when the other two were never run. #}
+<text x="36" y="122" font-size="10" fill="#64748b">Mediator: {{ mediator }} · {{ n_steps_ok }}/4 Baron-Kenny steps satisfied{% if n_steps_ungraded|default(0) > 0 %} · {{ n_steps_ungraded }} step{{ 's' if n_steps_ungraded != 1 }} not reported{% endif %}</text>
+{% endif %}
+{% if not measured %}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# NOTHING WAS DECOMPOSED PANEL  (see the CRITICAL note above)       #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ notice_y }}" width="644" height="{{ notice_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ notice_y }}" width="2.5" height="{{ notice_h }}" rx="1" fill="#64748b"/>
+<rect x="520" y="{{ notice_y + 20 }}" width="140" height="28" rx="14" fill="#f1f5f9"/>
+<text x="590" y="{{ notice_y + 39 }}" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b">NOT CHECKED</text>
+<text x="56" y="{{ notice_y + 32 }}" font-size="15" font-weight="700" fill="#64748b">Nothing was decomposed</text>
+<text x="56" y="{{ notice_y + 56 }}" font-size="10.5" fill="#64748b">No direct, indirect or total effect was estimated and no Baron-Kenny step was</text>
+<text x="56" y="{{ notice_y + 74 }}" font-size="10.5" fill="#64748b">tested. This is not a finding of no mediation: no mediation was tested.</text>
+{% else %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Causal Flow Diagram                                              #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ flow_y }}" width="644" height="{{ flow_h }}" rx="10" fill="#ffffff"/>
+
+{# Treatment box #}
+<rect x="56" y="{{ flow_y + 20 }}" width="130" height="50" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+<text x="121" y="{{ flow_y + 42 }}" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">Treatment</text>
+{# PER FIELD, not per canvas. The whole-canvas guard above answers "did this   #}
+{# decomposition report anything"; it cannot answer "did it report THIS        #}
+{# effect", and a decomposition carrying only a total printed 0.000 for the    #}
+{# other two, which is the finding "this path carries none of the gap" for a   #}
+{# path nobody estimated. #}
+<text x="121" y="{{ flow_y + 56 }}" text-anchor="middle" font-size="8" fill="#64748b">total: {% if total_known|default(true) %}{{ total_effect|f3 }}{% else %}not reported{% endif %}</text>
+
+{# Mediator box #}
+<rect x="270" y="{{ flow_y + 20 }}" width="130" height="50" rx="8" fill="#fefce8" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="335" y="{{ flow_y + 42 }}" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">{{ mediator }}</text>
+<text x="335" y="{{ flow_y + 56 }}" text-anchor="middle" font-size="8" fill="#64748b">indirect: {% if indirect_known|default(true) %}{{ indirect_effect|f3 }}{% else %}not reported{% endif %}</text>
+
+{# Outcome box #}
+<rect x="490" y="{{ flow_y + 20 }}" width="130" height="50" rx="8" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+<text x="555" y="{{ flow_y + 42 }}" text-anchor="middle" font-size="10" font-weight="600" fill="#065f46">Outcome</text>
+<text x="555" y="{{ flow_y + 56 }}" text-anchor="middle" font-size="8" fill="#64748b">direct: {% if direct_known|default(true) %}{{ direct_effect|f3 }}{% else %}not reported{% endif %}</text>
+
+{# Arrows #}
+<line x1="186" y1="{{ flow_y + 30 }}" x2="270" y2="{{ flow_y + 30 }}" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrow-amber)"/>
+<line x1="400" y1="{{ flow_y + 30 }}" x2="490" y2="{{ flow_y + 30 }}" stroke="#f59e0b" stroke-width="1.5"/>
+<line x1="186" y1="{{ flow_y + 60 }}" x2="490" y2="{{ flow_y + 60 }}" stroke="#059669" stroke-width="1.5" stroke-dasharray="4,3"/>
+<text x="340" y="{{ flow_y + 76 }}" text-anchor="middle" font-size="8" fill="#059669" font-weight="500">direct path (c')</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Effect Decomposition Bar                                         #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ decomp_y }}" width="644" height="{{ decomp_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ decomp_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Effect Decomposition</text>
+
+{# Stacked bar. A segment is drawn only for a component that was estimated: a  #}
+{# bar of a given width IS the measurement here, so an unreported component    #}
+{# contributes no segment rather than a minimum-width one. #}
+{% if direct_known|default(true) %}
+<rect x="56" y="{{ decomp_y + 34 }}" width="{{ direct_w }}" height="20" rx="4" fill="#059669" opacity="0.7"/>
+{% endif %}
+{% if indirect_known|default(true) %}
+<rect x="{{ 56 + direct_w if direct_known|default(true) else 56 }}" y="{{ decomp_y + 34 }}" width="{{ indirect_w }}" height="20" rx="4" fill="#f59e0b" opacity="0.7"/>
+{% endif %}
+{% if not direct_known|default(true) and not indirect_known|default(true) %}
+<rect x="56" y="{{ decomp_y + 34 }}" width="280" height="20" rx="4" fill="#f1f5f9"/>
+<text x="196" y="{{ decomp_y + 48 }}" text-anchor="middle" font-size="8.5" font-weight="600" fill="#64748b">neither path was estimated</text>
+{% endif %}
+
+{# Labels #}
+<text x="56" y="{{ decomp_y + 70 }}" font-size="9" fill="{{ '#059669' if direct_known|default(true) else '#94a3b8' }}" font-weight="600">Direct: {% if direct_known|default(true) %}{{ direct_effect|f4 }}{% else %}not reported{% endif %}</text>
+<text x="200" y="{{ decomp_y + 70 }}" font-size="9" fill="{{ '#f59e0b' if indirect_known|default(true) else '#94a3b8' }}" font-weight="600">Indirect: {% if indirect_known|default(true) %}{{ indirect_effect|f4 }}{% else %}not reported{% endif %}</text>
+<text x="400" y="{{ decomp_y + 70 }}" font-size="9" fill="{{ '#0f172a' if total_known|default(true) else '#94a3b8' }}" font-weight="600">Total: {% if total_known|default(true) %}{{ total_effect|f4 }}{% else %}not reported{% endif %}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Proportion Mediated Gauge                                        #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ gauge_y }}" width="644" height="{{ gauge_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ gauge_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Proportion Mediated</text>
+
+{# Semi-circle gauge. An unreported proportion draws no needle and prints no   #}
+{# percentage: a 0% gauge is the finding "the mediator carries none of the     #}
+{# gap", which is the most specific claim this dial can make. #}
+{% if proportion_mediated_known|default(true) %}
+<g transform="translate(340, {{ gauge_y + 70 }})">
+  <path d="M -60 0 A 60 60 0 0 1 60 0" fill="none" stroke="#f1f5f9" stroke-width="10" stroke-linecap="round"/>
+  <path d="M -60 0 A 60 60 0 0 1 {{ -60 + prop_med_arc * 0.667 }} {{ -(prop_med_arc * 0.55)|int }}" fill="none" stroke="#f59e0b" stroke-width="10" stroke-linecap="round" opacity="0.8"/>
+  <text x="0" y="-10" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">{{ prop_med_pct }}%</text>
+</g>
+
+<text x="200" y="{{ gauge_y + 72 }}" font-size="9" fill="#64748b">0%</text>
+<text x="460" y="{{ gauge_y + 72 }}" font-size="9" fill="#64748b">100%</text>
+{% else %}
+<g transform="translate(340, {{ gauge_y + 70 }})">
+  <path d="M -60 0 A 60 60 0 0 1 60 0" fill="none" stroke="#f1f5f9" stroke-width="10" stroke-linecap="round"/>
+  <text x="0" y="-10" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b">{{ could_not_check_text|default('COULD NOT CHECK', true) }}</text>
+</g>
+<text x="340" y="{{ gauge_y + 72 }}" text-anchor="middle" font-size="9" fill="#94a3b8">no proportion mediated was reported</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Baron-Kenny Steps                                                #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ bk_y }}" width="644" height="{{ bk_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ bk_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Baron-Kenny Mediation Steps</text>
+<line x1="56" y1="{{ bk_y + 30 }}" x2="660" y2="{{ bk_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{# CRITICAL: three states per step, never two. A red cross is the strongest    #}
+{# claim this panel can make about a path (the ladder was climbed here and it  #}
+{# broke), and until 2026-08-27 a step nobody evaluated drew exactly that,     #}
+{# because the adapter defaulted it to False. A half-reported ladder showed    #}
+{# two ticks and two crosses, so the two unevaluated steps read as measured    #}
+{# negatives. An unreported step gets the neutral slate marker and says so.    #}
+{% for s in bk_steps %}
+{% set sy = bk_y + 34 + loop.index0 * 28 %}
+{% if s.step_known|default(true) %}
+{% if s.satisfied %}
+<rect x="56" y="{{ sy + 4 }}" width="18" height="18" rx="9" fill="#ecfdf5"/>
+<text x="65" y="{{ sy + 16 }}" text-anchor="middle" font-size="10" font-weight="700" fill="#059669">&#x2713;</text>
+{% else %}
+<rect x="56" y="{{ sy + 4 }}" width="18" height="18" rx="9" fill="#fef2f2"/>
+<text x="65" y="{{ sy + 16 }}" text-anchor="middle" font-size="10" font-weight="700" fill="#dc2626">&#x2717;</text>
+{% endif %}
+<text x="84" y="{{ sy + 16 }}" font-size="9.5" fill="#475569">{{ s.label }}</text>
+{% else %}
+<rect x="56" y="{{ sy + 4 }}" width="18" height="18" rx="9" fill="#f1f5f9"/>
+<text x="65" y="{{ sy + 16 }}" text-anchor="middle" font-size="10" font-weight="700" fill="#64748b">&#xb7;</text>
+<text x="84" y="{{ sy + 16 }}" font-size="9.5" fill="#94a3b8">{{ s.label }}</text>
+<text x="600" y="{{ sy + 16 }}" text-anchor="end" font-size="8" font-weight="600" fill="#64748b">not reported</text>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Temporal Stability (conditional)                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if temporal %}
+<rect x="36" y="{{ temp_y }}" width="644" height="{{ temp_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ temp_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Temporal Stability</text>
+{# The pill geometry is data-driven so the third state (COULD NOT CHECK, for a
+   series whose stability was never tested) gets a caption that fits. STABLE and
+   UNSTABLE keep the original 70-wide pill at x=570. #}
+<rect x="{{ temporal.pill_x|default(570, true) }}" y="{{ temp_y + 8 }}" width="{{ temporal.pill_w|default(70, true) }}" height="20" rx="10" fill="{{ temporal.trend_color }}15"/>
+<text x="{{ temporal.pill_cx|default(605, true) }}" y="{{ temp_y + 22 }}" text-anchor="middle" font-size="9" font-weight="600" fill="{{ temporal.trend_color }}">{{ temporal.trend_label }}</text>
+
+{# Mini chart area #}
+<g transform="translate(0, {{ temp_y + 30 }})">
+  <line x1="56" y1="60" x2="640" y2="60" stroke="#e2e8f0" stroke-width="0.5"/>
+  <line x1="56" y1="30" x2="640" y2="30" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="3,3"/>
+  {% for p in temporal.points %}
+  <circle cx="{{ p.x }}" cy="{{ p.y + 20 }}" r="4" fill="{{ temporal.trend_color }}" opacity="0.7"/>
+  {% if not loop.last and temporal.points[loop.index0 + 1] is defined %}
+  <line x1="{{ p.x }}" y1="{{ p.y + 20 }}" x2="{{ temporal.points[loop.index0 + 1].x }}" y2="{{ temporal.points[loop.index0 + 1].y + 20 }}" stroke="{{ temporal.trend_color }}" stroke-width="1.5" opacity="0.5"/>
+  {% endif %}
+  <text x="{{ p.x }}" y="72" text-anchor="middle" font-size="7" fill="#94a3b8">{{ p.value|f3 }}</text>
+  {% endfor %}
+</g>
+{# "trend slope: 0.0000" is a measured flat trend, which is a positive finding #}
+{# about temporal consistency; it was printed for any series carrying no       #}
+{# slope at all. Same three states as the verdict pill above it. #}
+<text x="56" y="{{ temp_y + 100 }}" font-size="8" fill="#94a3b8">trend slope: {% if temporal.trend_slope_known|default(true) %}{{ temporal.trend_slope|f4 }}{% else %}not reported{% endif %}</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Recommendations                                                  #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ rec_y }}" width="644" height="{{ rec_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Recommendations</text>
+{% for r in recommendations %}
+<text x="56" y="{{ rec_y + 42 + loop.index0 * 18 }}" font-size="9.5" fill="#6b7280">{{ loop.index }}. {{ r }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

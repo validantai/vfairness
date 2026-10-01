@@ -1,0 +1,10 @@
+name = "vfairness-docs"
+compatibility_date = "2025-05-01"
+
+routes = [
+  { pattern = "vfairness.validant.ai", custom_domain = true }
+]
+
+[assets]
+directory = "./docs/site"
+not_found_handling = "404-page"

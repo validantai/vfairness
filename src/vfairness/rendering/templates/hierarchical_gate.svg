@@ -1,0 +1,302 @@
+{# ── Hierarchical Fairness Gate · SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set summary_h = 80 %}
+{% set level_header_h = 40 %}
+{% set level_row_h = 28 %}
+
+{# Compute per-level heights #}
+{# CRITICAL, Jinja loop scoping. A bare `{% set x = x + ... %}` inside a
+   `{% for %}` is DISCARDED when the iteration ends, so this accumulator stayed
+   0 no matter how many levels were drawn, and the identical shape at the level
+   loop below (`cur_y`) left EVERY panel at the same y. The published
+   hierarchical_gate.svg showed an APPROVED gate, three green PASS chips, and
+   one of the eight metrics that substantiate them: four panels painted at one
+   coordinate, the last one covering the rest, with the warnings panel over the
+   top of all of them because levels_h was 0. A namespace is the only accumulator
+   that survives the loop. NEVER convert these back to a bare `{% set %}`.
+   A substring assertion cannot see this defect (the markup is correct, the
+   coordinates are not); only rasterising the canvas can, which is why
+   tests/test_desc_agrees_with_canvas.py asserts DISTINCT y values here. #}
+{% set _stack = namespace(levels_h=0) %}
+{% for level in levels %}
+{% set _stack.levels_h = _stack.levels_h + level_header_h + level.metrics|length * level_row_h + 12 + 12 %}
+{% endfor %}
+{% set levels_h = _stack.levels_h %}
+
+{# The panel is drawn whenever there is a small-sample STATE to disclose, not
+   only when a warning was raised. An empty warning list had two meanings (the
+   check ran and found nothing, or it never ran) and drawing nothing said the
+   first one for both: measured 2026-09-30, the three values of
+   small_sample_check_ran rendered byte-identical canvases. F13. #}
+{% set warnings_h = 0 %}
+{% if warnings or small_sample_state %}{% set warnings_h = 56 + warnings|length * 22 + (small_sample_notes|length if small_sample_notes else 0) * 13 %}{% endif %}
+
+{% if explanation %}{% set _pre_exp = explanation|wordwrap(105) %}{% set exp_h = 44 + _pre_exp.split('\n')|length * 16 %}{% else %}{% set exp_h = 0 %}{% endif %}
+
+{% set summary_y = header_h %}
+{% set levels_y = summary_y + summary_h + 16 %}
+{% set warnings_y = levels_y + levels_h + 4 %}
+{% set exp_y = warnings_y + warnings_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── Gate status colors ── #}
+{# CRITICAL: three states, never two. A gate handed no decision must not print #}
+{# a verdict. Until 2026-08-27 hierarchical_gate_to_svg(None) fell back to a   #}
+{# demo fixture and this template rendered APPROVED, with PASS on all three    #}
+{# levels, for a model nobody had gated. NEVER collapse the first branch into  #}
+{# the BLOCKED else: could-not-check is not a rejection either. #}
+{% set verdict_given = (approved is defined and approved is not none) %}
+{% if not verdict_given %}
+{% set gate_color = '#64748b' %}
+{% set gate_bg = '#f1f5f9' %}
+{% set gate_label = 'NOT CHECKED' %}
+{% elif approved %}
+{% set gate_color = '#059669' %}
+{% set gate_bg = '#ecfdf5' %}
+{% set gate_label = 'APPROVED' %}
+{% else %}
+{% set gate_color = '#dc2626' %}
+{% set gate_bg = '#fef2f2' %}
+{% set gate_label = 'BLOCKED' %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" fill="url(#accent)"/>
+
+{# ── EXAMPLE band ── #}
+{# The demo fixture is reachable only through example=True, and when it is used #}
+{# the canvas has to say so where a reader looks, not only in the <desc>. DO    #}
+{# NOT REMOVE: the band and the watermark are the only things separating a      #}
+{# sample from an audit artifact once the SVG is exported. #}
+{% if is_example %}
+<rect x="0" y="54" width="680" height="20" fill="#fef3c7"/>
+<text x="340" y="68" text-anchor="middle" font-size="9.5" font-weight="700" fill="#92400e" letter-spacing="0.8">EXAMPLE ONLY: SYNTHETIC DEMONSTRATION DATA, NOT A REAL EVALUATION</text>
+{% endif %}
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">Hierarchical fairness evaluation: {{ levels|length }} level{{ 's' if levels|length != 1 else '' }} checked</text>
+
+{# ── Gate status badge ── #}
+<rect x="520" y="68" width="160" height="56" rx="10" fill="#ffffff"/>
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="{{ gate_color }}"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">HIERARCHICAL GATE</text>
+<rect x="536" y="90" width="120" height="26" rx="13" fill="{{ gate_bg }}"/>
+<text x="596" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="{{ gate_color }}">{{ gate_label }}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Summary Panel                                                     #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ summary_y }}" width="644" height="{{ summary_h }}" rx="10" fill="#ffffff"/>
+
+{# Level summary badges #}
+{% set badge_w = 190 %}
+{% set badge_gap = 16 %}
+{% set badge_x = 56 %}
+
+{# CRITICAL: three states PER LEVEL, never two, for the same reason the gate    #}
+{# badge above has three. Each of these three was PASS-or-else-FAIL, and the    #}
+{# else swallowed the level that was never evaluated: a decision whose          #}
+{# level_results carry no metric arrives here with n_*_total == 0 (and, for the #}
+{# two lower levels, a status of None, which `is defined` does NOT reject),     #}
+{# so the panel printed OVERALL FAIL 0/0 metrics, SINGLE ATTRIBUTE FAIL 0/0     #}
+{# checks and INTERSECTIONAL FAIL 0/0 combos. Three red failures for three      #}
+{# levels nobody ran, sitting under a correct headline that lends them its      #}
+{# credibility. A level with no check is NOT CHECKED, in slate: zero checks     #}
+{# passed of zero run is not a rejection, and 0/0 is not a measurement. #}
+{% set nc_color = '#64748b' %}
+{% set nc_bg = '#f1f5f9' %}
+
+{# The pass counts arrive already summed (n_*_pass / n_*_total in             #}
+{# adapters_workflow), and those totals count EVERY metric on the level,      #}
+{# including one the gate never graded. An ungraded row belongs in neither    #}
+{# the numerator nor the denominator: "1/2 metrics" beside a green PASS is a  #}
+{# claim that two metrics were measured. The denominators are re-derived here #}
+{# from the rows themselves, and the ungraded count is printed beside them so #}
+{# a partly graded level still reports what it measured without reading as an #}
+{# all-clear over the level. With nothing ungraded these totals are the ones  #}
+{# the adapter supplied, unchanged. #}
+{% set _ug = namespace(ov=0, sa=0, isec=0) %}
+{% for _lv in (levels or []) %}
+{% for _m in (_lv.metrics or []) %}
+{% if _m.passed is not defined or _m.passed is none %}
+{% if _lv.type == 'overall' %}{% set _ug.ov = _ug.ov + 1 %}{% elif _lv.type == 'single attribute' %}{% set _ug.sa = _ug.sa + 1 %}{% else %}{% set _ug.isec = _ug.isec + 1 %}{% endif %}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+{# Overall badge #}
+{% if overall_status is defined %}
+{% set ov_total = (n_overall_total or 0) - _ug.ov %}
+{% set ov_tail = (', ' ~ _ug.ov ~ ' not checked') if _ug.ov else '' %}
+{% if overall_status is none or not ov_total %}{% set ov_color = nc_color %}{% set ov_bg = nc_bg %}{% set ov_label = 'NOT CHECKED' %}{% set ov_detail = (_ug.ov ~ ' metric(s) not checked') if _ug.ov else 'nothing evaluated' %}{% elif n_overall_pass == ov_total %}{% set ov_color = '#059669' %}{% set ov_bg = '#ecfdf5' %}{% set ov_label = 'PASS' %}{% set ov_detail = n_overall_pass ~ '/' ~ ov_total ~ ' metrics' ~ ov_tail %}{% else %}{% set ov_color = '#dc2626' %}{% set ov_bg = '#fef2f2' %}{% set ov_label = 'FAIL' %}{% set ov_detail = n_overall_pass ~ '/' ~ ov_total ~ ' metrics' ~ ov_tail %}{% endif %}
+<rect x="{{ badge_x }}" y="{{ summary_y + 14 }}" width="{{ badge_w }}" height="50" rx="8" fill="{{ ov_bg }}"/>
+<text x="{{ badge_x + 14 }}" y="{{ summary_y + 32 }}" font-size="8" font-weight="600" fill="{{ ov_color }}" letter-spacing="0.5">OVERALL</text>
+<text x="{{ badge_x + 14 }}" y="{{ summary_y + 52 }}" font-size="{{ 9 if ov_label == 'NOT CHECKED' else 12 }}" font-weight="700" fill="{{ ov_color }}">{{ ov_label }}</text>
+<text x="{{ badge_x + 84 if ov_label == 'NOT CHECKED' else badge_x + 60 }}" y="{{ summary_y + 52 }}" font-size="9" fill="{{ ov_color }}">{{ ov_detail }}</text>
+{% endif %}
+
+{# Single-attr badge #}
+{% if single_status is defined %}
+{% set sa_total = (n_single_total or 0) - _ug.sa %}
+{% set sa_tail = (', ' ~ _ug.sa ~ ' not checked') if _ug.sa else '' %}
+{% if single_status is none or not sa_total %}{% set sa_color = nc_color %}{% set sa_bg = nc_bg %}{% set sa_label = 'NOT CHECKED' %}{% set sa_detail = (_ug.sa ~ ' check(s) not checked') if _ug.sa else 'nothing evaluated' %}{% elif n_single_pass == sa_total %}{% set sa_color = '#059669' %}{% set sa_bg = '#ecfdf5' %}{% set sa_label = 'PASS' %}{% set sa_detail = n_single_pass ~ '/' ~ sa_total ~ ' checks' ~ sa_tail %}{% else %}{% set sa_color = '#dc2626' %}{% set sa_bg = '#fef2f2' %}{% set sa_label = 'FAIL' %}{% set sa_detail = n_single_pass ~ '/' ~ sa_total ~ ' checks' ~ sa_tail %}{% endif %}
+{% set sa_x = badge_x + badge_w + badge_gap %}
+<rect x="{{ sa_x }}" y="{{ summary_y + 14 }}" width="{{ badge_w }}" height="50" rx="8" fill="{{ sa_bg }}"/>
+<text x="{{ sa_x + 14 }}" y="{{ summary_y + 32 }}" font-size="8" font-weight="600" fill="{{ sa_color }}" letter-spacing="0.5">SINGLE ATTRIBUTE</text>
+<text x="{{ sa_x + 14 }}" y="{{ summary_y + 52 }}" font-size="{{ 9 if sa_label == 'NOT CHECKED' else 12 }}" font-weight="700" fill="{{ sa_color }}">{{ sa_label }}</text>
+<text x="{{ sa_x + 84 if sa_label == 'NOT CHECKED' else sa_x + 60 }}" y="{{ summary_y + 52 }}" font-size="9" fill="{{ sa_color }}">{{ sa_detail }}</text>
+{% endif %}
+
+{# Intersectional badge #}
+{% if intersect_status is defined %}
+{% set is_total = (n_intersect_total or 0) - _ug.isec %}
+{% set is_tail = (', ' ~ _ug.isec ~ ' not checked') if _ug.isec else '' %}
+{% if intersect_status is none or not is_total %}{% set is_color = nc_color %}{% set is_bg = nc_bg %}{% set is_label = 'NOT CHECKED' %}{% set is_detail = (_ug.isec ~ ' combo(s) not checked') if _ug.isec else 'nothing evaluated' %}{% elif n_intersect_pass == is_total %}{% set is_color = '#059669' %}{% set is_bg = '#ecfdf5' %}{% set is_label = 'PASS' %}{% set is_detail = n_intersect_pass ~ '/' ~ is_total ~ ' combos' ~ is_tail %}{% else %}{% set is_color = '#dc2626' %}{% set is_bg = '#fef2f2' %}{% set is_label = 'FAIL' %}{% set is_detail = n_intersect_pass ~ '/' ~ is_total ~ ' combos' ~ is_tail %}{% endif %}
+{% set is_x = badge_x + 2 * (badge_w + badge_gap) %}
+<rect x="{{ is_x }}" y="{{ summary_y + 14 }}" width="{{ badge_w }}" height="50" rx="8" fill="{{ is_bg }}"/>
+<text x="{{ is_x + 14 }}" y="{{ summary_y + 32 }}" font-size="8" font-weight="600" fill="{{ is_color }}" letter-spacing="0.5">INTERSECTIONAL</text>
+<text x="{{ is_x + 14 }}" y="{{ summary_y + 52 }}" font-size="{{ 9 if is_label == 'NOT CHECKED' else 12 }}" font-weight="700" fill="{{ is_color }}">{{ is_label }}</text>
+<text x="{{ is_x + 84 if is_label == 'NOT CHECKED' else is_x + 60 }}" y="{{ summary_y + 52 }}" font-size="9" fill="{{ is_color }}">{{ is_detail }}</text>
+{% endif %}
+
+{# The three level badges above are the summary. With no decision there are no #}
+{# badges, and an empty panel beside a headline is read as agreement with it,  #}
+{# so the panel states the absence in words instead. #}
+{% if not verdict_given %}
+<text x="56" y="{{ summary_y + 30 }}" font-size="11" font-weight="700" fill="#64748b">Nothing was assessed</text>
+<text x="56" y="{{ summary_y + 50 }}" font-size="10" fill="#64748b">No gate decision was supplied, so no level was evaluated: not overall, not per attribute,</text>
+<text x="56" y="{{ summary_y + 68 }}" font-size="10" fill="#64748b">not intersectional. This gate is neither approved nor blocked here.</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Per-Level Detail Panels                                           #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# CRITICAL, same Jinja loop scoping as the height accumulator at the top of this
+   file: the running y MUST live on a namespace or every panel below draws at
+   levels_y and only the last one painted is visible. See the note there. #}
+{% set _panel = namespace(y=levels_y) %}
+{% for level in levels %}
+{% set cur_y = _panel.y %}
+{% set lh = level_header_h + level.metrics|length * level_row_h + 12 %}
+{# CRITICAL: three states per level panel, for the same reason the summary      #}
+{# badges above have three. This was PASS-or-else-FAIL, so a level whose gate   #}
+{# returned no verdict (approved is None, which `else` swallows silently) was   #}
+{# painted red, badged FAIL, and given the failure stripe down its left edge.   #}
+{# A level nobody graded has not failed. NEVER collapse the first branch into   #}
+{# the FAIL else. #}
+{% if level.approved is not defined or level.approved is none %}{% set lv_color = '#64748b' %}{% set lv_bg = '#f1f5f9' %}{% set lv_label = 'NOT CHECKED' %}{% elif level.approved %}{% set lv_color = '#059669' %}{% set lv_bg = '#ecfdf5' %}{% set lv_label = 'PASS' %}{% else %}{% set lv_color = '#dc2626' %}{% set lv_bg = '#fef2f2' %}{% set lv_label = 'FAIL' %}{% endif %}
+
+<rect x="36" y="{{ cur_y }}" width="644" height="{{ lh }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ cur_y }}" width="2.5" height="{{ lh }}" rx="1" fill="{{ lv_color }}"/>
+
+{# Level header #}
+<text x="56" y="{{ cur_y + 18 }}" font-size="8" font-weight="600" fill="{{ lv_color }}" letter-spacing="0.5">{{ level.type|upper }}</text>
+<text x="180" y="{{ cur_y + 18 }}" font-size="10.5" font-weight="600" fill="#0f172a">{{ level.name }}</text>
+{# Status badge #}
+<rect x="{{ 564 if lv_label == 'NOT CHECKED' else 580 }}" y="{{ cur_y + 5 }}" width="{{ 76 if lv_label == 'NOT CHECKED' else 60 }}" height="20" rx="10" fill="{{ lv_bg }}"/>
+<text x="{{ 602 if lv_label == 'NOT CHECKED' else 610 }}" y="{{ cur_y + 19 }}" text-anchor="middle" font-size="{{ 8 if lv_label == 'NOT CHECKED' else 9 }}" font-weight="600" fill="{{ lv_color }}">{{ lv_label }}</text>
+
+{# Column headers #}
+<text x="56" y="{{ cur_y + 36 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">METRIC</text>
+<text x="340" y="{{ cur_y + 36 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">VALUE</text>
+<text x="440" y="{{ cur_y + 36 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">THRESHOLD</text>
+<text x="580" y="{{ cur_y + 36 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">STATUS</text>
+
+{# Metric rows #}
+{% for m in level.metrics %}
+{% set my = cur_y + level_header_h + loop.index0 * level_row_h %}
+{# CRITICAL: three states per metric row. This was PASS-or-else-FAIL, so a      #}
+{# metric the gate never graded (passed is None) was badged FAIL in red with    #}
+{# the pink row wash behind it, and a reader was sent after a breach that was   #}
+{# never measured. A metric with no verdict is NOT CHECKED, in slate. NEVER     #}
+{# collapse the first branch into the FAIL else. #}
+{% if m.passed is not defined or m.passed is none %}{% set m_color = '#64748b' %}{% set m_bg = '#f1f5f9' %}{% set m_label = 'NOT CHECKED' %}{% elif m.passed %}{% set m_color = '#059669' %}{% set m_bg = '#ecfdf5' %}{% set m_label = 'PASS' %}{% else %}{% set m_color = '#dc2626' %}{% set m_bg = '#fef2f2' %}{% set m_label = 'FAIL' %}{% endif %}
+
+{% if m_label == 'FAIL' %}
+<rect x="46" y="{{ my }}" width="624" height="{{ level_row_h }}" fill="#fef2f2" opacity="0.3"/>
+{% endif %}
+
+<text x="56" y="{{ my + 18 }}" font-size="10" fill="#0f172a">{{ m.name|truncate_text(40) }}</text>
+{# An ungraded row gets no number: |f3 already prints N/A for a missing value,
+   but in the failure red that reads as a measured breach with a lost digit. #}
+<text x="340" y="{{ my + 18 }}" font-size="{{ 10 if m_label == 'NOT CHECKED' else 12 }}" font-weight="700" fill="{{ m_color }}">{% if m_label == 'NOT CHECKED' %}not measured{% else %}{{ m.value|f3 }}{% endif %}</text>
+<text x="440" y="{{ my + 18 }}" font-size="10" fill="#6b7280">{% if m.threshold is not none %}{{ m.threshold|f3 }}{% else %}n/a{% endif %}</text>
+<rect x="{{ 556 if m_label == 'NOT CHECKED' else 572 }}" y="{{ my + 4 }}" width="{{ 66 if m_label == 'NOT CHECKED' else 50 }}" height="18" rx="9" fill="{{ m_bg }}"/>
+<text x="{{ 589 if m_label == 'NOT CHECKED' else 597 }}" y="{{ my + 17 }}" text-anchor="middle" font-size="{{ 7 if m_label == 'NOT CHECKED' else 8 }}" font-weight="600" fill="{{ m_color }}">{{ m_label }}</text>
+{% endfor %}
+
+{% set _panel.y = _panel.y + lh + 12 %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Small-Sample Warnings                                             #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if warnings or small_sample_state %}
+{# Amber for a real breach of the floor, slate for every could-not-check, emerald
+   only for a check that RAN and came back clean. A could-not-check must never
+   take the clean colour and must never take the breach colour either. #}
+{% if small_sample_state == 'RAN' %}
+{% set ss_color = '#059669' %}
+{% elif warnings %}
+{% set ss_color = '#f59e0b' %}
+{% else %}
+{% set ss_color = '#64748b' %}
+{% endif %}
+<rect x="36" y="{{ warnings_y }}" width="644" height="{{ warnings_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ warnings_y }}" width="2.5" height="{{ warnings_h }}" rx="1" fill="{{ ss_color }}"/>
+<text x="56" y="{{ warnings_y + 20 }}" font-size="8" font-weight="600" fill="{{ ss_color }}" letter-spacing="0.5">SMALL-SAMPLE CHECK: {{ small_sample_state|default('NOT RECORDED', true) }}</text>
+<text x="260" y="{{ warnings_y + 20 }}" font-size="10.5" font-weight="600" fill="#0f172a">{{ small_sample_headline|default('This decision does not say whether any size was checked', true) }}</text>
+<line x1="56" y1="{{ warnings_y + 30 }}" x2="660" y2="{{ warnings_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+
+{% for w in warnings %}
+{# The metric is printed because a rate-denominator row is a statement about ONE
+   metric: "f, the true-positive rate leg" refuses equalized odds and says
+   nothing about demographic parity. #}
+<text x="66" y="{{ warnings_y + 48 + loop.index0 * 22 }}" font-size="9.5" fill="{{ ss_color }}">{{ w.group }}: {{ w.size }} row(s) in the denominator (min {{ w.min_recommended }}){% if w.metric and w.metric != 'all' %} for {{ w.metric }}{% endif %}</text>
+{% endfor %}
+{% for _n in (small_sample_notes or []) %}
+<text x="66" y="{{ warnings_y + 48 + warnings|length * 22 + loop.index0 * 13 }}" font-size="8.5" fill="#6b7280">{{ _n }}</text>
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── EXAMPLE watermark, painted last so it survives every panel above it ── #}
+{# Repeated down a tall canvas so a crop or a screenshot of one section cannot #}
+{# lose the only mark that separates a sample from a finding. #}
+{% if is_example %}
+{% for _p in ([22, 50, 78] if total_h > 1100 else [50]) %}
+{% set _wy = (total_h * _p / 100)|int %}
+<text x="340" y="{{ _wy }}" text-anchor="middle" font-size="76" font-weight="800" fill="#92400e" opacity="0.12" letter-spacing="6" transform="rotate(-24 340 {{ _wy }})">EXAMPLE</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

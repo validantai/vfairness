@@ -1,0 +1,32 @@
+{# ── Shared COULD NOT CHECK panel · vfairness Design System v4 · 680 wide ── #}
+{#                                                                            #}
+{# CRITICAL: three states, never two. "Nothing failed" and "nothing ran" must #}
+{# never render the same. A count of zero is not a finding of zero, and a     #}
+{# sentinel is not a measurement.                                             #}
+{#                                                                            #}
+{# Every template that includes this draws it INSTEAD of its verdict stack,   #}
+{# never beside it: a run that measured nothing must not also print a score,  #}
+{# a rate, a band, a 0-of-0 count or a status colour anywhere on the canvas.  #}
+{# The panel is slate, deliberately neither the green that reads as a pass    #}
+{# nor the red that reads as a finding: could-not-check is not a rejection    #}
+{# either, and collapsing it into one of the other two is the whole bug this  #}
+{# partial exists to close.                                                   #}
+{#                                                                            #}
+{# It lives in ONE file so the seventeen adapters share one third state       #}
+{# rather than each inventing its own, and so a later template cannot ship a  #}
+{# quieter version of this notice.                                            #}
+{#                                                                            #}
+{# The including template must set, before the include:                       #}
+{#   {% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{#   {% set na_h = 76 + _na_lines|length * 18 %}                              #}
+{#   {% set na_y = <where the verdict stack would have started> %}            #}
+{# and may set na_headline to name what was not assessed.                     #}
+<rect x="36" y="{{ na_y }}" width="644" height="{{ na_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ na_y }}" width="2.5" height="{{ na_h }}" rx="1" fill="#64748b"/>
+<rect x="516" y="{{ na_y + 18 }}" width="144" height="28" rx="14" fill="#f1f5f9"/>
+<text x="588" y="{{ na_y + 37 }}" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b" letter-spacing="0.4">NOT CHECKED</text>
+<text x="56" y="{{ na_y + 32 }}" font-size="15" font-weight="700" fill="#64748b">{{ na_headline|default('Nothing was assessed', true) }}</text>
+{% for _na_line in _na_lines %}
+<text x="56" y="{{ na_y + 56 + loop.index0 * 18 }}" font-size="10.5" fill="#64748b">{{ _na_line }}</text>
+{% endfor %}
+<text x="56" y="{{ na_y + na_h - 14 }}" font-size="9.5" fill="#94a3b8">This chart is not a pass and not a failure. No value on it was measured, so it certifies nothing.</text>

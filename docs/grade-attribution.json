@@ -1,0 +1,13 @@
+{
+  "_what_this_is": "The last run of scripts/verify_grade_attribution.py. It runs each test file a grading row names and looks for the graded unit's own lines in the coverage report, because a row naming a test that never executes the unit is a published badge with nothing behind it. It takes about forty minutes, so this is a dated SNAPSHOT and the date travels with the numbers.",
+  "measured_on": "2026-09-29",
+  "rows": 721,
+  "test_files": 108,
+  "verdicts": {
+    "confirmed by line coverage": 677,
+    "blind: class body runs at import": 38,
+    "unit not on the current surface": 5,
+    "blind: body excluded from coverage": 1
+  },
+  "findings": []
+}

@@ -1,0 +1,320 @@
+{# ── Fairness Training Report SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set stats_h = 48 %}
+{% set baseline_h = 80 %}
+{% set methods_header_h = 40 %}
+{% set methods_row_h = 32 %}
+{% set methods_h = methods_header_h + methods|length * methods_row_h + 10 %}
+{% set rec_h = 90 %}
+{% set issues_header_h = 40 %}
+{% set issues_row_h = 30 %}
+{% set issues_h = (issues_header_h + issues|length * issues_row_h + 10) if issues else 0 %}
+{% set actions_header_h = 36 %}
+{% set actions_row_h = 26 %}
+{% set actions_h = (actions_header_h + actions|length * actions_row_h + 10) if actions else 0 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% endif %}
+{% set stats_y = header_h %}
+{% set baseline_y = stats_y + stats_h + 16 %}
+{% set methods_y = baseline_y + baseline_h + 16 %}
+{% set rec_y = methods_y + methods_h + 16 %}
+{% set issues_y = rec_y + rec_h + 16 %}
+{% set actions_y = issues_y + (issues_h + 16 if issues else 0) %}
+{% set exp_y = actions_y + (actions_h + 16 if actions else 0) %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   A report with nothing in it used to draw this whole body out of .get
+   defaults: "Accuracy 0.0000 | Violation 0.0000 | Constraint VIOLATED" under a
+   red stripe, for a constraint that was never evaluated. A fabricated FAILURE
+   is exactly as wrong as a fabricated all-clear, and worse to read, because it
+   sends someone after a violation that does not exist. The body goes and the
+   panel states the absence: no verdict, no score, no rate, no status colour. #}
+{% if not_assessable %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = header_h %}
+{% set exp_y = na_y + na_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}
+<text x="644" y="32" text-anchor="end" font-size="9" fill="#b0b8c4">{{ timestamp }}</text>
+{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{% if not_assessable %}
+<text x="36" y="122" font-size="10" fill="#64748b">{{ na_headline|default('Nothing was assessed', true) }}</text>
+{% include '_could_not_check.svg' %}
+{% else %}
+{# THE HEADLINE RULE, part (c): the ungraded count belongs BESIDE THE HEADLINE.
+   A method whose run reported no constraint result was drawn NOT CHECKED in its
+   own table row and nowhere else, so the count reached the reader only if they
+   scrolled the whole methods table and tallied the slate chips themselves (on a
+   six-method report the first of them sits at y=487). A reader who takes the
+   subtitle and stops reading is exactly the reader this rule protects: the line
+   said "N samples, N groups, N features" and nothing about the methods that
+   were never evaluated, which reads as a report that evaluated all of them.
+
+   Derived from the SAME rows the table draws, `m.graded`, rather than from a
+   separate tally, so the subtitle and the chips cannot drift apart; the
+   adapter's own count is preferred when it supplies one. See report_card.svg,
+   which counts its ungraded metrics in the template for the same reason. #}
+{% set _ungraded_methods = n_ungraded|default(methods|rejectattr('graded')|list|length, true) %}
+<text x="36" y="122" font-size="10" fill="#64748b">{{ task_type }} task · {{ n_samples }} samples, {{ n_groups }} groups, {{ n_features }} features · {{ attribute_name }}{% if _ungraded_methods %} · {{ _ungraded_methods }} method{{ 's' if _ungraded_methods != 1 else '' }} not graded: no constraint result{% endif %}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Stats row                                                         #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ stats_y }}" width="152" height="{{ stats_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ stats_y + 18 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">TASK TYPE</text>
+<text x="56" y="{{ stats_y + 36 }}" font-size="12" font-weight="700" fill="#0f172a">{{ task_type }}</text>
+
+<rect x="200" y="{{ stats_y }}" width="152" height="{{ stats_h }}" rx="10" fill="#ffffff"/>
+<text x="220" y="{{ stats_y + 18 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">SAMPLES</text>
+<text x="220" y="{{ stats_y + 36 }}" font-size="12" font-weight="700" fill="#0f172a">{{ n_samples }}</text>
+
+<rect x="364" y="{{ stats_y }}" width="152" height="{{ stats_h }}" rx="10" fill="#ffffff"/>
+<text x="384" y="{{ stats_y + 18 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">GROUPS</text>
+<text x="384" y="{{ stats_y + 36 }}" font-size="12" font-weight="700" fill="#0f172a">{{ n_groups }}</text>
+
+<rect x="528" y="{{ stats_y }}" width="152" height="{{ stats_h }}" rx="10" fill="#ffffff"/>
+<text x="548" y="{{ stats_y + 18 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">FEATURES</text>
+<text x="548" y="{{ stats_y + 36 }}" font-size="12" font-weight="700" fill="#0f172a">{{ n_features }}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Baseline panel                                                    #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ baseline_y }}" width="644" height="{{ baseline_h }}" rx="10" fill="#ffffff"/>
+{# The stripe is a status colour, so it may only be painted from a verdict that
+   was actually reached. A baseline with no constraint result never gets here:
+   the adapter raises the chart-level could-not-check flag instead, so the
+   canvas and the accessible description change together. #}
+{% if not baseline_satisfied %}
+<rect x="36" y="{{ baseline_y }}" width="2.5" height="{{ baseline_h }}" rx="1" fill="#dc2626"/>
+{% else %}
+<rect x="36" y="{{ baseline_y }}" width="2.5" height="{{ baseline_h }}" rx="1" fill="#059669"/>
+{% endif %}
+
+<text x="56" y="{{ baseline_y + 20 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">BASELINE PERFORMANCE</text>
+
+{# CRITICAL, ONE GATE PER CELL, and both defects it closes were executed.       #}
+{# `baseline_measured` is an OR over two independent cells, so a baseline with  #}
+{# a measured accuracy and NO violation entered this block and the colour       #}
+{# branch below then raised `TypeError: '>' not supported between instances of  #}
+{# 'NoneType' and 'float'`. The adapter swallows a render failure as a warning  #}
+{# and returns a 1179-byte fallback card, so one unmeasured cell cost the whole #}
+{# page. The second defect was the number itself: `|f4` prints a NaN straight   #}
+{# through as the string "nan", and the accuracy the producer had already       #}
+{# disowned via `parameters['accuracy_measured']` was drawn here in bold blue.  #}
+{# Both cells are withheld at the boundary now as well; see                     #}
+{# adapters_training._baseline_state.                                           #}
+{% if baseline_accuracy_measured or baseline_violation_measured %}
+<text x="56" y="{{ baseline_y + 44 }}" font-size="10" fill="#6b7280">Accuracy</text>
+{% if baseline_accuracy_measured %}
+<text x="160" y="{{ baseline_y + 44 }}" font-size="13" font-weight="700" fill="#3b82f6">{{ baseline_accuracy|f4 }}</text>
+{% else %}
+<text x="160" y="{{ baseline_y + 44 }}" font-size="9" font-style="italic" fill="#64748b">not measured{% if baseline_accuracy_reason %}<title>Accuracy not measured: {{ baseline_accuracy_reason }}</title>{% endif %}</text>
+{% endif %}
+
+<text x="280" y="{{ baseline_y + 44 }}" font-size="10" fill="#6b7280">Violation</text>
+{% if baseline_violation_measured %}
+<text x="370" y="{{ baseline_y + 44 }}" font-size="13" font-weight="700" fill="{% if baseline_violation > 0.1 %}#dc2626{% elif baseline_violation > 0.05 %}#f59e0b{% else %}#059669{% endif %}">{{ baseline_violation|f4 }}</text>
+{% else %}
+<text x="370" y="{{ baseline_y + 44 }}" font-size="9" font-style="italic" fill="#64748b">not measured</text>
+{% endif %}
+{% else %}
+<text x="56" y="{{ baseline_y + 44 }}" font-size="10.5" fill="#64748b">Accuracy and fairness violation were not measured on this run.{% if baseline_accuracy_reason %}<title>Accuracy not measured: {{ baseline_accuracy_reason }}</title>{% endif %}</text>
+{% endif %}
+
+<text x="500" y="{{ baseline_y + 44 }}" font-size="10" fill="#6b7280">Constraint</text>
+{% if baseline_satisfied %}
+<rect x="568" y="{{ baseline_y + 32 }}" width="90" height="20" rx="10" fill="#ecfdf5"/>
+<text x="613" y="{{ baseline_y + 46 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#059669">SATISFIED</text>
+{% else %}
+<rect x="568" y="{{ baseline_y + 32 }}" width="90" height="20" rx="10" fill="#fef2f2"/>
+<text x="613" y="{{ baseline_y + 46 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#dc2626">VIOLATED</text>
+{% endif %}
+
+<text x="56" y="{{ baseline_y + 68 }}" font-size="9" fill="#94a3b8">Sensitive attribute: {{ attribute_name }}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Methods comparison table                                          #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ methods_y }}" width="644" height="{{ methods_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ methods_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">METHOD</text>
+<text x="240" y="{{ methods_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">ACCURACY</text>
+<text x="370" y="{{ methods_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">VIOLATION</text>
+<text x="490" y="{{ methods_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">SATISFIED</text>
+<text x="590" y="{{ methods_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">TIME</text>
+<line x1="56" y1="{{ methods_y + 32 }}" x2="660" y2="{{ methods_y + 32 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for m in methods %}
+{% set ry = methods_y + methods_header_h + loop.index0 * methods_row_h %}
+
+{# CRITICAL, per row: every branch below used to be written `{% if m.satisfied  #}
+{# %} ... {% else %} FAIL`, so a method whose constraint was NEVER EVALUATED    #}
+{# took the FAIL arm and drew a red row stripe, a red violation number and a    #}
+{# red FAIL chip. That is a fabricated failure, and it sends a reader after a   #}
+{# violation that does not exist. `m.graded` is what decides now, and it is set #}
+{# from `constraint_satisfied is not None`; see adapters_training._method_state.#}
+{# Highlight best method (first satisfied) #}
+{% if m.satisfied and loop.index0 == 0 %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ methods_row_h }}" fill="#ecfdf5" opacity="0.4"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ methods_row_h }}" fill="#059669"/>
+{% elif m.graded and not m.satisfied %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ methods_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ methods_row_h }}" fill="#dc2626"/>
+{% endif %}
+
+<text x="56" y="{{ ry + 20 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ m.name|truncate_text(25) }}</text>
+{% if m.accuracy_measured %}
+<text x="240" y="{{ ry + 20 }}" font-size="11" font-weight="600" fill="#3b82f6">{{ m.accuracy|f4 }}</text>
+{% else %}
+{# The producer's own WHY rides along as the element's accessible name. The    #}
+{# canvas already carries the three-state WORD; the reason is far too long for #}
+{# an unwrapped <text> in a 130px column, and dropping it entirely is how a    #}
+{# correct measurement ends up with no reader. See _method_state.             #}
+<text x="240" y="{{ ry + 20 }}" font-size="9" font-style="italic" fill="#64748b">not measured{% if m.accuracy_reason %}<title>Accuracy not measured: {{ m.accuracy_reason }}</title>{% endif %}</text>
+{% endif %}
+{% if m.violation_measured %}
+<text x="370" y="{{ ry + 20 }}" font-size="11" font-weight="600" fill="{% if not m.graded %}#64748b{% elif m.satisfied %}#059669{% else %}#dc2626{% endif %}">{{ m.violation|f4 }}</text>
+{% else %}
+<text x="370" y="{{ ry + 20 }}" font-size="9" font-style="italic" fill="#64748b">not measured</text>
+{% endif %}
+
+{# A VACUOUS verdict is not an ABSENT one, so it gets its own chip rather than  #}
+{# the generic NOT CHECKED. A method that collapsed to a constant prediction    #}
+{# DID report a constraint result; that result is satisfied by construction and #}
+{# measures nothing. Before this branch existed the row drew a green PASS chip. #}
+{# This arm is above `not m.graded` because a vacuous row is ungraded too.      #}
+{% if m.vacuous %}
+<rect x="490" y="{{ ry + 6 }}" width="72" height="18" rx="9" fill="#f1f5f9"/>
+<text x="526" y="{{ ry + 19 }}" text-anchor="middle" font-size="7.5" font-weight="600" fill="#64748b">VACUOUS<title>{{ m.vacuous_reason }}</title></text>
+{% elif not m.graded %}
+<rect x="490" y="{{ ry + 6 }}" width="72" height="18" rx="9" fill="#f1f5f9"/>
+<text x="526" y="{{ ry + 19 }}" text-anchor="middle" font-size="7.5" font-weight="600" fill="#64748b">NOT CHECKED</text>
+{% elif m.satisfied %}
+<rect x="490" y="{{ ry + 6 }}" width="56" height="18" rx="9" fill="#ecfdf5"/>
+<text x="518" y="{{ ry + 19 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#059669">PASS</text>
+{% else %}
+<rect x="490" y="{{ ry + 6 }}" width="56" height="18" rx="9" fill="#fef2f2"/>
+<text x="518" y="{{ ry + 19 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#dc2626">FAIL</text>
+{% endif %}
+
+{% if m.time %}
+<text x="590" y="{{ ry + 20 }}" font-size="10" fill="#6b7280">{{ m.time|f2 }}s</text>
+{% else %}
+<text x="590" y="{{ ry + 20 }}" font-size="10" fill="#94a3b8">n/a</text>
+{% endif %}
+
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + methods_row_h }}" x2="660" y2="{{ ry + methods_row_h }}" stroke="#f1f5f9" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Recommendation panel                                              #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ rec_y }}" width="644" height="{{ rec_h }}" rx="10" fill="#ffffff"/>
+{% if recommendation.priority == 'high' %}
+<rect x="36" y="{{ rec_y }}" width="644" height="1.5" fill="#dc2626"/>
+{% elif recommendation.priority == 'medium' %}
+<rect x="36" y="{{ rec_y }}" width="644" height="1.5" fill="#f59e0b"/>
+{% else %}
+<rect x="56" y="{{ rec_y }}" width="604" height="0.5" fill="#475569"/>
+{% endif %}
+
+<text x="56" y="{{ rec_y + 22 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">RECOMMENDATION</text>
+
+<text x="56" y="{{ rec_y + 44 }}" font-size="11" font-weight="700" fill="#0f172a">{{ recommendation.method }}</text>
+{# A priority chip is a verdict about advice. No recommendation was produced
+   here, so LOW would be a grade invented for something that does not exist. #}
+{% if recommendation.given %}
+<rect x="240" y="{{ rec_y + 32 }}" width="56" height="18" rx="9" fill="{% if recommendation.priority == 'high' %}#fef2f2{% elif recommendation.priority == 'medium' %}#fef3c7{% else %}#f1f5f9{% endif %}"/>
+<text x="268" y="{{ rec_y + 45 }}" text-anchor="middle" font-size="8" font-weight="600" fill="{% if recommendation.priority == 'high' %}#dc2626{% elif recommendation.priority == 'medium' %}#f59e0b{% else %}#64748b{% endif %}">{{ recommendation.priority|upper }}</text>
+{% endif %}
+
+{% if recommendation.given %}
+<text x="56" y="{{ rec_y + 64 }}" font-size="9.5" fill="#6b7280">{{ recommendation.rationale|truncate_text(105) }}</text>
+{% else %}
+<text x="56" y="{{ rec_y + 64 }}" font-size="9.5" fill="#64748b">No mitigation method was recommended for this run.</text>
+{% endif %}
+{% if recommendation.alternatives %}
+<text x="56" y="{{ rec_y + 80 }}" font-size="8.5" fill="#94a3b8">Alternatives: {{ recommendation.alternatives[:3]|join(', ') }}</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Issues table (if present)                                         #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if issues %}
+<rect x="36" y="{{ issues_y }}" width="644" height="{{ issues_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ issues_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">ISSUES</text>
+<line x1="56" y1="{{ issues_y + 32 }}" x2="660" y2="{{ issues_y + 32 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for issue in issues %}
+{% set iy = issues_y + issues_header_h + loop.index0 * issues_row_h %}
+{% if issue.severity == 'high' %}
+<rect x="36" y="{{ iy }}" width="644" height="{{ issues_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ iy }}" width="2.5" height="{{ issues_row_h }}" fill="#dc2626"/>
+{% endif %}
+<circle cx="62" cy="{{ iy + 15 }}" r="3" fill="{% if issue.severity == 'high' %}#dc2626{% elif issue.severity == 'medium' %}#f59e0b{% else %}#94a3b8{% endif %}"/>
+<text x="74" y="{{ iy + 19 }}" font-size="9" font-weight="600" fill="#0f172a">[{{ issue.type }}]</text>
+<text x="170" y="{{ iy + 19 }}" font-size="9" fill="#6b7280">{{ issue.description|truncate_text(60) }}</text>
+<rect x="600" y="{{ iy + 5 }}" width="50" height="16" rx="4" fill="{% if issue.severity == 'high' %}#fef2f2{% elif issue.severity == 'medium' %}#fef3c7{% else %}#f1f5f9{% endif %}"/>
+<text x="625" y="{{ iy + 17 }}" text-anchor="middle" font-size="7" font-weight="600" fill="{% if issue.severity == 'high' %}#dc2626{% elif issue.severity == 'medium' %}#f59e0b{% else %}#64748b{% endif %}">{{ issue.severity|upper }}</text>
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Actions list                                                      #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if actions %}
+<rect x="36" y="{{ actions_y }}" width="644" height="{{ actions_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ actions_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">ACTION ITEMS</text>
+<line x1="56" y1="{{ actions_y + 30 }}" x2="660" y2="{{ actions_y + 30 }}" stroke="#f1f5f9" stroke-width="0.5"/>
+
+{% for action in actions %}
+{% set ay = actions_y + actions_header_h + loop.index0 * actions_row_h %}
+<circle cx="62" cy="{{ ay + 10 }}" r="7" fill="#f1f5f9"/>
+<text x="62" y="{{ ay + 14 }}" text-anchor="middle" font-size="7" font-weight="700" fill="#64748b">{{ loop.index }}</text>
+<text x="78" y="{{ ay + 14 }}" font-size="9.5" fill="#0f172a">{{ action|truncate_text(95) }}</text>
+{% endfor %}
+{% endif %}
+{% endif %}{# end: not not_assessable #}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation panel                                                  #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+
+</svg>

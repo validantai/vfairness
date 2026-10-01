@@ -1,0 +1,42 @@
+{
+  "use_case": "insurance",
+  "jurisdiction": "eu",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "gender": {
+      "status": "forbidden",
+      "legal_basis": "CJEU C-236/09 Test-Achats; Directive 2004/113/EC",
+      "notes": "Gender forbidden as an actuarial / pricing factor in insurance since 21 December 2012."
+    },
+    "ethnicity": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9; Racial Equality Directive 2000/43/EC"
+    },
+    "religion": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9"
+    },
+    "health": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9; Solvency II",
+      "notes": "Use lawful for risk assessment subject to Art. 9(2)(h) or Member State derogation."
+    },
+    "genetic": {
+      "status": "forbidden",
+      "legal_basis": "Council of Europe Oviedo Convention Art. 12; national bans (e.g. France L1141-1)",
+      "notes": "Genetic predictive test results may not be requested or used by insurers in most Member States."
+    },
+    "sexual_orientation": {
+      "status": "forbidden",
+      "legal_basis": "Directive 2004/113/EC; GDPR Art. 9"
+    },
+    "disability": {
+      "status": "restricted",
+      "legal_basis": "UN CRPD; Member State law"
+    },
+    "age": {
+      "status": "restricted",
+      "legal_basis": "Directive 2004/113/EC (recital allows proportionate use of age in insurance)"
+    }
+  }
+}

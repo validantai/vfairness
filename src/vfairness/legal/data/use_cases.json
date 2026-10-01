@@ -1,0 +1,68 @@
+{
+  "revision": "2026-05-20",
+  "use_cases": [
+    {
+      "id": "recruitment",
+      "label": "Recruitment / hiring",
+      "domain_keywords": ["hir", "recruit", "employ", "talent", "screening", "applicant", "hr"]
+    },
+    {
+      "id": "lending",
+      "label": "Lending / credit",
+      "domain_keywords": ["lend", "credit", "loan", "mortgage", "underwriting", "consumer_credit"]
+    },
+    {
+      "id": "insurance",
+      "label": "Insurance underwriting / pricing",
+      "domain_keywords": ["insur", "underwrit", "actuar", "premium"]
+    },
+    {
+      "id": "healthcare",
+      "label": "Healthcare / clinical decision support",
+      "domain_keywords": ["health", "clinic", "medic", "patient", "triage", "hospital", "diagnos"]
+    },
+    {
+      "id": "housing",
+      "label": "Housing / tenant screening",
+      "domain_keywords": ["housing", "rental", "tenant", "landlord", "real_estate"]
+    },
+    {
+      "id": "education",
+      "label": "Education / admission",
+      "domain_keywords": ["admiss", "education", "school", "univers", "student"]
+    },
+    {
+      "id": "criminal_justice",
+      "label": "Criminal justice / risk assessment",
+      "domain_keywords": ["recidivism", "parole", "bail", "criminal_justice", "sentencing", "policing"]
+    },
+    {
+      "id": "welfare",
+      "label": "Welfare / public benefits eligibility",
+      "domain_keywords": ["welfare", "benefit", "social_security", "eligibility"]
+    },
+    {
+      "id": "advertising",
+      "label": "Advertising / audience targeting",
+      "domain_keywords": ["advertis", "marketing", "audience", "targeting", "ad_delivery"]
+    },
+    {
+      "id": "generic",
+      "label": "Generic / unspecified",
+      "domain_keywords": []
+    }
+  ],
+  "jurisdiction_keywords": {
+    "us-federal": ["us", "u.s", "united states", "america", "usa"],
+    "us-ca": ["california", "ca-us", "us-ca"],
+    "us-ny": ["new york", "ny-us", "us-ny"],
+    "eu": ["eu", "europe", "european union"],
+    "de": ["germany", "deutschland", "de"],
+    "uk": ["uk", "united kingdom", "britain", "england", "scotland", "wales"],
+    "ch": ["switzerland", "schweiz", "suisse", "ch"],
+    "br": ["brazil", "brasil", "br"],
+    "ca": ["canada"],
+    "au": ["australia"],
+    "sg": ["singapore"]
+  }
+}

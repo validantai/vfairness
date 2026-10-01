@@ -1,0 +1,59 @@
+{
+  "use_case": "recruitment",
+  "jurisdiction": "uk",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "health": {
+      "status": "forbidden",
+      "lifecycle": "pre_offer",
+      "legal_basis": "Equality Act 2010, s.60",
+      "notes": "Pre-offer health or disability inquiries unlawful except for reasonable adjustments at interview, monitoring, or genuine occupational requirement."
+    },
+    "disability": {
+      "status": "forbidden",
+      "lifecycle": "pre_offer",
+      "legal_basis": "Equality Act 2010, s.60",
+      "carve_out": "reasonable_accommodation"
+    },
+    "criminal_record": {
+      "status": "forbidden",
+      "legal_basis": "Rehabilitation of Offenders Act 1974",
+      "notes": "Spent convictions must not be asked about for most roles; certain exempted roles (regulated activity with children/vulnerable adults) are exceptions under the ROA 1974 Exceptions Order 1975."
+    },
+    "ethnicity": {
+      "status": "monitoring_only",
+      "legal_basis": "Equality Act 2010; UK GDPR Art. 9; DPA 2018 Sch. 1 Part 2 §8 (equality of opportunity)",
+      "carve_out": "equality_monitoring"
+    },
+    "gender": {
+      "status": "monitoring_only",
+      "legal_basis": "Equality Act 2010; UK GDPR Art. 9",
+      "carve_out": "equality_monitoring"
+    },
+    "religion": {
+      "status": "restricted",
+      "legal_basis": "Equality Act 2010; UK GDPR Art. 9"
+    },
+    "sexual_orientation": {
+      "status": "restricted",
+      "legal_basis": "Equality Act 2010; UK GDPR Art. 9"
+    },
+    "genetic": {
+      "status": "restricted",
+      "legal_basis": "UK GDPR Art. 9; ABI Concordat on Genetic Testing"
+    },
+    "pregnancy": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "Equality Act 2010, s.18"
+    },
+    "age": {
+      "status": "restricted",
+      "legal_basis": "Equality Act 2010, s.5"
+    },
+    "salary_history": {
+      "status": "allowed",
+      "notes": "Not banned, but discouraged by government guidance for pay-equity reasons."
+    }
+  }
+}

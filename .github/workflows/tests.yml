@@ -1,0 +1,147 @@
+name: Tests
+
+# The WHOLE vfairness suite, with coverage, on every push and pull request
+# (VI_A_GR_026, VI_A_GR_027).
+#
+# ROOT-RELATIVE BY DESIGN. This file lives in the vfairness/ subtree of the
+# private development monorepo and becomes active only in the PUBLIC repo
+# (validantai/vfairness), where that subtree IS the repo root: pyproject.toml,
+# src/ and tests/ sit at the top level. So there is no `vfairness/` path prefix
+# and no `defaults.run.working-directory` here, unlike the monorepo's own copy
+# of this gate. release.yml carries the same transformation.
+#
+# There is deliberately NO `paths:` filter. In the monorepo a filter is what
+# stops the whole matrix from running on a frontend commit; here the repository
+# IS the library, so a filter could only ever give a change a way to skip its
+# own gate.
+#
+# docs/RELEASE_PIPELINE.md tells a reader that this suite runs on every push and
+# pull request across 3.11 / 3.12 / 3.13. That sentence is only true because
+# this file exists in the exported tree. Do not narrow the triggers without
+# correcting the claim in the same change.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: this workflow only reads the repo and runs the test suite.
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Full suite + coverage
+    runs-on: ubuntu-latest
+    # Test every advertised Python version (requires-python >=3.11, classifiers
+    # 3.11 to 3.13), so the support window is verified, not just claimed.
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        # Optional extras so the rendering / viz / monitoring / causal tests
+        # actually run instead of failing or skipping. `causal` (networkx +
+        # dowhy) is needed for tests/unit/test_causal_graph.py, which imports
+        # networkx directly.
+        #
+        # xai / training / parity ARE installed, and the comment that used to
+        # sit here was wrong. It said those tests "skip or use documented
+        # fallbacks without them". They do not: they importorskip, so on
+        # 2026-08-27 an audit found 41 explainability and in-processing tests
+        # had executed in NO environment, here or locally, including the
+        # regression pins for two findings previously rated CRITICAL (the
+        # AdversarialDebiasingLoss sign inversion that trained the predictor to
+        # help the adversary, and the GRL no-op). Nobody could say whether those
+        # fixes still held. Installing the extras costs about eleven seconds of
+        # compute and turns 41 invisible skips into real coverage.
+        #
+        # A skip is invisible: "1869 passed, 61 skipped" and "1930 passed" are
+        # the same shade of green, and the reasons only print under -rs. That is
+        # why VFAIRNESS_REQUIRE_BACKENDS below makes a missing backend a NAMED
+        # FAILURE rather than a silent skip.
+        #
+        # `cicd` is here for PyYAML, and it is the same lesson a third time.
+        # PyYAML is declared by NO other extra and by none of their transitive
+        # requirements, and tests/test_release_mechanics.py opens with
+        # `pytest.importorskip("yaml")`, so without this extra every test in that
+        # file - the ones that keep the PUBLISH pipeline honest - collapsed into a
+        # single skip line here. Measured 2026-08-28 on a 3.12 environment with every
+        # other extra: `import yaml` -> ModuleNotFoundError, and
+        # `pytest tests/test_release_mechanics.py -q` -> "1 skipped". The extra
+        # is one small pure-Python dependency. It is pinned from the other side
+        # too: test_release_mechanics.py asserts that this install line carries
+        # whichever extra declares the module the file needs.
+        #
+        # The CPU torch wheel FIRST, and not as an optimisation. The default
+        # PyPI torch wheel carries the whole CUDA runtime at about 2.5 GB, and
+        # on 2026-08-28 the 3.11 leg of this matrix died at this step with
+        # "OSError: [Errno 28] No space left on device" while 3.12 and 3.13
+        # happened to survive: the runner image has no GPU, so every byte of
+        # that download is unusable weight that only sometimes fits. The cpu
+        # index is about 200 MB. The extras install below then sees the
+        # requirement already satisfied and does not re-resolve it, so this line
+        # has to stay AHEAD of it. Same trick as fairness-checks.yml, which has
+        # been proving it on 3.11 for a while.
+        run: |
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          # `dashboard` carries plotly, and it is NOT in `viz` (matplotlib and
+          # seaborn only). Added 2026-09-10 after CI had been red on every commit
+          # for a day: 45 ImportErrors reading "Plotly is required for
+          # FairnessDashboard", across 15 tests.
+          #
+          # The louder half of that finding is what the extra was hiding. NINE
+          # test files call importorskip("plotly"), so they SKIPPED silently in
+          # CI rather than failing, and the run reported 46 skipped. This repo's
+          # own comments are emphatic that an invisible skip and a pass are the
+          # same shade of green. The dashboard and visualization surface has
+          # therefore been effectively untested in CI, and the only reason it
+          # became visible is that a newer test imports the dashboard module
+          # directly, which raises instead of skipping.
+          pip install -e '.[dev,rendering,viz,dashboard,monitoring,causal,xai,training,parity,cicd]'
+
+      - name: Install gitleaks (pinned + checksum-verified)
+        # Two tests in this suite prove the secret-scan gate by RUNNING it, and
+        # they fail closed when the scanner is absent: "the secret scanner is not
+        # installed, so the gate could not be run and nothing here was checked.
+        # Could-not-check, not a pass." That is the correct behaviour and it was
+        # red in CI, because this workflow never installed gitleaks while
+        # export-boundary.yml did. Same pin and same checksum as there and as
+        # secret-scan.yml, so all three cannot drift apart.
+        env:
+          GITLEAKS_VERSION: "8.30.1"
+          GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+        run: |
+          set -euo pipefail
+          url="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sfL "$url" -o /tmp/gitleaks.tar.gz
+          echo "${GITLEAKS_SHA256}  /tmp/gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/gitleaks.tar.gz -C /tmp gitleaks
+          sudo install -m 0755 /tmp/gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+
+      - name: Run full suite with coverage
+        # Whole suite (no marker filter). Branch-inclusive coverage (branch=true
+        # in pyproject). The gate sits just below the measured value so coverage
+        # can only ratchet up toward the 80% target.
+        #
+        # Re-baselined 43 -> 55 on 2026-08-27. 43 was set against a ~45% baseline
+        # in 2026-08; the reachable surface has grown since (the xai/training
+        # extras now install here, and a coverage wave added 226 behavioural
+        # tests), and coverage measured 66.88% locally on the same extras. 55
+        # leaves headroom for runner-to-runner variation while making the gate a
+        # real ratchet again rather than one nothing could trip.
+        env:
+          # A missing backend must be a named failure, never a silent skip.
+          VFAIRNESS_REQUIRE_BACKENDS: "1"
+        run: python -m pytest --cov=vfairness --cov-report=term-missing --cov-report=xml --cov-fail-under=55

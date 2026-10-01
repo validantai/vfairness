@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105 40" height="40">
+  <g transform="translate(6,4)">
+    <rect x="2" y="4" width="8" height="8" rx="1" fill="#150458"/>
+    <rect x="2" y="16" width="8" height="12" rx="1" fill="#150458"/>
+    <rect x="14" y="0" width="8" height="12" rx="1" fill="#150458"/>
+    <rect x="14" y="16" width="8" height="8" rx="1" fill="#150458"/>
+    <rect x="26" y="8" width="8" height="4" rx="1" fill="#150458"/>
+  </g>
+  <text x="44" y="26" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="600" fill="#150458">pandas</text>
+</svg>

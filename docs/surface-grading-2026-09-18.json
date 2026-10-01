@@ -1,0 +1,4230 @@
+{
+ "_normalisation": "Some auditors returned their corrected grade as prose rather than the enum. The leading state is taken as the grade and the remainder kept in grade_note. An answer that names no state at all is recorded UNPROVEN, never PROVEN: a grade nobody can read is not a pass.",
+ "items": {
+  "vfairness.evaluation.vfairness_metrics.MultipleTestingResult.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "test_multiple_testing_result_to_dict_is_json_shaped, plus test_an_untested_comparison_does_not_dilute_the_family which asserts the dict form carries tested_mask [True, False, True] and n_not_tested 1",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics.StatisticalResult.to_dict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_statistical_result_to_dict_carries_the_could_not_check_state; test_control_statistical_result_to_dict_reports_a_real_finding",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.compute_group_rate": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_compute_group_rate_control_and_empty_denominator, test_group_rate_of_zero_is_still_a_measurement",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.compute_group_statistic": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_compute_group_statistic_control_and_undefined_values",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.get_group": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_missing_level_get_group_carries_the_real_size, test_get_group_raises_for_an_unknown_name",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.get_group_proportions": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_missing_level_proportion_is_its_real_share, plus the proportions assertion in test_group_sizes_masks_and_indices_control",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.get_group_sizes": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_missing_level_group_sizes_count_the_rows, test_every_row_lands_in_exactly_one_group_when_values_are_missing (asserts the masks partition all 120 rows exactly once), test_missing_level_matches_the_dataframe_path",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.get_indices": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_missing_level_indices_point_at_the_rows",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.get_info": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_missing_level_get_info_reports_the_real_sizes, test_get_info_agrees_with_the_parts_it_summarises, plus the assertions inside test_all_groups_below_the_gate_returns_empty_and_warns",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.get_invalid_groups": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "grade_note": "scoped to one input class; PROVEN on every input the pins cover",
+   "test_file": "assertions in test_all_groups_below_the_gate_returns_empty_and_warns and test_partial_drop_keeps_the_survivors_and_names_the_dropped",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.get_mask": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_missing_level_mask_selects_the_rows, test_every_row_lands_in_exactly_one_group_when_values_are_missing",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.get_size": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_missing_level_get_size_counts_the_rows (red under levelmask), plus test_group_sizes_masks_and_indices_control",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.get_valid_groups": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_all_groups_below_the_gate_returns_empty_and_warns, test_partial_drop_keeps_the_survivors_and_names_the_dropped",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.iter_groups": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_missing_level_iter_groups_covers_every_row (its own test, so it fails on its own assertion under the sabotage rather than behind someone else's)",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._grouping.compute_max_difference": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_max_difference_control_measures_a_real_gap, test_max_difference_control_three_groups_picks_the_widest_pair, test_max_difference_control_equal_groups_still_measure_zero, test_max_difference_refuses_when_no_pair_is_comparable, test_max_difference_refuses_two_infinite_values, test_max_difference_keeps_measuring_when_two_values_survive, test_max_difference_reads_numpy_scalars_as_measurements, test_mae_parity_returns_nan_not_zero_when_a_group_is_undefined (3 of these go red under the maxdiff sabotage, 1 under 'lowerbound'; the 4 controls stayed green)",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.apply_multiple_testing_correction": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_an_untested_comparison_does_not_dilute_the_family; test_control_a_full_family_is_corrected_against_its_real_size",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.bayesian_difference_ci": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_bayesian_difference_ci_refuses_a_group_with_no_observations; test_bayesian_difference_ci_refuses_an_impossible_count_pair",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.bayesian_mean_ci": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_bayesian_mean_ci_refuses_a_constant_sample (parametrised n=20 AND n=25, deliberately, because that is the axis that hid it); test_bayesian_mean_ci_refuses_non_finite_data",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.bootstrap_over_index": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "test_interval_builders_refuse_when_nothing_could_be_resampled; test_control_interval_builders_still_bracket_a_real_disparity",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.cohens_d": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_cohens_d_refuses_two_constant_arms_at_every_length (n = 5, 20, 25, and the identical-arms control inside it)",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.cohens_h": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_cohens_h_interpretation_does_not_regrade_its_own_producers_nan (asserts cohens_h returns NaN, then that the band function does not grade it)",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.cohens_h_interpretation": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_cohens_h_interpretation_refuses_an_unmeasured_effect; test_cohens_h_interpretation_does_not_regrade_its_own_producers_nan",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.compute_metric_with_ci": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_interval_builders_refuse_when_nothing_could_be_resampled; test_control_interval_builders_still_bracket_a_real_disparity",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.detectability": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_detectability_keeps_could_not_check_apart_from_not_detectable",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.empirical_likelihood_ci": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_empirical_likelihood_ci_refuses_an_impossible_count_pair; test_empirical_likelihood_ci_refuses_no_observations",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.fisher_exact_test": {
+   "audit_overturned": false,
+   "audited": false,
+   "claimed_grade": "DEFECT OPEN",
+   "fabricated": true,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "test_fisher_exact_test_empty_table_never_drifts_from_scipy (pins all four degenerate-margin shapes against scipy) and test_control_fisher_exact_test_still_finds_a_real_association",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.group_reliability": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_reliability_tier_boundaries_and_group_reliability",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.interpret_effect_size": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "test_interpret_effect_size_reads_a_measured_zero_ratio (parametrised over both ratio types, and it first asserts by execution that odds_ratio really does return 0.0)",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.min_attainable_p_fisher": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_control_min_attainable_p_floors_match_their_closed_forms",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.min_attainable_p_mcnemar": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_control_min_attainable_p_floors_match_their_closed_forms",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.min_attainable_p_permutation": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_control_min_attainable_p_floors_match_their_closed_forms",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.min_attainable_p_sign_flip": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_min_attainable_p_sign_flip_survives_an_ordinary_pair_count (1024, 2000, 5000)",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.minimum_detectable_effect": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_minimum_detectable_effect_refuses_a_design_with_no_positive_mde (three designs)",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.odds_ratio": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_ratios_refuse_an_empty_or_undefined_table; test_control_ratios_still_measure_a_real_disparity",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.power_warning": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "test_power_warning_does_not_clear_a_subgroup_it_could_not_assess",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.proportion_z_test": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "grade_note": "the claimed n<2 / non-finite fix is genuine, correct and independently re-sabotaged RED, and must be kept; the callable as a whole still returns a constant nobody measured on ordinary healthy data",
+   "test_file": "test_proportion_z_test_refuses_a_group_too_small_to_test; test_proportion_z_test_refuses_an_unmeasured_proportion; test_an_untested_comparison_does_not_dilute_the_family",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.reliability_tier": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "test_reliability_tier_boundaries_and_group_reliability",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.risk_ratio": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_ratios_refuse_an_empty_or_undefined_table; test_control_ratios_still_measure_a_real_disparity",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.select_method": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "test_select_method_is_a_recommendation_and_refuses_prefer_bayesian",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.sequential_fairness_test": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "test_sequential_fairness_test_keeps_its_three_states; test_control_sequential_fairness_test_still_finds_a_real_difference",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.simultaneous_disparity_bounds": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_simultaneous_bounds_refuse_a_single_group; test_simultaneous_bounds_refuse_an_empty_family",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.stratified_bootstrap_ci": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_interval_builders_refuse_when_nothing_could_be_resampled",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.validate_confidence_level": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "test_validate_confidence_level_refuses_everything_outside_the_unit_interval (7 parametrised bad values); test_control_validate_confidence_level_returns_a_real_level",
+   "wave": "wave1"
+  },
+  "vfairness.evaluation.vfairness_metrics._statistics.wilson_score_interval": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_wilson_score_interval_refuses_an_impossible_count_pair",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.BetaCalibrator.forward": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g006.py::TestCalibratorTransformsStillTransform::test_beta_matches_the_kull_formula",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.BetaCalibrator.get_parameters": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g006.py::TestCalibratorTransformsStillTransform::test_beta_matches_the_kull_formula",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.CalibrationAwareTrainer.fine_tune_calibration": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g006.py::TestFineTuneCalibrationRefusesWhenItMeasuredNothing, 4 tests: empty loader, calibration_epochs=0, all batches unmeasurable (plus the assertion that the parameters were left alone), and the control.",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.CalibrationAwareTrainer.train_step": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g006.py::TestTrainStepReportsWhatItDidNotMeasure, 3 tests: calibration off reports NaN, an unmeasurable batch reports NaN without poisoning the step or the weights, and the control.",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.CalibrationState.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g006.py::TestCalibrationStateClaimsNothingItDidNotMeasure::test_global_ece_is_nan_not_a_perfect_zero and ::test_control_to_dict_carries_the_real_fitted_parameters",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.FocalCalibrator.forward": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g006.py::TestFocalCalibratorNamesItsOwnCollapse, 3 tests: gamma below -1 warns and the output has zero spread; a degenerate group absent from the batch raises NO warning (the message must describe this batch, not the object); and the healthy control.",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.FocalCalibrator.get_parameters": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g006.py::TestCalibratorTransformsStillTransform::test_focal_get_parameters_reports_the_real_gamma",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.PlattScalingCalibrator.forward": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g006.py::TestCalibratorTransformsStillTransform::test_platt_applies_the_learned_affine_map",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.PlattScalingCalibrator.get_parameters": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g006.py::TestCalibratorTransformsStillTransform::test_platt_applies_the_learned_affine_map",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.TemperatureScalingCalibrator.forward": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g006.py::TestCalibratorTransformsStillTransform::test_temperature_divides_by_the_learned_temperature",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.TemperatureScalingCalibrator.get_parameters": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g006.py::TestCalibratorTransformsStillTransform::test_temperature_divides_by_the_learned_temperature and ::TestCalibrationStateClaimsNothingItDidNotMeasure::test_control_to_dict_carries_the_real_fitted_parameters",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.TrainableGroupCalibrator.calibration_loss": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g006.py::TestCalibrationLossRefusesWhenNothingIsMeasurable (5 tests: too-small batch, zero rows, unmatched group ids, partial coverage with an independently computed expected value, min_group_size honoured) and ::TestCalibrationLossStillMeasuresControl (2 tests: the healthy value against a numpy reimplementation of the formula, and that the loss still moves the parameters).",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.TrainableGroupCalibrator.forward": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g006.py::TestCalibratorTransformsStillTransform::test_the_unified_forward_delegates_to_the_chosen_method",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.TrainableGroupCalibrator.freeze": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g006.py::TestFactoryAndFreezing::test_freeze_and_unfreeze_flip_requires_grad",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.TrainableGroupCalibrator.get_calibration_state": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g006.py::TestCalibrationStateClaimsNothingItDidNotMeasure (both tests)",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.TrainableGroupCalibrator.unfreeze": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g006.py::TestFactoryAndFreezing::test_freeze_and_unfreeze_flip_requires_grad",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.check_torch_available": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g006.py::TestFactoryAndFreezing::test_check_torch_available_returns_none_when_torch_is_here",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.calibrators.group_calibrators.create_group_calibrator": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g006.py::TestFactoryAndFreezing::test_create_group_calibrator_builds_the_named_method and ::test_create_group_calibrator_refuses_an_unknown_method",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.constraints.base.BaseFairnessConstraint.compute_violation": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "none (no reachable behaviour to pin)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.BaseFairnessConstraint.is_satisfied": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g011.py::TestIsSatisfiedHasThreeStates (2 tests, one parametrised over all five)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.BaseFairnessConstraint.signed_constraint_value": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "none (no reachable behaviour to pin)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.BoundedGroupLossConstraint.compute_violation": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g011.py::TestAPredictionWithNoScoreIsNotAPass::test_all_nan_predictions_get_no_verdict[bounded_group_loss]",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.BoundedGroupLossConstraint.signed_constraint_value": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g011.py::TestBoundedGroupLossSignedValue (3 tests)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.ConstraintViolation.to_dict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g011.py::TestTheDictsAReportReads (3 tests)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.DemographicParityConstraint.compute_violation": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g011.py::TestAPredictionWithNoScoreIsNotAPass (4 tests, 2 parametrised over all five constraints) and ::TestTheReportingSurface::test_an_unscored_baseline_is_not_a_clean_baseline",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.DemographicParityConstraint.signed_constraint_value": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "tests/test_surface_grade_g011.py::TestADeviationNeedsAPeer::test_control_the_signed_values_still_carry_size_and_sign and ::TestBoundedGroupLossSignedValue::test_a_group_that_does_not_exist_raises_rather_than_answering_zero (parametrised over all five)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.EqualOpportunityConstraint.compute_violation": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g011.py::TestADeviationNeedsAPeer::test_equal_opportunity_refuses_the_only_measurable_group (+ 3 controls)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.EqualOpportunityConstraint.signed_constraint_value": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g011.py::TestADeviationNeedsAPeer::test_equal_opportunity_signed_value_says_it_is_steering_not_measuring",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.EqualizedOddsConstraint.compute_violation": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g011.py::TestADeviationNeedsAPeer::test_equalized_odds_does_not_dilute_a_real_deviation_with_a_vacuous_zero and ::test_equalized_odds_refuses_when_neither_arm_has_a_peer",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.EqualizedOddsConstraint.signed_constraint_value": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g011.py::TestEqualizedOddsSignedValueThreeStates::test_an_arm_whose_centre_holds_one_rate_is_not_a_measured_gap (+ single-group and control)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.FalsePositiveRateParityConstraint.compute_violation": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g011.py::TestADeviationNeedsAPeer::test_fpr_parity_refuses_the_only_measurable_group",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.FalsePositiveRateParityConstraint.signed_constraint_value": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g011.py::TestADeviationNeedsAPeer::test_fpr_parity_refuses_the_only_measurable_group (second half)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.base.OptimizationResult.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g011.py::TestTheDictsAReportReads::test_optimization_result_dict_passes_a_nan_through_rather_than_tidying_it",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.EnsembleClassifier.predict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "TestAnEnsembleThatCombinesNothing[EnsembleClassifier.predict] (4 cases) and TestControlAnEnsembleThatCombinesSomethingStillAnswers::test_ensemble_classifier.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.EnsembleClassifier.predict_proba": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "TestAnEnsembleThatCombinesNothing[EnsembleClassifier.predict_proba] and TestVoteFractionsAreDisclosed[EnsembleClassifier] plus its two over-correction controls.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.ExponentiatedGradient.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g007.py::TestExponentiatedGradientOnOneGroup (three states, to_dict pass-through, still a fail STATE and not a crash) and TestControlTheFittedPathsStillMeasure::test_exponentiated_gradient_round_trip.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.ExponentiatedGradient.get_result": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "Identity and post-refusal availability pinned in TestControlTheFittedPathsStillMeasure::test_exponentiated_gradient_round_trip (`estimator.get_result() is result`) and TestExponentiatedGradientOnOneGroup::test_it_is_still_a_fail_state_and_not_a_crash.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.ExponentiatedGradient.predict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "TestPredictUsesExactlyTheModelWhoseMetricsWereReported::test_exponentiated_gradient, ::test_an_unfitted_estimator_refuses_rather_than_answering[predict], TestExponentiatedGradientOnOneGroup::test_it_is_still_a_fail_state_and_not_a_crash.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.ExponentiatedGradient.predict_proba": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g007.py::test_exponentiated_gradient_predict_proba_discloses_hard_labels (real fit, LinearSVC) and ::test_control_predict_proba_of_a_probabilistic_fit_does_not_warn, which asserts 0 < min and max < 1 and no warning.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.GridSearch.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestControlTheFittedPathsStillMeasure::test_grid_search_round_trip and TestPredictUsesExactlyTheModelWhoseMetricsWereReported::test_grid_search. The refusal pin itself lives in tests/test_bgl_stage1_g11_reductions.py, which is another agent's file; I did not edit it, I sabotage-checked it.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.GridSearch.predict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestPredictUsesExactlyTheModelWhoseMetricsWereReported::test_grid_search and ::test_an_unfitted_estimator_refuses_rather_than_answering[GridSearch-predict].",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.ReductionResult.predict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g007.py::TestAnEnsembleThatCombinesNothing, parametrized over all four predict surfaces (all-negligible weights, empty ensemble, NaN weight, classifiers/weights length mismatch), plus TestControlAnEnsembleThatCombinesSomethingStillAnswers.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.ReductionResult.predict_proba": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "TestAnEnsembleThatCombinesNothing (parametrized over this surface) and TestVoteFractionsAreDisclosed, with test_control_probabilistic_members_do_not_warn asserting the exact 0.5 average and no warning.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.ReductionResult.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestExponentiatedGradientOnOneGroup::test_to_dict_carries_the_third_state_out and the payload assertions inside test_exponentiated_gradient_round_trip.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.ThresholdOptimizer.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g007.py::TestFitDoesNotCertifyOverFabricatedRejections (all-NaN, and the quiet 5-of-120 case) and ::TestAnUnevaluableConstraintIsNotABreach (one group, equalized odds with an empty arm), each with an over-correction control that recomputes the real gap in the test.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.ThresholdOptimizer.get_thresholds": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "TestAnUnevaluableConstraintIsNotABreach::test_one_group_is_could_not_check asserts both get_thresholds() == {'A': 0.5} and the 'NOT selected for fairness' warning, so the seed can never again be returned without the disclosure beside it.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.constraints.reductions.ThresholdOptimizer.predict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g007.py::TestPredictRefusesAnUnscoreableRow (nan, +inf, -inf, the index named in the message) plus test_control_finite_scores_are_still_decided, which derives the expected labels from the fitted thresholds rather than reading them back.",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.loss_functions.adversarial.AdversarialDebiasingLoss.get_adversary_accuracy": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g019.py::test_non_finite_predictions_are_not_a_chance_level_measurement[nan|inf|-inf], ::test_non_finite_attribute_is_not_a_zero_leak, ::test_multiclass_control_and_multiclass_nan, ::test_control_a_trained_adversary_measures_a_real_leak_exactly, ::test_control_no_leak_is_reported_as_chance_not_refused, ::test_one_group_and_untrained_adversary_still_refuse, ::test_an_out_of_domain_label_stays_a_raised_error",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.loss_functions.adversarial.AdversarialDebiasingLoss.to": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g019.py::test_to_returns_self_and_moves_the_adversary[AdversarialDebiasingLoss], ::test_a_half_precision_cast_is_not_mistaken_for_training, ::test_control_a_trained_adversary_stays_trained_across_a_cast",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.loss_functions.adversarial.AdversarialDebiasingLoss.update_adversary": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g019.py::test_a_step_that_moves_no_weight_is_not_training[AdversarialDebiasingLoss], ::test_an_update_on_zero_rows_is_not_training_either, ::test_zero_adversary_steps_is_refused_at_construction[AdversarialDebiasingLoss], ::test_zero_adversary_steps_set_after_construction_never_returns_a_number[AdversarialDebiasingLoss], ::test_control_a_real_step_counts_as_training_and_the_penalty_is_measured[AdversarialDebiasingLoss], ::test_control_training_really_trains_and_the_penalty_follows_it, ::test_control_one_step_is_accepted_and_averages_over_the_steps[AdversarialDebiasingLoss]",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.loss_functions.adversarial.Adversary.forward": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g019.py::test_adversary_forward_returns_a_probability_distribution",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.loss_functions.adversarial.FairRepresentationLoss.forward": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g019.py::test_fair_representation_forward_measures_and_decomposes, ::test_fair_representation_forward_refuses_what_it_could_not_measure, ::test_to_returns_self_and_moves_the_adversary[FairRepresentationLoss]",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.loss_functions.adversarial.FairRepresentationLoss.to": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g019.py::test_to_returns_self_and_moves_the_adversary[FairRepresentationLoss]",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.loss_functions.adversarial.GradientReversalFunction.backward": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g019.py::test_gradient_reversal_is_identity_forward_and_negated_backward",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.loss_functions.adversarial.GradientReversalFunction.forward": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g019.py::test_gradient_reversal_is_identity_forward_and_negated_backward",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.loss_functions.adversarial.GradientReversalLayer.forward": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g019.py::test_gradient_reversal_is_identity_forward_and_negated_backward",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.loss_functions.adversarial.GradientReversalLayer.set_lambda": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g019.py::test_gradient_reversal_is_identity_forward_and_negated_backward",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.loss_functions.adversarial.ProjectedAdversarialLoss.to": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g019.py::test_to_returns_self_and_moves_the_adversary[ProjectedAdversarialLoss]",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.loss_functions.adversarial.ProjectedAdversarialLoss.update_adversary": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g019.py::test_zero_adversary_steps_is_refused_at_construction[ProjectedAdversarialLoss], ::test_zero_adversary_steps_set_after_construction_never_returns_a_number[ProjectedAdversarialLoss], ::test_a_step_that_moves_no_weight_is_not_training[ProjectedAdversarialLoss], ::test_control_a_real_step_counts_as_training_and_the_penalty_is_measured[ProjectedAdversarialLoss], ::test_control_one_step_is_accepted_and_averages_over_the_steps[ProjectedAdversarialLoss]",
+   "wave": "wave2"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairClassifier.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g009.py::TestFitReportsAMeasurement (4 tests: 3-method control + 3-method refusal)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairClassifier.get_params": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "covered indirectly by TestParamsRoundTrip::test_control_a_real_parameter_still_lands and ::test_fitted_state_is_not_a_parameter, which both depend on get_params being complete",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairClassifier.predict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g009.py::TestPredictWithoutGroupsSaysTheMitigationIsNotApplied (2 tests)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairClassifier.predict_proba": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g009.py::TestPredictProbaNeverInventsConfidence (5 tests)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairClassifier.predict_with_sensitive_attr": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g009.py::TestPredictWithoutGroupsSaysTheMitigationIsNotApplied::test_threshold_predict_warns_and_differs_from_the_adjusted_answer",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairClassifier.score": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g009.py::TestScoreWithoutTheSensitiveAttribute (5 tests)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairClassifier.set_params": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g009.py::TestParamsRoundTrip::test_an_unknown_parameter_name_is_refused[classifier], ::test_fitted_state_is_not_a_parameter, ::test_control_a_real_parameter_still_lands[classifier]",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairClassifierResult.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g009.py::TestFitReportsAMeasurement::test_to_dict_carries_every_field_including_the_third_state",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairRegressor.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g009.py::TestFactories::test_control_make_fair_regressor_fits_and_its_offsets_close_the_gap",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairRegressor.get_params": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g009.py::TestParamsRoundTrip::test_the_regressor_rebuilds_with_the_policy_it_was_given and ::test_the_regressor_expands_and_routes_base_estimator_params",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairRegressor.predict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g009.py::TestFairRegressorScoreNamesItsModel::test_predict_without_groups_says_the_offsets_were_not_applied (+ the control beside it)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairRegressor.predict_with_sensitive_attr": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g009.py::TestFairRegressorScoreNamesItsModel::test_an_unseen_group_makes_the_score_nan_rather_than_a_partial_fit",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairRegressor.score": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g009.py::TestFairRegressorScoreNamesItsModel (7 tests)",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.FairRegressor.set_params": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g009.py::TestParamsRoundTrip::test_an_unknown_parameter_name_is_refused[regressor], ::test_the_regressor_refuses_an_invalid_unseen_group_policy, ::test_control_a_real_parameter_still_lands[regressor]",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.make_fair_classifier": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g009.py::TestFactories::test_make_fair_classifier_builds_something_that_measures_the_same_thing",
+   "wave": "wave1"
+  },
+  "vfairness.in_processing.wrappers.sklearn_wrappers.make_fair_regressor": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g009.py::TestFactories::test_make_fair_regressor_does_not_smuggle_past_the_refusals and ::test_control_make_fair_regressor_fits_and_its_offsets_close_the_gap",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.ContextualStereotypeScorer.score": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.ContextualStereotypeScorer.score_batch": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "SEMI-PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.FramingScorer.score": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.FramingScorer.score_batch": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.HelpfulnessScorer.score": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "grade_note": "residual in the same function): the refusal is defeated by a SINGLE ascii word token, and realistic non-English output carries one",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.HelpfulnessScorer.score_batch": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.InformationQualityScorer.score": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.InformationQualityScorer.score_batch": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.KeywordRegardScorer.score": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.KeywordRegardScorer.score_batch": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.KeywordSentimentScorer.score": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.KeywordSentimentScorer.score_batch": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.KeywordToxicityScorer.score": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.KeywordToxicityScorer.score_batch": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.LLMJudgeScorer.score": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.LLMJudgeScorer.score_batch": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.RefusalScorer.score": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.RefusalScorer.score_batch": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.RepresentationScorer.score": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.RepresentationScorer.score_batch": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.SemanticQualityScorer.dimension_coverage": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.SemanticQualityScorer.score": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.SemanticQualityScorer.score_batch": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.SidecarSentimentScorer.score": {
+   "audit_overturned": false,
+   "audited": false,
+   "claimed_grade": "DEFECT OPEN",
+   "fabricated": true,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.SidecarSentimentScorer.score_batch": {
+   "audit_overturned": false,
+   "audited": false,
+   "claimed_grade": "DEFECT OPEN",
+   "fabricated": true,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.SidecarToxicityScorer.score": {
+   "audit_overturned": false,
+   "audited": false,
+   "claimed_grade": "DEFECT OPEN",
+   "fabricated": true,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.SidecarToxicityScorer.score_batch": {
+   "audit_overturned": false,
+   "audited": false,
+   "claimed_grade": "DEFECT OPEN",
+   "fabricated": true,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.StereotypeScorer.score": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.StereotypeScorer.score_batch": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.TextScorer.score": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.TextScorer.score_batch": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.identifier_tokens": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.mentions_any_term": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.normalize_text": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.phrase_present": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.scorer_provenance": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.scorer_status": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "SEMI-PROVEN",
+   "grade_note": "the fix and two of its three rungs are PROVEN; the stereotype rung the same change introduced is unpinned, and my sabotage of it was GREEN across all 85 tests",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.term_forms": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.llm.scorers.word_tokens": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g000.py",
+   "wave": "wave1"
+  },
+  "vfairness.mcp.tools.analyze_intersectional": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g016.py::test_analyze_intersectional_cell_needs_every_attribute_recorded (refusal pin, phantom cell), ::test_analyze_intersectional_refuses_when_no_cell_is_measurable (refusal pin, unmeasured analysis), ::test_analyze_intersectional_healthy_reports_the_measured_disparity (over-correction control, the hand-computed 0.700).",
+   "wave": "wave1"
+  },
+  "vfairness.mcp.tools.audit_agent": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "SEMI-PROVEN",
+   "test_file": "::test_audit_agent_gap_is_not_drawn_against_attribute_less_rows, ::test_audit_agent_discloses_a_gap_over_groups_the_metric_calls_invalid, ::test_audit_agent_says_when_no_cross_group_gap_could_be_computed (three refusal pins), ::test_audit_agent_healthy_gap_is_measured_and_not_disclaimed (over-correction control).",
+   "wave": "wave1"
+  },
+  "vfairness.mcp.tools.detect_proxies": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "grade_note": "narrow): everything the agent pinned is real and survives sabotage, but the same payload publishes an unearned completeness verdict. `proxy_chain_coverage.<attr>.complete = true` and `summary: \"Proxy analysis complete\"` are computed ONLY from the chain half, and go out over a correlation in the same dict that was never computed, with the reason reaching the client nowhere.",
+   "test_file": "::test_detect_proxies_will_not_call_a_partial_search_complete (refusal pin), ::test_detect_proxies_still_measures_the_real_proxy and ::test_detect_proxies_says_complete_when_the_search_did_cover_the_frame (two over-correction controls).",
+   "wave": "wave1"
+  },
+  "vfairness.mcp.tools.explain_decision": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "::test_explain_decision_lists_the_features_it_could_not_assess (refusal pin with the control folded in: the measurable feature must still come back at exactly 1.0), ::test_explain_decision_named_feature_absent_from_the_frame_is_disclosed (refusal pin), ::test_explain_decision_clean_frame_reports_no_unmeasured_features (over-correction control).",
+   "wave": "wave1"
+  },
+  "vfairness.mcp.tools.glossary_markdown": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "",
+   "wave": "wave1"
+  },
+  "vfairness.mcp.tools.jsonify": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "",
+   "wave": "wave1"
+  },
+  "vfairness.mcp.tools.jurisdictions_markdown": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "",
+   "wave": "wave1"
+  },
+  "vfairness.mcp.tools.load_dataframe": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "",
+   "wave": "wave1"
+  },
+  "vfairness.mcp.tools.measure_fairness": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "::test_measure_fairness_excludes_rows_with_no_protected_attribute, ::test_a_missing_string_label_is_not_a_third_class, ::test_measure_fairness_refuses_a_one_group_comparison (three refusal pins) and ::test_measure_fairness_still_measures_the_real_disparity, ::test_a_group_genuinely_named_none_is_still_measured, ::test_the_real_disparity_survives_dropping_the_unlabelled_rows, ::test_a_complete_string_column_encodes_exactly_as_before (four over-correction controls).",
+   "wave": "wave1"
+  },
+  "vfairness.mcp.tools.suggest_mitigation": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "::test_suggest_mitigation_zero_recommendations_is_not_an_all_clear (refusal pin), ::test_suggest_mitigation_full_screen_carries_no_caveat (over-correction control).",
+   "wave": "wave1"
+  },
+  "vfairness.mcp.tools.triage_dataset": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "grade_note": "the graded defect is genuinely closed and pinned, but a residual of the same class is live at the same surface and I could not close it in a verification role",
+   "test_file": "::test_triage_dataset_does_not_say_complete_when_nothing_was_assessed and ::test_triage_dataset_partial_coverage_is_its_own_state (refusal pins), ::test_triage_dataset_healthy_still_says_complete (over-correction control). The partial test doubles as a do-not-delete-the-finding control: it runs the assessable attribute alone and asserts every bucket count survives when the null attribute is added.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.cicd.monitor.BiasMonitor.drift_detected": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "asserted in TestUndefinedGroupRateIsNotPerfectParity::test_the_monitor_level_surfaces_all_say_could_not_check, ::test_control_a_measured_stable_batch_is_still_ok, TestWarmUpWindowIsNotAnOkBatch::test_the_alert_suppression_the_setting_exists_for_is_untouched",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.BiasMonitor.get_alerts": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "asserted inside TestUndefinedGroupRateIsNotPerfectParity::test_the_alert_channel_carries_the_third_state and TestWarmUpWindowIsNotAnOkBatch::test_the_alert_suppression_the_setting_exists_for_is_untouched",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.BiasMonitor.get_current_metrics": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestUndefinedGroupRateIsNotPerfectParity::test_the_monitor_level_surfaces_all_say_could_not_check, TestStateSurfacesKeepTheThirdState::test_a_metric_never_seen_is_absent_rather_than_stable",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.BiasMonitor.get_drift_status": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestUndefinedGroupRateIsNotPerfectParity::test_the_monitor_level_surfaces_all_say_could_not_check plus the warm-up and update_baseline tests",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.BiasMonitor.get_rolling_average": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "TestStateSurfacesKeepTheThirdState::test_rolling_average_refuses_a_window_holding_an_unmeasured_batch + its control",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.BiasMonitor.get_summary": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "TestWarmUpWindowIsNotAnOkBatch::test_the_summary_says_the_metric_was_never_compared, TestStateSurfacesKeepTheThirdState::test_update_baseline_forgets_the_old_verdict_rather_than_clearing_it, ::test_config_to_dict_round_trips_the_thresholds_a_reader_needs",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.BiasMonitor.log_batch": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g018.py::TestUndefinedGroupRateIsNotPerfectParity (6 tests incl. a both-group-orders parametrisation) and ::TestWarmUpWindowIsNotAnOkBatch (5 tests)",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.BiasMonitor.reset": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "TestStateSurfacesKeepTheThirdState::test_reset_returns_to_the_never_seen_state",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.BiasMonitor.to_prometheus_metrics": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g018.py::TestUndefinedGroupRateIsNotPerfectParity::test_prometheus_exports_no_data_not_a_zero and ::TestWarmUpWindowIsNotAnOkBatch::test_the_summary_says_the_metric_was_never_compared",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.BiasMonitor.trigger_alert": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "TestTriggerAlertAgreesWithDriftDetected (3 tests) and TestUndefinedGroupRateIsNotPerfectParity::test_the_alert_channel_carries_the_third_state",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.BiasMonitor.unmeasurable_metrics": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestUndefinedGroupRateIsNotPerfectParity::test_the_monitor_level_surfaces_all_say_could_not_check",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.BiasMonitor.update_baseline": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "TestStateSurfacesKeepTheThirdState::test_update_baseline_forgets_the_old_verdict_rather_than_clearing_it",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.DriftAlert.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "grade_note": "behaviour verified honest by execution in BOTH directions, but the pin holds only the refusal half: every sabotage of the MEASURED half is green across 203 tests",
+   "test_file": "TestUndefinedGroupRateIsNotPerfectParity::test_the_alert_channel_carries_the_third_state",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.MonitorConfig.to_dict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "TestStateSurfacesKeepTheThirdState::test_config_to_dict_round_trips_the_thresholds_a_reader_needs",
+   "wave": "wave2"
+  },
+  "vfairness.operations.cicd.monitor.MonitoringResult.to_dict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "asserted inside test_the_gap_is_refused_whatever_the_group_order (both orders) and test_a_batch_compared_against_nothing_is_could_not_check",
+   "wave": "wave2"
+  },
+  "vfairness.operations.experimentation.power.FairnessPowerAnalyzer.adaptive_sampling_plan": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "Pinned inside tests/test_surface_grade_g023.py::TestTheSamplingPlanFrameShowsWhatWasNotAssessed (plan.not_assessed == [('f',)], no 'already powered' anywhere, the measured intersection keeps its allocation) and by the effect-size refusal test.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.experimentation.power.FairnessPowerAnalyzer.get_detailed_results": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "Asserted inside TestZeroObservationsIsNotAPowerOfAlphaOverTwo::test_the_summary_renders_the_third_state_instead_of_crashing (detailed.power NaN, detailed.is_powered None, to_dict()['power'] NaN, n_rows_control 60), with the fully observed control.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.experimentation.power.FairnessPowerAnalyzer.get_power_summary": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g023.py::TestZeroObservationsIsNotAPowerOfAlphaOverTwo::test_the_summary_renders_the_third_state_instead_of_crashing (plus the fully observed control).",
+   "wave": "wave2"
+  },
+  "vfairness.operations.experimentation.power.FairnessPowerAnalyzer.minimum_detectable_effect": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "Covered by TestZeroObservationsIsNotAPowerOfAlphaOverTwo::test_power_and_mde_refuse_whatever_the_floor_is and ::test_the_summary_renders_the_third_state_instead_of_crashing; the control asserts 0.5115 to 1e-4 against an independently computed value.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.experimentation.power.FairnessPowerAnalyzer.power_for_sample_size": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g023.py::TestZeroObservationsIsNotAPowerOfAlphaOverTwo::test_power_and_mde_refuse_whatever_the_floor_is, with the control test_control_the_same_shape_fully_observed_is_measured_exactly asserting power/mde/required against stdlib normal quantiles computed in the test.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.experimentation.power.FairnessPowerAnalyzer.required_sample_size": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g023.py::TestAnEffectSizeThatIsNotANumberIsRefused (3 methods x 4 values), test_the_plan_refuses_too_rather_than_planning_around_it, and test_control_an_ordinary_effect_size_is_answered, which asserts 0.5 still answers 63 AND that a very small effect size (1e-3) still gets a real answer, so refusing everything cannot pass.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.experimentation.power.FairnessPowerAnalyzer.sequential_test": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g023.py::TestSPRTBelowTheFloorHasNoLikelihoodRatio (pin + a control that drops the floor to 10 and asserts the identical observations produce the independently computed LLR and a real REJECT_NULL) and ::TestSPRTDoesNotInventAPooledStandardDeviation (three tests: not a stop decision, the ratio equals the independently computed one, the ratio actually tracks the measured spread -- a tenfold narrower treatment arm at the same gap must give a far larger ratio, which a divisor of 1.0 by decree cannot do -- plus a full-size control that still stops).",
+   "wave": "wave2"
+  },
+  "vfairness.operations.experimentation.power.PowerResult.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "",
+   "wave": "wave2"
+  },
+  "vfairness.operations.experimentation.power.SamplingPlan.to_dataframe": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g023.py::TestTheSamplingPlanFrameShowsWhatWasNotAssessed::test_the_unassessed_intersection_has_a_row_that_says_so, with test_control_a_fully_observed_plan_is_unchanged asserting that with nothing unassessed the frame is still exactly one row per underpowered intersection and carries no NaN.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.experimentation.power.SamplingPlan.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_serialiser_honesty.py::test_every_serialiser_emits_every_field_its_result_declares",
+   "wave": "wave2",
+   "sabotage": "Ran 2026-09-27. Deleted the \"not_assessed\" entry from SamplingPlan.to_dict and re-ran the named test: it reddened with 'SamplingPlan.to_dict drops [\\'not_assessed\\']' (1 failed, 6 passed). Source restored and confirmed byte-identical with diff.",
+   "grade_note": "Citation added 2026-09-27. The row was overturned to PROVEN on audit from a claimed NOT A MEASUREMENT and the auditor named no test, so a PROVEN grade rested on nothing a reader could open, and it had been counted in the published PROVEN total since. The pin already existed: the serialiser sweep discovers this method structurally, among 118 in scope, and asserts that every field the result declares is emitted. to_dict does carry not_assessed and n_not_assessed, which is what makes the grade correct; the sabotage above is what makes it evidence."
+  },
+  "vfairness.operations.experimentation.power.SequentialTestResult.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.AdaptiveThresholdManager.get_all_thresholds": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g014.py::TestFeedbackCountsOnlyWhatAPersonSaid::test_thresholds_and_reset_report_what_is_stored, which asserts both the copy semantics and that a reset key falls back to 0.7 rather than to zero.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.AdaptiveThresholdManager.get_feedback_stats": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g014.py::TestFeedbackCountsOnlyWhatAPersonSaid.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.AdaptiveThresholdManager.get_threshold": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g014.py::TestFeedbackCountsOnlyWhatAPersonSaid::test_thresholds_and_reset_report_what_is_stored.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.AdaptiveThresholdManager.is_alert_warranted": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g014.py::TestBothOperandsOfTheAlertGate (6 tests: nan/inf/-inf thresholds, both operands missing, the finite-threshold control grading both ways including a measured 0.0 and a np.float32 score, and the set_threshold refusal-does-not-store control).",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.AdaptiveThresholdManager.reset": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g014.py::TestFeedbackCountsOnlyWhatAPersonSaid::test_thresholds_and_reset_report_what_is_stored.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.AdaptiveThresholdManager.set_threshold": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g014.py::TestBothOperandsOfTheAlertGate::test_control_a_threshold_set_by_hand_still_moves_the_verdict and ::test_set_threshold_clamps_a_finite_value_into_the_band.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.AdaptiveThresholdManager.update_from_feedback": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g014.py::TestFeedbackCountsOnlyWhatAPersonSaid (5 tests, shared with get_feedback_stats).",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.AlertPayload.acknowledge": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "Covered by tests/test_surface_grade_g014.py::TestTheAlertLogSaysWhyItIsEmpty::test_control_acknowledgement_counts_are_real.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.AlertPayload.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g014.py::TestToDictKeepsTheThirdState (3 tests).",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.FairnessAlertPrioritizer.build_drift_event": {
+   "audit_overturned": false,
+   "audited": false,
+   "claimed_grade": "DEFECT OPEN",
+   "fabricated": true,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g014.py::TestTheSubstitutedContextIsNamedWhereItHappens (4 tests). It pins the DISCLOSURE and deliberately NOT the fabricated 5.1, so it stays green when the defect is properly closed rather than making the revert the cheapest way to green.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.FairnessAlertPrioritizer.calculate_priority": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g014.py::TestAMeasuredDriftScoreIsNotRefusedForItsDtype (15 tests: 4 dtype cases must be scored, an int64 case, the end-to-end payload, 7 parametrized refusal controls, an absent-is-a-floor control, a measured-zero control).",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.FairnessAlertPrioritizer.clear_log": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "Covered by tests/test_surface_grade_g014.py::TestTheAlertLogSaysWhyItIsEmpty::test_control_acknowledgement_counts_are_real.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.FairnessAlertPrioritizer.create_alert": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g014.py::TestAMeasuredDriftScoreIsNotRefusedForItsDtype::test_the_payload_no_longer_contradicts_itself, plus the to_dict class below.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.FairnessAlertPrioritizer.get_alert_log": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g014.py::TestTheAlertLogSaysWhyItIsEmpty (4 tests).",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.FairnessAlertPrioritizer.get_alert_summary": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g014.py::TestTheAlertLogSaysWhyItIsEmpty (4 tests, shared with get_alert_log).",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.alerts.FairnessAlertPrioritizer.route_alert": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g014.py::TestRoutingNeverBorrowsAGrade (4 tests).",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.DriftResult.to_dict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g020.py::TestScaleDictSaysWhetherAnythingRan (2 tests)",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.FairnessDriftDetector.check_drift": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g020.py::TestManufacturedReadingsAreNotGraded::test_check_drift_refuses_a_current_window_of_copies plus the two controls",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.FairnessDriftDetector.clear_history": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g020.py::TestHistoryFrameKeepsItsContract::test_a_could_not_check_run_is_stored_as_none_not_false (tail assertions)",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.FairnessDriftDetector.decompose_temporal_patterns": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g020.py::TestDecompositionInventsNothing (3 tests)",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.FairnessDriftDetector.detect_drift_ks": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g020.py::TestKsRefusalsSaySo (4 tests)",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.FairnessDriftDetector.detect_drift_mmd": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g020.py::TestMmdAlphaIsValidated (5 parametrised + 1 control)",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.FairnessDriftDetector.detect_drift_multiscale": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g020.py::TestManufacturedReadingsAreNotGraded (7 tests)",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.FairnessDriftDetector.get_explanation": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "none: the explainer's own three-state behaviour is already pinned by tests/test_readiness2_explainer.py and tests/test_explain_partial_runs.py, both of which I ran and which pass.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.FairnessDriftDetector.get_history_df": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g020.py::TestHistoryFrameKeepsItsContract (3 tests)",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.FairnessDriftDetector.get_results_history": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g020.py::TestHistoryFrameKeepsItsContract::test_a_run_that_could_not_be_checked_is_still_in_the_history",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.FairnessDriftDetector.run_sprt": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g020.py::TestSprtThirdState (5 tests)",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.FairnessDriftDetector.set_baseline": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g020.py::TestBaselineWidthIsNotHidden (2 tests)",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.drift.MultiscaleDriftResult.to_dict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g020.py::TestMultiscaleDictKeepsTheThirdState (2 tests)",
+   "wave": "wave2"
+  },
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.compute_equal_opportunity": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestMissingPredictionColumnIsNanNotACrash::test_equal_opportunity_refuses_instead_of_raising plus the shared control.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.compute_equalized_odds": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestMissingPredictionColumnIsNanNotACrash - 4 pins (equalized odds, equal opportunity, the label half, and the whole window surviving) plus 1 over-correction control asserting 0.3 and 0.1 on a frame where the two arms differ, so a single wrong arm cannot satisfy both.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.get_alert_summary": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestTheOtherGradedSurfaces::test_alert_summary_counts_real_breaches_and_stays_empty_when_clean and ::test_an_empty_summary_is_ambiguous_and_the_history_is_the_channel.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.get_current_metrics": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestTheOtherGradedSurfaces::test_current_metrics_and_window_are_snapshots_of_the_last_window (exact value, copy semantics, and the NaN-survives-the-accessor assertion).",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.get_explanation": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestTheOtherGradedSurfaces::test_monitor_explanation_never_reads_clean_when_nothing_was_checked (the could-not-check window is not 'info', and the clean window still is).",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.get_metric_history": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestTheOtherGradedSurfaces::test_metric_history_carries_the_value_the_count_and_the_determination and ::test_an_empty_summary_is_ambiguous_and_the_history_is_the_channel.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.get_window_df": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g004.py::TestTheOtherGradedSurfaces::test_current_metrics_and_window_are_snapshots_of_the_last_window.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.reset": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g004.py::TestTheOtherGradedSurfaces::test_set_reference_stores_a_copy_and_reset_clears_everything.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.set_reference": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g004.py::TestTheOtherGradedSurfaces::test_set_reference_stores_a_copy_and_reset_clears_everything.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.update_and_check": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestMissingPredictionColumnIsNanNotACrash::test_the_whole_window_survives_the_misconfigured_column plus the three TestSerialisedVerdictHasThreeStates cases (nothing-checked / breaching / clean) asserting exact metric values.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.TemporalFairnessAnalyzer.detect_seasonal_pattern": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestSeasonalPatternRefusalIsAudible - 2 refusal pins plus 1 over-correction control asserting all seven slot means exactly.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.TemporalFairnessAnalyzer.detect_trend": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestTrendWithNoTimeAxis - 4 refusal pins (the call, the summary, the forecast, the explanation) plus 2 over-correction controls asserting the exact slopes 0.0 and 0.01.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.TemporalFairnessAnalyzer.detect_weekly_degradation": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestWeekdayCheckNeedsTwoWeekdays - 2 refusal pins (weekly cadence, all-one-date) plus 2 over-correction controls asserting (True, 0.40) and (False, 0.05) exactly.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.TemporalFairnessAnalyzer.forecast_metric": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestForecastAnchor - 3 refusal pins plus 1 over-correction control asserting the three exact values AND the three exact dates; plus TestTrendWithNoTimeAxis::test_the_forecast_built_on_it_is_not_a_flat_line.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.TemporalFairnessAnalyzer.get_explanation": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestTemporalExplanationSeverity - 1 refusal pin plus 2 over-correction controls (measured-clean stays 'info', measured-degrading stays 'high'); plus TestTrendWithNoTimeAxis::test_the_explanation_does_not_read_stable.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.TemporalFairnessAnalyzer.get_metric_summary": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestTheOtherGradedSurfaces::test_metric_summary_is_exact_when_measured_and_empty_when_not plus TestTrendWithNoTimeAxis::test_the_summary_does_not_publish_the_fabricated_slope.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.TemporalFairnessAnalyzer.get_tracked_metrics": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g004.py::TestTheOtherGradedSurfaces::test_analyzer_accessors_report_what_was_recorded.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.TemporalFairnessAnalyzer.to_dataframe": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g004.py::TestTheOtherGradedSurfaces::test_analyzer_accessors_report_what_was_recorded.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.TemporalFairnessAnalyzer.update_daily_metrics": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g004.py::TestTheOtherGradedSurfaces::test_update_daily_metrics_prunes_by_the_lookback_window.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.WindowMetrics.to_dict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestSerialisedVerdictHasThreeStates - 1 refusal pin plus 2 over-correction controls asserting exact serialised values in both directions.",
+   "wave": "wave1"
+  },
+  "vfairness.operations.monitoring.tracker.mmd_gaussian": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g004.py::TestTheOtherGradedSurfaces::test_mmd_refuses_out_loud_and_still_measures_a_real_shift - a refusal pin plus two controls (exact 0.0 for identical samples, the closed-form value for the shifted pair).",
+   "wave": "wave1"
+  },
+  "vfairness.operations.pulse.regulatory.attach_lightweight_regulatory": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "None; behaviour recorded by execution above.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.base_rates_differ": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g013.py: 4 refusal pins + 4 controls.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.build_ll144": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g013.py: 2 refusal pins + 2 controls.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.build_recheck": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g013.py: 1 refusal pin + 1 control.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.build_reference_groups": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g013.py: 1 refusal pin + 3 controls.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.build_regulatory_exports": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "Covered indirectly by the build_ll144 / build_art10 / iso24027 pins and by the pre-existing regulatoryExports assertions in test_pulse_compliance.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.build_targets": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g013.py: 4 refusal pins + 1 control.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.clamp_target_ratio": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g013.py::test_build_targets_refuses_a_bool_as_a_ratio and the control above.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.empty_exports": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g013.py::test_empty_exports_carries_no_measured_looking_value",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.historical_context": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g013.py::test_historical_context_is_a_catalog_lookup_with_an_honest_miss",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.iso24027_crosswalk": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g013.py::test_iso24027_crosswalk_maps_only_what_was_computed",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.legal_admissibility": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g013.py::test_legal_admissibility_classifier_failure_returns_the_null_counter_block (with an inline control) and the pre-existing test_legal_admissibility_present_with_coverage.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.legal_context_as_of": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "None of my own; the pre-existing format assertion stands.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.parse_pulse_options": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g013.py::test_parse_pulse_options_refuses_an_unknown_harm_direction",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.sanitize_suite": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g013.py::test_sanitize_suite_drops_every_secret_bearing_key",
+   "wave": "wave2"
+  },
+  "vfairness.operations.pulse.regulatory.uncovered_admissibility": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g013.py: 1 refusal pin + 1 control.",
+   "wave": "wave2"
+  },
+  "vfairness.operations.reporting.store.HealthScore.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "grade_note": "NOT A MEASUREMENT is refuted: it carries a fairness number and a traffic-light verdict across the serialisation boundary a caller reads a float out of",
+   "test_file": "TestTheStoreStillMeasures::test_to_dict_carries_the_third_state_to_the_reader (pinned even though the item is not a measurement, because this is where a refusal could vanish)",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.clear": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "TestClearEmptiesTheModelRegistry (the pin plus a control asserting register_model still registers, with its metadata and registered_at)",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.compute_health_score": {
+   "audit_overturned": false,
+   "audited": false,
+   "claimed_grade": "DEFECT OPEN",
+   "fabricated": true,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "no pin for the open defect (pinning it would pin the fabrication). Everything else about the function is pinned: TestTheStoreStillMeasures::test_the_composite_is_the_hand_computed_one, TestAnEmptyStoreSaysItIsEmpty::test_the_health_score_is_withheld_not_perfect, and the three undetermined-row refusals inside the ingestion class",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.get_alerts": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "TestEveryIngestionPathCarriesTheThirdState::test_ingest_from_prioritizer_and_get_alerts_filter_what_is_there, TestAnEmptyStoreSaysItIsEmpty",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.get_drift_history": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestEveryIngestionPathCarriesTheThirdState::test_ingest_drift_result_carries_a_refusal_through plus TestAnUncomputedMmdIsNotZero",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.get_groups": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "TestTheAccessorsPickTheRightRows::test_get_groups_excludes_the_overall_pseudo_group, TestAnEmptyStoreSaysItIsEmpty",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.get_latest": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "TestTheAccessorsPickTheRightRows::test_get_latest_picks_the_newest_not_the_first_stored, TestAnEmptyStoreSaysItIsEmpty",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.get_metric_names": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "TestAnEmptyStoreSaysItIsEmpty::test_every_accessor_refuses_rather_than_invents",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.get_metrics": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestTheStoreStillMeasures::test_the_privacy_tiers_are_still_applied_and_labelled and ::test_ingest_dataframe_round_trips_our_own_export_without_losing_a_state",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.get_sources": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "TestAnEmptyStoreSaysItIsEmpty::test_every_accessor_refuses_rather_than_invents",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.get_summary": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "TestTheStoreStillMeasures::test_the_query_accessors_report_what_is_there, TestClearEmptiesTheModelRegistry, TestAnEmptyStoreSaysItIsEmpty",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.get_threshold_history": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestEveryIngestionPathCarriesTheThirdState::test_ingest_threshold_update_records_exactly_what_it_was_given, TestAnEmptyStoreSaysItIsEmpty",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.get_time_range": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "TestAnEmptyStoreSaysItIsEmpty::test_every_accessor_refuses_rather_than_invents",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.ingest_alert": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g003.py::TestAnUnscoredAlertHasNoPriority, six tests: two refusal pins, a severity pin, two over-correction controls (a real 9.8 and a genuinely MEASURED 0.0 both survive with no warning), and a caller-trace pin on the health score",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.ingest_dataframe": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "TestTheStoreStillMeasures::test_ingest_dataframe_round_trips_our_own_export_without_losing_a_state",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.ingest_drift_result": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "TestAnUncomputedMmdIsNotZero (3 tests: the refusal pin, a control asserting a real 0.37 and the drift score beside it arrive exactly, and a control asserting a genuinely MEASURED 0.0 still survives as 0.0)",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.ingest_from_analyzer": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestEveryIngestionPathCarriesTheThirdState::test_ingest_from_analyzer_records_values_not_verdicts",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.ingest_from_detector": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "TestEveryIngestionPathCarriesTheThirdState::test_control_ingest_from_detector_carries_a_measured_drift_through",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.ingest_from_monitor": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestEveryIngestionPathCarriesTheThirdState::test_ingest_from_monitor_preserves_the_history_determinations",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.ingest_from_prioritizer": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "TestEveryIngestionPathCarriesTheThirdState::test_ingest_from_prioritizer_and_get_alerts_filter_what_is_there",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.ingest_threshold_update": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "TestEveryIngestionPathCarriesTheThirdState::test_ingest_threshold_update_records_exactly_what_it_was_given",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.ingest_window_metrics": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "TestEveryIngestionPathCarriesTheThirdState::test_ingest_window_metrics_keeps_an_uncompared_metric_uncompared",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.prune": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "grade_note": "and if graded as a measurement anyway, the evidence supports at most SEMI-PROVEN, never PROVEN",
+   "test_file": "TestTheStoreStillMeasures::test_prune_removes_and_counts_exactly_the_old_records, TestAnEmptyStoreSaysItIsEmpty",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.register_model": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "TestClearEmptiesTheModelRegistry::test_control_register_model_still_registers",
+   "wave": "wave1"
+  },
+  "vfairness.operations.reporting.store.MetricsStore.to_dataframe": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestTheStoreStillMeasures::test_the_privacy_tiers_are_still_applied_and_labelled (asserts the full tier map and the warning), plus the round-trip test",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.analyze_disparity": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestItStillMeasures::test_the_numbers_match_an_independent_computation pins the exact 0.5; the refusal is held by TestCriticalIssuesDiscloseWhatWasNeverChecked, whose note fires only when np.isfinite(ece_disparity) is False.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.analyze_tradeoffs": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_tradeoffs_refuse_when_no_two_groups_were_compared and test_tradeoffs_control_measure_a_real_base_rate_gap.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.calibrate": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_calibrate_actually_changes_the_probabilities (asserts group B moves down by more than 0.1, so a passthrough cannot satisfy it).",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.clear_cache": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "test_clear_cache_returns_nothing_and_forces_recomputation.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.decompose_brier": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_brier_decomposition_refuses_the_skill_score_on_one_class and test_brier_decomposition_control_on_two_classes (uncertainty 0.1875 computed independently).",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.evaluate_brier": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_mce_and_brier_match_the_hand_computation.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.evaluate_calibration": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_mce_and_brier_match_the_hand_computation asserts the dict's key set and the MCE it carries.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.evaluate_calibration_improvement": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "TestCalibrationImprovementIsLabelledInSample (5 tests + 8 parametrized): the residual observation across 4 seeds x 2 bin counts, the coverage block, the warning, that supplying y_prob_calibrated is still in-sample, and the RuntimeError control when no calibrator is fitted. Plus test_the_before_figure_is_a_real_measurement as the measurement control.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.evaluate_ece": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_the_numbers_match_an_independent_computation (control) and test_ece_and_mce_refuse_below_two_rows (refusal).",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.evaluate_mce": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_mce_and_brier_match_the_hand_computation and test_ece_and_mce_refuse_below_two_rows.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.fit_calibrator": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_fit_calibrator_refuses_the_unimplemented_strategy and test_fit_calibrator_says_when_a_group_got_no_usable_calibrator.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.full_analysis": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "TestCriticalIssuesDiscloseWhatWasNeverChecked (3 tests), including one proving the fix does NOT swallow real findings: with a large miscalibrated group plus a 6-row group, the note names only the disparity, the overall ECE is still finite, and 'Poor Calibration' still appears. Control: TestItStillMeasures::test_the_healthy_report_carries_measured_verdicts_and_real_issues asserts 'Not Assessed' is absent on measured data.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.get_calibration_curve": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "SEMI-PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "test_get_calibration_curve_refuses_an_unknown_group_by_name.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.get_calibration_result": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_transform_before_fit_refuses_rather_than_returning_the_input covers the RuntimeError.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.get_data_summary": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_get_data_summary_describes_the_input_it_was_given (base rates asserted against hand counts).",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.get_explanation": {
+   "audit_overturned": false,
+   "audited": false,
+   "claimed_grade": "DEFECT OPEN",
+   "fabricated": true,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.get_impossibility_diagnosis": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "test_impossibility_diagnosis_is_three_state (both directions in one test).",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.get_recommendation": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "SEMI-PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "test_get_recommendation_is_not_shared_between_contexts.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationAnalyzer.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_transform_before_fit_refuses_rather_than_returning_the_input and test_transform_on_an_unseen_group_warns_that_it_was_not_group_calibrated.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationReport.summary": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g005.py::TestSummaryDoesNotDefaultAMetricToZero (6 tests: absent key parametrized over ece/mce/brier, NaN parametrized, a key PRESENT holding None, the per-group table, and the end-to-end unmeasurable analyzer) plus TestItStillMeasures::test_the_summary_renders_those_numbers_including_a_real_zero as the control.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationReport.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_to_dict_and_to_json_carry_the_three_state_verdicts.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationReport.to_json": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "test_to_json_emits_no_bare_nan_token, test_to_json_uses_null_for_could_not_check_and_keeps_the_key, test_control_to_json_keeps_every_measured_number_including_a_real_zero.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.analyzer.CalibrationReport.to_svg": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "test_to_svg_renders_and_marks_the_unmeasurable_report_not_assessed (both directions in one test).",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.GroupCalibrationResult.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g015.py::TestTheRemainingSurfaces::test_to_dict_carries_every_field_of_the_dataclass (structural: set(to_dict()) == {f.name for f in dataclasses.fields(result)})",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.GroupCalibrator.evaluate": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g015.py::TestEvaluateDisclosesItsCoverage (2 tests) and ::TestTheRemainingSurfaces::test_evaluate_survives_a_group_that_could_not_be_calibrated / test_evaluate_refuses_rather_than_returning_zero_when_nothing_is_measurable",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.GroupCalibrator.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g015.py::TestOneUnmeasurableGroupKeepsTheOthersMeasured (3 tests) and ::TestAMapThatLearnedNothingIsLabelled (2 tests)",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.GroupCalibrator.fit_transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g015.py::TestTheRemainingSurfaces::test_fit_transform_is_fit_then_transform_and_keeps_the_disclosure",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.GroupCalibrator.get_calibration_result": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g015.py::TestTheRemainingSurfaces::test_get_calibration_result_refuses_before_fit_and_carries_the_disclosure",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.GroupCalibrator.get_group_calibrator": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g015.py::TestLookupsSeparateUnknownFromUncalibrated::test_an_unknown_group_is_not_reported_as_uncalibrated",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.GroupCalibrator.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g015.py::TestIntegerProbabilitiesAreNotTruncated (3 tests) and ::TestTheRemainingSurfaces::test_transform_says_why_its_nan_rows_are_nan",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.IntersectionalCalibrator.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g015.py::TestARefusedFitIsNotSwallowedByTheConstantInputGate (2 tests)",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.IntersectionalCalibrator.fit_transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g015.py::TestTheRemainingSurfaces::test_intersectional_fit_transform_is_fit_then_transform",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.IntersectionalCalibrator.get_calibrator_for_group": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g015.py::TestLookupsSeparateUnknownFromUncalibrated::test_an_intersection_named_with_a_missing_attribute_is_refused",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.IntersectionalCalibrator.get_group_provenance": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g015.py::TestTheRemainingSurfaces::test_group_statistics_and_provenance_are_the_measured_ones and ::TestARefusedFitIsNotSwallowedByTheConstantInputGate::test_a_nan_map_is_never_labelled_intersectional",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.IntersectionalCalibrator.get_group_statistics": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g015.py::TestTheRemainingSurfaces::test_group_statistics_and_provenance_are_the_measured_ones (asserts the exact four counts and both unfitted refusals)",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.IntersectionalCalibrator.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g015.py::TestIntegerProbabilitiesAreNotTruncated::test_intersectional_transform_returns_floats_for_an_int_input, and the transform half of test_a_nan_map_is_never_labelled_intersectional",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.validate_borrowing_strategy": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g015.py::TestTheRemainingSurfaces::test_the_two_strategy_validators_refuse_what_they_do_not_run",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.group_calibrator.validate_fallback_strategy": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g015.py::TestTheRemainingSurfaces::test_the_two_strategy_validators_refuse_what_they_do_not_run (both accepted values, all four refusals, and both constructors)",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.calibration.methods.BaseCalibrator.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.BaseCalibrator.fit_transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g012.py::TestFitTransformCarriesTheRefusal::test_fit_transform_returns_nan_where_fit_refused (G012-11) and ::test_control_fit_transform_equals_fit_then_transform (G012-12)",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.BaseCalibrator.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.BetaCalibrator.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g012.py::TestBetaIdentifiabilityUsesTheWeightedRows, 4 tests (G012-1 to G012-4)",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.BetaCalibrator.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g012.py::TestTransformRefusesNonProbabilities (G012-8 x 3 inputs x 5 classes, G012-9 x 5 classes)",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.CalibrationFitResult.to_dict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g012.py::TestCalibrationFitResultToDict, 3 tests (G012-13 pins to_dict against dataclasses.fields rather than a hardcoded name list, G012-14, G012-15)",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.HistogramBinning.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "Covered by my G012-8/9/12 parametrizations; the dedicated fit-side pins are the existing tests/test_bgl_stage2b_s2b08.py::TestHistogramGridDegeneracy, which I sabotage-checked rather than duplicating.",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.HistogramBinning.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g012.py::TestTransformRefusesNonProbabilities, the HistogramBinning parametrizations of G012-8 and G012-9",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.IsotonicCalibrator.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g012.py::TestIsotonicWeightlessRows, 3 tests (G012-5, G012-6, G012-7)",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.IsotonicCalibrator.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g012.py::TestTransformRefusesNonProbabilities, the IsotonicCalibrator parametrizations of G012-8 and G012-9",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.PlattScaling.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "Covered by my G012-9/12 parametrizations; the dedicated fit-side pins are the existing tests/test_bgl_stage2b_s2b08.py::TestPlattConstantColumnAtEveryScale, which I sabotage-checked rather than duplicating.",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.PlattScaling.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g012.py::TestTransformRefusesNonProbabilities, the PlattScaling parametrizations of G012-8 and G012-9",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.TemperatureScaling.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g012.py::TestTransformRefusesNonProbabilities::test_control_temperature_recovers_a_known_overconfidence (G012-10), plus the G012-9/12 parametrizations; the dedicated degeneracy pins are the existing tests/test_bgl_stage2b_s2b08.py::TestTemperatureDegeneracy, which I sabotage-checked.",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.calibration.methods.TemperatureScaling.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g012.py::TestTransformRefusesNonProbabilities, the TemperatureScaling parametrizations of G012-8 and G012-9",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.BaseReweighter.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.BaseReweighter.fit_transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g008.py::TestReweightersRefuseWhatTheyCannotMeasure::test_fit_transform_is_fit_then_transform_and_carries_the_refusal",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.BaseReweighter.predict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g008.py::TestReweightersRefuseWhatTheyCannotMeasure::test_prediction_reweighter_all_nan_is_not_a_neutral_factor and TestAGroupAbsentAtFitTimeIsRefused (both assert dtype AND content)",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.BaseReweighter.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.CalibratedEqualizer.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g008.py::TestCalibratedEqualizerFitRefusesAnUnestimableGrid (2 tests)",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.CalibratedEqualizer.transform": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g008.py::TestReweightersRefuseWhatTheyCannotMeasure::test_calibrated_equalizer_does_not_map_a_group_it_never_fitted",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.DistributionMatcher.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g008.py::TestReweightersRefuseWhatTheyCannotMeasure::test_distribution_matcher_refuses_a_grid_it_cannot_estimate and ::test_control_distribution_matcher_matches_two_big_groups",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.DistributionMatcher.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g008.py::TestReweightersRefuseWhatTheyCannotMeasure::test_distribution_matcher_refuses_a_grid_it_cannot_estimate",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.PredictionReweighter.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g008.py::TestZeroMeanGroupIsNotANeutralFactor (3 tests) + TestReweightersRefuseWhatTheyCannotMeasure::test_prediction_reweighter_all_nan_is_not_a_neutral_factor and ::test_control_one_unscored_group_does_not_discard_the_other_two",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.PredictionReweighter.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g008.py::TestAGroupAbsentAtFitTimeIsRefused::test_prediction_reweighter_does_not_pass_an_unfitted_group_through",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.RejectionOptionClassifier.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g008.py::TestRejectionOptionUnprivilegedIsMeasured (4 tests, including a name-independence test that runs the same scores under two labellings)",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.RejectionOptionClassifier.predict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "covered inside TestAGroupAbsentAtFitTimeIsRefused::test_rejection_option_does_not_push_down_a_group_it_never_saw (dtype + NaN + warning) and TestRejectionOptionUnprivilegedIsMeasured::test_equal_positive_rates_do_not_name_an_unprivileged_group (int path)",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.RejectionOptionClassifier.transform": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g008.py::TestAGroupAbsentAtFitTimeIsRefused::test_rejection_option_does_not_push_down_a_group_it_never_saw and TestRejectionOptionUnprivilegedIsMeasured::test_a_group_tied_for_worst_is_not_pushed_down",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.ReweightingResult.summary": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g008.py::TestSummaryDoesNotInvertTheFinding (4 tests, including an end-to-end one that produces the regression through RejectionOptionClassifier rather than by hand)",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.reweighting.reweighter.ReweightingResult.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g008.py::TestReweightingResultToDict::test_to_dict_carries_every_field_including_the_disclosures, which walks dataclasses.fields(ReweightingResult) so a field added later and not published fails the test (the copy-constructor-drops-a-later-field shape)",
+   "wave": "wave1"
+  },
+  "vfairness.post_processing.threshold_optimization.optimizer.BaseThresholdOptimizer.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "None. A pin on `pass` would assert the absence of an implementation, which would fight any future change rather than protect one.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.threshold_optimization.optimizer.BaseThresholdOptimizer.fit_predict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g017.py::TestTheRemainingSurfaces::test_fit_predict_equals_fit_then_predict and ::test_fit_predict_refuses_unscored_rows_rather_than_rejecting_them.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.threshold_optimization.optimizer.BaseThresholdOptimizer.predict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "None, same reason as the abstract fit.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.threshold_optimization.optimizer.GroupThresholdOptimizer.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g017.py::TestGroupThresholdOptimizer::test_unscored_rows_make_the_verdict_not_assessed and ::test_control_group_thresholds_are_applied_exactly.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.threshold_optimization.optimizer.GroupThresholdOptimizer.predict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g017.py::TestGroupThresholdOptimizer::test_predict_refuses_a_group_it_never_fitted and ::test_control_group_thresholds_are_applied_exactly.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.threshold_optimization.optimizer.MultiObjectiveThresholdOptimizer.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g017.py::TestParetoFrontierSaysWhatItRankedOn, 6 tests: the artifact records an unmeasurable objective; the summary reader is told; a frontier that ranked on nothing says so (and the frontier really is inflated on that input, asserted, so the pin cannot pass on the wrong scenario); no-sweep is not reported as an unmeasurable objective; plus two controls, one asserting the disclosure stays silent on healthy data and one, free of any disclosure assertion, recomputing the selected point's accuracy independently from its own thresholds.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.threshold_optimization.optimizer.MultiObjectiveThresholdOptimizer.predict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "None of my own: the existing tests/test_bgl_stage1_g05_thresholds.py::TestPredictRefusesWhatItCannotScore already pins all four refusals with two controls, and I verified by sabotage (below) that those pins are load-bearing rather than taking them on trust. I did not add a duplicate.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.threshold_optimization.optimizer.MultiObjectiveThresholdOptimizer.select_point": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g017.py::TestTheRemainingSurfaces::test_select_point_moves_the_result_and_refuses_an_index_it_has_not_got.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.threshold_optimization.optimizer.ThresholdOptimizer.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "tests/test_surface_grade_g017.py::TestSingleThresholdOptimizer::test_one_group_is_not_assessed and ::test_control_a_real_gap_is_measured_and_predicted (the control recomputes both the parity gap and the accuracy independently).",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.threshold_optimization.optimizer.ThresholdOptimizer.predict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g017.py::TestSingleThresholdOptimizer::test_predict_refuses_a_row_with_no_score plus the control test_control_a_real_gap_is_measured_and_predicted.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.threshold_optimization.optimizer.ThresholdResult.summary": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g017.py::TestParetoFrontierSaysWhatItRankedOn::test_the_reader_of_the_summary_is_told and ::test_a_frontier_that_ranked_on_nothing_says_so, plus the summary assertions inside TestSingleThresholdOptimizer::test_one_group_is_not_assessed and TestGroupThresholdOptimizer::test_unscored_rows_make_the_verdict_not_assessed, with a control asserting the new wording is ABSENT on healthy data.",
+   "wave": "wave2"
+  },
+  "vfairness.post_processing.threshold_optimization.optimizer.ThresholdResult.to_dict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g017.py::TestTheRemainingSurfaces::test_to_dict_carries_the_third_state_not_a_false and ::test_control_to_dict_carries_a_real_verdict_when_there_is_one.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasAuditReport.assessment_coverage": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g021.py::TestTheCoverageRecordItself, 4 tests covering complete / none / partial / unrecorded plus the empty-record branch.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasAuditReport.execution_coverage": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g021.py::TestTheCoverageRecordItself (3 state tests) plus the fixture-reach test in TestGetCriticalCount.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasAuditReport.get_critical_count": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g021.py::TestGetCriticalCount, 7 tests: fixture-reaches-the-branch, 4 refusal states, and 3 over-correction controls.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasAuditReport.get_high_risk_features": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g021.py::TestGetHighRiskFeatures, 5 tests (3 refusals, 2 controls).",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasAuditReport.summary": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "tests/test_surface_grade_g021.py::TestTheCoverageRecordItself::test_the_text_summary_carries_the_refusal_to_a_reader.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasAuditReport.to_dict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "Covered through to_json by TestTheCoverageRecordItself::test_the_json_export_carries_both_coverage_words and ::test_the_json_export_of_a_clean_audit_says_complete.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasAuditReport.to_json": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "TestTheCoverageRecordItself::test_the_json_export_carries_both_coverage_words and ::test_the_json_export_of_a_clean_audit_says_complete (both go through to_json, not to_dict).",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasAuditReport.to_svg": {
+   "audit_overturned": false,
+   "audited": false,
+   "claimed_grade": "DEFECT OPEN",
+   "fabricated": true,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g021.py::TestTheCanvasStillGradesAnAuditThatAssessedNothing, 2 tests, both xfail(strict) per this repo's xfail_strict=true policy.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasAuditReport.unassessable_attributes": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g021.py::TestTheCoverageRecordItself::test_an_unassessable_audit_reports_none_of_its_attributes_assessed / test_one_assessable_and_one_starved_attribute_is_partial / test_a_hand_built_report_says_unrecorded_rather_than_either_state.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasDetector.analyze_disparities": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g021.py::TestCachesAreKeyedByTheirArguments, 6 tests including test_an_exploratory_call_no_longer_empties_the_audit.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasDetector.clear_cache": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g021.py::TestCachesAreKeyedByTheirArguments::test_clear_cache_empties_all_four_caches_and_returns_nothing.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasDetector.full_audit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "Exercised end to end by every test in tests/test_surface_grade_g021.py; specifically pinned by TestTheCoverageRecordItself and by TestCachesAreKeyedByTheirArguments::test_an_exploratory_call_no_longer_empties_the_audit.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasDetector.get_dataset_summary": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g021.py::TestGetDatasetSummary, 3 tests.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasDetector.get_explanation": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g021.py::TestGetExplanation, 7 tests including test_the_audit_recommendations_are_not_swallowed (the guard must not delete what the audit did say) and 2 healthy controls.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.bias_detection.detector.BiasDetector.identify_proxies": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g021.py::TestCachesAreKeyedByTheirArguments::test_identify_proxies_threshold_is_not_ignored.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.feature_engineering.analyzer.FeatureAnalysisReport.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g022.py::TestReportSerialisationCarriesTheThirdState, 2 tests (the incomplete case and the control).",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.feature_engineering.analyzer.FeatureAnalysisReport.to_json": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "Asserted inside TestReportSerialisationCarriesTheThirdState (both the incomplete and the control test check the to_json string, not only the dict).",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.feature_engineering.analyzer.FeatureEngineeringAnalyzer.analyze_proxies": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g022.py::TestAnalyzeProxiesSaysWhenItCouldNotGrade, 4 tests: test_a_nan_correlation_is_not_graded_negligible, test_an_unscreened_attribute_is_not_an_all_clear, test_a_zero_threshold_is_honoured_not_replaced_by_the_default, test_control_healthy_data_still_finds_the_critical_proxy.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.feature_engineering.analyzer.FeatureEngineeringAnalyzer.compare_transformations": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g022.py::TestCompareTransformationsRefusesInsteadOfScoringZero, 5 tests: test_no_measurable_pair_is_nan_not_zero, test_too_few_rows_is_nan_not_zero, test_a_method_that_raises_gets_a_row_saying_so, test_control_healthy_data_still_measures_the_real_correlation (expected value from np.corrcoef, not copied), test_control_one_unmeasurable_column_does_not_discard_the_other (the reverse-defect control).",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.feature_engineering.analyzer.FeatureEngineeringAnalyzer.full_analysis": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "Covered by TestRecommendationsDiscloseTheScreenThatDidNotRun and TestReportSerialisationCarriesTheThirdState in tests/test_surface_grade_g022.py; the pre-existing proxy-channel pins in tests/test_bgl_stage2_s2g03.py::TestProxyScreenSaysWhenItDidNotLook still pass unchanged (4 tests).",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.feature_engineering.analyzer.FeatureEngineeringAnalyzer.get_correlation_matrix": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g022.py::TestCorrelationSurfacesRefuseWithNaN::test_get_correlation_matrix_is_nan_on_a_constant_attribute plus test_get_correlation_matrix_control (expected value from np.corrcoef).",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.feature_engineering.analyzer.FeatureEngineeringAnalyzer.get_explanation": {
+   "audit_overturned": false,
+   "audited": false,
+   "claimed_grade": "DEFECT OPEN",
+   "fabricated": true,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g022.py::TestRecommendationsDiscloseTheScreenThatDidNotRun::test_the_could_not_check_row_reaches_the_explanation pins the part I could close. I deliberately did NOT write a test asserting the (correct) severity, because it would be red on arrival and would belong to explainer.py's owner.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.feature_engineering.analyzer.FeatureEngineeringAnalyzer.get_feature_correlation_matrix": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g022.py::TestCorrelationSurfacesRefuseWithNaN, 3 tests: is_nan_below_min_periods, is_nan_for_a_constant_column, and the control asserting the exact Pearson r plus the tuple shape under return_pvalues.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.feature_engineering.analyzer.FeatureEngineeringAnalyzer.get_feature_recommendations": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g022.py::TestRecommendationsDiscloseTheScreenThatDidNotRun, 3 tests: test_an_unscreened_frame_gets_a_could_not_check_row, test_the_could_not_check_row_reaches_the_explanation, test_control_healthy_data_recommends_the_real_finding_first.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.feature_engineering.analyzer.FeatureEngineeringAnalyzer.get_transformation_report": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g022.py::TestTransformIsDataNotAMeasurement::test_get_transformation_report_is_none_before_any_fit (asserts None first, then the real result after a fit).",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.feature_engineering.analyzer.FeatureEngineeringAnalyzer.transform": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g022.py::TestTransformIsDataNotAMeasurement, 2 tests: transform_returns_feature_values_and_reduces_the_association (before > 0.95, after < 0.01, both computed in the test) and transform_refuses_an_unknown_method.",
+   "wave": "wave2"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.BaseFeatureTransformer.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "none needed for the body; the shared machinery it declares (_check_is_fitted, _validate_protected_attributes) is exercised by tests/test_surface_grade_g002.py::test_base_fit_transform_and_feature_names_out_carry_the_real_columns",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.BaseFeatureTransformer.fit_transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g002.py::test_base_fit_transform_and_feature_names_out_carry_the_real_columns",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.BaseFeatureTransformer.get_feature_names_out": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g002.py::test_base_fit_transform_and_feature_names_out_carry_the_real_columns",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.BaseFeatureTransformer.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "none for the body",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.CorrelationReducer.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_a_feature_no_reduction_was_fitted_for_is_not_reported_as_modified + ::test_control_a_healthy_correlation_reduction_still_measures_and_reduces",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.CorrelationReducer.transform": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_a_refit_that_cannot_estimate_a_projection_does_not_reuse_the_old_one + ::test_control_decorrelate_on_a_healthy_frame_still_projects",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.DisparateImpactRemover.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_disparate_impact_remover_calls_a_one_group_frame_a_could_not_check (asserts fit_metrics n_groups / n_features_repaired and the fit-side warning) + ::test_control_disparate_impact_remover_still_equalizes_two_group_means",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.DisparateImpactRemover.transform": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_disparate_impact_remover_calls_a_one_group_frame_a_could_not_check + the control",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.FairRepresentationTransformer.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_fair_representation_refuses_what_it_cannot_encode + ::test_control_fair_representation_still_encodes_and_counts_imputations",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.FairRepresentationTransformer.transform": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_control_fair_representation_still_encodes_and_counts_imputations + the refusal half of ::test_fair_representation_refuses_what_it_cannot_encode",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.FeatureImportanceResult.to_dict": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g002.py::test_the_converters_do_not_turn_an_unmeasured_value_into_a_number",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.FeatureSuppressor.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_feature_suppressor_does_not_certify_a_column_it_could_not_score + ::test_control_feature_suppressor_still_removes_a_real_proxy",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.FeatureSuppressor.transform": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "covered by tests/test_surface_grade_g002.py::test_control_feature_suppressor_still_removes_a_real_proxy (asserts the returned column list)",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.IntersectionalTransformer.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_a_single_intersectional_group_says_no_adjustment_was_made + ::test_control_four_intersectional_groups_are_still_levelled_and_silent",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.IntersectionalTransformer.transform": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "SEMI-PROVEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_a_one_row_intersection_is_counted_not_silently_passed_through",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.LabelMassager.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_label_massager_reports_the_flips_it_made_not_half_of_them, ::test_label_massager_without_a_usable_ranker_says_so_instead_of_staying_silent, ::test_label_massager_on_one_group_says_there_was_nothing_to_compare",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.LabelMassager.get_massaged_labels": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_label_massager_reports_the_flips_it_made_not_half_of_them + ::test_label_massager_without_a_usable_ranker_says_so_instead_of_staying_silent",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.LabelMassager.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g002.py::test_the_reweighting_and_massaging_transforms_are_identity_on_features",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.Resampler.fit": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "exercised by tests/test_surface_grade_g002.py::test_resampler_says_between_group_balance_was_not_measured_on_one_group and ::test_control_resampler_still_balances_two_groups_and_counts_the_copies (both call fit first)",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.Resampler.get_resampled_data": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_resampler_says_between_group_balance_was_not_measured_on_one_group + ::test_control_resampler_still_balances_two_groups_and_counts_the_copies",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.Resampler.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g002.py::test_the_reweighting_and_massaging_transforms_are_identity_on_features",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.ResidualTransformer.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_residual_transformer_leaves_an_unmeasurable_attribute_out_of_the_report + ::test_control_residual_transformer_still_removes_a_real_group_gap",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.ResidualTransformer.transform": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "SEMI-PROVEN",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_control_residual_transformer_still_removes_a_real_group_gap pins the healthy measurement (S26 RED). I did NOT pin the unseen-group disclosure.",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.ReweightingTransformer.fit": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_one_protected_group_does_not_earn_a_no_reweighting_needed_weight, ::test_target_parity_on_a_single_label_says_nothing_was_equalized, ::test_control_two_unbalanced_groups_still_get_their_exact_weights, ::test_control_target_parity_on_two_labels_still_equalizes_the_rates",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.ReweightingTransformer.get_sample_weights": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "DEFECT OPEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_get_sample_weights_refuses_a_group_it_never_fitted + the second half of ::test_one_protected_group_does_not_earn_a_no_reweighting_needed_weight",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.ReweightingTransformer.transform": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "NOT A MEASUREMENT",
+   "test_file": "tests/test_surface_grade_g002.py::test_the_reweighting_and_massaging_transforms_are_identity_on_features",
+   "wave": "wave1"
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.TransformationResult.to_dict": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g002.py::test_the_converters_do_not_turn_an_unmeasured_value_into_a_number",
+   "wave": "wave1"
+  },
+  "vfairness.operations.pulse.regulatory.build_art10": {
+   "audit_overturned": false,
+   "audited": true,
+   "claimed_grade": "PROVEN",
+   "fabricated": true,
+   "fixed": true,
+   "grade": "PROVEN",
+   "test_file": "tests/test_surface_grade_g013.py: 2 refusal pins + 2 controls.",
+   "wave": "wave2",
+   "grade_note": "Key corrected 2026-09-27: it was recorded as vfairness.operations.pulse.build_art10, which does not resolve. build_art10 lives in vfairness.operations.pulse.regulatory, like every sibling graded in the same batch. The grade and its evidence are unchanged; only the address was wrong."
+  }
+ },
+ "measured_on": "2026-09-18",
+ "method": "Each item was executed on healthy input carrying a real findable disparity and on the degenerate inputs where the thing it claims to measure does not exist, then graded into one of five states. Every claim that could hide a defect was re-checked by an independent agent told to refute it; where the auditor overturned the grade, the AUDITOR'S grade is recorded here, not the grader's. An item with audited=false carries a claim, not a measurement.",
+ "states": {
+  "DEFECT OPEN": "proved by execution to report a value nobody measured",
+  "NOT A MEASUREMENT": "produces no fairness number and no verdict, so the defect class cannot apply; assigned only after running it",
+  "PROVEN": "refuses honestly when nothing is measurable, measures correctly when something is, and a test holds it there",
+  "SEMI-PROVEN": "behaves honestly today, verified by execution, but no pin fails when it regresses",
+  "UNPROVEN": "no fixture could reach it"
+ },
+ "_retired": {
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.get_metric_summary": {
+   "audit_overturned": true,
+   "audited": true,
+   "claimed_grade": "NOT A MEASUREMENT",
+   "fabricated": false,
+   "fixed": false,
+   "grade": "PROVEN",
+   "grade_note": "for the only callable of that name, TemporalFairnessAnalyzer.get_metric_summary). The row as written must not stand as NOT A MEASUREMENT: FairnessMonitor.get_metric_summary does not exist, and the callable that does exist is a measurement. The grading agent's own flag was correct.",
+   "test_file": "",
+   "wave": "wave1",
+   "retired": "Retired 2026-09-27: FairnessMonitor has no get_metric_summary and never did, so this row graded nothing. The audit that overturned it to PROVEN said exactly that in its own note and recorded the grade anyway, and it has been counted in the published PROVEN total ever since. The real callable of that name, vfairness.operations.monitoring.tracker.TemporalFairnessAnalyzer.get_metric_summary, carries its own row and was re-graded PROVEN by the 2026-09-25 wave. Kept here rather than deleted so the count can be reconciled against earlier publications."
+  }
+ }
+}

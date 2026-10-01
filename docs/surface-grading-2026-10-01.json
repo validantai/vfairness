@@ -1,0 +1,75 @@
+{
+ "_what_this_is": "First examinations. Every unit here had NO grade: nobody had run it on undefined input, which is where every defect this campaign found was living. audited is FALSE on every row by construction.",
+ "measured_on": "2026-10-01",
+ "wave": "grade-1",
+ "counts": {
+  "NOT A MEASUREMENT": 1,
+  "PROVEN": 5
+ },
+ "reports_read": 1,
+ "reports_glob": "/tmp/claude-501/oracle/grade5/grade-*.json",
+ "unresolved_by_this_method": [],
+ "items": {
+  "vfairness.operations.reporting.store.MetricsStore.window_now": {
+   "grade": "NOT A MEASUREMENT",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-last-five-2026-10-01",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_last_five_units.py",
+   "sabotage": "the fix was replaced by the naive version it superseded (via a pytest plugin patching the unit) and the named test failed; restored, 17 of 17 pass",
+   "judgement": "Run 2026-10-01 on an aware and a naive store: returns datetime.now() carrying the records' own tzinfo (aware for an aware store, naive for a naive one). It is a window bound, not a fairness number or verdict. Pinned anyway: tests/test_first_examination_last_five_units.py::test_window_now_is_aware_for_an_aware_store_and_naive_for_a_naive_one, sabotaged red with a naive datetime.now()."
+  },
+  "vfairness.post_processing.threshold_optimization.constraints.FeasibleThresholds.get": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-last-five-2026-10-01",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_last_five_units.py",
+   "sabotage": "the fix was replaced by the naive version it superseded (via a pytest plugin patching the unit) and the named test failed; restored, 17 of 17 pass",
+   "judgement": "Run 2026-10-01: a measured group returns its thresholds; an unknown key returns the caller's default; a group recorded as NOT assessed raises KeyError instead of returning [] (which reads as 'measured, nothing works'). Sabotage: dict.get returned the default and the pin failed."
+  },
+  "vfairness.post_processing.threshold_optimization.constraints.FeasibleThresholds.setdefault": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-last-five-2026-10-01",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_last_five_units.py",
+   "sabotage": "the fix was replaced by the naive version it superseded (via a pytest plugin patching the unit) and the named test failed; restored, 17 of 17 pass",
+   "judgement": "Run 2026-10-01: refuses to insert a default for a not-assessed group (KeyError, key stays absent), returns existing values and inserts for a genuinely new key. Sabotage: dict.setdefault inserted [] and the pin failed."
+  },
+  "vfairness.preprocessing.feature_engineering.transformers.finite_or_nan": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-last-five-2026-10-01",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_last_five_units.py",
+   "sabotage": "the fix was replaced by the naive version it superseded (via a pytest plugin patching the unit) and the named test failed; restored, 17 of 17 pass",
+   "judgement": "Run 2026-10-01 on None, NaN, +/-inf, True, np.bool_, non-numeric strings and lists: all NaN. Real numbers including numpy scalars and numeric strings come back exactly. Sabotage: a bare float() let True through as 1.0 and inf through, and 4 tests failed."
+  },
+  "vfairness.xai.explainers.base.prediction_fn_available": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-last-five-2026-10-01",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_last_five_units.py",
+   "sabotage": "the fix was replaced by the naive version it superseded (via a pytest plugin patching the unit) and the named test failed; restored, 17 of 17 pass",
+   "judgement": "Run 2026-10-01: an unfitted LogisticRegression (has .predict, cannot predict) is refused, the fitted one and a plain callable are accepted. Sabotage: the old callable-or-hasattr(predict) check accepted the unfitted model and the pin failed."
+  },
+  "vfairness.evaluation.vfairness_metrics.classification.selection_rate_disparity_matrix": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "re-examination-of-unproven-2026-10-01",
+   "audited": false,
+   "first_examination": false,
+   "regrade_of": "UNPROVEN, in the 2026-09-30 grading wave (an internal file, not published): the fix credited there was made in an internal harness script, so this unit's own behaviour had never been judged",
+   "test_file": "tests/test_selection_rate_disparity_matrix_examined.py",
+   "sabotage": "(1) headline computed over every group instead of the interpretable ones: 1 test failed (a 2-row group that selected nobody defined min_ratio 0.0); (2) original file without headline_excluded_groups: 2 failed; restored byte-identical (diff -q), 8 of 8 pass",
+   "judgement": "Run 2026-10-01. Healthy 300/200/100 rows: every rate, min_ratio, its pair and max_difference equal hand computation to 1e-12. One group, no rows, every prediction missing, every group label missing: min_ratio NaN, pair None, headline_basis no_pair. Nobody selected anywhere: NaN (0/0), never 1.0. A group selected nobody: 0.0 for that pair, a TRUE measurement of total exclusion. A 2-row group is marked invalid, kept out of the headline, and now named in the new headline_excluded_groups field (previously visible only by walking rates). Consumers (MCP tool, pulse orchestrator) pass the full result on."
+  }
+ }
+}

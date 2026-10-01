@@ -1,0 +1,29 @@
+{
+ "pages": {
+  "": "2026-10-01",
+  "agent-testing/": "2026-10-01",
+  "api-reference/": "2026-10-01",
+  "business-guide/": "2026-10-01",
+  "concepts/": "2026-10-01",
+  "concepts/changelog.html": "2026-10-01",
+  "concepts/references.html": "2026-10-01",
+  "explainability-and-xai/": "2026-10-01",
+  "getting-started/": "2026-10-01",
+  "legal/": "2026-10-01",
+  "llm-testing/": "2026-10-01",
+  "multi-agent-testing/": "2026-10-01",
+  "our-offering/": "2026-10-01",
+  "quality-and-hardening/": "2026-10-01",
+  "release-pipeline/": "2026-10-01",
+  "sample-assessment/": "2026-10-01",
+  "sample-assessment/cv-audit.html": "2026-10-01",
+  "sample-assessment/llm-audit.html": "2026-10-01",
+  "sample-assessment/ranking-audit.html": "2026-10-01",
+  "status/": "2026-10-01",
+  "svg-gallery/": "2026-10-01",
+  "test-objects/": "2026-10-01",
+  "training-time-interventions/": "2026-10-01",
+  "usage-map/": "2026-10-01",
+  "workflow-integration/": "2026-10-01"
+ }
+}

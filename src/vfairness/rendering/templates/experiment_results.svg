@@ -1,0 +1,402 @@
+{# ── FairnessExperiment · A/B Test Results SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set summary_h = 66 %}
+{% set effects_header_h = 40 %}
+{% set effects_row_h = 36 %}
+{% set effects_h = effects_header_h + effects|length * effects_row_h + 10 %}
+{% set forest_h = 200 %}
+{% set heterogeneity_h = 66 %}
+{% set power_h = 48 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}
+{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 40 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{% set summary_y = header_h %}
+{% set effects_y = summary_y + summary_h + 16 %}
+{% set forest_y = effects_y + effects_h + 16 %}
+{% set het_y = forest_y + forest_h + 16 %}
+{% set power_y = het_y + heterogeneity_h + 16 %}
+{% set exp_y = power_y + power_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── Forest plot geometry ── #}
+{% set fpl = 160 %}
+{% set fpr = 620 %}
+{% set fpt = forest_y + 40 %}
+{% set fpb = forest_y + forest_h - 20 %}
+{% set fpw = fpr - fpl %}
+{% set fph = fpb - fpt %}
+{% set fp_mid = fpl + (fpw / 2)|int %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{# With nothing supplied this line read "Independent · 0 intersections · N/A":
+   a design nobody reported and a count nobody took, stated as fact under the
+   title. #}
+{# Worded so it cannot contradict a count that WAS supplied: a dict carrying
+   only `n_intersections` still estimated and tested nothing. #}
+{% if nothing_measured %}
+<text x="36" y="122" font-size="10" fill="#94a3b8">No effect estimate and no statistical test were supplied, so nothing on this canvas was measured</text>
+{% else %}
+{# THE HEADLINE RULE, part (c): the ungraded count belongs BESIDE THE HEADLINE.
+   Both counts were on the canvas already, and both were at the FOOT of it: the
+   omitted forest rows are named at the top-right of the forest plot (y ≈ 640 on
+   a four-effect report) and the ungraded power verdicts inside the POWER
+   SUMMARY panel below that (y ≈ 720). This subtitle meanwhile said "4
+   intersections", a count that reads as a measurement, and a reader who takes
+   the headline and stops reading never meets either caveat. The panel lines
+   stay where they are: each explains an absence in the panel it belongs to,
+   and the point of this rule is that the count also reaches the reader who
+   never gets that far. #}
+<text x="36" y="122" font-size="10" fill="#64748b">{% if design_known %}{{ design_type }} · {% endif %}{{ n_intersections }} intersection{{ 's' if n_intersections != 1 }} · {{ attribute_names }}{% if n_power_ungraded|default(0) > 0 or forest_omitted|default(0) > 0 %} · not graded: {% if n_power_ungraded|default(0) > 0 %}{{ n_power_ungraded }} without a power verdict{% endif %}{% if n_power_ungraded|default(0) > 0 and forest_omitted|default(0) > 0 %}, {% endif %}{% if forest_omitted|default(0) > 0 %}{{ forest_omitted }} without an effect estimate{% endif %}{% endif %}</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Overall effect summary                                            #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ summary_y }}" width="644" height="{{ summary_h }}" rx="10" fill="#ffffff"/>
+{# Three states on the headline, never two. An absent estimate takes the neutral
+   slate accent, never the ocean of a significant result and never a verdict
+   colour: a reader takes the grade off the colour before the words. #}
+{% if not overall_effect_known %}
+<rect x="36" y="{{ summary_y }}" width="2.5" height="{{ summary_h }}" rx="1" fill="#64748b"/>
+{% elif overall_significant %}
+<rect x="36" y="{{ summary_y }}" width="2.5" height="{{ summary_h }}" rx="1" fill="#3b82f6"/>
+{% else %}
+<rect x="36" y="{{ summary_y }}" width="2.5" height="{{ summary_h }}" rx="1" fill="#94a3b8"/>
+{% endif %}
+
+<text x="56" y="{{ summary_y + 20 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">OVERALL TREATMENT EFFECT</text>
+
+{# The headline number was the last fabrication left on this canvas: with no
+   estimate supplied it read "+0.0000" in 22px beside a could-not-check p-value
+   and a could-not-check heterogeneity card, and the honest panels made it look
+   verified. No estimate, no number, and it is said here rather than only in the
+   accessible description. #}
+{% if overall_effect_known %}
+<text x="56" y="{{ summary_y + 46 }}" font-size="22" font-weight="700" fill="#0f172a">{{ overall_effect }}</text>
+{# The adapter supplies the whole phrase, so an ABSENT interval says so rather
+   than printing invented bounds inside "95% CI [...]". #}
+<text x="170" y="{{ summary_y + 46 }}" font-size="11" fill="{{ '#6b7280' if overall_has_ci else '#94a3b8' }}">{{ overall_ci_display|default('CI not computed', true) }}</text>
+{% else %}
+<text x="56" y="{{ summary_y + 44 }}" font-size="12" font-weight="700" fill="#64748b">{{ could_not_check_text|default('COULD NOT CHECK', true) }}</text>
+<text x="200" y="{{ summary_y + 44 }}" font-size="11" fill="#94a3b8">{{ overall_ci_display|default('CI not computed', true) }}</text>
+<text x="56" y="{{ summary_y + 60 }}" font-size="9" fill="#94a3b8">no overall treatment effect was reported for this experiment</text>
+{% endif %}
+
+{# Three states, never two. `overall_p_known` is false when the experiment
+   reported no p-value at all: the adapter used to default that to 1.0, and this
+   badge then read NOT SIGNIFICANT, a measured-sounding verdict drawn from no
+   measurement. The comparison below is guarded because an unknown p reaches
+   here as None, which Jinja cannot order against 0.05. #}
+<text x="400" y="{{ summary_y + 44 }}" font-size="10" fill="#6b7280">p-value</text>
+<text x="460" y="{{ summary_y + 44 }}" font-size="{{ 13 if overall_p_known else 10 }}" font-weight="700" fill="{{ '#dc2626' if (overall_p_known and overall_p < 0.05) else ('#475569' if overall_p_known else '#94a3b8') }}">{{ overall_p_display }}</text>
+
+{% if not overall_p_known %}
+<rect x="560" y="{{ summary_y + 30 }}" width="100" height="22" rx="11" fill="#f1f5f9"/>
+<text x="610" y="{{ summary_y + 45 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#64748b">{{ could_not_check_text|default('COULD NOT CHECK', true) }}</text>
+{% elif overall_significant %}
+<rect x="560" y="{{ summary_y + 30 }}" width="100" height="22" rx="11" fill="#eff6ff"/>
+<text x="610" y="{{ summary_y + 45 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#3b82f6">SIGNIFICANT</text>
+{% else %}
+<rect x="560" y="{{ summary_y + 30 }}" width="100" height="22" rx="11" fill="#f1f5f9"/>
+<text x="610" y="{{ summary_y + 45 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#64748b">NOT SIGNIFICANT</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Intersection effects table                                        #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ effects_y }}" width="644" height="{{ effects_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ effects_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">INTERSECTION</text>
+<text x="220" y="{{ effects_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">EFFECT (d)</text>
+<text x="310" y="{{ effects_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">95% CI</text>
+<text x="430" y="{{ effects_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">P-VALUE</text>
+<text x="510" y="{{ effects_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">N</text>
+<text x="580" y="{{ effects_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">STATUS</text>
+<line x1="56" y1="{{ effects_y + 32 }}" x2="660" y2="{{ effects_y + 32 }}" stroke="#475569" stroke-width="0.75"/>
+
+{# THREE STATES ON SIGNIFICANCE, never two, and the flag that carries the third
+   one is `significant_known`. adapters_experimentation sets `significant` False
+   and `significant_known` False for a row that reported neither a significance
+   flag nor a p-value to derive one from, so every bare test on `e.significant`
+   below sent an UNKNOWN significance to the arm that means "tested and found not
+   significant": the same ink, the same filled grey dot, the same absence of the
+   blue accent. A reader takes the grade off the colour before the words, so an
+   unknown was coloured as a decided one, on the row and again on the forest
+   plot. The flag was emitted and READ ZERO TIMES here, which is a fix that
+   never landed.
+
+   `|default(true)` throughout: a hand-built dict, or one produced before the
+   flag existed, keeps exactly the colours it had. Only a row that says outright
+   that nobody decided gets the third state. #}
+{% for e in effects %}
+{% set ry = effects_y + effects_header_h + loop.index0 * effects_row_h %}
+{% set sig_known = e.significant_known|default(true) %}
+{% set sig_yes = sig_known and e.significant %}
+
+{% if sig_yes %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ effects_row_h }}" fill="#eff6ff" opacity="0.3"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ effects_row_h }}" fill="#3b82f6"/>
+{% endif %}
+
+<text x="56" y="{{ ry + 22 }}" font-size="10" font-weight="500" fill="#0f172a">{{ e.name|truncate_text(22) }}</text>
+{# A row that reported no effect says so; it does not print +0.0000, which is
+   the single most specific effect this column can state.
+
+   The ink is the significance verdict: ocean for a measured significant effect,
+   the table's own slate for a measured non-significant one, and the withheld
+   grey for an effect whose significance nobody decided. That last one is the
+   same grey the unmeasured cells in this table already use, so an unknown reads
+   as an unknown rather than as the darker ink of a decided result. #}
+<text x="220" y="{{ ry + 22 }}" font-size="{{ 11 if e.effect_known else 9 }}" font-weight="{{ 600 if e.effect_known else 500 }}" fill="{{ (('#3b82f6' if sig_yes else '#475569') if sig_known else '#94a3b8') if e.effect_known else '#94a3b8' }}">{{ e.effect }}</text>
+<text x="310" y="{{ ry + 22 }}" font-size="9.5" fill="{{ '#6b7280' if e.has_ci else '#94a3b8' }}">{{ e.ci_display|default('CI not computed', true) }}</text>
+{# An effect row with no p-value says so; it does not print 1.0000. #}
+<text x="430" y="{{ ry + 22 }}" font-size="10" font-weight="500" fill="{{ '#dc2626' if (e.has_p and e.p_value < 0.05) else ('#475569' if e.has_p else '#94a3b8') }}">{{ e.p_display }}</text>
+{# Neither arm reported: not a sample of 0. #}
+<text x="510" y="{{ ry + 22 }}" font-size="{{ 9.5 if e.n_known else 8 }}" fill="{{ '#6b7280' if e.n_known else '#94a3b8' }}">{{ e.n_display }}</text>
+
+{% if sig_yes and e.powered %}
+<rect x="574" y="{{ ry + 8 }}" width="80" height="18" rx="9" fill="#eff6ff"/>
+<text x="614" y="{{ ry + 21 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#3b82f6">SIG + POWERED</text>
+{% elif sig_yes %}
+<rect x="574" y="{{ ry + 8 }}" width="80" height="18" rx="9" fill="#fef3c7"/>
+<text x="614" y="{{ ry + 21 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#f59e0b">SIGNIFICANT</text>
+{% elif e.powered %}
+<rect x="574" y="{{ ry + 8 }}" width="80" height="18" rx="9" fill="#f1f5f9"/>
+<text x="614" y="{{ ry + 21 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#64748b">POWERED</text>
+{% elif e.powered_known %}
+<rect x="574" y="{{ ry + 8 }}" width="80" height="18" rx="9" fill="#f1f5f9"/>
+<text x="614" y="{{ ry + 21 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#94a3b8">UNDERPOWERED</text>
+{% else %}
+{# UNDERPOWERED is a verdict about this subgroup: it says the row was sized and
+   found short of data, and it was printed for rows that reported no power at
+   all, because the adapter defaulted `powered` to False. There is nothing to
+   derive the verdict from, so the status is withheld here rather than guessed. #}
+<rect x="574" y="{{ ry + 8 }}" width="80" height="18" rx="9" fill="#f1f5f9"/>
+<text x="614" y="{{ ry + 21 }}" text-anchor="middle" font-size="7.5" font-weight="600" fill="#64748b">{{ could_not_check_text|default('COULD NOT CHECK', true) }}</text>
+{% endif %}
+
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + effects_row_h }}" x2="660" y2="{{ ry + effects_row_h }}" stroke="#f1f5f9" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Forest plot                                                        #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ forest_y }}" width="644" height="{{ forest_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ forest_y + 24 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">FOREST PLOT: EFFECT SIZES WITH 95% CONFIDENCE INTERVALS</text>
+{# Every position on this axis is a value, so a row with no effect estimate
+   cannot be drawn anywhere on it: plotted at the centre it read as an effect of
+   exactly zero. Those rows are left off and counted here. #}
+{% if forest_omitted > 0 %}
+<text x="660" y="{{ forest_y + 24 }}" text-anchor="end" font-size="8" fill="#64748b">{{ forest_omitted }} row{{ 's' if forest_omitted != 1 }} not plotted: no effect estimate was reported</text>
+{% endif %}
+
+{# Axes #}
+<line x1="{{ fpl }}" y1="{{ fpb }}" x2="{{ fpr }}" y2="{{ fpb }}" stroke="#cbd5e1" stroke-width="1"/>
+
+{# Zero line #}
+<line x1="{{ fp_mid }}" y1="{{ fpt }}" x2="{{ fp_mid }}" y2="{{ fpb }}" stroke="#dc2626" stroke-width="0.5" stroke-dasharray="4,3" opacity="0.6"/>
+<text x="{{ fp_mid }}" y="{{ fpb + 14 }}" text-anchor="middle" font-size="7" fill="#94a3b8">0</text>
+
+{# Scale labels #}
+<text x="{{ fpl }}" y="{{ fpb + 14 }}" text-anchor="middle" font-size="7" fill="#94a3b8">{{ forest_min }}</text>
+<text x="{{ fpr }}" y="{{ fpb + 14 }}" text-anchor="middle" font-size="7" fill="#94a3b8">{{ forest_max }}</text>
+<text x="{{ (fpl + fp_mid) / 2 }}" y="{{ fpb + 14 }}" text-anchor="middle" font-size="7" fill="#94a3b8">{{ forest_q1 }}</text>
+<text x="{{ (fp_mid + fpr) / 2 }}" y="{{ fpb + 14 }}" text-anchor="middle" font-size="7" fill="#94a3b8">{{ forest_q3 }}</text>
+
+{# Effect points + CI whiskers #}
+{% if forest_effects %}
+{% set n_eff = forest_effects|length %}
+{% set row_spacing = (fph / (n_eff + 1))|int %}
+{% for e in forest_effects %}
+{% set ey = fpt + ((loop.index) * row_spacing)|int %}
+{# The same three states as the table above, on the surface where the marker
+   style IS the significance encoding. See the note at the effects loop. #}
+{% set fsig_known = e.significant_known|default(true) %}
+{% set fsig_yes = fsig_known and e.significant %}
+
+{# Label #}
+<text x="{{ fpl - 8 }}" y="{{ ey + 4 }}" text-anchor="end" font-size="8" fill="#475569">{{ e.name|truncate_text(16) }}</text>
+
+{% set eff_x = fp_mid + (e.effect_raw * fpw / (2 * forest_abs_max))|int %}
+{% if eff_x < fpl %}{% set eff_x = fpl %}{% endif %}
+{% if eff_x > fpr %}{% set eff_x = fpr %}{% endif %}
+
+{# CI whisker. Drawn ONLY when the interval was computed: a missing bound used
+   to arrive as 0, so the whisker was drawn from the effect to the zero line and
+   read as a band that crosses no-difference. No interval, no whisker, and the
+   row is labelled instead. #}
+{% if e.has_ci %}
+{% set ci_lo_x = fp_mid + (e.ci_lower_raw * fpw / (2 * forest_abs_max))|int %}
+{% set ci_hi_x = fp_mid + (e.ci_upper_raw * fpw / (2 * forest_abs_max))|int %}
+
+{# Clamp to plot area #}
+{% if ci_lo_x < fpl %}{% set ci_lo_x = fpl %}{% endif %}
+{% if ci_hi_x > fpr %}{% set ci_hi_x = fpr %}{% endif %}
+
+{% set whisker = '#3b82f6' if fsig_yes else ('#94a3b8' if fsig_known else '#cbd5e1') %}
+<line x1="{{ ci_lo_x }}" y1="{{ ey }}" x2="{{ ci_hi_x }}" y2="{{ ey }}" stroke="{{ whisker }}" stroke-width="1.5"{% if not fsig_known %} stroke-dasharray="3,2"{% endif %}/>
+<line x1="{{ ci_lo_x }}" y1="{{ ey - 4 }}" x2="{{ ci_lo_x }}" y2="{{ ey + 4 }}" stroke="{{ whisker }}" stroke-width="1"/>
+<line x1="{{ ci_hi_x }}" y1="{{ ey - 4 }}" x2="{{ ci_hi_x }}" y2="{{ ey + 4 }}" stroke="{{ whisker }}" stroke-width="1"/>
+{% else %}
+<text x="{{ eff_x + 8 }}" y="{{ ey + 3 }}" font-size="7" fill="#94a3b8">CI not computed</text>
+{% endif %}
+
+{# Point estimate. Three markers, because a forest plot states significance in
+   the marker before it states it anywhere else: a filled ocean dot for a
+   measured significant effect, a filled slate dot for a measured
+   non-significant one, and a HOLLOW dot for a row whose significance nobody
+   decided. Hollow rather than another shade of grey: the two greys are one
+   step apart at this size and a reader would have read the unknown as the
+   decided result, which is the whole defect. #}
+{% if fsig_yes %}
+<circle cx="{{ eff_x }}" cy="{{ ey }}" r="4" fill="#3b82f6" stroke="#ffffff" stroke-width="1"/>
+{% elif fsig_known %}
+<circle cx="{{ eff_x }}" cy="{{ ey }}" r="3.5" fill="#94a3b8" stroke="#ffffff" stroke-width="1"/>
+{% else %}
+<circle cx="{{ eff_x }}" cy="{{ ey }}" r="3.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Heterogeneity panel                                               #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Three states, never two. HOMOGENEOUS is a positive finding about
+   between-group consistency, so it is only ever drawn when a test actually
+   reported one. `heterogeneity_detected` used to default to False and
+   `heterogeneity_p_value` to 1.0, which painted this panel green and captioned
+   it "HOMOGENEOUS, p-value: 1.0000" for an experiment that ran no such test.
+   Could-not-check takes the neutral slate, never the green of a measured
+   result. Both numeric comparisons are guarded: an absent p arrives as None. #}
+<rect x="36" y="{{ het_y }}" width="314" height="{{ heterogeneity_h }}" rx="10" fill="#ffffff"/>
+{% if not heterogeneity_known %}
+<rect x="36" y="{{ het_y }}" width="2.5" height="{{ heterogeneity_h }}" rx="1" fill="#64748b"/>
+{% elif heterogeneity_detected %}
+<rect x="36" y="{{ het_y }}" width="2.5" height="{{ heterogeneity_h }}" rx="1" fill="#f59e0b"/>
+{% else %}
+<rect x="36" y="{{ het_y }}" width="2.5" height="{{ heterogeneity_h }}" rx="1" fill="#059669"/>
+{% endif %}
+
+<text x="56" y="{{ het_y + 20 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">HETEROGENEITY TEST</text>
+{% if not heterogeneity_known %}
+<text x="56" y="{{ het_y + 44 }}" font-size="12" font-weight="700" fill="#64748b">{{ could_not_check_text|default('COULD NOT CHECK', true) }}</text>
+<text x="56" y="{{ het_y + 60 }}" font-size="9" fill="#94a3b8">no heterogeneity test was reported for this experiment</text>
+{% else %}
+{% if heterogeneity_detected %}
+<text x="56" y="{{ het_y + 44 }}" font-size="14" font-weight="700" fill="#f59e0b">DETECTED</text>
+{% else %}
+<text x="56" y="{{ het_y + 44 }}" font-size="14" font-weight="700" fill="#059669">HOMOGENEOUS</text>
+{% endif %}
+<text x="56" y="{{ het_y + 60 }}" font-size="9" fill="#94a3b8">p-value: <tspan font-weight="700" fill="{{ '#dc2626' if (heterogeneity_p_known and heterogeneity_p < 0.05) else ('#475569' if heterogeneity_p_known else '#94a3b8') }}">{{ heterogeneity_p_display }}</tspan></text>
+{% endif %}
+
+{# ── Power summary ── #}
+<rect x="366" y="{{ het_y }}" width="314" height="{{ heterogeneity_h }}" rx="10" fill="#ffffff"/>
+<text x="386" y="{{ het_y + 20 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">POWER SUMMARY</text>
+{# A count of zero is not a finding of zero. With no intersection reported this
+   read "0 / 0 intersections adequately powered", which is a statement about an
+   experiment: none of its subgroups had enough data. No subgroup was examined.
+
+   The denominator is the GRADED population for the same reason. "1 / 2
+   adequately powered" over a row that carried no power verdict says that second
+   subgroup was sized and found short, and it was the row that reported
+   nothing. #}
+{% if n_power_denom > 0 %}
+<text x="386" y="{{ het_y + 44 }}" font-size="14" font-weight="700" fill="#0f172a">{{ n_powered }} / {{ n_power_denom }}</text>
+<text x="480" y="{{ het_y + 44 }}" font-size="10" fill="#6b7280">intersections adequately powered</text>
+{% if n_power_ungraded > 0 and not n_excluded > 0 %}
+<text x="386" y="{{ het_y + 60 }}" font-size="9" fill="#94a3b8">{{ n_power_ungraded }} further intersection{{ 's' if n_power_ungraded != 1 }} not graded: no power verdict</text>
+{% endif %}
+{% else %}
+<text x="386" y="{{ het_y + 44 }}" font-size="12" font-weight="700" fill="#64748b">{{ could_not_check_text|default('COULD NOT CHECK', true) }}</text>
+{# The excluded-count line below occupies this same baseline, so it is left to
+   speak for itself when there is one: it already explains the absence. #}
+{% if not n_excluded > 0 %}
+{% if effects %}
+<text x="386" y="{{ het_y + 60 }}" font-size="9" fill="#94a3b8">no intersection reported a power verdict, so none was graded</text>
+{% else %}
+<text x="386" y="{{ het_y + 60 }}" font-size="9" fill="#94a3b8">no intersection was reported, so none was graded for power</text>
+{% endif %}
+{% endif %}
+{% endif %}
+{% if n_excluded > 0 %}
+<text x="386" y="{{ het_y + 60 }}" font-size="9" fill="#f59e0b">{{ n_excluded }} excluded (insufficient data)</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Metadata row                                                       #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ power_y }}" width="644" height="{{ power_h }}" rx="10" fill="#ffffff"/>
+{# Every cell in this row is a claim about the experiment, so each carries the
+   three states of the panels above it. An empty call printed "Independent",
+   "N CONTROL 0", "N TREATMENT 0" and "INTERSECTIONS 0": a named design and two
+   empty arms, none of them reported. A REPORTED zero still prints as 0. #}
+<text x="56" y="{{ power_y + 18 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">DESIGN</text>
+{% if design_known %}
+<text x="56" y="{{ power_y + 36 }}" font-size="11" font-weight="600" fill="#0f172a">{{ design_type }}</text>
+{% else %}
+<text x="56" y="{{ power_y + 36 }}" font-size="10" font-weight="600" fill="#94a3b8">not reported</text>
+{% endif %}
+
+{# Per ARM, and read off the rows that actually reported one. A canvas whose
+   only row reported nothing used to total both arms to 0 and print them as
+   measured sample sizes. #}
+<text x="200" y="{{ power_y + 18 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">N CONTROL</text>
+{% if n_control_known %}
+<text x="200" y="{{ power_y + 36 }}" font-size="11" font-weight="600" fill="#0f172a">{{ n_control }}</text>
+{% else %}
+<text x="200" y="{{ power_y + 36 }}" font-size="10" font-weight="600" fill="#94a3b8">not reported</text>
+{% endif %}
+
+<text x="340" y="{{ power_y + 18 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">N TREATMENT</text>
+{% if n_treatment_known %}
+<text x="340" y="{{ power_y + 36 }}" font-size="11" font-weight="600" fill="#0f172a">{{ n_treatment }}</text>
+{% else %}
+<text x="340" y="{{ power_y + 36 }}" font-size="10" font-weight="600" fill="#94a3b8">not reported</text>
+{% endif %}
+
+<text x="500" y="{{ power_y + 18 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">INTERSECTIONS</text>
+{% if n_intersections_known %}
+<text x="500" y="{{ power_y + 36 }}" font-size="11" font-weight="600" fill="#0f172a">{{ n_intersections }}</text>
+{% else %}
+<text x="500" y="{{ power_y + 36 }}" font-size="10" font-weight="600" fill="#94a3b8">not reported</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                  #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

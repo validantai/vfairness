@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a3a4f">
+    <meta name="description" content="How a vfairness version goes from a code change to PyPI: every step, who performs it, what stops a bad release, and the status of the first release.">
+    <title>Release Pipeline | vfairness Documentation</title>
+
+    <link rel="icon" type="image/svg+xml" href="../img/favicon-v2.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script>/* theme before first paint: vf-theme = light | dark | system */(function(){var m='system';try{m=localStorage.getItem('vf-theme')||'system'}catch(e){}var d=m==='dark'||(m==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;r.setAttribute('data-theme',d?'dark':'light');r.setAttribute('data-theme-mode',m)})()</script>
+
+    <script src="https://validant.ai/consent/v1/consent.js" defer></script>
+  </head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="../index.html">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
+                </a>
+                <span class="logo-divider"></span>
+                <span class="lib-name"><span>v</span>fairness</span>
+            </div>
+            <nav class="main-nav" aria-label="Main navigation">
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="../getting-started/index.html" class="nav-link">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../api-reference/index.html" class="nav-link">API Reference</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Learn
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Learn submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../test-objects/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Find a Test Object</span>
+                                        <span class="nav-dropdown__desc">Data, models and agents to test, by access depth</span>
+                                    </span>
+                                </a>
+                                <a href="../business-guide/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Business Guide</span>
+                                        <span class="nav-dropdown__desc">Fairness strategy for decision-makers</span>
+                                    </span>
+                                </a>
+                                <div class="nav-dropdown__group">
+                                    <div class="nav-dropdown__group-label">
+                                        <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+                                        <span class="nav-dropdown__text">
+                                            <span class="nav-dropdown__label">Sample Assessments</span>
+                                            <span class="nav-dropdown__desc">End-to-end audits with EU AI Act compliance</span>
+                                        </span>
+                                    </div>
+                                    <div class="nav-dropdown__group-items">
+                                        <a href="../sample-assessment/index.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Binary Classifier</span> <span class="sub-desc">— Credit scoring</span></a>
+                                        <a href="../sample-assessment/llm-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Foundation LLM</span> <span class="sub-desc">— Resume screening</span></a>
+                                        <a href="../sample-assessment/cv-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Computer Vision</span> <span class="sub-desc">— Medical imaging</span></a>
+                                        <a href="../sample-assessment/ranking-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Ranking System</span> <span class="sub-desc">&mdash; Job platform</span></a>
+                                    </div>
+                                </div>
+                                <a href="../concepts/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Concepts</span>
+                                        <span class="nav-dropdown__desc">Fairness theory and metric foundations</span>
+                                    </span>
+                                </a>
+                                <a href="../quality-and-hardening/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Quality &amp; Hardening</span>
+                                        <span class="nav-dropdown__desc">Testing, security, and the road to beta</span>
+                                    </span>
+                                </a>
+                                <a href="../release-pipeline/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M12 22V12"/><path d="M3.3 7l8.7 5 8.7-5"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Releasing</span>
+                                        <span class="nav-dropdown__desc">How new versions ship to PyPI</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../our-offering/index.html" class="nav-link">Our Offering</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Explore
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Explore submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../svg-gallery/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">SVG Gallery</span>
+                                        <span class="nav-dropdown__desc">Interactive visualization templates</span>
+                                    </span>
+                                </a>
+                                <a href="../workflow-integration/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Workflow Integration</span>
+                                        <span class="nav-dropdown__desc">MLOps, CI/CD, and experiment tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../usage-map/index.html" role="menuitem" class="nav-dropdown__item" data-um-injected="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Library Usage Map</span>
+                                        <span class="nav-dropdown__desc">Where the platform uses each vfairness symbol</span>
+                                    </span>
+                                </a>
+<a href="../llm-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">LLM Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Counterfactual testing, benchmarks, output analysis for LLMs</span>
+                                    </span>
+                                </a>
+                                <a href="../agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Agent Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Correspondence testing, tool bias, RAG bias, pipeline tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../multi-agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Multi-Agent Testing</span>
+                                        <span class="nav-dropdown__desc">Emergent bias, groupthink, non-compositionality</span>
+                                    </span>
+                                </a>
+                                <a href="../explainability-and-xai/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Explainability &amp; XAI</span>
+                                        <span class="nav-dropdown__desc">SHAP attributions, fairness decomposition, counterfactuals</span>
+                                    </span>
+                                </a>
+                                <a href="../training-time-interventions/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Training-Time Interventions</span>
+                                        <span class="nav-dropdown__desc">Fairness-aware losses, constraints, calibration</span>
+                                    </span>
+                                </a>
+</div>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="nav-cta">
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="Search docs...">
+                    </div>
+                    <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+
+                <button type="button" class="mobile-nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-panel">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+<!-- Mobile Navigation -->
+<div class="mobile-nav-overlay" aria-hidden="true"></div>
+<nav class="mobile-nav-panel" id="mobile-nav-panel" aria-label="Mobile navigation" aria-hidden="true">
+    <div class="mobile-nav-header">
+        <span class="mobile-nav-title">Menu</span>
+        <button type="button" class="mobile-nav-close" aria-label="Close navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div class="mobile-nav-body">
+        <a href="../getting-started/index.html" class="mobile-nav-link">Getting Started</a>
+        <a href="../api-reference/index.html" class="mobile-nav-link">API Reference</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Learn
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../test-objects/index.html" class="mobile-nav-sublink">Find a Test Object</a>
+                <a href="../business-guide/index.html" class="mobile-nav-sublink">Business Guide</a>
+                <span class="mobile-nav-sublink" style="font-size:0.7rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:0.5rem 0 0.15rem;">Sample Assessments</span>
+                <a href="../sample-assessment/index.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Binary Classifier</a>
+                <a href="../sample-assessment/llm-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Foundation LLM</a>
+                <a href="../sample-assessment/cv-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Computer Vision</a>
+                <a href="../sample-assessment/ranking-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Ranking System</a>
+                <a href="../concepts/index.html" class="mobile-nav-sublink">Concepts</a>
+                <a href="../quality-and-hardening/index.html" class="mobile-nav-sublink">Quality &amp; Hardening</a>
+                <a href="../release-pipeline/index.html" class="mobile-nav-sublink">Releasing</a>
+            </div></div>
+        </div>
+        <a href="../our-offering/index.html" class="mobile-nav-link">Our Offering</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Explore
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../svg-gallery/index.html" class="mobile-nav-sublink">SVG Gallery</a>
+                <a href="../workflow-integration/index.html" class="mobile-nav-sublink">Workflow Integration</a>
+                <a href="../usage-map/index.html" class="mobile-nav-sublink" data-um-injected="1">Library Usage Map</a>
+<a href="../llm-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">LLM Fairness Testing</a>
+                <a href="../agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Agent Fairness Testing</a>
+                <a href="../multi-agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Multi-Agent Testing</a>
+                <a href="../explainability-and-xai/index.html" class="mobile-nav-sublink">Explainability &amp; XAI</a>
+                <a href="../training-time-interventions/index.html" class="mobile-nav-sublink">Training-Time Interventions</a>
+</div></div>
+        </div>
+    </div>
+    <div class="mobile-nav-footer">
+        <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            GitHub
+        </a>
+    </div>
+</nav>
+<script>/* Mobile nav bootstrap — works before main.js loads */
+(function(){
+var t=document.querySelector(".mobile-nav-toggle"),p=document.querySelector(".mobile-nav-panel"),o=document.querySelector(".mobile-nav-overlay"),c=document.querySelector(".mobile-nav-close");
+if(!t||!p)return;t.setAttribute("data-nav-init","1");
+function open(){t.setAttribute("aria-expanded","true");p.classList.add("is-open");p.setAttribute("aria-hidden","false");if(o)o.classList.add("is-open");document.body.style.overflow="hidden";}
+function close(){t.setAttribute("aria-expanded","false");p.classList.remove("is-open");p.setAttribute("aria-hidden","true");if(o)o.classList.remove("is-open");document.body.style.overflow="";}
+t.addEventListener("click",function(){t.getAttribute("aria-expanded")==="true"?close():open();});
+if(c)c.addEventListener("click",close);
+if(o)o.addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList.contains("is-open"))close();});
+})()
+</script>
+
+    <div class="page-wrapper docs-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Release pipeline</div>
+                <ul class="sidebar-nav">
+                    <li><a href="#status">Status</a></li>
+                    <li><a href="#at-a-glance">At a glance</a></li>
+                    <li><a href="#develop">1. Develop</a></li>
+                    <li><a href="#decide">2. Decide</a></li>
+                    <li><a href="#export">3. Export</a></li>
+                    <li><a href="#release">4. Release</a></li>
+                    <li><a href="#enforced">Enforced vs by hand</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-container">
+<style>
+.rp { --ok: #0f9f6e; --ok-bg: #e7f7f0; --hand: #b45309; --hand-bg: #fdf3e3; --auto: #0e7490; --auto-bg: #e6f6f9;
+  --ink: var(--color-gray-900, #111827); --soft: var(--color-gray-600, #4b5563); --line: var(--color-gray-200, #e5e7eb);
+  --card: #fff; --ground: var(--color-gray-50, #f9fafb); color: var(--ink); }
+.rp h1 { margin-bottom: .3rem; }
+.rp-lead { font-size: 1.08rem; line-height: 1.6; color: var(--soft); max-width: 70ch; }
+.rp-status { border: 1px solid var(--line); border-left: 6px solid var(--hand); border-radius: 14px; background: var(--card);
+  padding: 1.2rem 1.4rem; margin: 1.4rem 0 2rem; }
+.rp-status h2 { margin: 0 0 .3rem; font-size: 1.15rem; }
+.rp-status p { margin: 0 0 .8rem; line-height: 1.55; }
+.rp-checks { list-style: none; margin: 0; padding: 0; display: grid; gap: .45rem; }
+.rp-checks li { display: grid; grid-template-columns: 7.5rem 1fr; gap: .6rem; align-items: start; font-size: .94rem; line-height: 1.45; }
+.rp-tag { font-size: .7rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; border-radius: 999px;
+  padding: .18rem .55rem; text-align: center; }
+.rp-tag--ok { color: var(--ok); background: var(--ok-bg); } .rp-tag--todo { color: var(--hand); background: var(--hand-bg); }
+.rp-tag--unknown { color: var(--soft); background: var(--ground); border: 1px solid var(--line); }
+.rp-figure { border: 1px solid var(--line); border-radius: 14px; background: var(--card); padding: 1rem; margin: 1rem 0 .6rem;
+  overflow-x: auto; }
+.rp-figure svg { display: block; width: 100%; min-width: 820px; height: auto; }
+.rp-key { display: flex; flex-wrap: wrap; gap: 1.1rem; font-size: .85rem; color: var(--soft); margin: .4rem 0 2rem; }
+.rp-key span::before { content: ""; display: inline-block; width: .85rem; height: .85rem; border-radius: 3px; margin-right: .35rem; vertical-align: -1px; }
+.rp-key .a::before { background: var(--auto-bg); border: 1.5px solid var(--auto); }
+.rp-key .h::before { background: var(--hand-bg); border: 1.5px solid var(--hand); }
+.rp-key .g::before { background: var(--ok-bg); border: 1.5px solid var(--ok); }
+.rp-stage { margin: 2.2rem 0 0; }
+.rp-stage__head { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; }
+.rp-stage__head h2 { margin: 0; }
+.rp-where { font-size: .8rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--soft); }
+.rp-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: .9rem; margin-top: .9rem; }
+.rp-step { border: 1px solid var(--line); border-top: 4px solid var(--c); border-radius: 12px; background: var(--card);
+  padding: .95rem 1.1rem; display: flex; flex-direction: column; gap: .45rem; }
+.rp-step--auto { --c: var(--auto); } .rp-step--hand { --c: var(--hand); } .rp-step--gate { --c: var(--ok); }
+.rp-step h3 { margin: 0; font-size: 1rem; }
+.rp-step .who { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--c); }
+.rp-step p { margin: 0; font-size: .92rem; line-height: 1.5; }
+.rp-step .stops { font-size: .88rem; color: var(--soft); border-top: 1px dashed var(--line); padding-top: .45rem; }
+.rp-step .stops strong { color: var(--ink); }
+.rp-honest { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: .9rem; }
+.rp-box { border-radius: 12px; padding: 1rem 1.2rem; border: 1px solid var(--line); }
+.rp-box--ok { background: var(--ok-bg); } .rp-box--hand { background: var(--hand-bg); }
+.rp-box h3 { margin: 0 0 .5rem; font-size: 1rem; }
+.rp-box ul { margin: 0; padding-left: 1.1rem; display: grid; gap: .45rem; font-size: .93rem; line-height: 1.5; }
+.rp-note { color: var(--soft); font-size: .9rem; line-height: 1.55; }
+.rp code { font-size: .85em; }
+</style>
+<section class="rp" id="overview">
+  <span class="rd-eyebrow" style="font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--soft)">vfairness &middot; release pipeline &middot; checked 1 Oct 2026</span>
+  <h1>Release pipeline</h1>
+  <p class="rp-lead">How a version of vfairness gets from a code change to <code>pip install vfairness</code>:
+  every step, who or what performs it, and what stops a bad release. Whether the library is
+  <em>ready</em> to release is a separate question, answered on
+  <a href="../quality-and-hardening/index.html">Quality &amp; Hardening</a>.</p>
+
+  <div class="rp-status" id="status">
+    <h2>Status: 0.1.0 released on 2026-10-01</h2>
+    <p>Version 0.1.0 is the first public beta, published from the <code>v0.1.0</code> tag through the workflow below. What had to be true before it could go out:</p>
+    <ul class="rp-checks">
+      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>The beta gate reads BETA READY</strong>: all 8 conditions met (see Quality &amp; Hardening).</span></li>
+      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>Someone can approve.</strong> The <code>pypi</code> environment on the public repository admits <code>v</code>-tags and requires an active reviewer before anything reaches PyPI.</span></li>
+      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>PyPI trusts exactly this repository and workflow</strong> (trusted publishing over OIDC, no stored token). PyPI confirmed the registration when it refused to add it a second time.</span></li>
+      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>The public repository is filled</strong> by the export, and its own test suite must pass there before the tag can publish.</span></li>
+      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>Tag <code>v0.1.0</code></strong> on the public repository. The earlier 0.0.1 on PyPI is our own name reservation and contains none of this code.</span></li>
+    </ul>
+  </div>
+
+  <h2 id="at-a-glance">The pipeline at a glance</h2>
+  <div class="rp-figure" role="img" aria-label="Four stages: develop in the private repository with automatic checks on every change; decide by hand with the readiness gate; export a snapshot to the public repository; release from a tag, which first requires the full test suite to have passed on that commit, then build, smoke test, human approval, PyPI and the GitHub Release.">
+  <svg viewBox="0 0 1000 330" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker>
+    </defs>
+    <!-- stage bands -->
+    <g font-size="11" font-weight="700" letter-spacing="1.2" fill="#6b7280">
+      <rect x="8" y="10" width="200" height="310" rx="12" fill="#f9fafb" stroke="#e5e7eb"/>
+      <text x="22" y="34">1 · DEVELOP</text><text x="22" y="50" font-weight="500" letter-spacing="0">private repository</text>
+      <rect x="222" y="10" width="200" height="310" rx="12" fill="#f9fafb" stroke="#e5e7eb"/>
+      <text x="236" y="34">2 · DECIDE</text><text x="236" y="50" font-weight="500" letter-spacing="0">maintainer, by hand</text>
+      <rect x="436" y="10" width="140" height="310" rx="12" fill="#f9fafb" stroke="#e5e7eb"/>
+      <text x="450" y="34">3 · EXPORT</text><text x="450" y="50" font-weight="500" letter-spacing="0">to the public repo</text>
+      <rect x="590" y="10" width="402" height="310" rx="12" fill="#f9fafb" stroke="#e5e7eb"/>
+      <text x="604" y="34">4 · RELEASE</text><text x="604" y="50" font-weight="500" letter-spacing="0">public repository, started by a tag</text>
+    </g>
+    <!-- develop -->
+    <g font-size="12.5">
+      <rect x="22" y="70" width="172" height="58" rx="9" fill="#e6f6f9" stroke="#0e7490" stroke-width="1.5"/>
+      <text x="34" y="94" font-weight="700" fill="#0e7490">Every change</text><text x="34" y="113" fill="#111827">tests, lint, types, security</text>
+      <rect x="22" y="146" width="172" height="58" rx="9" fill="#e6f6f9" stroke="#0e7490" stroke-width="1.5"/>
+      <text x="34" y="170" font-weight="700" fill="#0e7490">Reference checks</text><text x="34" y="189" fill="#111827">same answer as libraries</text>
+      <rect x="22" y="222" width="172" height="58" rx="9" fill="#e6f6f9" stroke="#0e7490" stroke-width="1.5"/>
+      <text x="34" y="246" font-weight="700" fill="#0e7490">Export boundary</text><text x="34" y="265" fill="#111827">nothing internal leaks</text>
+    </g>
+    <!-- decide -->
+    <g font-size="12.5">
+      <rect x="236" y="70" width="172" height="58" rx="9" fill="#e7f7f0" stroke="#0f9f6e" stroke-width="1.5"/>
+      <text x="248" y="94" font-weight="700" fill="#0f9f6e">Readiness gate</text><text x="248" y="113" fill="#111827">must read BETA READY</text>
+      <rect x="236" y="146" width="172" height="58" rx="9" fill="#fdf3e3" stroke="#b45309" stroke-width="1.5"/>
+      <text x="248" y="170" font-weight="700" fill="#b45309">Version + wording</text><text x="248" y="189" fill="#111827">one commit, one script</text>
+    </g>
+    <!-- export -->
+    <g font-size="12.5">
+      <rect x="450" y="146" width="112" height="58" rx="9" fill="#fdf3e3" stroke="#b45309" stroke-width="1.5"/>
+      <text x="462" y="170" font-weight="700" fill="#b45309">Snapshot</text><text x="462" y="189" fill="#111827">screened push</text>
+    </g>
+    <!-- release -->
+    <g font-size="12.5">
+      <rect x="604" y="70" width="110" height="58" rx="9" fill="#fdf3e3" stroke="#b45309" stroke-width="1.5"/>
+      <text x="616" y="94" font-weight="700" fill="#b45309">Tag v0.1.0</text><text x="616" y="113" fill="#111827">starts the run</text>
+      <rect x="728" y="70" width="118" height="58" rx="9" fill="#e7f7f0" stroke="#0f9f6e" stroke-width="1.5"/>
+      <text x="740" y="94" font-weight="700" fill="#0f9f6e">Tests passed?</text><text x="740" y="113" fill="#111827">on this commit</text>
+      <rect x="860" y="70" width="118" height="58" rx="9" fill="#e6f6f9" stroke="#0e7490" stroke-width="1.5"/>
+      <text x="872" y="94" font-weight="700" fill="#0e7490">Build + verify</text><text x="872" y="113" fill="#111827">package, SBOM</text>
+      <rect x="860" y="160" width="118" height="58" rx="9" fill="#e6f6f9" stroke="#0e7490" stroke-width="1.5"/>
+      <text x="872" y="184" font-weight="700" fill="#0e7490">Smoke test</text><text x="872" y="203" fill="#111827">clean install</text>
+      <rect x="728" y="160" width="118" height="58" rx="9" fill="#e7f7f0" stroke="#0f9f6e" stroke-width="1.5"/>
+      <text x="740" y="184" font-weight="700" fill="#0f9f6e">Approval</text><text x="740" y="203" fill="#111827">human sign-off</text>
+      <rect x="604" y="160" width="110" height="58" rx="9" fill="#e6f6f9" stroke="#0e7490" stroke-width="1.5"/>
+      <text x="616" y="184" font-weight="700" fill="#0e7490">Publish</text><text x="616" y="203" fill="#111827">PyPI, signed</text>
+      <rect x="604" y="248" width="110" height="58" rx="9" fill="#e6f6f9" stroke="#0e7490" stroke-width="1.5"/>
+      <text x="616" y="272" font-weight="700" fill="#0e7490">GitHub</text><text x="616" y="291" fill="#111827">Release + SBOM</text>
+      <rect x="728" y="248" width="250" height="58" rx="9" fill="#ffffff" stroke="#e5e7eb"/>
+      <text x="740" y="268" font-size="11.5" fill="#4b5563">Publishing needs a pushed tag, a v-tag</text>
+      <text x="740" y="284" font-size="11.5" fill="#4b5563">and the public repository, all three.</text>
+      <text x="740" y="300" font-size="11.5" fill="#4b5563">The private copy can never publish.</text>
+    </g>
+    <!-- arrows -->
+    <g stroke="#6b7280" stroke-width="1.6" fill="none" marker-end="url(#arr)">
+      <path d="M194 175 H232"/>
+      <path d="M408 175 H446"/>
+      <path d="M562 175 H580 V99 H600"/>
+      <path d="M714 99 H724"/><path d="M846 99 H856"/>
+      <path d="M919 128 V156"/>
+      <path d="M860 189 H850"/><path d="M728 189 H718"/>
+      <path d="M659 218 V244"/>
+    </g>
+  </svg>
+  </div>
+  <div class="rp-key"><span class="a">automatic</span><span class="h">done by a person</span><span class="g">a gate that can stop the release</span></div>
+
+  <div class="rp-stage" id="develop">
+    <div class="rp-stage__head"><h2>1. Develop</h2><span class="rp-where">private repository &middot; on every change</span></div>
+    <div class="rp-steps">
+      <div class="rp-step rp-step--auto"><span class="who">Automatic, blocking</span><h3>Tests on every change</h3>
+        <p>The full test suite on Python 3.11, 3.12 and 3.13, with optional backends required, plus lint, formatting and type checks.</p>
+        <p class="stops"><strong>Stops:</strong> a change that breaks a test, falls below the coverage floor (55% overall, 80% of new lines), or fails a type check.</p></div>
+      <div class="rp-step rp-step--auto"><span class="who">Automatic, blocking</span><h3>Reference and honesty checks</h3>
+        <p>The 34 metrics with an outside reference are compared with fairlearn, scikit-learn, statsmodels and scipy; every measuring capability is fed broken data.</p>
+        <p class="stops"><strong>Stops:</strong> a number that drifts from the reference, or one invented where nothing was measurable.</p></div>
+      <div class="rp-step rp-step--auto"><span class="who">Automatic, blocking</span><h3>Security and the export boundary</h3>
+        <p>Bandit, a dependency vulnerability audit, a secret scan, and a check that the export to the public repository carries nothing internal.</p>
+        <p class="stops"><strong>Stops:</strong> a known-vulnerable dependency, a leaked secret, or internal material on its way out.</p></div>
+    </div>
+  </div>
+
+  <div class="rp-stage" id="decide">
+    <div class="rp-stage__head"><h2>2. Decide</h2><span class="rp-where">maintainer &middot; before cutting a release</span></div>
+    <div class="rp-steps">
+      <div class="rp-step rp-step--gate"><span class="who">A person runs it</span><h3>Readiness gate</h3>
+        <p><code>python scripts/release_gate.py</code> must read <strong>BETA READY</strong>: all 8 beta conditions met.</p>
+        <p class="stops"><strong>Stops:</strong> a release while any condition is open. It is run by hand; no workflow runs it for you.</p></div>
+      <div class="rp-step rp-step--hand"><span class="who">A person, one script</span><h3>Version and wording</h3>
+        <p>The version is set in one place, and a release script in the development repository changes every "not yet released" sentence to "released" in one commit.</p>
+        <p class="stops"><strong>Stops:</strong> a half-done change. A test fails if the changelog, README, citation file and site pages disagree about whether the version is released.</p></div>
+    </div>
+  </div>
+
+  <div class="rp-stage" id="export">
+    <div class="rp-stage__head"><h2>3. Export</h2><span class="rp-where">private to public repository</span></div>
+    <div class="rp-steps">
+      <div class="rp-step rp-step--hand"><span class="who">A person runs it</span><h3>Snapshot to the public repository</h3>
+        <p>The export script copies the library to <code>validantai/vfairness</code>, screening every file against a list of what may leave, with patterns for secrets and a size limit.</p>
+        <p class="stops"><strong>Stops:</strong> internal files, secrets and oversized artifacts. It must run before publishing, because PyPI keeps the README as it was at upload.</p></div>
+    </div>
+  </div>
+
+  <div class="rp-stage" id="release">
+    <div class="rp-stage__head"><h2>4. Release</h2><span class="rp-where">public repository &middot; started by pushing a tag</span></div>
+    <div class="rp-steps">
+      <section id="flow" style="display:contents">
+      <div class="rp-step rp-step--gate"><span class="who">Automatic gate</span><h3>1. Suite green on this commit</h3>
+        <p>Before anything is built, the run asks GitHub whether the full test suite passed on the exact commit being tagged, on every Python version.</p>
+        <p class="stops"><strong>Stops:</strong> a release from a commit whose tests failed, or never ran. A missing, cancelled or skipped run counts as a failure, not a pass.</p></div>
+      <div class="rp-step rp-step--auto"><span class="who">Automatic</span><h3>2. Build and verify</h3>
+        <p>Checks that the tag matches the package version, builds the source and wheel packages, validates them, and generates a software bill of materials (SBOM).</p>
+        <p class="stops"><strong>Stops:</strong> a tag that does not match the version, a malformed package, or an SBOM that describes the build machine instead of the package.</p></div>
+      <div class="rp-step rp-step--auto"><span class="who">Automatic</span><h3>3. Clean-room smoke test</h3>
+        <p>Installs the built wheel in a fresh environment and uses the public API from outside the source tree, so it tests what a user would install.</p>
+        <p class="stops"><strong>Stops:</strong> a package that installs but cannot be imported or used.</p></div>
+      <div class="rp-step rp-step--gate"><span class="who">A person approves, then automatic</span><h3>4. Publish to PyPI</h3>
+        <p>The run pauses at the <code>pypi</code> environment until a required reviewer approves. Then it uploads through PyPI trusted publishing: no stored password or token, a short-lived credential, and signed provenance attestations.</p>
+        <p class="stops"><strong>Stops:</strong> an upload nobody approved, and a publish from anywhere else: it needs a pushed tag, a <code>v</code>-tag and the public repository, all three.</p></div>
+      <div class="rp-step rp-step--auto"><span class="who">Automatic</span><h3>5. Publish the GitHub Release</h3>
+        <p>Creates the release for the tag and attaches the packages and the SBOM.</p>
+        <p class="stops"><strong>Runs only</strong> after the PyPI publish succeeded.</p></div>
+      </section>
+    </div>
+  </div>
+
+  <section id="setup" class="rp-stage">
+    <div class="rp-stage__head"><h2>One-time setup</h2><span class="rp-where">before the first release</span></div>
+    <div class="rp-honest">
+      <div class="rp-box"><h3>A trusted publisher on PyPI</h3><p class="rp-note" style="margin:0">PyPI must trust exactly the public repository <code>validantai/vfairness</code> and its <code>release.yml</code>. Until it does, the publish fails closed: everything before the upload still runs.</p></div>
+      <div class="rp-box"><h3>The <code>pypi</code> environment, with a required reviewer</h3><p class="rp-note" style="margin:0">This is what makes a person approve every upload. If that environment had never been created, GitHub would create it implicitly on first use with no reviewers, so the approval would gate nothing and the run would go straight to the upload. It exists today with a required reviewer (checked 1 Oct 2026), but that reviewer is an account being retired and has to be replaced by an active one.</p></div>
+    </div>
+  </section>
+
+  <h2 id="enforced" style="margin-top:2.4rem">What is enforced, and what relies on a person</h2>
+  <div class="rp-honest">
+    <div class="rp-box rp-box--ok"><h3>Enforced by the pipeline itself</h3><ul>
+      <li>Tests, coverage floors, lint, types and security on every change.</li>
+      <li>The full test suite must have passed on the exact commit being tagged; a missing or skipped run blocks the release.</li>
+      <li>The tag must match the package version.</li>
+      <li>Only the public repository can publish; a tag in the private repository builds and stops.</li>
+      <li>A person must approve every upload.</li>
+      <li><strong>Trusted Publishing (OIDC).</strong> No stored PyPI password or token exists to steal.</li></ul></div>
+    <div class="rp-box rp-box--hand"><h3>Relies on the maintainer</h3><ul>
+      <li>Running the readiness gate before cutting a release; no workflow runs it.</li>
+      <li>Exporting before tagging, so PyPI shows the right README.</li>
+      <li>There is no TestPyPI rehearsal (removed 28 Aug 2026), so the gates above are the only protection before an upload that cannot be undone. A PyPI version cannot be overwritten.</li></ul></div>
+  </div>
+  <p class="rp-note" style="margin-top:1.4rem">The full operator runbook, including what to do if a release goes wrong,
+  is <code>docs/RELEASE_PIPELINE.md</code> in the repository.</p>
+</section>
+
+            </div>
+        </main>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="brand-logo">
+                    <p>Systems for Trust &amp; Agency. Building tools for responsible AI development.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Documentation</h4>
+                        <ul>
+                            <li><a href="../getting-started/index.html">Getting Started</a></li>
+                            <li><a href="../business-guide/index.html">Business Guide</a></li>
+                            <li><a href="../api-reference/index.html">API Reference</a></li>
+                            <li><a href="../concepts/index.html">Concepts</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="../concepts/references.html">Academic References</a></li>
+                            <li><a href="../concepts/changelog.html">Changelog</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="https://validant.ai" target="_blank">validant.ai</a></li>
+                            <li><a href="https://validant.ai/imprint#publisher" target="_blank">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Glinz &amp; Company GmbH (validant.ai). vfairness is licensed under the Apache License 2.0.</p>
+                <div class="footer-legal">
+                    <a href="../legal/index.html">Legal</a>
+                    <span class="footer-dot">·</span>
+                    <a href="../legal/index.html#ai-usage" title="AI-Assisted Development Disclosure">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -1px; margin-right: 3px;"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/></svg>AI-Assisted
+                    </a>
+                </div>
+            </div>
+            <div class="footer-github-mobile">
+                <a href="https://github.com/validantai/vfairness" class="btn" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; vertical-align: -2px;"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="../js/main.js"></script>
+
+    <!-- Scroll-based active section tracking -->
+    <script>
+    (function() {
+        'use strict';
+
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+
+        const sidebarLinks = Array.from(sidebar.querySelectorAll('.sidebar-nav a[href^="#"]'));
+
+        const sectionMap = new Map();
+        const sectionIds = [];
+
+        sidebarLinks.forEach(function(link) {
+            const id = link.getAttribute('href').substring(1);
+            const section = document.getElementById(id);
+            if (section) {
+                sectionMap.set(id, { link: link, element: section });
+                sectionIds.push(id);
+            }
+        });
+
+        if (sectionIds.length === 0) return;
+
+        let currentActiveId = null;
+
+        function setActiveLink(id) {
+            if (id === currentActiveId) return;
+            currentActiveId = id;
+
+            sidebarLinks.forEach(function(link) {
+                link.classList.remove('active');
+            });
+
+            sidebar.querySelectorAll('.sidebar-title.has-active').forEach(function(t) {
+                t.classList.remove('has-active');
+            });
+
+            const current = sectionMap.get(id);
+            if (current) {
+                current.link.classList.add('active');
+
+                if (typeof window.ensureSidebarSectionExpanded === 'function') {
+                    window.ensureSidebarSectionExpanded(current.link);
+                }
+
+                var parentSection = current.link.closest('.sidebar-section');
+                if (parentSection) {
+                    var sectionTitle = parentSection.querySelector('.sidebar-title');
+                    if (sectionTitle) sectionTitle.classList.add('has-active');
+                }
+
+                var linkRect = current.link.getBoundingClientRect();
+                var sidebarRect = sidebar.getBoundingClientRect();
+                if (linkRect.top < sidebarRect.top + 50 || linkRect.bottom > sidebarRect.bottom - 50) {
+                    current.link.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+
+        function updateOnScroll() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const headerHeight = 70;
+            let activeId = sectionIds[0];
+
+            for (let i = 0; i < sectionIds.length; i++) {
+                const id = sectionIds[i];
+                const section = sectionMap.get(id);
+                if (section) {
+                    const rect = section.element.getBoundingClientRect();
+                    const offsetTop = rect.top + scrollTop;
+                    if (scrollTop >= offsetTop - headerHeight - 20) {
+                        activeId = id;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            setActiveLink(activeId);
+        }
+
+        let scrollTimeout;
+        function handleScroll() {
+            if (scrollTimeout) return;
+            scrollTimeout = requestAnimationFrame(function() {
+                updateOnScroll();
+                scrollTimeout = null;
+            });
+        }
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        updateOnScroll();
+
+        sidebarLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                const id = link.getAttribute('href').substring(1);
+                setTimeout(function() { setActiveLink(id); }, 100);
+            });
+        });
+    })();
+    </script>
+
+    <script>
+    /* A link into the record points at a collapsed entry, so open every
+       details around the target before scrolling to it. */
+    (function () {
+        function openTo(hash) {
+            if (!hash || hash.length < 2) { return; }
+            var el = null;
+            try { el = document.getElementById(decodeURIComponent(hash.slice(1))); }
+            catch (e) { el = null; }
+            if (!el) { return; }
+            var node = el;
+            while (node && node !== document.body) {
+                if (node.tagName === 'DETAILS') { node.open = true; }
+                node = node.parentNode;
+            }
+            el.scrollIntoView();
+        }
+        window.addEventListener('hashchange', function () { openTo(location.hash); });
+        /* A click on a link whose target is already the current hash fires no
+           hashchange, so the click is handled too. */
+        document.addEventListener('click', function (ev) {
+            var a = ev.target && ev.target.closest ? ev.target.closest('a[href^="#"]') : null;
+            if (a) { openTo(a.getAttribute('href')); }
+        });
+        openTo(location.hash);
+    })();
+    </script>
+
+    <script>
+    /* Every figure in the headline tables is read at load from
+       ../data/library-stats.json, the file scripts/library_kpis.py generates.
+       The HTML literals are fallbacks and they match the values in that file at
+       the time this page was written. Classes, not ids, so one value can appear
+       in several places and can never diverge between them. */
+    (function () {
+        function num(n) {
+            return (n == null || isNaN(n)) ? null : Number(n).toLocaleString('en-US');
+        }
+        function setAll(sel, value) {
+            if (value == null || value === '') { return; }
+            var nodes = document.querySelectorAll(sel);
+            for (var i = 0; i < nodes.length; i++) { nodes[i].textContent = value; }
+        }
+        function esc(t) {
+            return String(t).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+        fetch('../data/library-stats.json', { cache: 'no-cache' })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function (s) {
+                var k = s && s.kpis;
+                if (!k || !k.surface || !k.hardening) { return; }
+                var surf = k.surface, hard = k.hardening;
+
+                /* The per-surface blocks publish "ungraded" as a list of names and
+                   the total block publishes it as a count. Read whichever the file
+                   holds, and derive only when it holds neither, so a disagreement
+                   between the file and the arithmetic shows on the page instead of
+                   being smoothed over here. */
+                function row(prefix, d) {
+                    if (!d) { return; }
+                    var un;
+                    if (Object.prototype.toString.call(d.ungraded) === '[object Array]') {
+                        un = d.ungraded.length;
+                    } else if (typeof d.ungraded === 'number') {
+                        un = d.ungraded;
+                    } else {
+                        un = d.total - d.graded;
+                    }
+                    setAll('.kpi-' + prefix + '-total', num(d.total));
+                    setAll('.kpi-' + prefix + '-graded', num(d.graded));
+                    setAll('.kpi-' + prefix + '-ungraded', num(un));
+                }
+                row('fn', surf.functions);
+                row('cl', surf.classes);
+                row('me', surf.methods);
+                row('all', surf.total);
+
+                /* A capability row counts as graded because it carries a grade,
+                   so the graded count is derived from the grades themselves. If
+                   the two ever disagree the page shows the disagreement rather
+                   than a hard-coded zero. */
+                var p = hard.proof || {};
+                var gradedRows = ['BGL-A', 'BGL-B', 'BGL-C', 'BGL-D'].reduce(
+                    function (a, g) { return a + (p[g] || 0); }, 0);
+                var cap = surf.capabilities || {};
+                setAll('.kpi-cap-total', num(cap.rows));
+                setAll('.kpi-cap-graded', num(gradedRows));
+                setAll('.kpi-cap-ungraded', num((cap.rows || 0) - gradedRows));
+                setAll('.kpi-cap-rows', num(cap.rows));
+                setAll('.kpi-cap-objects', num(cap.objects));
+                setAll('.kpi-bgl-a', num(p['BGL-A']));
+                setAll('.kpi-bgl-b', num(p['BGL-B']));
+                setAll('.kpi-bgl-c', num(p['BGL-C']));
+                setAll('.kpi-bgl-d', num(p['BGL-D']));
+
+                /* The wider-surface grading waves. A separate measurement from
+                   the capability census above, with a fifth state the census
+                   never needed, so the two are never summed. */
+                var g = hard.grading || {};
+                if (g.available) {
+                    var by = g.by_grade || {};
+                    setAll('.kpi-grade-items', num(g.items));
+                    setAll('.kpi-grade-audited', num(g.audited));
+                    setAll('.kpi-grade-unaudited', num(g.unaudited));
+                    setAll('.kpi-grade-overturned', num(g.audit_overturned));
+                    /* Two different questions. `audit_overturned` is "is the grade
+                       shown today a second opinion?" and correctly falls when a row
+                       is re-graded. `..._ever` is "how often has this method ever
+                       disagreed with itself?", which is history and can only grow.
+                       Publishing only the first understated it by a factor of three. */
+                    setAll('.kpi-grade-overturned-ever', num(g.audit_overturned_ever));
+                    setAll('.kpi-grade-overturned-superseded', num(g.audit_overturned_superseded));
+                    setAll('.kpi-grade-audited-ever', num(g.audited_ever));
+                }
+
+                /* One row per grading wave, built from hard.waves. Written here
+                   rather than typed into the markup because the per-wave audit
+                   counts are the figures a reader uses to judge the totals, and a
+                   typed table is exactly how the page came to claim 410 of 420
+                   audited for eight days after that stopped being true. If the
+                   key is missing the placeholder row says so rather than leaving
+                   an empty table that reads as "no waves". */
+                (function () {
+                    var body = document.querySelector('.kpi-wave-body');
+                    if (!body) { return; }
+                    var waves = hard.waves;
+                    if (!waves || !waves.length) {
+                        body.innerHTML = '<tr><td colspan="8">Per-wave figures are not in the '
+                            + 'published statistics file, so this table cannot be filled. It is '
+                            + 'not empty because there were no waves.</td></tr>';
+                        return;
+                    }
+                    var rows = '';
+                    for (var i = 0; i < waves.length; i++) {
+                        var w = waves[i];
+                        var states = [];
+                        for (var st in (w.by_grade || {})) {
+                            if (Object.prototype.hasOwnProperty.call(w.by_grade, st)) {
+                                states.push(esc(st) + ' ' + num(w.by_grade[st]));
+                            }
+                        }
+                        /* Three states for the audit column, never two. A wave with
+                           no audited row says so in words, because a bare 0 beside a
+                           0 overturned reads as "nothing wrong was found". */
+                        var aud = w.audited
+                            ? num(w.audited) + ' of ' + num(w.rows)
+                            : '<strong>none</strong>';
+                        var over = w.audited ? num(w.overturned) : 'not checked';
+                        rows += '<tr>'
+                            + '<td>' + esc(w.label)
+                            + '<div class="qa-wave-file">' + esc(w.file) + '</div>'
+                            + '<div class="qa-wave-states">'
+                            + states.join(' &middot; ') + '</div></td>'
+                            + '<td>' + esc(w.measured_on || '') + '</td>'
+                            + '<td>' + num(w.rows) + '</td>'
+                            + '<td>' + num(w.found_fabricating) + '</td>'
+                            + '<td>' + num(w.fixed) + '</td>'
+                            + '<td>' + num(w.sabotaged) + '</td>'
+                            + '<td>' + aud + '</td>'
+                            + '<td>' + over + '</td>'
+                            + '</tr>';
+                    }
+                    body.innerHTML = rows;
+                })();
+
+                if (g.available) {
+                    setAll('.kpi-grade-fabricating', num(g.found_fabricating));
+                    setAll('.kpi-grade-fixed', num(g.fixed));
+                    setAll('.kpi-grade-measured-on', g.measured_on);
+                    var stateClass = {
+                        'PROVEN': 'kpi-grade-proven',
+                        'SEMI-PROVEN': 'kpi-grade-semi',
+                        'NOT A MEASUREMENT': 'kpi-grade-nam',
+                        'DEFECT OPEN': 'kpi-grade-defect',
+                        'UNPROVEN': 'kpi-grade-unproven'
+                    };
+                    for (var key in stateClass) {
+                        if (Object.prototype.hasOwnProperty.call(stateClass, key)) {
+                            setAll('.' + stateClass[key], num(by[key] || 0));
+                        }
+                    }
+                    /* A state this page has no row for would otherwise vanish
+                       from the table, so it is appended with whatever definition
+                       the file carries for it. */
+                    var extra = '';
+                    for (var st in by) {
+                        if (Object.prototype.hasOwnProperty.call(by, st) && !stateClass[st]) {
+                            extra += '<tr><td>' + esc(st) + '</td><td>' + num(by[st])
+                                  + '</td><td>' + esc((g.states || {})[st] || '') + '</td></tr>';
+                        }
+                    }
+                    if (extra) {
+                        var gb = document.querySelector('.kpi-grade-body');
+                        if (gb) {
+                            var totalRow = gb.querySelector('tr.qa-total');
+                            if (totalRow) { totalRow.insertAdjacentHTML('beforebegin', extra); }
+                            else { gb.insertAdjacentHTML('beforeend', extra); }
+                        }
+                    }
+                }
+
+                setAll('.kpi-modules', num(surf.modules_scanned));
+
+                var t = hard.tests || {};
+                setAll('.kpi-tests', num(t.collected));
+
+                var ci = hard.ci || {};
+                setAll('.kpi-cov', num(ci.coverage_pct));
+                setAll('.kpi-cov-asof', ci.as_of);
+                setAll('.kpi-cov-commit', ci.commit);
+                setAll('.kpi-cov-floor', num(ci.ci_floor_pct));
+                setAll('.kpi-cov-diff', num(ci.diff_floor_pct));
+                setAll('.kpi-cov-unstmt', num(ci.uncovered_statements));
+                setAll('.kpi-cov-unbr', num(ci.uncovered_branches));
+                if (ci.source) {
+                    var links = document.querySelectorAll('a.kpi-cov-src');
+                    for (var i = 0; i < links.length; i++) { links[i].href = ci.source; }
+                }
+
+                var d = hard.defects || {};
+                setAll('.kpi-def-found', num(d.found));
+                setAll('.kpi-def-fixed', num(d.fixed));
+                setAll('.kpi-def-open', num(d.open));
+
+                setAll('.kpi-counts-asof', s.kpis.counts_as_of);
+                setAll('.kpi-measured-on', s.kpis.measured_on);
+
+                /* The triage buckets are rendered from the data, so a new bucket
+                   appears here instead of being silently dropped. */
+                var rem = hard.remaining || {};
+                var rows = Object.keys(rem).map(function (key) { return [key, rem[key]]; })
+                    .sort(function (a, b) { return b[1] - a[1]; });
+                var total = rows.reduce(function (a, r) { return a + r[1]; }, 0);
+                setAll('.kpi-triage-total', num(total));
+                var bodies = document.querySelectorAll('.kpi-triage-body');
+                if (rows.length) {
+                    var html = rows.map(function (r) {
+                        return '<tr><td>' + esc(r[0]) + '</td><td>' + num(r[1]) + '</td></tr>';
+                    }).join('')
+                        + '<tr class="qa-total"><td>Total</td><td>' + num(total) + '</td></tr>';
+                    for (var j = 0; j < bodies.length; j++) { bodies[j].innerHTML = html; }
+                }
+
+                /* A module the census could not import is a could-not-check about
+                   the counts themselves, so it is stated rather than dropped. */
+                var fails = surf.import_failures || [];
+                var notes = document.querySelectorAll('.qa-import-failures');
+                var text = fails.length
+                    ? 'The census could not import ' + fails.length + ' module'
+                        + (fails.length === 1 ? '' : 's') + ' ('
+                        + fails.map(function (x) { return x.module; }).join(', ') + '), so '
+                        + (fails.length === 1 ? 'whatever it defines is' : 'whatever they define is')
+                        + ' in neither column above.'
+                    : 'Every module in the package imported during the census.';
+                for (var n = 0; n < notes.length; n++) { notes[n].textContent = text; }
+            })
+            .catch(function () { /* keep the literals written into the HTML */ });
+    })();
+    </script>
+
+    <script>
+    // The beta criteria are read from the same generated file as every other
+    // figure on this page. The literals in the table are build-time fallbacks;
+    // if this block finds the key they are replaced, and if it does not the
+    // fallback stands rather than the row going blank.
+    (function () {
+        fetch('../data/library-stats.json', { cache: 'no-cache' })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                var g = d && d.kpis && d.kpis.release_gate;
+                if (!g || !g.beta_criteria) { return; }
+                g.beta_criteria.forEach(function (c) {
+                    var cell = document.getElementById('plan-' + c.id.toLowerCase());
+                    if (cell) { cell.textContent = c.measured; }
+                    if (cell && cell.nextElementSibling) {
+                        cell.nextElementSibling.textContent = c.passes ? 'Pass' : 'Fail';
+                    }
+                });
+                var v = document.getElementById('plan-verdict');
+                if (v && g.beta_verdict) { v.textContent = g.beta_verdict; }
+
+                /* Both verdicts and the count of failing criteria are quoted in
+                   the prose as well as in the table, including inside collapsed
+                   blocks. They are filled by class so a sentence can never
+                   disagree with the table beside it, and so a gate that turns
+                   green cannot leave a stale NOT READY behind where nobody
+                   looks. Before this change the verdict was fetched here and
+                   rendered nowhere: no element on the page carried the id the
+                   lookup above asks for. */
+                // Percent widths for the board's bars. Clamped, because a bar wider
+                // than its track reads as a number over 100 and a negative one
+                // silently vanishes; both would be a figure the page cannot mean.
+                function setWidth(sel, pct) {
+                    if (!isFinite(pct)) { return; }
+                    var w = Math.max(0, Math.min(100, pct));
+                    document.querySelectorAll(sel).forEach(function (el) {
+                        el.style.width = w.toFixed(1) + '%';
+                    });
+                }
+                function esc(v) {
+                    return String(v == null ? '' : v)
+                        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                }
+                function fill(sel, value) {
+                    if (value == null || value === '') { return; }
+                    var nodes = document.querySelectorAll(sel);
+                    for (var i = 0; i < nodes.length; i++) { nodes[i].textContent = value; }
+                }
+                function failing(list) {
+                    return (list || []).filter(function (c) { return !c.passes; }).length;
+                }
+                /* EVERY kpi-* value on this page is filled from the generated file, not
+                   typed into the markup. The literals in the HTML are build-time fallbacks
+                   for the case where this fetch fails, and tests/test_kpi_spans_are_live.py
+                   fails the build if a span is added that nothing here fills. A number
+                   wearing a kpi- class and set by hand is the defect this page is about,
+                   committed by the page itself. */
+                var h = (d.kpis && d.kpis.hardening) || {};
+                var sf = (d.kpis && d.kpis.surface) || {};
+                var gr = h.grading || {};
+                var ci = h.ci || {};
+                var led = (d.kpis && d.kpis.ledger) || {};
+                var num = function (v) {
+                    return (v === null || v === undefined) ? null : v.toLocaleString('en-US');
+                };
+                /* A state the data does not list is a state nothing is in, which is a
+                   measured ZERO and not a blank. Distinguished from "the block is
+                   missing entirely", which stays null so the fallback shows instead of
+                   this page inventing a zero it did not measure. */
+                var count = function (obj, key) {
+                    if (!obj) { return null; }
+                    return num(Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : 0);
+                };
+                var minus = function (a, b) {
+                    return (a === null || a === undefined || b === null || b === undefined)
+                        ? null : num(a - b);
+                };
+
+                fill('.kpi-all-total', num(sf.total && sf.total.total));
+                fill('.kpi-all-graded', num(sf.total && sf.total.graded));
+                fill('.kpi-all-ungraded', num(sf.total && sf.total.ungraded));
+                fill('.kpi-fn-graded', num(sf.functions && sf.functions.graded));
+                fill('.kpi-fn-ungraded', sf.functions && minus(sf.functions.total, sf.functions.graded));
+                fill('.kpi-cl-graded', num(sf.classes && sf.classes.graded));
+                fill('.kpi-cl-ungraded', sf.classes && minus(sf.classes.total, sf.classes.graded));
+                fill('.kpi-me-graded', num(sf.methods && sf.methods.graded));
+                fill('.kpi-me-ungraded', sf.methods && minus(sf.methods.total, sf.methods.graded));
+                fill('.kpi-cap-rows', num(sf.capabilities && sf.capabilities.rows));
+                fill('.kpi-cap-objects', num(sf.capabilities && sf.capabilities.objects));
+                fill('.kpi-modules', num(sf.modules_scanned));
+
+                fill('.kpi-tests', num(h.tests && h.tests.collected));
+                fill('.kpi-cov', num(ci.coverage_pct));
+                fill('.kpi-cov-floor', num(ci.ci_floor_pct));
+                fill('.kpi-cov-diff', num(ci.diff_floor_pct));
+                fill('.kpi-cov-asof', ci.as_of);
+
+                fill('.kpi-bgl-a', num(h.proof && h.proof['BGL-A']));
+                fill('.kpi-bgl-b', num(h.proof && h.proof['BGL-B']));
+                fill('.kpi-def-found', num(h.defects && h.defects.found));
+                fill('.kpi-def-fixed', num(h.defects && h.defects.fixed));
+                fill('.kpi-def-open', num(h.defects && h.defects.open));
+
+                fill('.kpi-grade-items', num(gr.items));
+                fill('.kpi-grade-defect', count(gr.by_grade, 'DEFECT OPEN'));
+                fill('.kpi-grade-audited', num(gr.audited));
+                fill('.kpi-grade-unaudited', num(gr.unaudited));
+                fill('.kpi-grade-overturned', num(gr.audit_overturned));
+                fill('.kpi-grade-overturned-ever', num(gr.audit_overturned_ever));
+                fill('.kpi-grade-overturned-superseded', num(gr.audit_overturned_superseded));
+                fill('.kpi-grade-audited-ever', num(gr.audited_ever));
+                fill('.kpi-grade-fabricating', num(gr.found_fabricating));
+                fill('.kpi-grade-fixed', num(gr.fixed));
+                fill('.kpi-grade-measured-on', gr.measured_on);
+
+                fill('.kpi-core-to-close', num(led.core_to_close));
+                fill('.kpi-preview-total', num(led.preview_total));
+                fill('.kpi-preview-checked', num(led.preview_checked));
+                fill('.kpi-preview-fix', num(led.preview_fix_pending));
+                fill('.kpi-preview-unchecked', num(led.preview_not_checked));
+                fill('.kpi-core-total', num(led.core_total));
+                fill('.kpi-core-checked', num(led.core_checked));
+                fill('.kpi-core-fix', num(led.core_fix_pending));
+                fill('.kpi-core-unchecked', num(led.core_not_checked));
+                fill('.kpi-ledger-checked', num(led.checked));
+                fill('.kpi-ledger-fix-pending', num(led.fix_pending));
+                fill('.kpi-ledger-not-checked', num(led.not_checked));
+                fill('.kpi-ledger-total', num(led.total));
+                /* The assessment path, the narrow claim inside the core claim. It was
+                   three typed digits and one of them was a "none carries an open defect"
+                   that the ledger had been contradicting with 13 for some time. */
+                fill('.kpi-path-total', num(led.path_total));
+                fill('.kpi-path-checked', num(led.path_checked));
+                fill('.kpi-path-fix', num(led.path_fix_pending));
+                fill('.kpi-path-unchecked', num(led.path_not_checked));
+                /* The attribution verifier's dated snapshot. Not live: that run takes
+                   forty minutes, so the date is published beside the numbers. */
+                var at = (d.kpis && d.kpis.attribution) || {};
+                if (at.available) {
+                    fill('.kpi-attr-date', at.measured_on);
+                    fill('.kpi-attr-rows', num(at.rows));
+                    fill('.kpi-attr-files', num(at.test_files));
+                    fill('.kpi-attr-confirmed', num(at.confirmed));
+                    fill('.kpi-attr-blind', num(at.blind));
+                    fill('.kpi-attr-findings', num(at.findings));
+                }
+                /* The share column of the second scope table. The whole table was typed:
+                   eight cells that happened to be right on the day, with nothing keeping
+                   them right, one screen below a table that IS checked. */
+                function pct(part) {
+                    return led.total ? (Math.round((1000 * part) / led.total) / 10).toFixed(1) : null;
+                }
+                fill('.kpi-share-checked', pct(led.checked));
+                fill('.kpi-share-fix', pct(led.fix_pending));
+                fill('.kpi-share-unchecked', pct(led.not_checked));
+
+                // The status board. Its figures come from here so it is right
+                // whenever the page is opened, not right on the day it was written.
+                var sr = (d.kpis && d.kpis.second_round) || {};
+                if (sr.available) {
+                    fill('.kpi-second-closed', num(sr.closed));
+                    fill('.kpi-second-recorded', num(sr.recorded));
+                    fill('.kpi-second-open', num(sr.open));
+                    if (sr.recorded) {
+                        setWidth('.qa-bar__fill--second', (100 * sr.closed) / sr.recorded);
+                    }
+                }
+                if (gr.items) {
+                    setWidth('.qa-bar__fill--audited', (100 * gr.audited_ever) / gr.items);
+                }
+                var bv = document.querySelector('.qa-board__big');
+                if (bv && g.beta_verdict === 'BETA READY') { bv.classList.add('is-ready'); }
+
+                // REBUILD THE BAR FROM THE DATA, so a criterion that changes state or
+                // is added to the gate is right on the board without anyone editing
+                // this page. Each block explains itself on hover and on focus.
+                var bar = document.querySelector('.qa-segbar');
+                var crit = (g && g.beta_criteria) || [];
+                if (bar && crit.length) {
+                    var ordered = crit.slice().sort(function (a, b) {
+                        if (a.passes !== b.passes) { return a.passes ? 1 : -1; }
+                        return String(a.id).localeCompare(String(b.id));
+                    });
+                    var blocked = ordered.filter(function (c) { return !c.passes; }).length;
+                    bar.setAttribute(
+                        'aria-label',
+                        blocked + ' of ' + ordered.length + ' beta criteria block the release.'
+                    );
+                    bar.innerHTML = ordered.map(function (c) {
+                        var state = c.passes ? 'passes' : 'BLOCKS the beta';
+                        return '<span class="qa-seg' + (c.passes ? '' : ' qa-seg--blocked') +
+                            '" tabindex="0" role="button" aria-label="' +
+                            esc(c.id + ': ' + c.name + '. ' + state + '. ' + (c.measured || '')) +
+                            '"><span class="qa-seg__tip"><b>' + esc(c.id) + ' &mdash; ' + state +
+                            '</b><span>' + esc(c.name) + '</span><span class="qa-seg__why">' +
+                            esc(c.plain || '') + '</span><span class="qa-seg__now">Measured now: ' +
+                            esc(c.measured || '') + '</span></span></span>';
+                    }).join('');
+                }
+
+                // THE SAME FACTS, FURTHER DOWN THE PAGE. This table was typed, and it
+                // listed five criteria when the gate had seven and reported B2 as a
+                // FAIL with 64 open long after B2 reached zero and started passing. It
+                // is generated now, and rebuilt here from the same reading, because two
+                // hand-kept copies of one fact is the drift mechanism itself.
+                var planBody = document.querySelector('.kpi-plan-body');
+                if (planBody && crit.length) {
+                    planBody.innerHTML = crit.map(function (c) {
+                        return '<tr><td><code>' + esc(c.id) + '</code> ' + esc(c.name) +
+                            '</td><td id="plan-' + esc(String(c.id).toLowerCase()) + '">' +
+                            esc(c.measured || '') + '</td><td class="' +
+                            (c.passes ? 'qa-state--pass' : 'qa-state--fail') + '">' +
+                            (c.passes ? 'Pass' : 'Blocks') + '</td></tr>';
+                    }).join('');
+                }
+
+                fill('.kpi-fn-total', num(sf.functions && sf.functions.total));
+                fill('.kpi-cl-total', num(sf.classes && sf.classes.total));
+                fill('.kpi-me-total', num(sf.methods && sf.methods.total));
+                fill('.kpi-cap-total', num(sf.capabilities && sf.capabilities.rows));
+                fill('.kpi-cap-graded', num(sf.capabilities && sf.capabilities.rows));
+                fill('.kpi-cap-ungraded', '0');
+                fill('.kpi-bgl-c', num(h.proof && h.proof['BGL-C']));
+                fill('.kpi-bgl-d', num(h.proof && h.proof['BGL-D']));
+                fill('.kpi-grade-proven', count(gr.by_grade, 'PROVEN'));
+                fill('.kpi-grade-semi', count(gr.by_grade, 'SEMI-PROVEN'));
+                fill('.kpi-grade-nam', count(gr.by_grade, 'NOT A MEASUREMENT'));
+                fill('.kpi-grade-unproven', count(gr.by_grade, 'UNPROVEN'));
+                /* The suite's composition. These four were typed as raw digits and every
+                   one of them had rotted: the page said 139 of 383 files and 1,679 of
+                   6,735 test definitions while the generator was measuring 246 of 508 and
+                   2,422 of 8,782, and published them in this same file the whole time. */
+                var tc = h.test_composition || {};
+                fill('.kpi-refusal-files', num(tc.refusal_named_files));
+                fill('.kpi-test-files', num(tc.test_files));
+                fill('.kpi-refusal-tests', num(tc.refusal_named_tests));
+                fill('.kpi-test-fns', num(tc.test_function_definitions));
+                fill('.kpi-cov-unstmt', num(ci.uncovered_statements));
+                fill('.kpi-triage-total', num(Object.keys(h.remaining || {})
+                    .reduce(function (a, k) { return a + h.remaining[k]; }, 0)));
+                fill('.kpi-cov-unbr', num(ci.uncovered_branches));
+                fill('.kpi-cov-commit', ci.commit);
+                var srcs = document.querySelectorAll('a.kpi-cov-src');
+                for (var si = 0; si < srcs.length; si++) {
+                    if (ci.source) { srcs[si].setAttribute('href', ci.source); }
+                }
+
+                /* The triage table has no per-cell classes, so its ROWS are rendered from
+                   the generated counts rather than typed. Sorted high to low, with a total
+                   the reader can add up for themselves. */
+                var tri = h.remaining || {};
+                var tbody = document.querySelector('.kpi-triage-body');
+                if (tbody && Object.keys(tri).length) {
+                    var rows = Object.keys(tri).map(function (k) { return [k, tri[k]]; });
+                    rows.sort(function (a, b) { return b[1] - a[1]; });
+                    var total = 0, html = '';
+                    for (var ri = 0; ri < rows.length; ri++) {
+                        total += rows[ri][1];
+                        html += '<tr><td>' + rows[ri][0] + '</td><td>' + num(rows[ri][1]) + '</td></tr>';
+                    }
+                    html += '<tr class="qa-total"><td>Total</td><td>' + num(total) + '</td></tr>';
+                    tbody.innerHTML = html;
+                }
+
+                fill('.kpi-measured-on', d.kpis && d.kpis.measured_on);
+                fill('.kpi-counts-asof', d.kpis && d.kpis.counts_as_of);
+
+                fill('.kpi-gate-date', g.measured_on);
+                fill('.kpi-beta-verdict', g.beta_verdict);
+                fill('.kpi-beta-fails', String(failing(g.beta_criteria)));
+                fill('.kpi-beta-count', String((g.beta_criteria || []).length));
+                if (g.criteria) {
+                    fill('.kpi-full-verdict', g.verdict);
+                    fill('.kpi-full-fails', String(failing(g.criteria)));
+                    fill('.kpi-full-count', String(g.criteria.length));
+                }
+            })
+            .catch(function () { /* fallbacks stand */ });
+    })();
+    </script>
+</body>
+</html>

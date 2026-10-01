@@ -1,0 +1,290 @@
+{# ── ExperimentAnalysis · Decision Recommendation SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set decision_h = 90 %}
+{% set reasoning_header_h = 30 %}
+{% set reasoning_row_h = 20 %}
+{% set reasoning_h = reasoning_header_h + reasoning|length * reasoning_row_h + 16 %}
+{% set tradeoffs_header_h = 30 %}
+{% set tradeoff_row_h = 28 %}
+{% set tradeoffs_h = (tradeoffs_header_h + tradeoffs|length * tradeoff_row_h + 16) if tradeoffs else 0 %}
+{% set caveats_header_h = 30 %}
+{% set caveat_row_h = 20 %}
+{% set caveats_h = (caveats_header_h + caveats|length * caveat_row_h + 16) if caveats else 0 %}
+{% set experiment_summary_h = 80 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}
+{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 40 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{% set decision_y = header_h %}
+{% set reasoning_y = decision_y + decision_h + 16 %}
+{% set tradeoffs_y = reasoning_y + reasoning_h + 16 %}
+{% set caveats_y = tradeoffs_y + (tradeoffs_h + 16 if tradeoffs else 0) %}
+{% set summary_y = caveats_y + (caveats_h + 16 if caveats else 0) %}
+{% set exp_y = summary_y + experiment_summary_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# Rule (c): the ungraded count belongs BESIDE THE HEADLINE, not at the foot.
+   This canvas stated it once only, appended to the arm-totals line at
+   `summary_y + 74`, which is y=382 on the emptiest possible canvas and y=402
+   through the adapter with a single reasoning line. Nothing lifts it into the
+   band: it hangs off the last panel, so every row added anywhere above pushes
+   it further down.
+
+   Meanwhile the subtitle above asserts "N intersections" flatly, because the
+   adapter builds that string from the SUPPLIED row count and never mentions how
+   many of them were graded for power. So a reader who took the headline and
+   stopped, which is the reader this rule exists for, met "9 intersections" and a
+   DEPLOY_TREATMENT decision, while the fact that 2 of those 9 were never graded
+   for power sat 280px below the claim.
+
+   Placed here rather than folded into the subtitle string because the subtitle
+   is assembled in adapters_experimentation.py: a badge driven by the template
+   key fires for any caller that sets it, including one supplying its own
+   subtitle. Absent when nothing is ungraded, so a fully graded canvas is
+   byte-identical to before. Mirrors the badge in calibration_disparity.svg. #}
+{% if n_power_ungraded|default(0) > 0 %}
+<rect x="404" y="102" width="276" height="24" rx="12" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+<text x="420" y="118" font-size="9.5" font-weight="700" fill="#64748b">COULD NOT CHECK: {{ n_power_ungraded }} intersection{{ 's' if n_power_ungraded != 1 }} not graded for power</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Decision panel                                                     #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ decision_y }}" width="644" height="{{ decision_h }}" rx="10" fill="#ffffff"/>
+
+{# Decision-dependent accent bar #}
+{# CRITICAL: three states, never two. Until 2026-08-27 an absent decision was
+   defaulted to INVESTIGATE_FURTHER by the adapter, so experiment_recommendation_to_svg({})
+   rendered a red accent bar, a red INVESTIGATE FURTHER badge, "CONFIDENCE 0%"
+   and the sentence "Investigate further, heterogeneous effects or anomalies
+   detected" over a metrics panel that simultaneously said COULD NOT CHECK. One
+   canvas, two contradictory states, and the confident one was the headline. A
+   decision that was never made is neither a recommendation nor a rejection. #}
+{# The fall-through used to be the RED bar, so any string this library does not
+   grade was painted as INVESTIGATE FURTHER, the most alarming decision on the
+   canvas. INVESTIGATE_FURTHER now has its own branch and the fall-through is
+   the neutral slate one: a decision nobody in this library made is neither a
+   recommendation nor a rejection, and rendering.explain._fr_experiment_recommendation
+   already refuses to read an unrecognised string out (its _RECOMMENDATION_SEVERITY
+   is the same closed four-value vocabulary as RecommendationDecision). While the
+   template still fell through to red, the CANVAS outranked that honest <desc>. #}
+{% if not decision_known %}
+<rect x="36" y="{{ decision_y }}" width="644" height="2" fill="#64748b"/>
+{% elif decision == 'DEPLOY_TREATMENT' %}
+<rect x="36" y="{{ decision_y }}" width="644" height="2" fill="#059669"/>
+{% elif decision == 'KEEP_CONTROL' %}
+<rect x="36" y="{{ decision_y }}" width="644" height="2" fill="#3b82f6"/>
+{% elif decision == 'EXTEND_EXPERIMENT' %}
+<rect x="36" y="{{ decision_y }}" width="644" height="2" fill="#f59e0b"/>
+{% elif decision == 'INVESTIGATE_FURTHER' %}
+<rect x="36" y="{{ decision_y }}" width="644" height="2" fill="#dc2626"/>
+{% else %}
+<rect x="36" y="{{ decision_y }}" width="644" height="2" fill="#64748b"/>
+{% endif %}
+
+<text x="56" y="{{ decision_y + 24 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">RECOMMENDATION</text>
+
+{# Decision badge #}
+{% if not decision_known %}
+<rect x="56" y="{{ decision_y + 32 }}" width="240" height="28" rx="14" fill="#f1f5f9"/>
+<text x="176" y="{{ decision_y + 50 }}" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b">NO RECOMMENDATION MADE</text>
+{% elif decision == 'DEPLOY_TREATMENT' %}
+<rect x="56" y="{{ decision_y + 32 }}" width="200" height="28" rx="14" fill="#ecfdf5"/>
+<text x="156" y="{{ decision_y + 50 }}" text-anchor="middle" font-size="12" font-weight="700" fill="#059669">DEPLOY TREATMENT</text>
+{% elif decision == 'KEEP_CONTROL' %}
+<rect x="56" y="{{ decision_y + 32 }}" width="160" height="28" rx="14" fill="#eff6ff"/>
+<text x="136" y="{{ decision_y + 50 }}" text-anchor="middle" font-size="12" font-weight="700" fill="#3b82f6">KEEP CONTROL</text>
+{% elif decision == 'EXTEND_EXPERIMENT' %}
+<rect x="56" y="{{ decision_y + 32 }}" width="200" height="28" rx="14" fill="#fef3c7"/>
+<text x="156" y="{{ decision_y + 50 }}" text-anchor="middle" font-size="12" font-weight="700" fill="#f59e0b">EXTEND EXPERIMENT</text>
+{% elif decision == 'INVESTIGATE_FURTHER' %}
+<rect x="56" y="{{ decision_y + 32 }}" width="210" height="28" rx="14" fill="#fef2f2"/>
+<text x="161" y="{{ decision_y + 50 }}" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">INVESTIGATE FURTHER</text>
+{% else %}
+{# THE THIRD STATE, and the reason it is not simply "NO RECOMMENDATION MADE":
+   something WAS supplied here, it is just not a decision this library grades,
+   so the badge says which of the two happened. Slate, never red: a fabricated
+   INVESTIGATE FURTHER sends a reader after a problem that was never found, and
+   discredits the tool when they work out why. #}
+<rect x="56" y="{{ decision_y + 32 }}" width="220" height="28" rx="14" fill="#f1f5f9"/>
+<text x="166" y="{{ decision_y + 50 }}" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b">DECISION NOT RECOGNISED</text>
+{# What was supplied, named rather than silently swallowed. Truncated to 13
+   characters and set at font-size 9 from x=286, so the run ends near x=390 and
+   cannot reach the CONFIDENCE readout at x=420: this line is a single
+   unwrapped <text>, and one that overlaps the number beside it is how a caveat
+   stops being read. Measured by rasterising, not by eye on the markup. #}
+<text x="286" y="{{ decision_y + 50 }}" font-size="9" fill="#94a3b8">supplied: {{ decision|truncate_text(13) }}</text>
+{% endif %}
+
+{# Confidence gauge #}
+{# A confidence of 0 is a real report (no confidence at all) and still prints as
+   0%. An ABSENT confidence prints nothing: "0%" beside a red bar is a measured
+   verdict about how sure the analysis is, and it was drawn from a missing key. #}
+<text x="420" y="{{ decision_y + 24 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">CONFIDENCE</text>
+{% if confidence_known %}
+<text x="420" y="{{ decision_y + 54 }}" font-size="26" font-weight="700" fill="#0f172a">{{ confidence_display }}%</text>
+
+{# Confidence bar #}
+{% set conf_bar_w = (confidence * 160)|int %}
+{% if conf_bar_w < 4 %}{% set conf_bar_w = 4 %}{% endif %}
+<rect x="500" y="{{ decision_y + 38 }}" width="160" height="14" rx="7" fill="#f1f5f9"/>
+<rect x="500" y="{{ decision_y + 38 }}" width="{{ conf_bar_w }}" height="14" rx="7" fill="{% if confidence >= 0.8 %}#059669{% elif confidence >= 0.5 %}#f59e0b{% else %}#dc2626{% endif %}"/>
+{% else %}
+<text x="420" y="{{ decision_y + 52 }}" font-size="12" font-weight="700" fill="#64748b">not reported</text>
+<rect x="500" y="{{ decision_y + 38 }}" width="160" height="14" rx="7" fill="#f1f5f9"/>
+{% endif %}
+
+<text x="56" y="{{ decision_y + 80 }}" font-size="9" fill="#6b7280">{{ summary_text|truncate_text(95) }}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Reasoning                                                          #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ reasoning_y }}" width="644" height="{{ reasoning_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ reasoning_y + 22 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">REASONING</text>
+
+{% for reason in reasoning %}
+{% set ry = reasoning_y + reasoning_header_h + loop.index0 * reasoning_row_h %}
+<circle cx="62" cy="{{ ry + 8 }}" r="2.5" fill="#3b82f6"/>
+<text x="74" y="{{ ry + 12 }}" font-size="9.5" fill="#475569">{{ reason|truncate_text(85) }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Trade-offs table                                                   #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if tradeoffs %}
+<rect x="36" y="{{ tradeoffs_y }}" width="644" height="{{ tradeoffs_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ tradeoffs_y + 22 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">TRADE-OFFS</text>
+
+{% for to in tradeoffs %}
+{% set ty = tradeoffs_y + tradeoffs_header_h + loop.index0 * tradeoff_row_h %}
+<text x="56" y="{{ ty + 18 }}" font-size="10" font-weight="600" fill="#0f172a">{{ to.name|truncate_text(20) }}</text>
+{# CRITICAL, per row: the literal word None is not a trade-off. The adapter
+   normalises every trade-off value with `str(v)`, so a row supplied as
+   {"latency": None} arrived here as the four-character string "None" and was
+   printed on the canvas in the value column, under the heading TRADE-OFFS,
+   beside a named cost. A reader takes that for a recorded finding; a screen
+   reader reads it out; an export carries it. Both spellings are caught, the
+   real None and the stringified one, because the adapter can hand over either.
+   A row that named a trade-off and reported nothing about it says so, in the
+   slate this design system uses for "not measured", never in the value colour. #}
+{% set _to_value = to.value %}
+{% if _to_value is none or _to_value|string|trim in ('', 'None') %}
+<text x="220" y="{{ ty + 18 }}" font-size="9" font-style="italic" fill="#94a3b8">not reported</text>
+{% else %}
+<text x="220" y="{{ ty + 18 }}" font-size="9.5" fill="#6b7280">{{ _to_value|truncate_text(60) }}</text>
+{% endif %}
+{% if not loop.last %}
+<line x1="56" y1="{{ ty + tradeoff_row_h }}" x2="660" y2="{{ ty + tradeoff_row_h }}" stroke="#f1f5f9" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Caveats                                                            #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if caveats %}
+<rect x="36" y="{{ caveats_y }}" width="644" height="{{ caveats_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ caveats_y }}" width="2.5" height="{{ caveats_h }}" rx="1" fill="#f59e0b"/>
+<text x="56" y="{{ caveats_y + 22 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">CAVEATS</text>
+
+{% for caveat in caveats %}
+{% set cy = caveats_y + caveats_header_h + loop.index0 * caveat_row_h %}
+<text x="62" y="{{ cy + 10 }}" font-size="9" fill="#f59e0b" font-weight="700">!</text>
+<text x="74" y="{{ cy + 10 }}" font-size="9.5" fill="#475569">{{ caveat|truncate_text(85) }}</text>
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Experiment summary                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ summary_y }}" width="644" height="{{ experiment_summary_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ summary_y + 20 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">EXPERIMENT METRICS</text>
+
+{# Three states, never two. This panel used to print "+0.0000", "1.0000" and a
+   green "No" whenever no experiment result was passed alongside the
+   recommendation, i.e. it manufactured a decisive statistical picture for a
+   report that carried none. Absent stays absent. #}
+{% if not experiment_metrics_known %}
+<rect x="56" y="{{ summary_y + 32 }}" width="140" height="18" rx="9" fill="#f1f5f9"/>
+<text x="126" y="{{ summary_y + 45 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#64748b">{{ could_not_check_text|default('COULD NOT CHECK', true) }}</text>
+<text x="56" y="{{ summary_y + 66 }}" font-size="9" fill="#6b7280">No experiment result was supplied with this recommendation, so no effect, p-value,</text>
+<text x="56" y="{{ summary_y + 78 }}" font-size="9" fill="#6b7280">heterogeneity verdict or power count was computed.</text>
+{% else %}
+<text x="56" y="{{ summary_y + 44 }}" font-size="9" fill="#6b7280">Overall effect</text>
+<text x="56" y="{{ summary_y + 60 }}" font-size="{{ 12 if overall_effect_known else 9 }}" font-weight="700" fill="{{ '#0f172a' if overall_effect_known else '#94a3b8' }}">{{ overall_effect }}</text>
+
+<text x="200" y="{{ summary_y + 44 }}" font-size="9" fill="#6b7280">p-value</text>
+<text x="200" y="{{ summary_y + 60 }}" font-size="{{ 12 if overall_p_known else 9 }}" font-weight="700" fill="{{ '#dc2626' if (overall_p_known and overall_p < 0.05) else ('#475569' if overall_p_known else '#94a3b8') }}">{{ overall_p_display }}</text>
+
+<text x="320" y="{{ summary_y + 44 }}" font-size="9" fill="#6b7280">Heterogeneity</text>
+{% if heterogeneity_known %}
+<text x="320" y="{{ summary_y + 60 }}" font-size="12" font-weight="700" fill="{{ '#f59e0b' if heterogeneity_detected else '#059669' }}">{{ 'Yes' if heterogeneity_detected else 'No' }}</text>
+{% else %}
+<text x="320" y="{{ summary_y + 60 }}" font-size="9" font-weight="700" fill="#64748b">not tested</text>
+{% endif %}
+
+<text x="440" y="{{ summary_y + 44 }}" font-size="9" fill="#6b7280">Powered</text>
+{# The denominator is the GRADED population, not the supplied row count.
+   "1/2 powered" over a row that carried no power verdict at all asserts that
+   second subgroup was sized and found short, which nobody measured. With
+   nothing graded there is no fraction to print: "0/0" is not a power result,
+   it is two absences formatted as one. #}
+{% if n_power_denom|default(0) > 0 %}
+<text x="440" y="{{ summary_y + 60 }}" font-size="12" font-weight="700" fill="#0f172a">{{ n_powered }}/{{ n_power_denom }}</text>
+{% else %}
+<text x="440" y="{{ summary_y + 60 }}" font-size="9" font-weight="700" fill="#64748b">not graded</text>
+{% endif %}
+
+<text x="560" y="{{ summary_y + 44 }}" font-size="9" fill="#6b7280">Design</text>
+{# A design nobody reported is not "Independent". The adapter defaulted the
+   string, so an experiment that named no design was rendered as one that named
+   the most common one. #}
+{% if design_known|default(true) %}
+<text x="560" y="{{ summary_y + 60 }}" font-size="12" font-weight="700" fill="#0f172a">{{ design_type }}</text>
+{% else %}
+<text x="560" y="{{ summary_y + 60 }}" font-size="9" font-weight="700" fill="#64748b">not reported</text>
+{% endif %}
+
+{# The arm totals: a row that reported neither arm did not report a sample
+   size of 0, and two arms nobody counted are not two empty arms. A SUPPLIED
+   zero still renders as 0, because that arm really was empty. #}
+<text x="56" y="{{ summary_y + 74 }}" font-size="8.5" fill="#94a3b8">{% if n_control_known|default(true) %}{{ n_control }} control{% else %}control samples not reported{% endif %} · {% if n_treatment_known|default(true) %}{{ n_treatment }} treatment samples{% else %}treatment samples not reported{% endif %}{% if n_power_ungraded|default(0) > 0 %} · {{ n_power_ungraded }} intersection{{ 's' if n_power_ungraded != 1 }} not graded for power{% endif %}</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                  #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

@@ -1,0 +1,251 @@
+{# ── Auto-Discovery Scanner SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set cand_row_h = 40 %}
+{% set cand_h = 34 + candidates|length * cand_row_h + 10 %}
+{% set viol_header_h = 34 %}
+{% set viol_row_h = 32 %}
+{% set viol_h = viol_header_h + violations|length * viol_row_h + 10 %}
+{% set grp_row_h = 40 %}
+{% set grp_h = 34 + groups|length * grp_row_h + 10 %}
+{# A panel for a part of the scan that never RAN needs room for the sentence   #}
+{# that says so. A panel that ran and came back empty is a real result and is  #}
+{# left exactly as it rendered before: see the third-state note at each panel. #}
+{% if not candidates and cand_state == 'not_scanned' %}{% set cand_h = 34 + 34 %}{% endif %}
+{% if not violations and viol_state == 'not_scanned' %}{% set viol_h = viol_header_h + 34 %}{% endif %}
+{% if not groups and group_state == 'not_scanned' %}{% set grp_h = 34 + 34 %}{% endif %}
+{% set rec_h = 34 + recommendations|length * 18 + 10 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}
+{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 40 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{% set cand_y = header_h %}
+{% set viol_y = cand_y + cand_h + 16 %}
+{% set grp_y = viol_y + viol_h + 16 %}
+{% set rec_y = grp_y + grp_h + 16 %}
+{% set exp_y = rec_y + rec_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── EXAMPLE band ── #}
+{# The demo fixture is reachable only through example=True, and when it is used #}
+{# the canvas has to say so where a reader looks, not only in the <desc>. An    #}
+{# unlabelled demo is indistinguishable from a scan of real data once the file  #}
+{# is exported. DO NOT REMOVE: the band and the watermark are the only things   #}
+{# separating a sample from an audit artifact. #}
+{% if is_example %}
+<rect x="0" y="54" width="680" height="20" fill="#fef3c7"/>
+<text x="340" y="68" text-anchor="middle" font-size="9.5" font-weight="700" fill="#92400e" letter-spacing="0.8">EXAMPLE ONLY: SYNTHETIC DEMONSTRATION DATA, NOT A REAL EVALUATION</text>
+{% endif %}
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ── Summary badge ── #}
+<rect x="520" y="68" width="160" height="56" rx="10" fill="#ffffff"/>
+{# Three states, never two. A green zero cannot be the answer both to "the scan
+   found no violation" and to "no scan was run", so could_not_check gets its own
+   slate band and never shows a count that would read as a finding. #}
+{% if scan_state == 'could_not_check' %}
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="#64748b"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">VIOLATIONS</text>
+<text x="536" y="106" font-size="13" font-weight="700" fill="#64748b">NOT SCANNED</text>
+<text x="536" y="120" font-size="9" fill="#94a3b8">no violation scan to report</text>
+{% elif n_high > 0 %}
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="#dc2626"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">VIOLATIONS</text>
+<text x="536" y="108" font-size="20" font-weight="700" fill="#dc2626">{{ n_violations }}</text>
+<text x="536" y="120" font-size="9" fill="#94a3b8">{{ n_high }} high severity{% if n_ungraded|default(0) > 0 %}, {{ n_ungraded }} not graded{% endif %}</text>
+{% elif n_ungraded|default(0) > 0 %}
+{# The third state PER ROW. "0 high severity" in emerald is a clean bill of
+   health about severity, and it cannot be issued over rows that reported no
+   severity at all: none of them is high, but none of them was graded either.
+   Slate, and the sub-line names how many were never placed. #}
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="#64748b"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">VIOLATIONS</text>
+<text x="536" y="108" font-size="20" font-weight="700" fill="#64748b">{{ n_violations }}</text>
+<text x="536" y="120" font-size="9" fill="#94a3b8">{{ n_ungraded }} not graded</text>
+{% else %}
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="#059669"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">VIOLATIONS</text>
+<text x="536" y="108" font-size="20" font-weight="700" fill="#059669">{{ n_violations }}</text>
+<text x="536" y="120" font-size="9" fill="#94a3b8">{{ n_high }} high severity</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Discovered Attributes                                            #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ cand_y }}" width="644" height="{{ cand_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ cand_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">ATTRIBUTE</text>
+<text x="225" y="{{ cand_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">CONFIDENCE</text>
+<text x="300" y="{{ cand_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">CATEGORY</text>
+<line x1="56" y1="{{ cand_y + 30 }}" x2="660" y2="{{ cand_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for c in candidates %}
+{% set ry = cand_y + 34 + loop.index0 * cand_row_h %}
+<text x="56" y="{{ ry + 16 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ c.name }}</text>
+<rect x="56" y="{{ ry + 22 }}" width="160" height="10" rx="3" fill="#f1f5f9"/>
+{# No bar and no number for a candidate that reported no confidence. The bar
+   used to default to 0 and then `max(4, ...)` drew a 4px stub in a confident
+   hue, so "nothing was reported" and "the scanner is 2% confident" looked the
+   same. The empty track stays, so the row still lines up with its neighbours. #}
+{% if c.confidence_reported %}
+<rect x="56" y="{{ ry + 22 }}" width="{{ c.bar_w }}" height="10" rx="3" fill="{{ c.color }}" opacity="0.7"/>
+<text x="225" y="{{ ry + 16 }}" font-size="10" font-weight="600" fill="{{ c.color }}">{{ c.confidence_display }}</text>
+{% else %}
+<text x="225" y="{{ ry + 16 }}" font-size="8.5" font-style="italic" fill="#64748b">{{ c.confidence_display }}</text>
+{% endif %}
+<rect x="280" y="{{ ry + 6 }}" width="80" height="20" rx="10" fill="#f1f5f9"/>
+<text x="320" y="{{ ry + 20 }}" text-anchor="middle" font-size="8" font-weight="500" fill="#64748b">{{ c.category }}</text>
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + cand_row_h }}" x2="660" y2="{{ ry + cand_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# An empty panel is silent, and silence under a heading reads as "we looked   #}
+{# here and there was nothing". That is a claim, and it is only true when the  #}
+{# scan ran; when it did not, the panel has to say so where a reader sees it.  #}
+{% if not candidates and cand_state == 'not_scanned' %}
+<text x="56" y="{{ cand_y + 50 }}" font-size="10" fill="#64748b">No attribute scan was supplied, so no candidate protected attribute was looked for.</text>
+{% endif %}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Violation Scanner                                                #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ viol_y }}" width="644" height="{{ viol_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ viol_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">ATTRIBUTE</text>
+<text x="200" y="{{ viol_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">METRIC</text>
+<text x="380" y="{{ viol_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">VALUE</text>
+<text x="440" y="{{ viol_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">THRESHOLD</text>
+<text x="540" y="{{ viol_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">SEVERITY</text>
+<line x1="56" y1="{{ viol_y + 30 }}" x2="660" y2="{{ viol_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for v in violations %}
+{% set ry = viol_y + viol_header_h + loop.index0 * viol_row_h %}
+{% if v.severity == 'high' %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ viol_row_h }}" fill="#fef2f2" opacity="0.25"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ viol_row_h }}" fill="#dc2626"/>
+{% endif %}
+<text x="56" y="{{ ry + 20 }}" font-size="10" font-weight="500" fill="#0f172a">{{ v.attribute }}</text>
+<text x="200" y="{{ ry + 20 }}" font-size="10" fill="#475569">{{ v.metric }}</text>
+{# CRITICAL, per row. These two cells read `v.value|f3` and `v.threshold|f2`
+   against adapter defaults of 0, so a violation carrying only an attribute name
+   printed VALUE 0.000 beside THRESHOLD 0.00 and asked the reader to compare
+   them. A withheld number is now said in words, in slate italic, at a size the
+   eye reads as an annotation rather than a measurement. #}
+{% if v.value_reported %}
+<text x="380" y="{{ ry + 20 }}" font-size="10" font-weight="600" fill="{{ v.color }}">{{ v.value_display }}</text>
+{% else %}
+<text x="380" y="{{ ry + 20 }}" font-size="8.5" font-style="italic" fill="#64748b">{{ v.value_display }}</text>
+{% endif %}
+{% if v.threshold_reported %}
+<text x="440" y="{{ ry + 20 }}" font-size="10" fill="#94a3b8">{{ v.threshold_display }}</text>
+{% else %}
+<text x="440" y="{{ ry + 20 }}" font-size="8.5" font-style="italic" fill="#64748b">{{ v.threshold_display }}</text>
+{% endif %}
+{# A severity is a judgement, so an ungraded row gets no coloured badge: the
+   pill is drawn only when the row reported one, and NOT GRADED is plain slate
+   text so it can never be mistaken for a verdict at a glance. #}
+{% if v.graded %}
+<rect x="536" y="{{ ry + 6 }}" width="60" height="18" rx="9" fill="{{ v.color }}20"/>
+<text x="566" y="{{ ry + 18 }}" text-anchor="middle" font-size="8" font-weight="600" fill="{{ v.color }}">{{ v.severity_label }}</text>
+{% else %}
+<text x="566" y="{{ ry + 18 }}" text-anchor="middle" font-size="8" font-style="italic" fill="#64748b">{{ v.severity_label }}</text>
+{% endif %}
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + viol_row_h }}" x2="660" y2="{{ ry + viol_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# The badge above already carries the third state; this is the same           #}
+{# distinction inside the table, where a reader looking for the rows lands.    #}
+{# "The scan found none" and "the scan never ran" must never share a rendering.#}
+{% if not violations and viol_state == 'not_scanned' %}
+<text x="56" y="{{ viol_y + 50 }}" font-size="10" fill="#64748b">No violation scan was supplied, so no metric was compared against a threshold.</text>
+{% endif %}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Intersectional Group Analysis                                    #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ grp_y }}" width="644" height="{{ grp_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ grp_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Intersectional Group Analysis</text>
+<line x1="56" y1="{{ grp_y + 30 }}" x2="660" y2="{{ grp_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for g in groups %}
+{% set ry = grp_y + 34 + loop.index0 * grp_row_h %}
+<text x="56" y="{{ ry + 16 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ g.group }}</text>
+{# "n=0 · ratio=1.00" was the adapter's default pair, and ratio=1.00 is exactly
+   parity: the single most reassuring number this panel can print, invented for
+   a group that reported neither figure. Both are now composed in the adapter,
+   which is the only place that knows whether they were reported. #}
+<text x="56" y="{{ ry + 30 }}" font-size="8" fill="#94a3b8">{{ g.meta_display }}</text>
+<rect x="300" y="{{ ry + 6 }}" width="200" height="12" rx="4" fill="#f1f5f9"/>
+{% if g.positive_rate_reported %}
+<rect x="300" y="{{ ry + 6 }}" width="{{ g.bar_w }}" height="12" rx="4" fill="{{ g.color }}" opacity="0.6"/>
+<text x="510" y="{{ ry + 16 }}" font-size="10" font-weight="600" fill="{{ g.color }}">{{ g.positive_rate_display }}</text>
+{% else %}
+<text x="510" y="{{ ry + 16 }}" font-size="8" font-style="italic" fill="#64748b">{{ g.positive_rate_display }}</text>
+{% endif %}
+{% if g.graded %}
+<rect x="570" y="{{ ry + 4 }}" width="60" height="18" rx="9" fill="{{ g.color }}20"/>
+<text x="600" y="{{ ry + 16 }}" text-anchor="middle" font-size="8" font-weight="600" fill="{{ g.color }}">{{ g.severity_label }}</text>
+{% else %}
+<text x="600" y="{{ ry + 16 }}" text-anchor="middle" font-size="8" font-style="italic" fill="#64748b">{{ g.severity_label }}</text>
+{% endif %}
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + grp_row_h }}" x2="660" y2="{{ ry + grp_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# Same third state again: no group profiled is not the same claim as no group #}
+{# disadvantaged, and an empty panel used to make them look alike. #}
+{% if not groups and group_state == 'not_scanned' %}
+<text x="56" y="{{ grp_y + 50 }}" font-size="10" fill="#64748b">No group profile was supplied, so no intersectional group was compared here.</text>
+{% endif %}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Recommendations                                                  #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ rec_y }}" width="644" height="{{ rec_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Recommendations</text>
+{% for r in recommendations %}
+<text x="56" y="{{ rec_y + 42 + loop.index0 * 18 }}" font-size="9.5" fill="#6b7280">{{ loop.index }}. {{ r }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── EXAMPLE watermark, painted last so it survives every panel above it ── #}
+{# Repeated down a tall canvas so a crop or a screenshot of one section cannot #}
+{# lose the only mark that separates a sample from a finding. #}
+{% if is_example %}
+{% for _p in ([22, 50, 78] if total_h > 1100 else [50]) %}
+{% set _wy = (total_h * _p / 100)|int %}
+<text x="340" y="{{ _wy }}" text-anchor="middle" font-size="76" font-weight="800" fill="#92400e" opacity="0.12" letter-spacing="6" transform="rotate(-24 340 {{ _wy }})">EXAMPLE</text>
+{% endfor %}
+{% endif %}
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

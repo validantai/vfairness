@@ -1,0 +1,2473 @@
+{
+ "vfairness.evaluation.vfairness_metrics.explainer.FairExplAIner.explain_confidence_interval": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "other"
+   }
+  }
+ },
+ "vfairness.evaluation.vfairness_metrics.explainer.FairExplAIner.explain_effect_size": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "other"
+   }
+  }
+ },
+ "vfairness.evaluation.vfairness_metrics.explainer.FairExplAIner.explain_metric": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "other"
+   }
+  }
+ },
+ "vfairness.evaluation.vfairness_metrics.explainer.FairExplAIner.explain_report": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   }
+  }
+ },
+ "vfairness.evaluation.vfairness_metrics.explainer.MetricExplanation.to_dict": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner MetricExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner MetricExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner MetricExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner MetricExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner MetricExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner MetricExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner MetricExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner MetricExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner MetricExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.evaluation.vfairness_metrics.explainer.explain_fairness_report": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   }
+  }
+ },
+ "vfairness.evaluation.vfairness_metrics.explainer.print_explanations": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   }
+  }
+ },
+ "vfairness.explainer.ExplanationReport.to_dict": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner ExplanationReport would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner ExplanationReport would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner ExplanationReport would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner ExplanationReport would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner ExplanationReport would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner ExplanationReport would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner ExplanationReport would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner ExplanationReport would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner ExplanationReport would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.diagnostics.adversarial.multi_seed_adversarial_probe": {
+  "consumed": [
+   "background",
+   "predict_fn",
+   "x"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "the healthy world did not produce a value (ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg )",
+  "runs": {
+   "all_constant": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg ",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg ",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg ",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 0) and arg 1 ",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg ",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "AttributeError: 'NoneType' object has no attribute 'std'",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "ValueError: Output size (200, 1) is not compatible with broadcast dimensions of inputs (200, 4).",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg ",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg ",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.diagnostics.adversarial.slack_adversarial_probe": {
+  "consumed": [
+   "background",
+   "predict_fn",
+   "x"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "the healthy world did not produce a value (ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg )",
+  "runs": {
+   "all_constant": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg ",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg ",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg ",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 0) and arg 1 ",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg ",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "AttributeError: 'NoneType' object has no attribute 'std'",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "ValueError: Output size (200, 1) is not compatible with broadcast dimensions of inputs (200, 4).",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg ",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "ValueError: shape mismatch: objects cannot be broadcast to a single shape.  Mismatch is between arg 0 with shape (200, 120) and arg ",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.diagnostics.faithfulness.local_r_squared": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "UFuncTypeError: ufunc 'subtract' did not contain a loop with signature matching types (dtype('<U1'), dtype('<U1')) -> None",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "UFuncTypeError: ufunc 'subtract' did not contain a loop with signature matching types (dtype('<U1'), dtype('<U1')) -> None",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "UFuncTypeError: ufunc 'subtract' did not contain a loop with signature matching types (dtype('<U1'), dtype('<U1')) -> None",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "UFuncTypeError: ufunc 'subtract' did not contain a loop with signature matching types (dtype('<U1'), dtype('<U1')) -> None",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "UFuncTypeError: ufunc 'subtract' did not contain a loop with signature matching types (dtype('<U1'), dtype('<U1')) -> None",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "UFuncTypeError: ufunc 'subtract' did not contain a loop with signature matching types (dtype('<U1'), dtype('<U1')) -> None",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "UFuncTypeError: ufunc 'subtract' did not contain a loop with signature matching types (dtype('<U1'), dtype('<U1')) -> None",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "UFuncTypeError: ufunc 'subtract' did not contain a loop with signature matching types (dtype('<U1'), dtype('<U1')) -> None",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "UFuncTypeError: ufunc 'subtract' did not contain a loop with signature matching types (dtype('<U1'), dtype('<U1')) -> None",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.diagnostics.faithfulness.removal_curve_auc": {
+  "consumed": [
+   "attributions",
+   "predict_fn",
+   "x"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "the healthy world did not produce a value (ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.)",
+  "runs": {
+   "all_constant": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "ValueError: Input X contains NaN.\nLogisticRegression does not accept missing values encoded as NaN natively. For supervised learning",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "ValueError: could not convert string to float: np.str_('a')",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "ValueError: Found array with 0 feature(s) (shape=(1, 0)) while a minimum of 1 is required by LogisticRegression.",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "IndexError: index 1 is out of bounds for axis 0 with size 1",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.diagnostics.stability.attribution_stability": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "TypeError: the resolved dtypes are not compatible with add.reduce. Resolved (dtype('<U1'), dtype('<U1'), dtype('<U2'))",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "TypeError: the resolved dtypes are not compatible with add.reduce. Resolved (dtype('<U1'), dtype('<U1'), dtype('<U2'))",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "TypeError: the resolved dtypes are not compatible with add.reduce. Resolved (dtype('<U1'), dtype('<U1'), dtype('<U2'))",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "TypeError: the resolved dtypes are not compatible with add.reduce. Resolved (dtype('<U1'), dtype('<U1'), dtype('<U2'))",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "TypeError: the resolved dtypes are not compatible with add.reduce. Resolved (dtype('<U1'), dtype('<U1'), dtype('<U2'))",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "TypeError: the resolved dtypes are not compatible with add.reduce. Resolved (dtype('<U1'), dtype('<U1'), dtype('<U2'))",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "TypeError: the resolved dtypes are not compatible with add.reduce. Resolved (dtype('<U1'), dtype('<U1'), dtype('<U2'))",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "TypeError: the resolved dtypes are not compatible with add.reduce. Resolved (dtype('<U1'), dtype('<U1'), dtype('<U2'))",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "TypeError: the resolved dtypes are not compatible with add.reduce. Resolved (dtype('<U1'), dtype('<U1'), dtype('<U2'))",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.anchors_adapter.AnchorsExplainer.explain_global": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "NotImplementedError: Anchors is a local (per-instance) rule method; capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "NotImplementedError: Anchors is a local (per-instance) rule method; capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "NotImplementedError: Anchors is a local (per-instance) rule method; capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "NotImplementedError: Anchors is a local (per-instance) rule method; capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "NotImplementedError: Anchors is a local (per-instance) rule method; capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "NotImplementedError: Anchors is a local (per-instance) rule method; capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "NotImplementedError: Anchors is a local (per-instance) rule method; capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "NotImplementedError: Anchors is a local (per-instance) rule method; capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "NotImplementedError: Anchors is a local (per-instance) rule method; capabilities.supports_global is False.",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.anchors_adapter.AnchorsExplainer.explain_local": {
+  "consumed": [
+   "background",
+   "data_hash",
+   "feature_names",
+   "instance_id",
+   "model",
+   "model_hash",
+   "subject_id",
+   "x"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "the healthy world did not produce a value (ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.)",
+  "runs": {
+   "all_constant": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "ValueError: Input X contains NaN.\nLogisticRegression does not accept missing values encoded as NaN natively. For supervised learning",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "n_warnings": 1,
+    "outcome": "other"
+   },
+   "empty": {
+    "detail": "ValueError: AnchorsExplainer requires a background (train_data) sample.",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "ValueError: AnchorsExplainer requires a background (train_data) sample.",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "n_warnings": 2,
+    "outcome": "other"
+   },
+   "single_class_fit": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.anchors_adapter.AnchorsExplainer.supports": {
+  "consumed": [
+   "model",
+   "model_type"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   }
+  }
+ },
+ "vfairness.xai.explainers.base.Explainer.explain_global": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.explainers.base.Explainer.explain_local": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.explainers.base.Explainer.supports": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner Explainer would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.explainers.dice_adapter.DiceCounterfactualExplainer.explain_global": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "NotImplementedError: DiCE is a local (per-instance) counterfactual method; it has no global mode. capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "NotImplementedError: DiCE is a local (per-instance) counterfactual method; it has no global mode. capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "NotImplementedError: DiCE is a local (per-instance) counterfactual method; it has no global mode. capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "NotImplementedError: DiCE is a local (per-instance) counterfactual method; it has no global mode. capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "NotImplementedError: DiCE is a local (per-instance) counterfactual method; it has no global mode. capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "NotImplementedError: DiCE is a local (per-instance) counterfactual method; it has no global mode. capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "NotImplementedError: DiCE is a local (per-instance) counterfactual method; it has no global mode. capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "NotImplementedError: DiCE is a local (per-instance) counterfactual method; it has no global mode. capabilities.supports_global is False.",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "NotImplementedError: DiCE is a local (per-instance) counterfactual method; it has no global mode. capabilities.supports_global is False.",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.dice_adapter.DiceCounterfactualExplainer.explain_local": {
+  "consumed": [
+   "background",
+   "data_hash",
+   "feature_names",
+   "instance_id",
+   "model",
+   "model_hash",
+   "subject_id",
+   "x"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "the healthy world did not produce a value (ValueError: DiceCounterfactualExplainer.explain_local requires `dataframe` (pandas, including the outcome column) and `outcome_name`)",
+  "runs": {
+   "all_constant": {
+    "detail": "ValueError: DiceCounterfactualExplainer.explain_local requires `dataframe` (pandas, including the outcome column) and `outcome_name`",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "ValueError: DiceCounterfactualExplainer.explain_local requires `dataframe` (pandas, including the outcome column) and `outcome_name`",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "ValueError: DiceCounterfactualExplainer.explain_local requires `dataframe` (pandas, including the outcome column) and `outcome_name`",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "ValueError: DiceCounterfactualExplainer.explain_local requires `dataframe` (pandas, including the outcome column) and `outcome_name`",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "ValueError: DiceCounterfactualExplainer.explain_local requires `dataframe` (pandas, including the outcome column) and `outcome_name`",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "ValueError: DiceCounterfactualExplainer.explain_local requires `dataframe` (pandas, including the outcome column) and `outcome_name`",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "ValueError: DiceCounterfactualExplainer.explain_local requires `dataframe` (pandas, including the outcome column) and `outcome_name`",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "ValueError: DiceCounterfactualExplainer.explain_local requires `dataframe` (pandas, including the outcome column) and `outcome_name`",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "ValueError: DiceCounterfactualExplainer.explain_local requires `dataframe` (pandas, including the outcome column) and `outcome_name`",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.dice_adapter.DiceCounterfactualExplainer.supports": {
+  "consumed": [
+   "model",
+   "model_type"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   }
+  }
+ },
+ "vfairness.xai.explainers.ig_adapter.IntegratedGradientsExplainer.explain_global": {
+  "consumed": [
+   "X",
+   "background",
+   "data_hash",
+   "feature_names",
+   "model",
+   "model_hash",
+   "subject_id"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "the healthy world did not produce a value (AttributeError: 'LogisticRegression' object has no attribute 'eval')",
+  "runs": {
+   "all_constant": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "AttributeError: '_ConstantModel' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "healthy": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.ig_adapter.IntegratedGradientsExplainer.explain_local": {
+  "consumed": [
+   "background",
+   "data_hash",
+   "feature_names",
+   "instance_id",
+   "model",
+   "model_hash",
+   "subject_id",
+   "x"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "the healthy world did not produce a value (AttributeError: 'LogisticRegression' object has no attribute 'eval')",
+  "runs": {
+   "all_constant": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "AttributeError: '_ConstantModel' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "AttributeError: 'LogisticRegression' object has no attribute 'eval'",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.ig_adapter.IntegratedGradientsExplainer.supports": {
+  "consumed": [
+   "model",
+   "model_type"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   }
+  }
+ },
+ "vfairness.xai.explainers.ig_adapter.completeness_scale": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "no fixture for parameter(s): prediction, base_value",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "no fixture for parameter(s): prediction, base_value",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "no fixture for parameter(s): prediction, base_value",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "no fixture for parameter(s): prediction, base_value",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "no fixture for parameter(s): prediction, base_value",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "no fixture for parameter(s): prediction, base_value",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "no fixture for parameter(s): prediction, base_value",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "no fixture for parameter(s): prediction, base_value",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "no fixture for parameter(s): prediction, base_value",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.explainers.lime_adapter.LimeExplainer.explain_global": {
+  "consumed": [
+   "X",
+   "background",
+   "data_hash",
+   "feature_names",
+   "model",
+   "model_hash",
+   "subject_id"
+  ],
+  "grade": "NEEDS JUDGEMENT",
+  "reason": "answered without a warning on 2 world(s) where no attribution is defined (all_constant, empty)",
+  "refused_defined_worlds": [
+   "no_background"
+  ],
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "all_nan": {
+    "detail": "ValueError: Input X contains NaN.\nLogisticRegression does not accept missing values encoded as NaN natively. For supervised learning",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "no_background": {
+    "detail": "ValueError: LimeExplainer requires a background sample for the local neighbourhood. LIME tolerates a scarcer / more out-of-distribut",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   }
+  }
+ },
+ "vfairness.xai.explainers.lime_adapter.LimeExplainer.explain_local": {
+  "consumed": [
+   "background",
+   "data_hash",
+   "feature_names",
+   "instance_id",
+   "model",
+   "model_hash",
+   "subject_id",
+   "x"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "the healthy world did not produce a value (ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.)",
+  "runs": {
+   "all_constant": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "ValueError: Input X contains NaN.\nLogisticRegression does not accept missing values encoded as NaN natively. For supervised learning",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "KeyError: 4",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "ValueError: LimeExplainer requires a background sample for the local neighbourhood. LIME tolerates a scarcer / more out-of-distribut",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "ValueError: LimeExplainer requires a background sample for the local neighbourhood. LIME tolerates a scarcer / more out-of-distribut",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "single_class_fit": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "ValueError: X has 480 features, but LogisticRegression is expecting 4 features as input.",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.lime_adapter.LimeExplainer.supports": {
+  "consumed": [
+   "model",
+   "model_type"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   }
+  }
+ },
+ "vfairness.xai.explainers.registry.available_methods": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   }
+  }
+ },
+ "vfairness.xai.explainers.registry.get_explainer": {
+  "consumed": [
+   "model_type"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "KeyError: \"Unknown explainer method: 'linear'\"",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "KeyError: \"Unknown explainer method: 'linear'\"",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "KeyError: \"Unknown explainer method: 'linear'\"",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "KeyError: \"Unknown explainer method: 'linear'\"",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "KeyError: \"Unknown explainer method: 'linear'\"",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "KeyError: \"Unknown explainer method: 'linear'\"",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "KeyError: \"Unknown explainer method: 'linear'\"",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "KeyError: \"Unknown explainer method: 'linear'\"",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "KeyError: \"Unknown explainer method: 'linear'\"",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.shap_adapter.KernelShapExplainer.explain_global": {
+  "consumed": [
+   "X",
+   "background",
+   "data_hash",
+   "feature_names",
+   "model",
+   "model_hash",
+   "subject_id"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "the healthy world did not produce a value (TypeError: 'LogisticRegression' object is not callable)",
+  "runs": {
+   "all_constant": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "TypeError: '_ConstantModel' object is not callable",
+    "outcome": "raised"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "healthy": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "ValueError: KernelExplainer requires a background sample (use shap.sample if large).",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.shap_adapter.KernelShapExplainer.explain_local": {
+  "consumed": [
+   "background",
+   "data_hash",
+   "feature_names",
+   "instance_id",
+   "model",
+   "model_hash",
+   "subject_id",
+   "x"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "the healthy world did not produce a value (TypeError: 'LogisticRegression' object is not callable)",
+  "runs": {
+   "all_constant": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "TypeError: '_ConstantModel' object is not callable",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "ValueError: KernelExplainer requires a background sample (use shap.sample if large).",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "TypeError: 'LogisticRegression' object is not callable",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.shap_adapter.KernelShapExplainer.supports": {
+  "consumed": [
+   "model",
+   "model_type"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   }
+  }
+ },
+ "vfairness.xai.explainers.shap_adapter.LinearShapExplainer.explain_global": {
+  "consumed": [
+   "X",
+   "background",
+   "data_hash",
+   "feature_names",
+   "model",
+   "model_hash",
+   "subject_id"
+  ],
+  "grade": "NEEDS JUDGEMENT",
+  "reason": "answered without a warning on 2 world(s) where no attribution is defined (all_constant, empty)",
+  "refused_defined_worlds": [
+   "constant_model",
+   "no_background"
+  ],
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "all_nan": {
+    "n_warnings": 240,
+    "outcome": "measured"
+   },
+   "constant_model": {
+    "detail": "InvalidModelError: An unknown model type was passed: <class '__main__._ConstantModel'>",
+    "outcome": "raised"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "no_background": {
+    "detail": "ValueError: LinearExplainer requires a background sample.",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "measured"
+   }
+  }
+ },
+ "vfairness.xai.explainers.shap_adapter.LinearShapExplainer.explain_local": {
+  "consumed": [
+   "background",
+   "data_hash",
+   "feature_names",
+   "instance_id",
+   "model",
+   "model_hash",
+   "subject_id",
+   "x"
+  ],
+  "grade": "SEMI-PROVEN",
+  "reason": "executed on the healthy world, and refused or warned on all 3 world(s) where no attribution is defined; no test pins that",
+  "refused_defined_worlds": [
+   "constant_model",
+   "no_background"
+  ],
+  "runs": {
+   "all_constant": {
+    "n_warnings": 1,
+    "outcome": "other"
+   },
+   "all_nan": {
+    "n_warnings": 2,
+    "outcome": "other"
+   },
+   "constant_model": {
+    "detail": "InvalidModelError: An unknown model type was passed: <class '__main__._ConstantModel'>",
+    "outcome": "raised"
+   },
+   "empty": {
+    "n_warnings": 3,
+    "outcome": "other"
+   },
+   "healthy": {
+    "n_warnings": 1,
+    "outcome": "other"
+   },
+   "no_background": {
+    "detail": "ValueError: LinearExplainer requires a background sample.",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "other"
+   },
+   "single_class_fit": {
+    "n_warnings": 1,
+    "outcome": "other"
+   },
+   "single_feature": {
+    "n_warnings": 1,
+    "outcome": "other"
+   }
+  }
+ },
+ "vfairness.xai.explainers.shap_adapter.LinearShapExplainer.supports": {
+  "consumed": [
+   "model",
+   "model_type"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   }
+  }
+ },
+ "vfairness.xai.explainers.shap_adapter.TreeShapExplainer.explain_global": {
+  "consumed": [
+   "X",
+   "background",
+   "data_hash",
+   "feature_names",
+   "model",
+   "model_hash",
+   "subject_id"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "the healthy world did not produce a value (InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>)",
+  "runs": {
+   "all_constant": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class '__main__._ConstantModel'>",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.shap_adapter.TreeShapExplainer.explain_local": {
+  "consumed": [
+   "background",
+   "data_hash",
+   "feature_names",
+   "instance_id",
+   "model",
+   "model_hash",
+   "subject_id",
+   "x"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "the healthy world did not produce a value (InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>)",
+  "runs": {
+   "all_constant": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class '__main__._ConstantModel'>",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "InvalidModelError: Model type not yet supported by TreeExplainer: <class 'sklearn.linear_model._logistic.LogisticRegression'>",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.explainers.shap_adapter.TreeShapExplainer.supports": {
+  "consumed": [
+   "model",
+   "model_type"
+  ],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "neutral"
+   }
+  }
+ },
+ "vfairness.xai.schemas.CounterfactualExplanation.to_db_row": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner CounterfactualExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner CounterfactualExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner CounterfactualExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner CounterfactualExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner CounterfactualExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner CounterfactualExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner CounterfactualExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner CounterfactualExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner CounterfactualExplanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.schemas.Explanation.to_db_row": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner Explanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner Explanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner Explanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner Explanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner Explanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner Explanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner Explanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner Explanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner Explanation would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.schemas.FairnessDecomposition.assert_identity": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.schemas.FairnessDecomposition.to_db_row": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner FairnessDecomposition would not construct: TypeError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.sidecar_cli.main": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   }
+  }
+ },
+ "vfairness.xai.storage.audit_artifact.build_audit_artifact_bundle": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "no fixture for parameter(s): explanations, params, library_versions, seed",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "no fixture for parameter(s): explanations, params, library_versions, seed",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "no fixture for parameter(s): explanations, params, library_versions, seed",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "no fixture for parameter(s): explanations, params, library_versions, seed",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "no fixture for parameter(s): explanations, params, library_versions, seed",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "no fixture for parameter(s): explanations, params, library_versions, seed",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "no fixture for parameter(s): explanations, params, library_versions, seed",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "no fixture for parameter(s): explanations, params, library_versions, seed",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "no fixture for parameter(s): explanations, params, library_versions, seed",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.storage.supabase_writer.SupabaseWriter.update_job_progress": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.storage.supabase_writer.SupabaseWriter.write_assessment": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.storage.supabase_writer.SupabaseWriter.write_audit_artifact": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.storage.supabase_writer.SupabaseWriter.write_explanations": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.storage.supabase_writer.SupabaseWriter.write_fairness_decomposition": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "all_nan": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "constant_model": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "empty": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "healthy": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "no_background": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "one_row": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_class_fit": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   },
+   "single_feature": {
+    "detail": "owner SupabaseWriter would not construct: ImportError",
+    "outcome": "NOT_REACHED"
+   }
+  }
+ },
+ "vfairness.xai.worker.runner.WorkerLoop.run": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   }
+  }
+ },
+ "vfairness.xai.worker.runner.WorkerLoop.stop": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "all_nan": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "constant_model": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "empty": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "healthy": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "no_background": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "one_row": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "single_class_fit": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   },
+   "single_feature": {
+    "n_warnings": 0,
+    "outcome": "refused"
+   }
+  }
+ },
+ "vfairness.xai.worker.runner.main": {
+  "consumed": [],
+  "grade": "NOT EXAMINED",
+  "reason": "it takes none of the data these worlds vary (no x, X or attributions parameter), so nothing they do says anything about it",
+  "runs": {
+   "all_constant": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "all_nan": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "constant_model": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "empty": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "healthy": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "no_background": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "one_row": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "single_class_fit": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   },
+   "single_feature": {
+    "detail": "ImportError: vfairness.xai.storage.SupabaseWriter requires `supabase`: `pip install vfairness[worker]`.",
+    "outcome": "raised"
+   }
+  }
+ }
+}

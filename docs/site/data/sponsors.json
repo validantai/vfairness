@@ -1,0 +1,34 @@
+{
+  "$comment": "THE ROSTER. Single source of truth for the sponsor wall, on every surface. Add a member and it appears on the vfairness offering page, the vfairness docs landing, the platform app and the platform docs landing, with no other edit. Only tiers that carry PUBLIC NAMING appear here: Supporters fund the work but are not listed, because naming everyone who pays anything would publish how much comes in. Slots are how many placements the wall shows; open ones render as available inventory rather than as absence.",
+  "updated": "2026-08-27",
+  "cta": {
+    "href": "https://vfairness.validant.ai/our-offering/",
+    "label": "Become a sponsor",
+    "note": "Sponsorship opens with the beta."
+  },
+  "tiers": [
+    {
+      "id": "corporate",
+      "label": "Corporate Patrons",
+      "from": "from USD 1000/mo",
+      "perk": "Company logo on every wall, a named backer credit, and Platform Pro for the team",
+      "slots": 4,
+      "members": []
+    },
+    {
+      "id": "patron",
+      "label": "Patrons",
+      "from": "from USD 50/mo",
+      "perk": "Named on every wall and in the project credits, with Platform Pro included",
+      "slots": 8,
+      "members": []
+    }
+  ],
+  "reach": [
+    "vfairness.validant.ai",
+    "The library documentation",
+    "Inside the Validant platform",
+    "The platform documentation",
+    "Project credits"
+  ]
+}

@@ -1,0 +1,191 @@
+{# ── FairnessAnalyzer · Metric Dashboard SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set score_h = 16 %}
+{% set table_header_h = 40 %}
+{% set table_row_h = 36 %}
+{% set table_h = table_header_h + cards|length * table_row_h + 10 %}
+{% set bars_header_h = 36 %}
+{% set bars_row_h = 36 %}
+{% set bars_h = bars_header_h + bars|length * bars_row_h + 16 %}
+{% set summary_h = 80 %}
+{% if explanation %}{% set _pre_exp = explanation|wordwrap(105) %}{% set exp_h = 44 + _pre_exp.split('\n')|length * 16 %}{% else %}{% set exp_h = 0 %}{% endif %}
+
+{% set table_y = header_h + score_h %}
+{% set bars_y = table_y + table_h + 16 %}
+{% set summary_y = bars_y + bars_h + 16 %}
+{% set exp_y = summary_y + summary_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}
+<text x="644" y="32" text-anchor="end" font-size="9" fill="#b0b8c4">{{ timestamp }}</text>
+{% endif %}
+<rect x="36" y="52" width="644" height="1.5" fill="url(#accent)"/>
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{% if task_type == 'regression' %}Regression fairness metrics{% else %}Classification fairness metrics{% endif %}: {{ cards|length }} metrics evaluated</text>
+
+{# ── Score badge ── #}
+{# Third state. A fairness score exists only when at least one metric produced a
+   threshold verdict; with none, `fairness_score` is None and the panel says so
+   rather than printing a number. 100/100 beside a NOT ASSESSABLE summary was a
+   self-contradicting certificate, and 0/100 would be the opposite lie. #}
+{% if not_assessable or fairness_score is none %}
+<rect x="440" y="68" width="240" height="64" rx="10" fill="#ffffff"/>
+<rect x="440" y="68" width="2.5" height="64" rx="1" fill="#64748b"/>
+<text x="456" y="82" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.5">FAIRNESS SCORE</text>
+<text x="456" y="106" font-size="15" font-weight="700" fill="#64748b">· NOT ASSESSABLE</text>
+<text x="456" y="122" font-size="8" fill="#94a3b8">could not check: no metric was verified</text>
+{% else %}
+{% set score_color = '#059669' if fairness_score >= 70 else '#f59e0b' if fairness_score >= 40 else '#dc2626' %}
+{% set score_bg = '#ecfdf5' if fairness_score >= 70 else '#fef3c7' if fairness_score >= 40 else '#fef2f2' %}
+<rect x="520" y="68" width="160" height="64" rx="10" fill="#ffffff"/>
+<rect x="520" y="68" width="2.5" height="64" rx="1" fill="{{ score_color }}"/>
+<text x="536" y="82" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.5">FAIRNESS SCORE</text>
+{% set _score_str = fairness_score|string %}
+{% set _score_x_end = 536 + _score_str|length * 16 %}
+{% set _slash100_end = _score_x_end + 28 %}
+<text x="536" y="112" font-size="26" font-weight="700" fill="{{ score_color }}">{{ fairness_score }}</text>
+<text x="{{ _score_x_end + 2 }}" y="112" font-size="11" fill="#94a3b8">/100</text>
+<rect x="{{ _slash100_end + 6 }}" y="98" width="{{ 668 - _slash100_end - 6 }}" height="18" rx="9" fill="{{ score_bg }}"/>
+<text x="{{ (_slash100_end + 6 + 668) // 2 }}" y="111" text-anchor="middle" font-size="8" font-weight="600" fill="{{ score_color }}">{{ n_passed }}P {{ n_failed }}F</text>
+{% endif %}
+{% if n_unknown %}
+<text x="520" y="146" font-size="8" font-weight="600" fill="#64748b">· {{ n_unknown }} metric(s) could not be checked</text>
+{% endif %}
+{# The OTHER ungraded population on this dashboard. The metric cards are one of
+   the two: the group bars are the other, and a group that reported no rate is
+   not plotted at all. That count was stated only in the Assessment Summary
+   paragraph, which sits at y≈606 on a typical render, far below the score a
+   reader takes away. The headline band is where the score is, so the count
+   belongs here too. Absent for a fully measured run, so a healthy canvas is
+   byte-identical. #}
+{% if n_unmeasured_groups %}
+<text x="520" y="{{ 158 if n_unknown else 146 }}" font-size="8" font-weight="600" fill="#64748b">· {{ n_unmeasured_groups }} group(s) reported no rate, not plotted</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Metric Table                                                      #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ table_y }}" width="644" height="{{ table_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">METRIC</text>
+<text x="340" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">VALUE</text>
+<text x="440" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">THRESHOLD</text>
+<text x="580" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">STATUS</text>
+<line x1="56" y1="{{ table_y + 32 }}" x2="660" y2="{{ table_y + 32 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for card in cards %}
+{% set ry = table_y + table_header_h + loop.index0 * table_row_h %}
+{# Row background: red for a MEASURED failure only. A could-not-check row gets
+   the neutral slate stripe, never the red one, because "we could not check" is
+   not "we checked and it failed". #}
+{% if card.state is defined and card.state == 'could_not_check' %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ table_row_h }}" fill="#f1f5f9" opacity="0.5"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ table_row_h }}" fill="#64748b"/>
+{% elif not card.passed %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ table_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ table_row_h }}" fill="#dc2626"/>
+{% endif %}
+
+{# Metric name + description #}
+<text x="56" y="{{ ry + 16 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ card.label }}</text>
+<text x="56" y="{{ ry + 28 }}" font-size="8.5" fill="#94a3b8">{{ card.key }}{% if card.is_ratio %} (ratio){% else %} (diff){% endif %}</text>
+
+{# Value #}
+<text x="340" y="{{ ry + 20 }}" font-size="13" font-weight="700" fill="{{ card.color }}">{{ card.value|f3 }}</text>
+
+{# Threshold #}
+{% if card.is_ratio %}
+<text x="440" y="{{ ry + 20 }}" font-size="10.5" fill="#6b7280">≥ {{ card.threshold|f2 }}</text>
+{% else %}
+<text x="440" y="{{ ry + 20 }}" font-size="10.5" fill="#6b7280">≤ {{ card.threshold|f2 }}</text>
+{% endif %}
+
+{# Status badge #}
+<rect x="566" y="{{ ry + 6 }}" width="72" height="20" rx="10" fill="{{ card.bg }}"/>
+<text x="602" y="{{ ry + 20 }}" text-anchor="middle" font-size="9" font-weight="600" fill="{{ card.color }}">{{ card.status }}</text>
+
+{# Row separator #}
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + table_row_h }}" x2="660" y2="{{ ry + table_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Group Positive Rates                                              #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ bars_y }}" width="644" height="{{ bars_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ bars_y + 24 }}" font-size="11" font-weight="700" fill="#0f172a">{% if task_type == 'regression' %}Mean Prediction by Group{% else %}Positive Rate by Group{% endif %}</text>
+
+{% for bar in bars %}
+{% set by = bars_y + bars_header_h + loop.index0 * bars_row_h %}
+{% set bw = bar.rate|bar_width(420) %}
+<text x="56" y="{{ by + 14 }}" font-size="10" font-weight="500" fill="#0f172a">{{ bar.group }}</text>
+<rect x="180" y="{{ by + 2 }}" width="{{ bw }}" height="14" rx="3" fill="{{ bar.color }}" opacity="0.75"/>
+<text x="{{ 180 + bw + 8 }}" y="{{ by + 14 }}" font-size="10" font-weight="600" fill="{{ bar.color }}">{% if task_type == 'regression' %}{{ bar.rate|f3 }}{% else %}{{ bar.rate|pct1 }}{% endif %}</text>
+{# "n=0" is a measured count, and a row with no size key reported none. Same
+   three states, and the same wording, as group_comparison.svg. #}
+{% if bar.n is not none %}
+<text x="{{ 180 + bw + 8 }}" y="{{ by + 26 }}" font-size="8" fill="#94a3b8">n={{ bar.n }}</text>
+{% else %}
+<text x="{{ 180 + bw + 8 }}" y="{{ by + 26 }}" font-size="8" fill="#94a3b8">n not reported</text>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Summary Panel                                                     #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# `n_failed == 0` is true both for "everything passed" and for "nothing was
+   checked", so it alone cannot drive a PASS banner. not_assessable splits them. #}
+{% if not_assessable %}
+{% set sum_color = '#64748b' %}
+{% else %}
+{% set sum_color = '#059669' if n_failed == 0 else '#f59e0b' if n_failed <= n_passed else '#dc2626' %}
+{% endif %}
+<rect x="36" y="{{ summary_y }}" width="644" height="{{ summary_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ summary_y }}" width="2.5" height="{{ summary_h }}" rx="1" fill="{{ sum_color }}"/>
+<text x="56" y="{{ summary_y + 20 }}" font-size="8" font-weight="600" fill="{{ sum_color }}" letter-spacing="0.5">{% if not_assessable %}NOT ASSESSABLE{% elif n_failed == 0 %}PASS{% elif n_failed <= n_passed %}WARNING{% else %}FAIL{% endif %}</text>
+{# The NOT ASSESSABLE marker is wider than PASS/WARNING/FAIL, so the heading
+   moves right in that case instead of being overlapped by it. #}
+<text x="{{ 146 if not_assessable else 110 }}" y="{{ summary_y + 20 }}" font-size="10.5" font-weight="600" fill="#0f172a">Assessment Summary</text>
+<line x1="56" y1="{{ summary_y + 30 }}" x2="660" y2="{{ summary_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+{% if summary %}
+{% set _sum = summary|wordwrap(110) %}
+{% set _sum_lines = _sum.split('\n') %}
+{% for _line in _sum_lines %}
+<text x="56" y="{{ summary_y + 48 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

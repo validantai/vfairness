@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/validantai/vfairness/blob/main/SECURITY.md
+    about: Please report security issues privately, following SECURITY.md. Do not open a public issue.
+  - name: How to join the beta
+    url: https://github.com/validantai/vfairness/blob/main/docs/BETA.md
+    about: What the beta covers, what it does not promise, and how to give feedback.

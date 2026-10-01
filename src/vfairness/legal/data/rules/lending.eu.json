@@ -1,0 +1,46 @@
+{
+  "use_case": "lending",
+  "jurisdiction": "eu",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "ethnicity": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9; Racial Equality Directive 2000/43/EC",
+      "carve_out": "ai_act_art_10_5",
+      "notes": "Consumer Credit Directive (EU 2023/2225) requires creditworthiness assessment based on relevant information; protected attributes may not be used."
+    },
+    "religion": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9"
+    },
+    "gender": {
+      "status": "monitoring_only",
+      "legal_basis": "Directive 2004/113/EC (post Test-Achats C-236/09)",
+      "notes": "Gender may not be used as an actuarial / pricing factor since 21 Dec 2012."
+    },
+    "health": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9"
+    },
+    "genetic": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9; Member State law often restricts use in financial services"
+    },
+    "age": {
+      "status": "restricted",
+      "legal_basis": "Directive 2000/78/EC; case law on financial-services age limits"
+    },
+    "nationality": {
+      "status": "restricted",
+      "legal_basis": "TFEU Art. 18 (non-discrimination on nationality grounds)"
+    },
+    "postcode": {
+      "status": "restricted",
+      "notes": "Strong proxy for ethnicity / social origin; EU AI Act high-risk credit-scoring (Annex III §5(b)) requires proxy detection."
+    },
+    "criminal_record": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 10"
+    }
+  }
+}

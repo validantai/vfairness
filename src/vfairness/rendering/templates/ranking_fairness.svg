@@ -1,0 +1,209 @@
+{# ── Ranking Fairness Report SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set badge_h = 56 %}
+{% set group_header_h = 34 %}
+{% set group_row_h = 44 %}
+{% set group_h = group_header_h + groups|length * group_row_h + 10 %}
+{% set pos_header_h = 34 %}
+{% set pos_row_h = 32 %}
+{% set pos_h = pos_header_h + groups|length * pos_row_h + 10 %}
+{% set rec_h = 34 + recommendations|length * 18 + 10 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}
+{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 40 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{% set badge_y = header_h %}
+{% set group_y = badge_y + badge_h + 16 %}
+{% set pos_y = group_y + group_h + 16 %}
+{% set rec_y = pos_y + pos_h + 16 %}
+{% set exp_y = rec_y + rec_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── EXAMPLE band ── #}
+{# The demo fixture is reachable only through example=True, and when it is used #}
+{# the canvas has to say so where a reader looks, not only in the <desc>. An    #}
+{# unlabelled demo is indistinguishable from a real ranking assessment once the #}
+{# file is exported. DO NOT REMOVE: the band and the watermark are the only     #}
+{# things separating a sample from an audit artifact. #}
+{% if is_example %}
+<rect x="0" y="54" width="680" height="20" fill="#fef3c7"/>
+<text x="340" y="68" text-anchor="middle" font-size="9.5" font-weight="700" fill="#92400e" letter-spacing="0.8">EXAMPLE ONLY: SYNTHETIC DEMONSTRATION DATA, NOT A REAL EVALUATION</text>
+{% endif %}
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ── Summary badge ── #}
+{# Three states, never two. The headline used to be decided here by testing
+   n_pass against n_total, which is ALSO true when nothing was measured, so a
+   page with no metric results at all printed a green FAIR out of 0 == 0. The
+   adapter grades it now (adapters_ranking._headline) and NOT ASSESSED is its
+   own state, never borrowed from either verdict. #}
+<rect x="520" y="68" width="160" height="56" rx="10" fill="#ffffff"/>
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="{{ verdict.color }}"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">OVERALL</text>
+<text x="536" y="108" font-size="{{ verdict.font_size }}" font-weight="700" fill="{{ verdict.color }}">{{ verdict.label }}</text>
+{% if verdict.caption %}
+<text x="536" y="120" font-size="9" fill="#94a3b8">{{ verdict.caption }}</text>
+{% else %}
+{# The denominator is the GRADED population. It used to be every supplied row,
+   so one measured breach beside six rows that reported nothing printed
+   "UNFAIR 0/7 metrics pass": six metrics placed in the denominator of a rate
+   about passing a threshold none of them was ever compared to. The adapter
+   counts it now (adapters_ranking, n_total = n_graded). #}
+<text x="536" y="120" font-size="9" fill="#94a3b8"><tspan font-weight="700">{{ n_pass }}/{{ n_total }}</tspan> metrics pass</text>
+{% endif %}
+{# Rule (c): the ungraded count goes on the CANVAS, next to the headline, not
+   only into the <desc>. Below the verdict box (which ends at y=124) and above
+   the badge panel (which starts at y=140), so no measured layout moves. #}
+{% if n_ungraded %}
+<text x="672" y="136" text-anchor="end" font-size="8.5" font-weight="600" fill="#64748b">{{ n_ungraded }} of {{ n_supplied }} metrics not graded</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Metric Badges Row                                                #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# CRITICAL, per row: the NUMBER is drawn only when the row reported one. A row #}
+{# carrying only a metric_name used to be graded against a defaulted 0 and an   #}
+{# invented 0.1 threshold, so it drew "0.000" in green beside a PASS badge and  #}
+{# counted toward the OVERALL FAIR headline. adapters_ranking sets `measured`   #}
+{# from the presence of the value itself; a defaulted number is not a           #}
+{# measurement, so there is nothing to draw here in its place. #}
+<rect x="36" y="{{ badge_y }}" width="644" height="{{ badge_h }}" rx="10" fill="#ffffff"/>
+{% for b in badges %}
+{% set bx = 56 + loop.index0 * 210 %}
+<rect x="{{ bx }}" y="{{ badge_y + 8 }}" width="190" height="38" rx="8" fill="{{ b.bg }}"/>
+<rect x="{{ bx }}" y="{{ badge_y + 8 }}" width="2" height="38" rx="1" fill="{{ b.color }}"/>
+<text x="{{ bx + 14 }}" y="{{ badge_y + 24 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.3">{{ b.name|upper }}</text>
+{% if b.measured %}
+<text x="{{ bx + 14 }}" y="{{ badge_y + 40 }}" font-size="12" font-weight="700" fill="{{ b.color }}">{{ b.value|f3 }}</text>
+{% else %}
+<text x="{{ bx + 14 }}" y="{{ badge_y + 40 }}" font-size="9" font-style="italic" fill="#64748b">no value reported</text>
+{% endif %}
+{% if b.graded %}
+<text x="{{ bx + 140 }}" y="{{ badge_y + 40 }}" font-size="9" font-weight="600" fill="{{ b.color }}">{{ b.label }}</text>
+{% else %}
+{# An ungraded label is twice the length of PASS and the badge is 190 wide, so #}
+{# it is set from the right edge. The graded branch above keeps its exact left #}
+{# origin and type size, so a passing or failing badge is unchanged. #}
+<text x="{{ bx + 176 }}" y="{{ badge_y + 40 }}" text-anchor="end" font-size="7.5" font-weight="600" fill="{{ b.color }}">{{ b.label }}</text>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Group Exposure Bars                                              #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ group_y }}" width="644" height="{{ group_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ group_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">GROUP</text>
+<text x="200" y="{{ group_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">EXPOSURE</text>
+<line x1="56" y1="{{ group_y + 30 }}" x2="660" y2="{{ group_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for g in groups %}
+{% set ry = group_y + group_header_h + loop.index0 * group_row_h %}
+<text x="56" y="{{ ry + 18 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ g.name }}</text>
+{# CRITICAL, per row: no bar and no number for a group that reported neither.   #}
+{# Every cell of this panel used to come from a `.get(key, 0)`, so a group      #}
+{# entry carrying only its NAME drew "n=0" beside a measured-looking exposure   #}
+{# of 0.000 in its own colour. Zero exposure is a group shut out of the ranking #}
+{# altogether, which is the strongest claim this panel can make, and it was     #}
+{# made from an absent number. adapters_ranking sets `measured` from the        #}
+{# presence of the exposure itself; the count carries its own None because a    #}
+{# group may report one and not the other. #}
+{% if g.count is not none %}
+<text x="56" y="{{ ry + 32 }}" font-size="8" fill="#94a3b8">n={{ g.count }}</text>
+{% else %}
+<text x="56" y="{{ ry + 32 }}" font-size="8" font-style="italic" fill="#94a3b8">n not reported</text>
+{% endif %}
+<rect x="200" y="{{ ry + 8 }}" width="260" height="12" rx="4" fill="#f1f5f9"/>
+{% if g.measured %}
+<rect x="200" y="{{ ry + 8 }}" width="{{ g.bar_w }}" height="12" rx="4" fill="{{ g.color }}" opacity="0.7"/>
+<text x="470" y="{{ ry + 18 }}" font-size="10" font-weight="600" fill="{{ g.color }}">{{ g.exposure|f3 }}</text>
+{% else %}
+<text x="470" y="{{ ry + 18 }}" font-size="8.5" font-style="italic" fill="#64748b">no exposure reported</text>
+{% endif %}
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + group_row_h }}" x2="660" y2="{{ ry + group_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Position Distribution Table                                      #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ pos_y }}" width="644" height="{{ pos_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ pos_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">GROUP</text>
+<text x="200" y="{{ pos_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">AVG POS</text>
+<text x="290" y="{{ pos_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">MEDIAN</text>
+<text x="380" y="{{ pos_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">MIN</text>
+<text x="440" y="{{ pos_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">MAX</text>
+<text x="510" y="{{ pos_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">COUNT</text>
+<line x1="56" y1="{{ pos_y + 30 }}" x2="660" y2="{{ pos_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for g in groups %}
+{% set ry = pos_y + pos_header_h + loop.index0 * pos_row_h %}
+<text x="56" y="{{ ry + 20 }}" font-size="10" font-weight="500" fill="#0f172a">{{ g.name }}</text>
+{# Per CELL, not per row: a group may report an average position and no median, #}
+{# and "0.0" in a POSITION column reads as rank zero, better than first place.   #}
+{# The |f1 filter already prints N/A for a withheld number (rendering.engine);   #}
+{# the two integer columns and the count have no filter, so they would have      #}
+{# printed the literal "None", and are branched here instead. #}
+<text x="200" y="{{ ry + 20 }}" font-size="10" fill="#475569">{{ g.avg_position|f1 }}</text>
+<text x="290" y="{{ ry + 20 }}" font-size="10" fill="#475569">{{ g.median_position|f1 }}</text>
+<text x="380" y="{{ ry + 20 }}" font-size="10" fill="#475569">{{ g.min_position if g.min_position is not none else 'N/A' }}</text>
+<text x="440" y="{{ ry + 20 }}" font-size="10" fill="#475569">{{ g.max_position if g.max_position is not none else 'N/A' }}</text>
+<text x="510" y="{{ ry + 20 }}" font-size="10" fill="#475569">{{ g.count if g.count is not none else 'N/A' }}</text>
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + pos_row_h }}" x2="660" y2="{{ ry + pos_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Recommendations                                                  #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ rec_y }}" width="644" height="{{ rec_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Recommendations</text>
+{% for r in recommendations %}
+<text x="56" y="{{ rec_y + 42 + loop.index0 * 18 }}" font-size="9.5" fill="#6b7280">{{ loop.index }}. {{ r }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── EXAMPLE watermark, painted last so it survives every panel above it ── #}
+{# Repeated down a tall canvas so a crop or a screenshot of one section cannot #}
+{# lose the only mark that separates a sample from a finding. #}
+{% if is_example %}
+{% for _p in ([22, 50, 78] if total_h > 1100 else [50]) %}
+{% set _wy = (total_h * _p / 100)|int %}
+<text x="340" y="{{ _wy }}" text-anchor="middle" font-size="76" font-weight="800" fill="#92400e" opacity="0.12" letter-spacing="6" transform="rotate(-24 340 {{ _wy }})">EXAMPLE</text>
+{% endfor %}
+{% endif %}
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

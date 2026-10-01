@@ -1,0 +1,43 @@
+{
+  "use_case": "healthcare",
+  "jurisdiction": "us-federal",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "health": {
+      "status": "allowed",
+      "legal_basis": "HIPAA Privacy Rule (45 CFR Part 164) treatment, payment, operations",
+      "notes": "Use for treatment lawful under HIPAA TPO; combine with minimum-necessary standard."
+    },
+    "genetic": {
+      "status": "restricted",
+      "legal_basis": "GINA Title I; HIPAA Privacy Rule",
+      "notes": "Treatment use lawful; underwriting / employment use prohibited."
+    },
+    "ethnicity": {
+      "status": "monitoring_only",
+      "legal_basis": "Section 1557 ACA; HHS Office of Minority Health",
+      "carve_out": "disparity_monitoring",
+      "notes": "Race / ethnicity widely collected to detect disparities. Use as a clinical-decision feature requires careful justification (the Optum / Obermeyer 2019 case is the canonical cautionary tale)."
+    },
+    "gender": {
+      "status": "allowed",
+      "notes": "Clinical relevance often justifies use; Section 1557 prohibits sex discrimination in healthcare programs."
+    },
+    "age": {
+      "status": "allowed",
+      "notes": "Clinically relevant; ADEA does not apply to healthcare delivery."
+    },
+    "disability": {
+      "status": "restricted",
+      "legal_basis": "ADA Title III; Section 504 Rehabilitation Act; Section 1557 ACA"
+    },
+    "nationality": {
+      "status": "restricted",
+      "legal_basis": "Section 1557 ACA national-origin"
+    },
+    "religion": {
+      "status": "restricted",
+      "notes": "Pastoral / dietary relevance; otherwise not clinically justified."
+    }
+  }
+}

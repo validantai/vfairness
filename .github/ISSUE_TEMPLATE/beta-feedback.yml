@@ -1,0 +1,67 @@
+name: Beta feedback
+description: Tell us what you tried with the vfairness beta and how it went.
+title: "[beta] "
+labels: ["beta-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing the beta. Everything below is optional except the
+        first box, so please do not let a blank field stop you from filing.
+
+        If you think you have found a **security** problem, do not file it here.
+        Follow [SECURITY.md](../blob/main/SECURITY.md) instead.
+  - type: textarea
+    id: what_happened
+    attributes:
+      label: What did you try, and what happened?
+      description: >
+        What you expected and what you got. A confusing error message or an
+        unclear page is a valid report; it does not have to be a crash.
+      placeholder: |
+        I ran a demographic parity check on a hiring dataset with 3 groups.
+        I expected a per-group table. I got a single number and could not tell
+        which group it referred to.
+    validations:
+      required: true
+  - type: textarea
+    id: snippet
+    attributes:
+      label: A minimal snippet, if something broke
+      description: The smallest piece of code that shows it. Paste the traceback too.
+      render: python
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which kind of audit was this?
+      description: >
+        We are deliberately looking for spread across these, so this answer is
+        genuinely useful even when the rest of the report is short.
+      options:
+        - Classification
+        - Regression
+        - Ranking
+        - LLM
+        - Agent or multi-agent
+        - Explainability (XAI)
+        - Reporting, charts or exports
+        - CI/CD gate
+        - Documentation only
+        - Something else
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Output of `python -c "import sys, vfairness; print(sys.version, vfairness.__version__)"`
+      placeholder: "3.12.4 ... 0.1.0"
+  - type: checkboxes
+    id: honesty
+    attributes:
+      label: One thing we especially want to hear about
+      description: >
+        The library's core promise is that it never reports a result it did not
+        measure. If you saw it claim something it had not checked, that is the
+        most valuable report you can send us.
+      options:
+        - label: I saw the library report a pass, a score or an "all clear" for something it had not actually measured.
+        - label: I saw a number or a verdict I could not trace back to my data.

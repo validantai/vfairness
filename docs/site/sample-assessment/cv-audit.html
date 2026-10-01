@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a3a4f">
+    <meta name="description" content="End-to-end fairness audit for a computer vision model in medical imaging. Image-specific bias evaluation, calibration, and EU AI Act compliance for healthcare AI using vfairness.">
+    <meta name="keywords" content="computer vision fairness, medical imaging AI, EU AI Act, healthcare bias, chest X-ray, algorithmic audit, vfairness">
+    <meta name="author" content="validant.ai">
+    <meta name="version" content="0.1.0">
+
+    <title>CV Audit &mdash; Medical Imaging Fairness Assessment | vfairness</title>
+
+    <link rel="icon" type="image/svg+xml" href="../img/favicon-v2.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script>/* theme before first paint: vf-theme = light | dark | system */(function(){var m='system';try{m=localStorage.getItem('vf-theme')||'system'}catch(e){}var d=m==='dark'||(m==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;r.setAttribute('data-theme',d?'dark':'light');r.setAttribute('data-theme-mode',m)})()</script>
+
+    <style>
+        /* ── Phase timeline ── */
+        .phase-timeline { display:flex; align-items:stretch; gap:0; overflow-x:auto; padding:0.5rem 0 1.5rem; margin:0 -0.5rem; }
+        .phase-step { flex:1; min-width:90px; text-align:center; position:relative; padding:0.6rem 0.3rem; }
+        .phase-step::after { content:''; position:absolute; top:22px; right:-50%; width:100%; height:2px; background:var(--color-gray-200); z-index:0; }
+        .phase-step:last-child::after { display:none; }
+        .phase-num { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; color:#fff; font-size:0.7rem; font-weight:700; position:relative; z-index:1; }
+        .phase-label { display:block; font-size:0.65rem; font-weight:500; color:var(--color-gray-500); margin-top:0.35rem; line-height:1.2; }
+        .phase-step.active .phase-label { color:var(--color-gray-900); font-weight:600; }
+
+        /* ── Artifact card ── */
+        .artifact-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; margin:1.5rem 0; }
+        .artifact-card { background:#fff; border:1px solid var(--color-gray-200); border-radius:var(--radius-lg); overflow:hidden; transition:all var(--transition-base); }
+        .artifact-card:hover { border-color:var(--color-gray-300); box-shadow:var(--shadow-md); }
+        .artifact-card img { width:100%; height:auto; display:block; border-bottom:1px solid var(--color-gray-100); }
+        .artifact-card .artifact-info { padding:0.75rem 1rem; }
+        .artifact-card .artifact-title { font-size:0.85rem; font-weight:600; color:var(--color-gray-900); }
+        .artifact-card .artifact-func { font-family:var(--font-mono); font-size:0.7rem; color:var(--color-gray-400); margin-top:0.2rem; }
+
+        /* ── Phase section ── */
+        .phase-section { margin-top:3rem; padding-top:2rem; border-top:1px solid var(--color-gray-200); }
+        .phase-section:first-of-type { border-top:none; margin-top:2rem; }
+        .phase-badge { display:inline-flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; }
+        .phase-badge .num { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; color:#fff; font-size:0.75rem; font-weight:700; }
+        .phase-badge .label { font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--color-gray-400); }
+
+        /* ── Findings callout ── */
+        .finding-box { background:var(--color-gray-50); border-left:3px solid; border-radius:0 var(--radius-md) var(--radius-md) 0; padding:1rem 1.25rem; margin:1.25rem 0; }
+        .finding-box.pass { border-color:#059669; }
+        .finding-box.warn { border-color:#f59e0b; }
+        .finding-box.fail { border-color:#dc2626; }
+        .finding-box .finding-title { font-size:0.8rem; font-weight:600; margin-bottom:0.4rem; }
+        .finding-box.pass .finding-title { color:#059669; }
+        .finding-box.warn .finding-title { color:#b45309; }
+        .finding-box.fail .finding-title { color:#dc2626; }
+        .finding-box p { font-size:0.85rem; color:var(--color-gray-600); margin:0; }
+
+        /* ── SVG preview ── */
+        .svg-preview { margin:1.5rem 0; border:1px solid var(--color-gray-200); border-radius:var(--radius-lg); overflow:hidden; background:#f8f9fb; }
+        .svg-preview img { width:100%; height:auto; display:block; }
+        .svg-preview-caption { padding:0.5rem 1rem; background:#fff; border-top:1px solid var(--color-gray-100); display:flex; justify-content:space-between; align-items:center; }
+        .svg-preview-caption .cap-title { font-size:0.8rem; font-weight:600; color:var(--color-gray-700); }
+        .svg-preview-caption .cap-func { font-family:var(--font-mono); font-size:0.7rem; color:var(--color-gray-400); }
+
+        /* ── EU AI Act checklist ── */
+        .compliance-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1rem; margin:1.5rem 0; }
+        .compliance-item { display:flex; gap:0.75rem; align-items:flex-start; padding:1rem; background:#fff; border:1px solid var(--color-gray-200); border-radius:var(--radius-lg); }
+        .compliance-check { width:24px; height:24px; border-radius:50%; background:#ecfdf5; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+        .compliance-check svg { color:#059669; }
+        .compliance-text .ct-title { font-size:0.85rem; font-weight:600; color:var(--color-gray-800); }
+        .compliance-text .ct-desc { font-size:0.78rem; color:var(--color-gray-500); margin-top:0.15rem; line-height:1.4; }
+
+        /* ── Scenario card ── */
+        .scenario-card { background:linear-gradient(135deg,#ede9fe,#ecfdf5); border:1px solid #a78bfa; border-radius:var(--radius-xl); padding:1.5rem 2rem; margin:1.5rem 0; }
+        .scenario-card h3 { margin-top:0; font-size:1.1rem; color:#5b21b6; }
+        .scenario-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; margin-top:1rem; }
+        .scenario-stat { text-align:center; }
+        .scenario-stat .val { font-size:1.5rem; font-weight:700; color:#5b21b6; }
+        .scenario-stat .lbl { font-size:0.75rem; color:var(--color-gray-500); margin-top:0.15rem; }
+
+        /* ── Module colors ── */
+        .mod-preprocessing { background:#f59e0b; }
+        .mod-training { background:#0aafe3; }
+        .mod-postprocessing { background:#6366f1; }
+        .mod-evaluation { background:#2c5f7c; }
+        .mod-operations { background:#059669; }
+        .mod-reporting { background:#7c3aed; }
+
+        /* ── Summary table ── */
+        .summary-table { width:100%; border-collapse:separate; border-spacing:0; margin:1rem 0; font-size:0.85rem; }
+        .summary-table th { background:var(--color-gray-50); padding:0.6rem 1rem; text-align:left; font-weight:600; color:var(--color-gray-600); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; border-bottom:2px solid var(--color-gray-200); }
+        .summary-table td { padding:0.6rem 1rem; border-bottom:1px solid var(--color-gray-100); color:var(--color-gray-700); }
+        .summary-table code { font-size:0.78rem; background:var(--color-gray-100); padding:0.1rem 0.4rem; border-radius:4px; }
+
+        /* ── Wide SVG side-by-side ── */
+        .svg-duo { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1.5rem 0; }
+        @media (max-width:768px) { .svg-duo { grid-template-columns:1fr; } .phase-timeline { overflow-x:auto; } }
+
+        /* ── CV-specific: image data callout ── */
+        .cv-note { display:flex; gap:0.75rem; align-items:flex-start; padding:1rem 1.25rem; background:#ede9fe; border:1px solid #a78bfa; border-radius:var(--radius-lg); margin:1.25rem 0; }
+        .cv-note .cv-icon { flex-shrink:0; width:28px; height:28px; background:#7c3aed; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:0.8rem; }
+        .cv-note .cv-text { font-size:0.85rem; color:#3b0764; line-height:1.5; }
+        .cv-note .cv-text strong { color:#5b21b6; }
+    </style>
+    <script src="https://validant.ai/consent/v1/consent.js" defer></script>
+  </head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+    <div class="header-container">
+        <div class="logo-section">
+            <a href="../index.html">
+                <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
+            </a>
+            <span class="logo-divider"></span>
+            <span class="lib-name"><span>v</span>fairness</span>
+        </div>
+        <nav class="main-nav" aria-label="Main navigation">
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="../getting-started/index.html" class="nav-link">Getting Started</a>
+                </li>
+                <li class="nav-item">
+                    <a href="../api-reference/index.html" class="nav-link">API Reference</a>
+                </li>
+                <li class="nav-item nav-item--has-dropdown">
+                    <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                        Learn
+                        <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <div class="nav-dropdown" role="menu" aria-label="Learn submenu">
+                        <div class="nav-dropdown__inner">
+                            <a href="../test-objects/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">Find a Test Object</span>
+                                    <span class="nav-dropdown__desc">Data, models and agents to test, by access depth</span>
+                                </span>
+                            </a>
+                            <a href="../business-guide/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">Business Guide</span>
+                                    <span class="nav-dropdown__desc">Fairness strategy for decision-makers</span>
+                                </span>
+                            </a>
+                            <div class="nav-dropdown__group">
+                                <div class="nav-dropdown__group-label">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Sample Assessments</span>
+                                        <span class="nav-dropdown__desc">End-to-end audits with EU AI Act compliance</span>
+                                    </span>
+                                </div>
+                                <div class="nav-dropdown__group-items">
+                                    <a href="index.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Binary Classifier</span> <span class="sub-desc">&mdash; Credit scoring</span></a>
+                                    <a href="llm-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Foundation LLM</span> <span class="sub-desc">&mdash; Resume screening</span></a>
+                                    <a href="cv-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Computer Vision</span> <span class="sub-desc">&mdash; Medical imaging</span></a>
+                                    <a href="ranking-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Ranking System</span> <span class="sub-desc">&mdash; Job platform</span></a>
+                                </div>
+                            </div>
+                            <a href="../concepts/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">Concepts</span>
+                                    <span class="nav-dropdown__desc">Fairness theory and metric foundations</span>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                    <li class="nav-item">
+                        <a href="../our-offering/index.html" class="nav-link">Our Offering</a>
+                    </li>
+                <li class="nav-item nav-item--has-dropdown">
+                    <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                        Explore
+                        <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <div class="nav-dropdown" role="menu" aria-label="Explore submenu">
+                        <div class="nav-dropdown__inner">
+                            <a href="../svg-gallery/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">SVG Gallery</span>
+                                    <span class="nav-dropdown__desc">Interactive visualization templates</span>
+                                </span>
+                            </a>
+                            <a href="../workflow-integration/index.html" role="menuitem" class="nav-dropdown__item">
+                                <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+                                <span class="nav-dropdown__text">
+                                    <span class="nav-dropdown__label">Workflow Integration</span>
+                                    <span class="nav-dropdown__desc">MLOps, CI/CD, and experiment tracking</span>
+                                </span>
+                            </a>
+                                <a href="../usage-map/index.html" role="menuitem" class="nav-dropdown__item" data-um-injected="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Library Usage Map</span>
+                                        <span class="nav-dropdown__desc">Where the platform uses each vfairness symbol</span>
+                                    </span>
+                                </a>
+<a href="../llm-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">LLM Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Counterfactual testing, benchmarks, output analysis for LLMs</span>
+                                    </span>
+                                </a>
+                                <a href="../agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Agent Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Correspondence testing, tool bias, RAG bias, pipeline tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../multi-agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Multi-Agent Testing</span>
+                                        <span class="nav-dropdown__desc">Emergent bias, groupthink, non-compositionality</span>
+                                    </span>
+                                </a>
+                                <a href="../explainability-and-xai/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Explainability &amp; XAI</span>
+                                        <span class="nav-dropdown__desc">SHAP attributions, fairness decomposition, counterfactuals</span>
+                                    </span>
+                                </a>
+                                <a href="../training-time-interventions/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Training-Time Interventions</span>
+                                        <span class="nav-dropdown__desc">Fairness-aware losses, constraints, calibration</span>
+                                    </span>
+                                </a>
+</div>
+                    </div>
+                </li>
+            </ul>
+                <div class="nav-cta">
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="Search docs...">
+                    </div>
+                    <a href="https://github.com/validantai/vfairness" class="btn btn-secondary btn-sm" target="_blank">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        GitHub
+                    </a>
+                </div>
+
+                <button type="button" class="mobile-nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-panel">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+<!-- Mobile Navigation -->
+<div class="mobile-nav-overlay" aria-hidden="true"></div>
+<nav class="mobile-nav-panel" id="mobile-nav-panel" aria-label="Mobile navigation" aria-hidden="true">
+    <div class="mobile-nav-header">
+        <span class="mobile-nav-title">Menu</span>
+        <button type="button" class="mobile-nav-close" aria-label="Close navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div class="mobile-nav-body">
+        <a href="../getting-started/index.html" class="mobile-nav-link">Getting Started</a>
+        <a href="../api-reference/index.html" class="mobile-nav-link">API Reference</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Learn
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../test-objects/index.html" class="mobile-nav-sublink">Find a Test Object</a>
+                <a href="../business-guide/index.html" class="mobile-nav-sublink">Business Guide</a>
+                <span class="mobile-nav-sublink" style="font-size:0.7rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:0.5rem 0 0.15rem;">Sample Assessments</span>
+                <a href="index.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Binary Classifier</a>
+                <a href="llm-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Foundation LLM</a>
+                <a href="cv-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Computer Vision</a>
+                <a href="ranking-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Ranking System</a>
+                <a href="../concepts/index.html" class="mobile-nav-sublink">Concepts</a>
+            </div></div>
+        </div>
+        <a href="../our-offering/index.html" class="mobile-nav-link">Our Offering</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Explore
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../svg-gallery/index.html" class="mobile-nav-sublink">SVG Gallery</a>
+                <a href="../workflow-integration/index.html" class="mobile-nav-sublink">Workflow Integration</a>
+                <a href="../usage-map/index.html" class="mobile-nav-sublink" data-um-injected="1">Library Usage Map</a>
+<a href="../llm-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">LLM Fairness Testing</a>
+                <a href="../agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Agent Fairness Testing</a>
+                <a href="../multi-agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Multi-Agent Testing</a>
+                <a href="../explainability-and-xai/index.html" class="mobile-nav-sublink">Explainability &amp; XAI</a>
+                <a href="../training-time-interventions/index.html" class="mobile-nav-sublink">Training-Time Interventions</a>
+</div></div>
+        </div>
+    </div>
+</nav>
+<script>/* Mobile nav bootstrap — works before main.js loads */
+(function(){
+var t=document.querySelector(".mobile-nav-toggle"),p=document.querySelector(".mobile-nav-panel"),o=document.querySelector(".mobile-nav-overlay"),c=document.querySelector(".mobile-nav-close");
+if(!t||!p)return;t.setAttribute("data-nav-init","1");
+function open(){t.setAttribute("aria-expanded","true");p.classList.add("is-open");p.setAttribute("aria-hidden","false");if(o)o.classList.add("is-open");document.body.style.overflow="hidden";}
+function close(){t.setAttribute("aria-expanded","false");p.classList.remove("is-open");p.setAttribute("aria-hidden","true");if(o)o.classList.remove("is-open");document.body.style.overflow="";}
+t.addEventListener("click",function(){t.getAttribute("aria-expanded")==="true"?close():open();});
+if(c)c.addEventListener("click",close);
+if(o)o.addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList.contains("is-open"))close();});
+})()
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     LAYOUT: Sidebar + Main
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="page-wrapper docs-layout">
+    <aside class="sidebar">
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title">CV Assessment</div>
+            <ul class="sidebar-nav">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#scenario">Scenario</a></li>
+                <li><a href="#phase-map">Phase Map</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#f59e0b;">Preprocessing</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-1">1. Data Validation</a></li>
+                <li><a href="#phase-2">2. Bias Detection</a></li>
+                <li><a href="#phase-3">3. Feature Analysis</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#0aafe3;">Training</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-4">4. Fair Training</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#6366f1;">Post-Processing</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-5">5. Calibration</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#2c5f7c;">Evaluation</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-6">6. Metrics &amp; Testing</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#059669;">Operations</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-7">7. CI/CD Gating</a></li>
+                <li><a href="#phase-8">8. Monitoring</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title" style="color:#7c3aed;">Reporting</div>
+            <ul class="sidebar-nav">
+                <li><a href="#phase-9">9. Dashboards</a></li>
+                <li><a href="#phase-10">10. EU AI Act Card</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-section expanded">
+            <div class="sidebar-title">Summary</div>
+            <ul class="sidebar-nav">
+                <li><a href="#artifacts">All Artifacts</a></li>
+                <li><a href="#workflow">Workflow Integration</a></li>
+                <li><a href="#compliance">Compliance Checklist</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="content-container">
+
+<header class="page-intro">
+    <p class="vf-eyebrow" data-dated>Sample assessment &middot; computer vision</p>
+    <h1>Medical imaging fairness assessment</h1>
+    <p class="lead">A complete audit of a chest X-ray triage model, from imaging data validation to the EU AI Act model card.</p>
+</header>
+
+<!-- ─────────────────────────────────────────────────────────────
+     OVERVIEW
+     ───────────────────────────────────────────────────────────── -->
+<section id="overview">
+    <h2 class="mt-0">Overview</h2>
+    <p>This walkthrough demonstrates a <strong>complete fairness audit of a computer vision model</strong> used in healthcare. Unlike <a href="index.html" style="color:var(--color-primary);font-weight:600;">tabular classifiers</a> or <a href="llm-audit.html" style="color:var(--color-primary);font-weight:600;">black-box LLMs</a>, image-based AI systems present unique fairness challenges: demographic representation in training images, performance disparities across skin tones and anatomical variations, and regression-style continuous outputs (urgency scores) alongside binary triage decisions.</p>
+
+    <div class="cv-note">
+        <div class="cv-icon">CV</div>
+        <div class="cv-text">
+            <strong>Computer vision specifics:</strong> Medical imaging models process unstructured image data where protected attributes are often <em>not explicit</em> in the input but are encoded in visual features (body habitus, bone density patterns, device artifacts). Fairness evaluation requires linking image predictions to demographic metadata collected separately, and auditing performance at the intersection of clinical and demographic subgroups.
+        </div>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            What you will build
+        </div>
+        <p>By following this guide, you will produce: a validated imaging dataset audit, bias detection across demographic groups, feature attribution analysis, a calibrated triage model, comprehensive fairness metrics with confidence intervals, robustness tests across imaging conditions, CI/CD gate decisions, monitoring dashboards, multi-tier reports, and an EU AI Act&ndash;compliant model card for a healthcare AI system &mdash; all backed by <strong>23 production-grade SVG artifacts</strong>.</p>
+    </div>
+
+    <div class="callout callout-warning">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+            This is a scripted scenario, not a real audit
+        </div>
+        <p>The dataset, the model and every number in the Findings boxes below are invented to show the
+        shape of a complete audit. No file named here ships with the library, so the walkthrough is not
+        reproducible end to end as written, and nothing on this page is a measurement of a real system.
+        The <strong>code</strong> is real and the <strong>call signatures</strong> are checked against the
+        library; the <strong>results</strong> are illustration.</p>
+    </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────
+     SCENARIO
+     ───────────────────────────────────────────────────────────── -->
+<section id="scenario">
+    <h2>The Scenario</h2>
+    <div class="scenario-card">
+        <h3 style="margin-top:0;">Chest X-Ray Triage Model &mdash; EU AI Act High-Risk System</h3>
+        <p style="color:#3b0764;font-size:0.9rem;">A hospital network deploys a deep learning model (DenseNet-121) to prioritize chest X-rays in the emergency department. The model outputs an urgency score (0&ndash;100) and a binary triage decision (urgent/routine). Under the EU AI Act (Annex III, Section 5a), AI systems intended to be used for medical diagnosis or triage are classified as <strong>high-risk AI</strong>, subject to the most stringent compliance requirements.</p>
+        <div class="scenario-grid">
+            <div class="scenario-stat">
+                <div class="val">45,000</div>
+                <div class="lbl">Chest X-rays</div>
+            </div>
+            <div class="scenario-stat">
+                <div class="val">3</div>
+                <div class="lbl">Protected Attributes</div>
+            </div>
+            <div class="scenario-stat">
+                <div class="val">23</div>
+                <div class="lbl">SVG Artifacts</div>
+            </div>
+            <div class="scenario-stat">
+                <div class="val">10</div>
+                <div class="lbl">Audit Phases</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+
+# ── Load imaging metadata + model predictions ──
+# Each row = one chest X-ray with radiologist labels + model predictions
+df = pd.read_csv("cxr_triage_predictions.csv")
+
+# Columns: study_id, urgency_score (0-100), triage_decision (urgent/routine),
+#           radiologist_label, gender, race, age_group, imaging_site, device_type
+
+PROTECTED   = ["gender", "race", "age_group"]
+SCORE_COL   = "urgency_score"
+OUTCOME_COL = "radiologist_label"  # Ground truth from radiologist panel
+FEATURES    = ["imaging_site", "device_type", "study_hour", "body_region"]
+
+# Binary labels
+df["urgent_true"]  = (df[OUTCOME_COL] == "urgent").astype(int)
+df["urgent_pred"]  = (df["triage_decision"] == "urgent").astype(int)
+y_true     = df["urgent_true"]
+y_pred     = df["urgent_pred"]
+y_scores   = df[SCORE_COL] / 100.0   # Normalize to [0, 1]
+sensitive  = df[PROTECTED]
+
+# Train/test split (temporal: older studies for train, recent for test)
+df_train = df[df["study_date"] < "2025-01-01"]
+df_test  = df[df["study_date"] >= "2025-01-01"]
+
+print(f"Dataset: {len(df)} X-rays ({len(df_train)} train, {len(df_test)} test)")
+print(f"Urgent prevalence: {df['urgent_true'].mean():.1%}")
+print(f"Protected attributes: {PROTECTED}")</code></pre>
+    </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────
+     PHASE MAP
+     ───────────────────────────────────────────────────────────── -->
+<section id="phase-map">
+    <h2>Audit Pipeline</h2>
+    <p>The ten phases below follow the standard vfairness pipeline but address image-specific challenges: representation in visual data, feature attribution for convolutional networks, calibration of continuous urgency scores, and regression fairness across demographic and clinical subgroups.</p>
+    <div class="phase-timeline">
+        <div class="phase-step active"><span class="phase-num mod-preprocessing">1</span><span class="phase-label">Data<br>Validation</span></div>
+        <div class="phase-step"><span class="phase-num mod-preprocessing">2</span><span class="phase-label">Bias<br>Detection</span></div>
+        <div class="phase-step"><span class="phase-num mod-preprocessing">3</span><span class="phase-label">Feature<br>Analysis</span></div>
+        <div class="phase-step"><span class="phase-num mod-training">4</span><span class="phase-label">Fair<br>Training</span></div>
+        <div class="phase-step"><span class="phase-num mod-postprocessing">5</span><span class="phase-label">Calibration</span></div>
+        <div class="phase-step"><span class="phase-num mod-evaluation">6</span><span class="phase-label">Metrics &amp;<br>Testing</span></div>
+        <div class="phase-step"><span class="phase-num mod-operations">7</span><span class="phase-label">CI/CD<br>Gating</span></div>
+        <div class="phase-step"><span class="phase-num mod-operations">8</span><span class="phase-label">Monitoring</span></div>
+        <div class="phase-step"><span class="phase-num mod-reporting">9</span><span class="phase-label">Dashboards</span></div>
+        <div class="phase-step"><span class="phase-num mod-reporting">10</span><span class="phase-label">Model<br>Card</span></div>
+    </div>
+
+    <div class="cv-note">
+        <div class="cv-icon">CV</div>
+        <div class="cv-text">
+            <strong>Image-specific adaptations:</strong> Phase 1 validates demographic representation in imaging datasets (acquisition site diversity, device type distribution). Phase 3 uses correlation analysis between metadata features and outcomes instead of pixel-level feature engineering. Phase 4 applies sample reweighting to correct demographic imbalance in training images. Phase 6 includes regression fairness for the continuous urgency score output.
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 1: DATA VALIDATION
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-1" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-preprocessing">1</span>
+        <span class="label">Preprocessing</span>
+    </div>
+    <h2 style="margin-top:0;">Data Validation</h2>
+    <p>Validate the imaging dataset for demographic representation, acquisition site diversity, and outcome label quality. Medical imaging datasets frequently suffer from site-specific bias (images from different hospitals have different visual characteristics) and underrepresentation of minority populations.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.cicd import DataBiasValidator, DataValidationConfig
+
+validator = DataBiasValidator(
+    protected_attributes=PROTECTED,
+    config=DataValidationConfig(
+        min_samples_per_group=100,     # Higher minimum for medical imaging
+        missing_value_threshold=0.02,  # Strict: clinical data must be complete
+    ),
+)
+result = validator.validate(df, outcome_column="urgent_true")
+
+print(f"Passed: {result.passed}")
+print(f"Issues: {len(result.issues)}")
+
+# ── Generate SVG artifact ──
+from vfairness.rendering import data_validation_to_svg
+
+data_validation_to_svg(
+    result,
+    explanation="Imaging dataset validation for the chest X-ray triage model. Checks "
+                "demographic representation across 6 imaging sites, device type distribution, "
+                "missing metadata rates, and outcome label quality.",
+    save_path="artifacts/01_data_validation.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/data_validation.svg" alt="Data Validation Report" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Data Validation Report</span>
+            <span class="cap-func">data_validation_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="finding-box warn">
+        <div class="finding-title">Findings</div>
+        <p>1 critical: <code>race=Asian</code> underrepresented at 4.2% (population base rate ~6%). 1 warning: imaging site #3 contributes 38% of images (site-specific bias risk). 1 informational: 0.8% of images have missing <code>age_group</code> metadata. Proceed with documented caveats and reweighting.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 2: BIAS DETECTION & AUTO-DISCOVERY
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-2" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-preprocessing">2</span>
+        <span class="label">Preprocessing</span>
+    </div>
+    <h2 style="margin-top:0;">Bias Detection &amp; Auto-Discovery</h2>
+    <p>Scan the model&rsquo;s predictions for demographic disparities. In medical imaging, bias can arise from: (1) prevalence differences across populations, (2) image quality variations by site/device, and (3) annotation bias from radiologist panels with limited diversity.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.evaluation.vfairness_metrics import (
+    detect_protected_attributes,
+    scan_fairness_violations,
+    discover_intersectional_groups,
+)
+from vfairness.preprocessing.bias_detection import BiasDetector
+from vfairness.rendering import auto_discovery_to_svg, bias_audit_to_svg
+
+# ── Auto-discovery on model predictions ──
+candidates = detect_protected_attributes(df)
+violations = scan_fairness_violations(df, y_pred.to_numpy(), y_true=y_true.to_numpy())
+intersectional = discover_intersectional_groups(df, PROTECTED, y_pred.to_numpy())
+
+auto_discovery_to_svg(
+    candidates=candidates,
+    violations=violations,
+    group_advantages=intersectional,
+    explanation="Automated scan of the chest X-ray triage model identifying gender, race, "
+                "and age_group as attributes correlated with prediction disparities. "
+                "age_group shows highest correlation due to disease prevalence differences.",
+    save_path="artifacts/02a_auto_discovery.svg",
+)
+
+# ── Full bias audit ──
+detector = BiasDetector(df, protected_attributes=PROTECTED, outcome_column="urgent_true")
+audit = detector.full_audit()
+
+bias_audit_to_svg(
+    audit,
+    explanation="Comprehensive bias audit of the triage model covering outcome disparities, "
+                "sensitivity/specificity by group, and intersectional analysis. Focus on "
+                "clinically significant false negative rate differences.",
+    save_path="artifacts/02b_bias_audit.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/auto_discovery.svg" alt="Auto-Discovery Scanner" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Auto-Discovery Scanner</span>
+                <span class="cap-func">auto_discovery_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/bias_audit.svg" alt="Bias Audit Dashboard" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Bias Audit Dashboard</span>
+                <span class="cap-func">bias_audit_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box fail">
+        <div class="finding-title">Findings</div>
+        <p>False negative rate disparity: <code>race=Black</code> patients have 12.4% FNR vs 6.1% overall &mdash; urgent cases are more likely to be missed. Intersectional group <code>Black &times; age_group=65+</code> has the highest FNR (15.8%). Two high-severity violations flagged for immediate review.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 3: FEATURE ANALYSIS
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-3" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-preprocessing">3</span>
+        <span class="label">Preprocessing</span>
+    </div>
+    <h2 style="margin-top:0;">Feature &amp; Metadata Analysis</h2>
+    <p>Analyze correlations between metadata features (imaging site, device type, acquisition parameters) and both outcomes and protected attributes. In medical imaging, site-specific visual signatures can act as demographic proxies &mdash; if certain demographics are concentrated at specific hospitals.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.preprocessing.feature_engineering import FeatureEngineeringAnalyzer
+from vfairness.rendering import (
+    proxy_risk_to_svg,
+    correlation_heatmap_to_svg,
+)
+
+analyzer = FeatureEngineeringAnalyzer(
+    df, protected_attributes=PROTECTED,
+    target_column="urgent_true", feature_columns=FEATURES,
+)
+report = analyzer.full_analysis()
+
+# ── Proxy risk: imaging_site as demographic proxy ──
+proxy_risk_to_svg(
+    report.proxy_variables,
+    explanation="Proxy analysis for imaging metadata. 'imaging_site' can act as a "
+                "demographic proxy because hospital catchment areas are demographically "
+                "stratified.",
+    save_path="artifacts/03a_proxy_risk.svg",
+)
+
+# ── Correlation heatmap ──
+# correlation_heatmap_to_svg expects a feature-keyed view of the matrix
+from types import SimpleNamespace
+
+cm = report.correlation_matrix
+heatmap_view = SimpleNamespace(
+    features=cm.feature_names,
+    protected_attributes=cm.protected_attributes,
+    correlations={
+        f: {a: float(cm.correlations[a][f]) for a in cm.protected_attributes}
+        for f in cm.feature_names
+    },
+)
+correlation_heatmap_to_svg(
+    heatmap_view,
+    explanation="Metadata-to-demographic correlation matrix. Reveals how imaging acquisition "
+                "context (site, device, time-of-day) correlates with protected attributes.",
+    save_path="artifacts/03b_correlation_heatmap.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/proxy_risk.svg" alt="Proxy Risk Assessment" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Proxy Risk Assessment</span>
+                <span class="cap-func">proxy_risk_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/correlation_heatmap.svg" alt="Correlation Heatmap" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Correlation Heatmap</span>
+                <span class="cap-func">correlation_heatmap_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box warn">
+        <div class="finding-title">Findings</div>
+        <p><code>imaging_site</code> is a critical proxy for <code>race</code> (r=0.68). Site #3 (38% of images) is 82% White patients, while site #5 (8% of images) is 71% Black patients. This demographic stratification by site means the model may learn site-specific visual artifacts as demographic shortcuts.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 4: FAIR TRAINING
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-4" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-training">4</span>
+        <span class="label">Training</span>
+    </div>
+    <h2 style="margin-top:0;">Fair Training with Sample Reweighting</h2>
+    <p>Retrain the model using sample reweighting to correct for demographic imbalance and site-specific bias. For imaging models, fairness-aware training typically uses <strong>reweighting</strong> (upweighting underrepresented group-outcome combinations) rather than adversarial methods, which can destabilize visual feature learning.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.preprocessing.feature_engineering import ReweightingTransformer
+from vfairness.post_processing.reweighting import ReweightingAnalyzer
+from vfairness.rendering import (
+    training_report_to_svg,
+    reweighting_comparison_to_svg,
+)
+
+# ── Kamiran &amp; Calders sample weights for fairness-aware retraining ──
+reweighter = ReweightingTransformer(
+    protected_attributes=PROTECTED, method="target_parity",
+)
+reweighter.fit(df_train, y=df_train["urgent_true"])
+weights = reweighter.get_sample_weights(df_train, y=df_train["urgent_true"])
+
+# Retrain DenseNet-121 with sample weights
+# model.fit(X_train_images, y_train, sample_weight=weights)
+
+# ... training loop produces training_history dict, rendered with
+# training_report_to_svg(training_history, save_path="artifacts/04a_training_report.svg") ...
+
+# ── Analyze what prediction reweighting would change ──
+rw_report = ReweightingAnalyzer(y_true, y_scores, sensitive["race"]).full_analysis()
+
+reweighting_comparison_to_svg(
+    rw_report,
+    explanation="Reweighting impact analysis: per-group positive rates before and "
+                "after reweighting, and the fairness-accuracy trade-off.",
+    save_path="artifacts/04b_reweighting_comparison.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/training_report.svg" alt="Training Report" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Training Report</span>
+                <span class="cap-func">training_report_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/reweighting_comparison_report.svg" alt="Reweighting Comparison" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Reweighting Comparison</span>
+                <span class="cap-func">reweighting_comparison_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Findings</div>
+        <p>Reweighting reduces the FNR disparity for <code>race=Black</code> from 12.4% to 7.8% (threshold: 8%). Overall AUC drops marginally from 0.912 to 0.905. The trade-off is clinically acceptable &mdash; fewer missed urgent cases in underserved populations.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 5: CALIBRATION
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-5" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-postprocessing">5</span>
+        <span class="label">Post-Processing</span>
+    </div>
+    <h2 style="margin-top:0;">Urgency Score Calibration</h2>
+    <p>The model&rsquo;s urgency scores (0&ndash;100) must be well-calibrated so that a score of &ldquo;80&rdquo; means the same clinical urgency regardless of patient demographics. In healthcare, miscalibration has direct patient safety implications.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.post_processing.calibration import CalibrationAnalyzer
+from vfairness.rendering import (
+    calibration_report_to_svg,
+    reliability_diagram_to_svg,
+)
+
+cal = CalibrationAnalyzer(y_true, y_scores, sensitive["race"])
+cal_report = cal.full_analysis()
+
+calibration_report_to_svg(
+    cal_report,
+    explanation="Group-wise calibration analysis for urgency scores. ECE computed per "
+                "racial group to detect if score '80' means different urgency levels "
+                "for different populations — a direct patient safety concern.",
+    save_path="artifacts/05a_calibration_report.svg",
+)
+
+reliability_diagram_to_svg(
+    y_true, y_scores,
+    explanation="Reliability diagram for the triage urgency scores. Deviation from the "
+                "diagonal indicates systematic over- or under-estimation of urgency.",
+    save_path="artifacts/05b_reliability_diagram.svg",
+)</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/calibration_report.svg" alt="Calibration Report" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Calibration Report</span>
+                <span class="cap-func">calibration_report_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/reliability_diagram.svg" alt="Reliability Diagram" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Reliability Diagram</span>
+                <span class="cap-func">reliability_diagram_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Findings</div>
+        <p>After reweighted training: overall ECE = 0.042. Group ECE disparity reduced from 0.051 to 0.018 (threshold: 0.02). Isotonic calibration applied as a final correction, bringing all groups below threshold.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 6: METRICS & TESTING
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-6" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-evaluation">6</span>
+        <span class="label">Evaluation</span>
+    </div>
+    <h2 style="margin-top:0;">Comprehensive Metrics &amp; Robustness Testing</h2>
+    <p>Evaluate the reweighted and calibrated model across all fairness dimensions. For healthcare AI, <strong>equalized odds</strong> (equal sensitivity/specificity across groups) is typically the most clinically relevant metric, since both false positives (unnecessary escalation) and false negatives (missed urgent cases) carry clinical consequences.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness import FairnessAnalyzer
+from vfairness.evaluation.vfairness_metrics import (
+    permutation_test, sensitivity_analysis, subgroup_robustness_audit,
+)
+from vfairness.evaluation.vfairness_metrics.regression import get_group_metrics
+from vfairness.rendering import (
+    radar_chart_to_svg,
+    metrics_bar_chart_to_svg,
+    confidence_intervals_to_svg,
+    group_comparison_to_svg,
+    robustness_testing_to_svg,
+    regression_fairness_to_svg,
+)
+
+analyzer = FairnessAnalyzer(
+    y_true, y_pred, sensitive["race"],
+    y_prob=y_scores, fair_explainer=True,
+)
+report = analyzer.get_report(include_ci=True, include_explanations=True)
+
+radar_chart_to_svg(report,
+    explanation="Multi-metric radar chart for the chest X-ray triage model. "
+                "Equalized odds is the primary clinical fairness metric.",
+    save_path="artifacts/06a_radar_chart.svg")
+
+metrics_bar_chart_to_svg(report,
+    explanation="All fairness metrics against healthcare-specific thresholds. "
+                "FNR parity is stricter (0.05) due to patient safety requirements.",
+    save_path="artifacts/06b_metrics_bar_chart.svg")
+
+# The forest plot reads a "confidence_intervals" mapping with lower/upper keys,
+# built here from the report's metrics_with_ci entries.
+confidence_intervals_to_svg(
+    {
+        "metrics": report["metrics"],
+        "confidence_intervals": {
+            m: {"lower": ci["lower_bound"], "upper": ci["upper_bound"]}
+            for m, ci in report["metrics_with_ci"].items()
+        },
+    },
+    explanation="95% bootstrap confidence intervals for each metric.",
+    save_path="artifacts/06c_confidence_intervals.svg")
+
+group_comparison_to_svg(report,
+    explanation="Per-group triage rate comparison.",
+    save_path="artifacts/06d_group_comparison.svg")
+
+# ── Robustness testing ──
+# The robustness tests take a metric function of (y_pred, sensitive_attr)
+def parity_gap(y_pred_arr, attr):
+    rates = [np.mean(y_pred_arr[attr == g]) for g in np.unique(attr)]
+    return max(rates) - min(rates)
+
+race_arr = sensitive["race"].to_numpy()
+perm = permutation_test(y_pred.to_numpy(), race_arr, parity_gap)
+sens = sensitivity_analysis(y_pred.to_numpy(), race_arr, parity_gap)
+audit = subgroup_robustness_audit(y_pred.to_numpy(), sensitive, y_true=y_true.to_numpy())
+
+robustness_testing_to_svg(
+    permutation_results=[perm], sensitivity_results=[sens],
+    subgroup_audit=audit,
+    explanation="Robustness validation across imaging conditions (site, device, time). "
+                "Tests metric stability under data perturbation.",
+    save_path="artifacts/06e_robustness_testing.svg")
+
+# ── Regression fairness on urgency scores ──
+regression_fairness_to_svg(
+    group_metrics=get_group_metrics(y_true.astype(float), y_scores, sensitive["race"]),
+    explanation="Regression fairness analysis of continuous urgency scores. Evaluates MAE "
+                "parity, mean prediction difference, and residual bias across racial groups.",
+    save_path="artifacts/06f_regression_fairness.svg")</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/radar_chart.svg" alt="Fairness Radar Chart" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Fairness Radar Chart</span>
+            <span class="cap-func">radar_chart_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/metrics_bar_chart.svg" alt="Metrics Bar Chart" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Metrics Bar Chart</span>
+                <span class="cap-func">metrics_bar_chart_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/confidence_intervals.svg" alt="Confidence Intervals" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Confidence Intervals</span>
+                <span class="cap-func">confidence_intervals_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/group_comparison.svg" alt="Group Comparison" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Group Comparison</span>
+                <span class="cap-func">group_comparison_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/robustness_testing.svg" alt="Robustness Testing" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Robustness Testing Dashboard</span>
+                <span class="cap-func">robustness_testing_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/regression_fairness.svg" alt="Regression Fairness" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Regression Fairness (Urgency Scores)</span>
+            <span class="cap-func">regression_fairness_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Findings</div>
+        <p>After reweighting + calibration: equalized odds difference = 0.04 (pass), FNR parity = 0.03 (pass, healthcare threshold 0.05), demographic parity difference = 0.07 (pass). Regression MAE parity = 0.08 (pass). All permutation tests significant (p &lt; 0.001). Robustness score: 0.81 (PASS).</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 7: CI/CD GATING
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-7" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-operations">7</span>
+        <span class="label">Operations</span>
+    </div>
+    <h2 style="margin-top:0;">CI/CD Gating</h2>
+    <p>Medical AI deployments require stringent gates. The fairness gate is complemented by clinical performance gates (minimum sensitivity, maximum FNR) that must be satisfied per demographic group before deployment.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.cicd import ModelFairnessGate, GateConfig
+from vfairness.operations.cicd.gate import HierarchicalGateConfig
+from vfairness.rendering import cicd_pipeline_to_svg, hierarchical_gate_to_svg
+
+gate = ModelFairnessGate(config=GateConfig(
+    thresholds={
+        "demographic_parity_difference": 0.10,
+        "equalized_odds_difference": 0.08,     # Stricter for healthcare
+        "equal_opportunity_difference": 0.05,  # FNR parity — patient safety
+    },
+))
+decision = gate.evaluate(y_true, y_pred, sensitive["race"])
+
+cicd_pipeline_to_svg(gate_decision=decision,
+    explanation="CI/CD fairness gate for the chest X-ray triage model. Healthcare-grade "
+                "thresholds: stricter equalized odds (0.08) and FNR parity (0.05).",
+    save_path="artifacts/07a_cicd_pipeline.svg")
+
+hier_config = HierarchicalGateConfig(
+    check_intersections=True,
+    intersection_depth=2,
+    min_group_size=50,
+    per_intersection_thresholds={
+        "Black_65+": {"equal_opportunity_difference": 0.08},
+    },
+)
+hier_decision = gate.evaluate_hierarchical(
+    y_true.to_numpy(), y_pred.to_numpy(),
+    protected_attrs={"race": sensitive["race"].to_numpy(),
+                     "age_group": sensitive["age_group"].to_numpy()},
+    hierarchical_config=hier_config,
+)
+
+hierarchical_gate_to_svg(hier_decision,
+    explanation="Hierarchical gate with clinical-grade intersectional evaluation. "
+                "Elevated thresholds for previously identified vulnerable group (Black × 65+).",
+    save_path="artifacts/07b_hierarchical_gate.svg")</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/cicd_pipeline.svg" alt="CI/CD Pipeline Gate" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">CI/CD Pipeline Gate</span>
+                <span class="cap-func">cicd_pipeline_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/hierarchical_gate.svg" alt="Hierarchical Gate" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Hierarchical Gate</span>
+                <span class="cap-func">hierarchical_gate_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Gate Decision: PASS</div>
+        <p>All global and per-group thresholds satisfied after reweighting. The <code>Black &times; 65+</code> subgroup passes its elevated threshold (FNR parity = 0.04, threshold 0.08). One SmallSampleWarning for <code>Asian &times; 18-24</code> (n=58).</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 8: MONITORING
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-8" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-operations">8</span>
+        <span class="label">Operations</span>
+    </div>
+    <h2 style="margin-top:0;">Production Monitoring</h2>
+    <p>Medical imaging models face unique drift sources: new imaging equipment, seasonal disease patterns, and changes in patient population demographics. Monitoring must track both fairness metrics and clinical performance per subgroup.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.monitoring import FairnessMonitor, FairnessMonitorConfig
+from vfairness.operations.monitoring import FairnessDriftDetector
+from vfairness.rendering import monitoring_dashboard_to_svg, drift_report_to_svg
+
+monitor = FairnessMonitor(config=FairnessMonitorConfig(
+    window_size=1000,          # rows retained in the sliding window
+    alert_threshold=0.8,       # minimum acceptable disparate impact ratio
+    metrics_to_track=["disparate_impact", "demographic_parity", "equalized_odds"],
+))
+
+# Batches are DataFrames carrying the prediction, the label, and the
+# protected-attribute columns (in production this runs on every batch)
+reference_df = pd.DataFrame({
+    "prediction": y_pred.to_numpy(),
+    "label": y_true.to_numpy(),
+    "race": df["race"].to_numpy(),
+})
+# stand-in for the next batch of triage decisions: same columns, fresh rows
+production_batch_df = reference_df.sample(500, random_state=7)
+
+monitor.set_reference(reference_df)
+window = monitor.update_and_check(production_batch_df)
+
+monitoring_dashboard_to_svg(window,
+    explanation="Fairness monitoring snapshot for the triage model: tracked metrics, "
+                "per-group rates, and alert status. Alerts on new imaging equipment "
+                "or seasonal population shifts.",
+    save_path="artifacts/08a_monitoring_dashboard.svg")
+
+# ── Drift detection ──
+# The detector compares series of a fairness metric over time, in production
+# taken from monitor.get_metric_history(); illustrative values shown here
+baseline_metric_series = pd.Series([0.04, 0.03, 0.05, 0.04, 0.03, 0.04, 0.05, 0.04] * 8)
+production_metric_series = pd.Series(np.linspace(0.04, 0.10, 64))
+
+detector = FairnessDriftDetector()
+detector.set_baseline(baseline_metric_series)
+drift = detector.check_drift(production_metric_series, metric="equal_opportunity")
+
+drift_report_to_svg(drift,
+    explanation="Drift analysis comparing production metrics against audit baseline. "
+                "Monitors for equipment-related drift and seasonal population changes.",
+    save_path="artifacts/08b_drift_report.svg")</code></pre>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/monitoring_dashboard.svg" alt="Monitoring Dashboard" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Monitoring Dashboard</span>
+                <span class="cap-func">monitoring_dashboard_to_svg()</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/drift_report.svg" alt="Drift Report" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Drift Report</span>
+                <span class="cap-func">drift_report_to_svg()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="finding-box pass">
+        <div class="finding-title">Findings</div>
+        <p>The detector fires on this window. Run the series above and <code>check_drift()</code> returns <code>drift_detected=True</code> with an overall drift score of 0.98: the equal-opportunity gap climbs from 0.04 to 0.10 against a baseline averaging 0.04. In an imaging deployment that is the pattern a fleet change produces, so it routes to the equipment review rather than to a model retrain by reflex. Automated alerts remain configured for new device types, which trigger mandatory re-evaluation, and for seasonal population thresholds.</p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 9: REPORTING DASHBOARDS
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-9" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-reporting">9</span>
+        <span class="label">Reporting</span>
+    </div>
+    <h2 style="margin-top:0;">Multi-Tier Reporting</h2>
+    <p>Generate three report tiers. The executive report for hospital leadership emphasizes patient safety metrics. The operational report for radiology teams includes site-specific performance. The technical report provides full statistical evidence for regulatory submission.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.reporting import (
+    ReportGenerator, ReportConfig, MetricsStore, ReportTier, OutputFormat,
+)
+from vfairness.rendering import reporting_dashboard_to_svg
+
+store = MetricsStore()
+store.ingest_window_metrics(window)   # Phase 8 monitoring window
+store.ingest_from_monitor(monitor)    # full monitor history
+store.ingest_drift_result(drift)
+
+generator = ReportGenerator(store, config=ReportConfig(
+    custom_title="Chest X-Ray Triage Model Fairness Report",
+))
+
+exec_report = generator.generate(tier=ReportTier.EXECUTIVE, output_format=OutputFormat.MARKDOWN)
+reporting_dashboard_to_svg(exec_report, tier="executive",
+    explanation="Hospital leadership summary: patient safety metrics, FNR parity status, "
+                "and compliance for CE marking under the EU AI Act / MDR.",
+    save_path="artifacts/09a_executive_dashboard.svg")
+
+ops_report = generator.generate(tier=ReportTier.OPERATIONAL, output_format=OutputFormat.MARKDOWN)
+reporting_dashboard_to_svg(ops_report, tier="operational",
+    explanation="Radiology team dashboard: per-site performance, device-specific metrics, "
+                "and recommendations for imaging protocol adjustments.",
+    save_path="artifacts/09b_operational_dashboard.svg")
+
+tech_report = generator.generate(tier=ReportTier.TECHNICAL, output_format=OutputFormat.JSON)
+reporting_dashboard_to_svg(tech_report, tier="technical",
+    explanation="Full statistical evidence for regulatory submission. Includes bootstrap "
+                "CIs, regression fairness, and subgroup robustness audit results.",
+    save_path="artifacts/09c_technical_dashboard.svg")</code></pre>
+    </div>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/reporting_dashboard_executive.svg" alt="Executive Dashboard" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">Executive Dashboard</span>
+            <span class="cap-func">reporting_dashboard_to_svg(tier="executive")</span>
+        </div>
+    </div>
+
+    <div class="svg-duo">
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/reporting_dashboard_operational.svg" alt="Operational Dashboard" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Operational Dashboard</span>
+                <span class="cap-func">reporting_dashboard_to_svg(tier="operational")</span>
+            </div>
+        </div>
+        <div class="svg-preview">
+            <img src="../img/svg-gallery/reporting_dashboard_technical.svg" alt="Technical Dashboard" loading="lazy">
+            <div class="svg-preview-caption">
+                <span class="cap-title">Technical Dashboard</span>
+                <span class="cap-func">reporting_dashboard_to_svg(tier="technical")</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 10: EU AI ACT MODEL CARD
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="phase-10" class="phase-section">
+    <div class="phase-badge">
+        <span class="num mod-reporting">10</span>
+        <span class="label">Compliance</span>
+    </div>
+    <h2 style="margin-top:0;">EU AI Act Model Card (Healthcare)</h2>
+    <p>Healthcare AI systems have <strong>dual regulatory obligations</strong>: the EU AI Act (Annex III, Section 5a) for high-risk AI, and the Medical Device Regulation (MDR 2017/745) when the system qualifies as a medical device. The model card must address both frameworks.</p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>from vfairness.operations.cicd.gate import FairnessReportCard
+from vfairness.rendering import report_card_to_svg
+
+# The card is built from the hierarchical gate decision produced in Phase 7
+card = FairnessReportCard(hier_decision, model_name="CXR-Triage-DenseNet-v3.2")
+markdown = card.to_markdown()
+payload = card.to_github_comment_payload()
+
+# The SVG renderer works from the standard gate decision of Phase 7
+report_card_to_svg(
+    decision=decision,
+    model_name="CXR-Triage-DenseNet-v3.2",
+    explanation="Fairness report card for the chest X-ray triage system: gate status "
+                "and the per-metric evaluations behind it. Accompanies the clinical "
+                "narrative documentation described below.",
+    save_path="artifacts/10_model_card.svg")</code></pre>
+    </div>
+
+    <p>The card carries the measured evidence: gate status, per-level and intersectional results, and the model name. The narrative half of an EU AI Act model card is documentation you write around it, not something the library can compute. For this audit that narrative records: intended use (prioritization of chest X-rays in the emergency department workflow, radiologist review of every triage decision within four hours, a prioritization aid rather than a diagnostic tool); risk classification HIGH under EU AI Act Annex III together with the Medical Device Regulation (EU) 2017/745; the training data summary (multi-site hospital network, six imaging centers, sample reweighting applied for demographic balance, site-aware augmentation); the evaluation summary (temporal train/test split, bootstrap confidence intervals at the 95% level, quarterly radiologist panel review); human oversight (board-certified radiologist review, monthly fairness review by the clinical AI committee, documented and audited overrides); and limitations (single geographic region, underrepresented Asian population, pediatric X-rays excluded, portable/bedside studies possibly out of distribution, site-specific visual artifacts).</p>
+
+    <div class="svg-preview">
+        <img src="../img/svg-gallery/report_card.svg" alt="EU AI Act Model Card" loading="lazy">
+        <div class="svg-preview-caption">
+            <span class="cap-title">EU AI Act Model Card (Healthcare)</span>
+            <span class="cap-func">report_card_to_svg()</span>
+        </div>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Dual Regulatory Framework: EU AI Act + MDR
+        </div>
+        <p>Healthcare AI systems face overlapping regulations:</p>
+        <ul style="font-size:0.85rem;color:var(--color-gray-600);margin-top:0.5rem;">
+            <li><strong>EU AI Act (Annex III, 5a)</strong> &mdash; High-risk AI classification for medical device AI systems</li>
+            <li><strong>MDR 2017/745</strong> &mdash; CE marking requirements for Software as a Medical Device (SaMD)</li>
+            <li><strong>Article 9</strong> &mdash; Risk management integrates with ISO 14971 (medical device risk management)</li>
+            <li><strong>Article 10</strong> &mdash; Data governance aligns with GSPR Annex I requirements for clinical evidence</li>
+            <li><strong>Article 15</strong> &mdash; Accuracy/robustness requirements map to clinical performance evaluation</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ALL ARTIFACTS SUMMARY
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="artifacts">
+    <h2>Complete Artifact Inventory</h2>
+    <p>The table below lists every artifact generated during this medical imaging audit.</p>
+
+    <table class="summary-table">
+        <thead>
+            <tr><th>Phase</th><th>Artifact</th><th>Function</th><th>Module</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>Data Validation Report</td><td><code>data_validation_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>2</td><td>Auto-Discovery Scanner</td><td><code>auto_discovery_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>2</td><td>Bias Audit Dashboard</td><td><code>bias_audit_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>3</td><td>Proxy Risk Assessment</td><td><code>proxy_risk_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>3</td><td>Correlation Heatmap</td><td><code>correlation_heatmap_to_svg()</code></td><td style="color:#f59e0b;">Preprocessing</td></tr>
+            <tr><td>4</td><td>Training Report</td><td><code>training_report_to_svg()</code></td><td style="color:#0aafe3;">Training</td></tr>
+            <tr><td>4</td><td>Reweighting Comparison</td><td><code>reweighting_comparison_to_svg()</code></td><td style="color:#0aafe3;">Training</td></tr>
+            <tr><td>5</td><td>Calibration Report</td><td><code>calibration_report_to_svg()</code></td><td style="color:#6366f1;">Post-Processing</td></tr>
+            <tr><td>5</td><td>Reliability Diagram</td><td><code>reliability_diagram_to_svg()</code></td><td style="color:#6366f1;">Post-Processing</td></tr>
+            <tr><td>6</td><td>Fairness Radar Chart</td><td><code>radar_chart_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>6</td><td>Metrics Bar Chart</td><td><code>metrics_bar_chart_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>6</td><td>Confidence Intervals</td><td><code>confidence_intervals_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>6</td><td>Group Comparison</td><td><code>group_comparison_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>6</td><td>Robustness Testing</td><td><code>robustness_testing_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>6</td><td>Regression Fairness</td><td><code>regression_fairness_to_svg()</code></td><td style="color:#2c5f7c;">Evaluation</td></tr>
+            <tr><td>7</td><td>CI/CD Pipeline Gate</td><td><code>cicd_pipeline_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>7</td><td>Hierarchical Gate</td><td><code>hierarchical_gate_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>8</td><td>Monitoring Dashboard</td><td><code>monitoring_dashboard_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>8</td><td>Drift Report</td><td><code>drift_report_to_svg()</code></td><td style="color:#059669;">Operations</td></tr>
+            <tr><td>9</td><td>Executive Dashboard</td><td><code>reporting_dashboard_to_svg()</code></td><td style="color:#7c3aed;">Reporting</td></tr>
+            <tr><td>9</td><td>Operational Dashboard</td><td><code>reporting_dashboard_to_svg()</code></td><td style="color:#7c3aed;">Reporting</td></tr>
+            <tr><td>9</td><td>Technical Dashboard</td><td><code>reporting_dashboard_to_svg()</code></td><td style="color:#7c3aed;">Reporting</td></tr>
+            <tr><td>10</td><td>EU AI Act Model Card</td><td><code>report_card_to_svg()</code></td><td style="color:#7c3aed;">Reporting</td></tr>
+        </tbody>
+    </table>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     WORKFLOW INTEGRATION
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="workflow">
+    <h2>Workflow Integration</h2>
+    <p>The audit above produces artifacts manually. To <strong>automate and enforce</strong> these checks in your development pipeline, vfairness provides workflow integration tools that plug directly into MLOps, CI/CD, version control, and testing infrastructure. For medical imaging, this is especially critical given MDR post-market surveillance requirements. See the <a href="../workflow-integration/index.html" style="color:var(--color-primary);font-weight:600;">Workflow Integration</a> guide for full documentation.</p>
+
+    <h3 style="margin-top:1.5rem;">1. Experiment Tracking</h3>
+    <p>Log every model retraining&rsquo;s fairness metrics to MLflow or Weights &amp; Biases. This is essential for medical imaging models that must be revalidated after equipment changes, site additions, or algorithm updates.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code># Option A: explicit logging after Phase 6
+from vfairness import log_fairness_to_mlflow
+import mlflow
+
+with mlflow.start_run(run_name="chest-xray-densenet121-v2.3"):
+    logged = log_fairness_to_mlflow(report, prefix="xray_v2.3")
+    print(f"Logged {logged} metrics to MLflow")
+
+# Option B: auto-logging decorator — wraps any evaluation function
+from vfairness import auto_log_fairness
+
+@auto_log_fairness(backend="wandb", prefix="xray")
+def evaluate_imaging_model(model, X_test, y_test, sensitive):
+    y_pred = model.predict(X_test)
+    return y_pred, y_test, sensitive  # triggers automatic fairness logging</code></pre>
+    </div>
+
+    <h3>2. Pre-Commit Hooks</h3>
+    <p>Enforce documentation standards before code reaches the repository. For medical AI, this ensures fairness configs and model cards are always up-to-date &mdash; a key MDR requirement for technical documentation.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">yaml</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code># .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/validantai/vfairness
+    # No vfairness version has been released or tagged yet, so there is no
+    # release tag to pin. Use a commit sha until one is cut, then pin the tag.
+    rev: &lt;commit-sha&gt;
+    hooks:
+      - id: vfairness-check-config    # validates fairness JSON configs
+      - id: vfairness-check-model-card # ensures model cards include fairness sections</code></pre>
+    </div>
+
+    <h3>3. pytest Integration</h3>
+    <p>Embed fairness assertions in your test suite. For medical imaging, test that diagnostic accuracy is equitable across demographic groups and acquisition sites &mdash; same checks as Phase 6, but automated on every commit.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code>import pytest
+from vfairness import assert_fairness, FairnessTestSuite
+
+# Test diagnostic fairness across patient demographics
+def test_imaging_model_fairness():
+    assert_fairness(
+        y_true, y_pred, sensitive["race"],
+        metrics=["demographic_parity_difference", "equalized_odds_difference"],
+        thresholds={"demographic_parity_difference": 0.08, "equalized_odds_difference": 0.10},
+    )
+
+# Full test suite with JUnit XML export for CI
+suite = FairnessTestSuite(
+    protected_attributes=["gender", "race", "age_group"],
+    metrics=["demographic_parity_difference", "equalized_odds_difference"],
+    thresholds={"demographic_parity_difference": 0.08, "equalized_odds_difference": 0.10},
+)
+results = suite.test_predictions(
+    y_true, y_pred, sensitive["race"],
+    attr_name="race",
+    raise_on_failure=False,   # record failures in the XML instead of raising
+)
+xml = suite.to_junit_xml()  # attach to CI pipeline artifacts</code></pre>
+    </div>
+
+    <h3>4. CI/CD Automation &amp; PR Comments</h3>
+    <p>Gate decisions from Phase 7 can be posted directly to GitHub as check results and PR comments. For medical imaging, this prevents model updates from reaching production without fairness validation &mdash; aligning with MDR change control requirements.</p>
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">python</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code># Post gate result as a GitHub Check (from Phase 7)
+check_payload = gate.create_github_check(decision)
+# → POST to /repos/{owner}/{repo}/check-runs
+
+# Generate PR comment with full fairness report card
+from vfairness import FairnessReportCard
+card = FairnessReportCard(decision, model_name="ChestXRay-DenseNet121-v2.3")
+comment_payload = card.to_github_comment_payload()
+# → POST to /repos/{owner}/{repo}/issues/{pr_number}/comments</code></pre>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span class="code-lang">yaml</span>
+            <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
+        </div>
+        <pre><code># .github/workflows/fairness-checks.yml
+name: Medical Imaging Fairness Gate
+on: [pull_request]
+jobs:
+  fairness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install vfairness
+      - run: python -m pytest tests/ -m fairness --junitxml=fairness-results.xml
+      - run: python scripts/evaluate_imaging_gate.py  # runs gate + posts PR comment</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Mapping audit phases to workflow tools
+        </div>
+        <p style="font-size:0.85rem;color:var(--color-gray-600);">
+            <strong>Phase 6</strong> (Metrics) &rarr; <code>@auto_log_fairness</code> + <code>assert_fairness()</code><br>
+            <strong>Phase 7</strong> (CI/CD) &rarr; <code>create_github_check()</code> + GitHub Actions YAML<br>
+            <strong>Phase 10</strong> (Model Card) &rarr; <code>FairnessReportCard.to_github_comment_payload()</code><br>
+            <strong>Every commit</strong> &rarr; Pre-commit hooks validate configs + model cards<br>
+            <strong>Equipment change</strong> &rarr; Re-run full suite + log to experiment tracker for MDR traceability
+        </p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     EU AI ACT COMPLIANCE CHECKLIST
+     ═══════════════════════════════════════════════════════════════ -->
+<section id="compliance">
+    <h2>EU AI Act Compliance Checklist</h2>
+    <p>Healthcare AI has the most stringent compliance requirements. Each item below maps to specific audit artifacts and addresses the overlap between the EU AI Act and the Medical Device Regulation.</p>
+
+    <div class="compliance-grid">
+        <div class="compliance-item">
+            <div class="compliance-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 9 &mdash; Risk Management</div>
+                <div class="ct-desc">Integrated with ISO 14971. Data validation, bias detection, proxy analysis, and robustness testing. Site-specific and equipment-specific risks documented.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 10 &mdash; Data Governance</div>
+                <div class="ct-desc">Training data fully documented: 45,000 images, 6 sites, demographic breakdown. Sample reweighting methodology for representation balance.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 11 &mdash; Technical Documentation</div>
+                <div class="ct-desc">22 SVG artifacts plus model card. Architecture documentation (DenseNet-121), training methodology, and clinical validation evidence.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 12 &mdash; Record-Keeping</div>
+                <div class="ct-desc">MetricsStore with automated logging. Per-study prediction records with timestamps, device metadata, and radiologist confirmation status.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 13 &mdash; Transparency</div>
+                <div class="ct-desc">Multi-tier reporting for hospital leadership, radiology teams, and regulatory bodies. Patient-facing information about AI-assisted triage.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 14 &mdash; Human Oversight</div>
+                <div class="ct-desc">All triage decisions reviewed by board-certified radiologist within 4 hours. Model serves as prioritization aid, not autonomous diagnostic.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 15 &mdash; Accuracy &amp; Robustness</div>
+                <div class="ct-desc">Calibration analysis, permutation tests, sensitivity analysis, regression fairness. Equipment-specific robustness validation across imaging devices.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="compliance-text">
+                <div class="ct-title">Art. 72 &mdash; Post-Market Monitoring</div>
+                <div class="ct-desc">Continuous monitoring with equipment-triggered re-evaluation. Quarterly clinical validation panels. Monthly fairness metric reviews.</div>
+            </div>
+        </div>
+        <div class="compliance-item">
+            <div class="compliance-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="compliance-text">
+                <div class="ct-title">MDR 2017/745 &mdash; CE Marking</div>
+                <div class="ct-desc">Clinical performance evaluation per GSPR Annex I. This fairness audit complements the clinical evidence dossier required for SaMD Class IIa CE marking.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout callout-info" style="margin-top:2rem;">
+        <div class="callout-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Next Steps
+        </div>
+        <p>This walkthrough used demo data for illustration. To apply this process to your own medical imaging model:</p>
+        <ol style="font-size:0.85rem;color:var(--color-gray-600);margin-top:0.5rem;">
+            <li>Ensure your imaging dataset has linked demographic metadata (may require IRB approval)</li>
+            <li>Validate representation across all acquisition sites and equipment types</li>
+            <li>Set clinically appropriate thresholds (consult with clinical AI committees)</li>
+            <li>Apply sample reweighting before training; do not rely solely on post-hoc calibration</li>
+            <li>Schedule equipment-triggered re-evaluations and quarterly clinical validation panels</li>
+            <li>Coordinate EU AI Act and MDR documentation into a single conformity assessment</li>
+        </ol>
+        <p style="margin-top:0.75rem;font-size:0.85rem;">Compare with the <a href="index.html" style="color:var(--color-primary);font-weight:600;">Credit Scoring Audit</a> (tabular data) or the <a href="llm-audit.html" style="color:var(--color-primary);font-weight:600;">LLM Audit</a> (black-box foundation model). Explore all 44 SVG templates in the <a href="../svg-gallery/index.html" style="color:var(--color-primary);font-weight:600;">SVG Gallery</a>.</p>
+    </div>
+</section>
+
+        </div><!-- /content-container -->
+    </main>
+</div><!-- /page-wrapper -->
+
+<script defer src="../js/main.js"></script>
+<script>
+// ── Sidebar scroll tracking ──
+(function () {
+    const sections = [...document.querySelectorAll('section[id]')];
+    const links = [...document.querySelectorAll('.sidebar-nav a')];
+    if (!sections.length || !links.length) return;
+
+    function update() {
+        const scrollY = window.scrollY + 100;
+        let current = sections[0].id;
+        for (const s of sections) {
+            if (s.offsetTop <= scrollY) current = s.id;
+        }
+        links.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+        });
+    }
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) { requestAnimationFrame(() => { update(); ticking = false; }); ticking = true; }
+    });
+    update();
+})();
+</script>
+</body>
+</html>

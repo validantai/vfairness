@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 40" height="40">
+  <g transform="translate(8,6)">
+    <path d="M0 0L0 28" stroke="#D00000" stroke-width="3" stroke-linecap="round"/>
+    <path d="M0 14L14 0" stroke="#D00000" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M6 8L16 28" stroke="#D00000" stroke-width="3" stroke-linecap="round" fill="none"/>
+  </g>
+  <text x="34" y="26" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="600" fill="#D00000">Keras</text>
+</svg>

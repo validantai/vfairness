@@ -1,0 +1,17 @@
+{
+  "use_case": "generic",
+  "jurisdiction": "uk",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "ethnicity": {"status": "restricted", "legal_basis": "UK GDPR Art. 9; Equality Act 2010"},
+    "religion": {"status": "restricted", "legal_basis": "UK GDPR Art. 9"},
+    "political_opinion": {"status": "restricted", "legal_basis": "UK GDPR Art. 9"},
+    "union_membership": {"status": "restricted", "legal_basis": "UK GDPR Art. 9"},
+    "sexual_orientation": {"status": "restricted", "legal_basis": "UK GDPR Art. 9"},
+    "health": {"status": "restricted", "legal_basis": "UK GDPR Art. 9"},
+    "disability": {"status": "restricted", "legal_basis": "UK GDPR Art. 9; Equality Act 2010"},
+    "genetic": {"status": "restricted", "legal_basis": "UK GDPR Art. 9"},
+    "biometric": {"status": "restricted", "legal_basis": "UK GDPR Art. 9"},
+    "criminal_record": {"status": "restricted", "legal_basis": "UK GDPR Art. 10; DPA 2018"}
+  }
+}

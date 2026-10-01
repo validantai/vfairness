@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a3a4f">
+    <meta name="description" content="Academic References and Citations - Foundational research in algorithmic fairness, bias detection, and responsible AI">
+    <title>Academic References | vfairness Documentation</title>
+
+    <link rel="icon" type="image/svg+xml" href="../img/favicon-v2.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script>/* theme before first paint: vf-theme = light | dark | system */(function(){var m='system';try{m=localStorage.getItem('vf-theme')||'system'}catch(e){}var d=m==='dark'||(m==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;r.setAttribute('data-theme',d?'dark':'light');r.setAttribute('data-theme-mode',m)})()</script>
+    <style>
+        .reference-category {
+            margin-bottom: var(--spacing-12);
+        }
+        .reference-list {
+            list-style: none;
+            padding: 0;
+        }
+        .reference-item {
+            padding: var(--spacing-4) var(--spacing-5);
+            background: var(--color-gray-50);
+            border-left: 3px solid var(--color-primary);
+            margin-bottom: var(--spacing-4);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            transition: all var(--transition-fast);
+        }
+        .reference-item:hover {
+            background: var(--color-white);
+            box-shadow: var(--shadow-md);
+            border-left-color: var(--color-teal);
+        }
+        .reference-authors {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-gray-900);
+        }
+        .reference-year {
+            color: var(--color-primary);
+            font-weight: var(--font-weight-medium);
+        }
+        .reference-title {
+            color: var(--color-gray-800);
+            font-style: italic;
+        }
+        .reference-source {
+            color: var(--color-gray-600);
+            font-size: var(--font-size-sm);
+        }
+        .reference-link {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-1);
+            font-size: var(--font-size-sm);
+            margin-top: var(--spacing-2);
+        }
+        .reference-link svg {
+            width: 14px;
+            height: 14px;
+        }
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-6);
+        }
+        .category-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-teal) 100%);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .category-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            background: var(--color-gray-200);
+            color: var(--color-gray-700);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            border-radius: var(--radius-full);
+            margin-left: var(--spacing-2);
+        }
+        .intro-section {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-teal) 100%);
+            color: white;
+            padding: var(--spacing-12) var(--spacing-8);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--spacing-12);
+        }
+        .intro-section > * {
+            position: relative;
+            z-index: 2;
+        }
+        .intro-section::before {
+            content: '';
+            position: absolute;
+            inset: -4%;
+            background-image: url("../img/aas-pattern-overlay.svg");
+            background-repeat: no-repeat;
+            background-position: center 52%;
+            background-size: cover;
+            opacity: 0.52;
+            pointer-events: none;
+            z-index: 1;
+            mask-image: radial-gradient(
+                ellipse 56% 50% at 50% 46%,
+                rgba(0, 0, 0, 1) 55%,
+                rgba(0, 0, 0, 0.5) 72%,
+                rgba(0, 0, 0, 0.1) 86%,
+                transparent 96%
+            );
+            -webkit-mask-image: radial-gradient(
+                ellipse 56% 50% at 50% 46%,
+                rgba(0, 0, 0, 1) 55%,
+                rgba(0, 0, 0, 0.5) 72%,
+                rgba(0, 0, 0, 0.1) 86%,
+                transparent 96%
+            );
+        }
+        .intro-section h1 {
+            color: white;
+            margin-bottom: var(--spacing-4);
+        }
+        .intro-section p {
+            opacity: 0.9;
+            max-width: 800px;
+        }
+        .quick-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-2);
+            margin-top: var(--spacing-6);
+        }
+        .quick-nav a {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            padding: var(--spacing-2) var(--spacing-4);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            transition: all var(--transition-fast);
+        }
+        .quick-nav a:hover {
+            background: rgba(255,255,255,0.25);
+            color: white;
+        }
+    </style>
+    <script src="https://validant.ai/consent/v1/consent.js" defer></script>
+  </head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="../index.html">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
+                </a>
+                <span class="logo-divider"></span>
+                <span class="lib-name"><span>v</span>fairness</span>
+            </div>
+            <nav class="main-nav" aria-label="Main navigation">
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="../getting-started/index.html" class="nav-link">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../api-reference/index.html" class="nav-link">API Reference</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Learn
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Learn submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../test-objects/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Find a Test Object</span>
+                                        <span class="nav-dropdown__desc">Data, models and agents to test, by access depth</span>
+                                    </span>
+                                </a>
+                                <a href="../business-guide/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Business Guide</span>
+                                        <span class="nav-dropdown__desc">Fairness strategy for decision-makers</span>
+                                    </span>
+                                </a>
+                                <div class="nav-dropdown__group">
+                                    <div class="nav-dropdown__group-label">
+                                        <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+                                        <span class="nav-dropdown__text">
+                                            <span class="nav-dropdown__label">Sample Assessments</span>
+                                            <span class="nav-dropdown__desc">End-to-end audits with EU AI Act compliance</span>
+                                        </span>
+                                    </div>
+                                    <div class="nav-dropdown__group-items">
+                                        <a href="../sample-assessment/index.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Binary Classifier</span> <span class="sub-desc">— Credit scoring</span></a>
+                                        <a href="../sample-assessment/llm-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Foundation LLM</span> <span class="sub-desc">— Resume screening</span></a>
+                                        <a href="../sample-assessment/cv-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Computer Vision</span> <span class="sub-desc">— Medical imaging</span></a>
+                                        <a href="../sample-assessment/ranking-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Ranking System</span> <span class="sub-desc">&mdash; Job platform</span></a>
+                                    </div>
+                                </div>
+                                <a href="../concepts/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Concepts</span>
+                                        <span class="nav-dropdown__desc">Fairness theory and metric foundations</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../our-offering/index.html" class="nav-link">Our Offering</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Explore
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Explore submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../svg-gallery/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">SVG Gallery</span>
+                                        <span class="nav-dropdown__desc">Interactive visualization templates</span>
+                                    </span>
+                                </a>
+                                <a href="../workflow-integration/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Workflow Integration</span>
+                                        <span class="nav-dropdown__desc">MLOps, CI/CD, and experiment tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../usage-map/index.html" role="menuitem" class="nav-dropdown__item" data-um-injected="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Library Usage Map</span>
+                                        <span class="nav-dropdown__desc">Where the platform uses each vfairness symbol</span>
+                                    </span>
+                                </a>
+<a href="../llm-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">LLM Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Counterfactual testing, benchmarks, output analysis for LLMs</span>
+                                    </span>
+                                </a>
+                                <a href="../agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Agent Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Correspondence testing, tool bias, RAG bias, pipeline tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../multi-agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Multi-Agent Testing</span>
+                                        <span class="nav-dropdown__desc">Emergent bias, groupthink, non-compositionality</span>
+                                    </span>
+                                </a>
+                                <a href="../explainability-and-xai/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Explainability &amp; XAI</span>
+                                        <span class="nav-dropdown__desc">SHAP attributions, fairness decomposition, counterfactuals</span>
+                                    </span>
+                                </a>
+                                <a href="../training-time-interventions/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Training-Time Interventions</span>
+                                        <span class="nav-dropdown__desc">Fairness-aware losses, constraints, calibration</span>
+                                    </span>
+                                </a>
+</div>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="nav-cta">
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="Search docs...">
+                    </div>
+                    <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+
+                <button type="button" class="mobile-nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-panel">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+<!-- Mobile Navigation -->
+<div class="mobile-nav-overlay" aria-hidden="true"></div>
+<nav class="mobile-nav-panel" id="mobile-nav-panel" aria-label="Mobile navigation" aria-hidden="true">
+    <div class="mobile-nav-header">
+        <span class="mobile-nav-title">Menu</span>
+        <button type="button" class="mobile-nav-close" aria-label="Close navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div class="mobile-nav-body">
+        <a href="../getting-started/index.html" class="mobile-nav-link">Getting Started</a>
+        <a href="../api-reference/index.html" class="mobile-nav-link">API Reference</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Learn
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../test-objects/index.html" class="mobile-nav-sublink">Find a Test Object</a>
+                <a href="../business-guide/index.html" class="mobile-nav-sublink">Business Guide</a>
+                <span class="mobile-nav-sublink" style="font-size:0.7rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:0.5rem 0 0.15rem;">Sample Assessments</span>
+                <a href="../sample-assessment/index.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Binary Classifier</a>
+                <a href="../sample-assessment/llm-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Foundation LLM</a>
+                <a href="../sample-assessment/cv-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Computer Vision</a>
+                <a href="../sample-assessment/ranking-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Ranking System</a>
+                <a href="../concepts/index.html" class="mobile-nav-sublink">Concepts</a>
+            </div></div>
+        </div>
+        <a href="../our-offering/index.html" class="mobile-nav-link">Our Offering</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Explore
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../svg-gallery/index.html" class="mobile-nav-sublink">SVG Gallery</a>
+                <a href="../workflow-integration/index.html" class="mobile-nav-sublink">Workflow Integration</a>
+                <a href="../usage-map/index.html" class="mobile-nav-sublink" data-um-injected="1">Library Usage Map</a>
+<a href="../llm-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">LLM Fairness Testing</a>
+                <a href="../agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Agent Fairness Testing</a>
+                <a href="../multi-agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Multi-Agent Testing</a>
+                <a href="../explainability-and-xai/index.html" class="mobile-nav-sublink">Explainability &amp; XAI</a>
+                <a href="../training-time-interventions/index.html" class="mobile-nav-sublink">Training-Time Interventions</a>
+</div></div>
+        </div>
+    </div>
+    <div class="mobile-nav-footer">
+        <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            GitHub
+        </a>
+    </div>
+</nav>
+<script>/* Mobile nav bootstrap — works before main.js loads */
+(function(){
+var t=document.querySelector(".mobile-nav-toggle"),p=document.querySelector(".mobile-nav-panel"),o=document.querySelector(".mobile-nav-overlay"),c=document.querySelector(".mobile-nav-close");
+if(!t||!p)return;t.setAttribute("data-nav-init","1");
+function open(){t.setAttribute("aria-expanded","true");p.classList.add("is-open");p.setAttribute("aria-hidden","false");if(o)o.classList.add("is-open");document.body.style.overflow="hidden";}
+function close(){t.setAttribute("aria-expanded","false");p.classList.remove("is-open");p.setAttribute("aria-hidden","true");if(o)o.classList.remove("is-open");document.body.style.overflow="";}
+t.addEventListener("click",function(){t.getAttribute("aria-expanded")==="true"?close():open();});
+if(c)c.addEventListener("click",close);
+if(o)o.addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList.contains("is-open"))close();});
+})()
+</script>
+
+    <div class="page-wrapper docs-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Concepts</div>
+                <ul class="sidebar-nav">
+                    <li><a href="index.html#fairness-definitions">Fairness Definitions</a></li>
+                    <li><a href="index.html#impossibility">The Impossibility Theorem</a></li>
+                    <li><a href="index.html#statistical-validation">Statistical Validation</a></li>
+                    <li><a href="index.html#sample-size">Sample Size Guidelines</a></li>
+                </ul>
+            </div>
+
+            <!-- 1. DATA & PREPROCESSING -->
+            <div class="sidebar-section">
+                <div class="sidebar-title sidebar-title-primary" style="color: #f59e0b;">Data &amp; Preprocessing</div>
+                <ul class="sidebar-nav">
+                    <li><a href="index.html#bias-sources">Sources of Bias</a></li>
+                    <li><a href="index.html#intersectionality">Intersectionality</a></li>
+                </ul>
+            </div>
+
+            <!-- 2–5 Pipeline stages -->
+            <div class="sidebar-section">
+                <div class="sidebar-title sidebar-title-primary" style="color: #0aafe3;">Training-Time Interventions</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title sidebar-title-primary" style="color: #6366f1;">Prediction-Time Interventions</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title sidebar-title-primary" style="color: #2c5f7c;">Evaluation &amp; Measurement</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title sidebar-title-primary" style="color: #059669;">Operations &amp; Monitoring</div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Resources</div>
+                <ul class="sidebar-nav">
+                    <li><a href="references.html" class="active">Academic References</a></li>
+                    <li><a href="changelog.html">Changelog</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-container">
+                <!-- Introduction -->
+                <div class="intro-section">
+                    <p class="vf-eyebrow" data-dated>Learn &middot; Academic references</p>
+                    <h1>Academic References</h1>
+                    <p class="lead" style="color: rgba(255,255,255,0.95);">
+                        A curated collection of foundational research in algorithmic fairness, machine learning ethics,
+                        and responsible AI. These works inform the theoretical foundations and practical implementations
+                        within vfairness.
+                    </p>
+                    <div class="quick-nav">
+                        <a href="#foundational">Foundational Works</a>
+                        <a href="#metrics">Fairness Metrics</a>
+                        <a href="#bias">Bias Detection</a>
+                        <a href="#ethical">Ethical Frameworks</a>
+                        <a href="#intersectionality">Intersectionality</a>
+                        <a href="#applications">Domain Applications</a>
+                        <a href="#euaia">EU AI Act</a>
+                        <a href="#european-cases">European Cases</a>
+                        <a href="#mitigation">Mitigation Methods</a>
+                        <a href="#swiss">Swiss Research</a>
+                    </div>
+                </div>
+
+                <!-- Foundational Works -->
+                    <section id="foundational" class="reference-category">
+                        <div class="category-header">
+                            <div class="category-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="mt-0 mb-0">Foundational Works<span class="category-count">10</span></h2>
+                                <p class="mb-0" style="color: var(--color-gray-600);">Seminal research establishing the field of algorithmic fairness</p>
+                            </div>
+                        </div>
+
+                        <ul class="reference-list">
+                            <li class="reference-item">
+                                <span class="reference-authors">Benjamin, R.</span>
+                                <span class="reference-year">(2019).</span>
+                                <span class="reference-title">Race After Technology: Abolitionist Tools for the New Jim Code.</span>
+                                <span class="reference-source">Polity Press.</span>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Examines how technologies reproduce racial hierarchies and proposes frameworks for understanding algorithmic discrimination as a continuation of historical patterns.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Bowker, G. C., & Star, S. L.</span>
+                                <span class="reference-year">(1999).</span>
+                                <span class="reference-title">Sorting Things Out: Classification and Its Consequences.</span>
+                                <span class="reference-source">MIT Press.</span>
+                                <a href="https://doi.org/10.7551/mitpress/6352.001.0001" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Foundational work on how classification systems embed social and political assumptions, essential for understanding bias in feature engineering.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Crawford, K.</span>
+                                <span class="reference-year">(2021).</span>
+                                <span class="reference-title">Atlas of AI: Power, Politics, and the Planetary Costs of Artificial Intelligence.</span>
+                                <span class="reference-source">Yale University Press.</span>
+                                <a href="https://doi.org/10.12987/9780300252392" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Comprehensive examination of how AI systems encode power structures and historical patterns of discrimination.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">D'Ignazio, C., & Klein, L. F.</span>
+                                <span class="reference-year">(2020).</span>
+                                <span class="reference-title">Data Feminism.</span>
+                                <span class="reference-source">MIT Press.</span>
+                                <a href="https://data-feminism.mitpress.mit.edu/" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Open Access
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Applies feminist theory to data science, emphasizing how power structures shape data collection, analysis, and representation.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Eubanks, V.</span>
+                                <span class="reference-year">(2018).</span>
+                                <span class="reference-title">Automating Inequality: How High-Tech Tools Profile, Police, and Punish the Poor.</span>
+                                <span class="reference-source">St. Martin's Press.</span>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Case studies demonstrating how algorithmic systems intensify surveillance and control of economically marginalized communities.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Noble, S. U.</span>
+                                <span class="reference-year">(2018).</span>
+                                <span class="reference-title">Algorithms of Oppression: How Search Engines Reinforce Racism.</span>
+                                <span class="reference-source">NYU Press.</span>
+                                <a href="https://doi.org/10.18574/nyu/9781479833641.001.0001" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Analysis of how search algorithms perpetuate and amplify racist and sexist stereotypes through their ranking mechanisms.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">O'Neil, C.</span>
+                                <span class="reference-year">(2016).</span>
+                                <span class="reference-title">Weapons of Math Destruction: How Big Data Increases Inequality and Threatens Democracy.</span>
+                                <span class="reference-source">Crown Publishing.</span>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Accessible introduction to algorithmic harms across domains including education, employment, and criminal justice.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Pasquale, F.</span>
+                                <span class="reference-year">(2015).</span>
+                                <span class="reference-title">The Black Box Society: The Secret Algorithms That Control Money and Information.</span>
+                                <span class="reference-source">Harvard University Press.</span>
+                                <a href="https://doi.org/10.4159/harvard.9780674736061" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Examines the opacity of algorithmic systems and advocates for transparency and accountability in automated decision-making.
+                                </p>
+                            </li>
+
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Barocas, S., &amp; Selbst, A. D.</span>
+                                <span class="reference-year">(2016).</span>
+                                <span class="reference-title">Big Data's Disparate Impact.</span>
+                                <span class="reference-source">California Law Review, 104(3), 671-732.</span>
+                                <a href="https://doi.org/10.15779/Z38BG31" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Landmark legal analysis of how big data analytics can produce discriminatory outcomes even without discriminatory intent, connecting data mining to disparate impact doctrine.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Barocas, S., Hardt, M., &amp; Narayanan, A.</span>
+                                <span class="reference-year">(2023).</span>
+                                <span class="reference-title">Fairness and Machine Learning: Limitations and Opportunities.</span>
+                                <span class="reference-source">MIT Press.</span>
+                                <a href="https://fairmlbook.org/" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Open Access
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Comprehensive textbook covering the mathematical foundations, societal context, and practical limitations of algorithmic fairness.
+                                </p>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Fairness Metrics & Impossibility -->
+                    <section id="metrics" class="reference-category">
+                        <div class="category-header">
+                            <div class="category-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="mt-0 mb-0">Fairness Metrics & Impossibility Results<span class="category-count">7</span></h2>
+                                <p class="mb-0" style="color: var(--color-gray-600);">Mathematical foundations of fairness definitions and their inherent trade-offs</p>
+                            </div>
+                        </div>
+
+                        <ul class="reference-list">
+                            <li class="reference-item">
+                                <span class="reference-authors">Chouldechova, A.</span>
+                                <span class="reference-year">(2017).</span>
+                                <span class="reference-title">Fair Prediction with Disparate Impact: A Study of Bias in Recidivism Prediction Instruments.</span>
+                                <span class="reference-source">Big Data, 5(2), 153-163.</span>
+                                <a href="https://doi.org/10.1089/big.2016.0047" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Proves impossibility of simultaneously achieving calibration and equal error rates across groups when base rates differ.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Corbett-Davies, S., & Goel, S.</span>
+                                <span class="reference-year">(2018).</span>
+                                <span class="reference-title">The Measure and Mismeasure of Fairness: A Critical Review of Fair Machine Learning.</span>
+                                <span class="reference-source">arXiv:1808.00023.</span>
+                                <a href="https://arxiv.org/abs/1808.00023" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    arXiv
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Comprehensive survey of fairness definitions, their relationships, and limitations in practical applications.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Dwork, C., Hardt, M., Pitassi, T., Reingold, O., & Zemel, R.</span>
+                                <span class="reference-year">(2012).</span>
+                                <span class="reference-title">Fairness Through Awareness.</span>
+                                <span class="reference-source">Proceedings of the 3rd Innovations in Theoretical Computer Science Conference (ITCS), 214-226.</span>
+                                <a href="https://doi.org/10.1145/2090236.2090255" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Introduces individual fairness as treating similar individuals similarly, foundational for metric-based fairness approaches.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Hardt, M., Price, E., & Srebro, N.</span>
+                                <span class="reference-year">(2016).</span>
+                                <span class="reference-title">Equality of Opportunity in Supervised Learning.</span>
+                                <span class="reference-source">Advances in Neural Information Processing Systems (NeurIPS), 29.</span>
+                                <a href="https://arxiv.org/abs/1610.02413" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    arXiv
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Defines equalized odds and equal opportunity metrics, establishing key group fairness constraints.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Kleinberg, J., Mullainathan, S., & Raghavan, M.</span>
+                                <span class="reference-year">(2016).</span>
+                                <span class="reference-title">Inherent Trade-Offs in the Fair Determination of Risk Scores.</span>
+                                <span class="reference-source">arXiv:1609.05807.</span>
+                                <a href="https://arxiv.org/abs/1609.05807" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    arXiv
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Fundamental impossibility theorem showing calibration and balance constraints cannot be simultaneously satisfied.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Mehrabi, N., Morstatter, F., Saxena, N., Lerman, K., & Galstyan, A.</span>
+                                <span class="reference-year">(2021).</span>
+                                <span class="reference-title">A Survey on Bias and Fairness in Machine Learning.</span>
+                                <span class="reference-source">ACM Computing Surveys, 54(6), 1-35.</span>
+                                <a href="https://doi.org/10.1145/3457607" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Comprehensive taxonomy of bias types, fairness definitions, and mitigation techniques in machine learning.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Verma, S., & Rubin, J.</span>
+                                <span class="reference-year">(2018).</span>
+                                <span class="reference-title">Fairness Definitions Explained.</span>
+                                <span class="reference-source">Proceedings of the International Workshop on Software Fairness (FairWare), 1-7.</span>
+                                <a href="https://doi.org/10.1145/3194770.3194776" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Accessible overview of major fairness definitions with clear explanations and relationships.
+                                </p>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Bias Detection -->
+                    <section id="bias" class="reference-category">
+                        <div class="category-header">
+                            <div class="category-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <path d="M21 21l-4.35-4.35"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="mt-0 mb-0">Bias Detection & Analysis<span class="category-count">6</span></h2>
+                                <p class="mb-0" style="color: var(--color-gray-600);">Methods for identifying and measuring bias in ML systems</p>
+                            </div>
+                        </div>
+
+                        <ul class="reference-list">
+                            <li class="reference-item">
+                                <span class="reference-authors">Buolamwini, J., & Gebru, T.</span>
+                                <span class="reference-year">(2018).</span>
+                                <span class="reference-title">Gender Shades: Intersectional Accuracy Disparities in Commercial Gender Classification.</span>
+                                <span class="reference-source">Proceedings of the 1st Conference on Fairness, Accountability and Transparency (FAccT), 77-91.</span>
+                                <a href="https://proceedings.mlr.press/v81/buolamwini18a.html" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Paper
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Landmark study demonstrating intersectional accuracy disparities in facial recognition, revealing up to 34% error rate differences.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Kearns, M., Neel, S., Roth, A., & Wu, Z. S.</span>
+                                <span class="reference-year">(2018).</span>
+                                <span class="reference-title">Preventing Fairness Gerrymandering: Auditing and Learning for Subgroup Fairness.</span>
+                                <span class="reference-source">Proceedings of the 35th International Conference on Machine Learning (ICML), 2564-2572.</span>
+                                <a href="https://arxiv.org/abs/1711.05144" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    arXiv
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Introduces methods to detect hidden disparities at subgroup intersections that aggregate metrics miss.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Obermeyer, Z., Powers, B., Vogeli, C., & Mullainathan, S.</span>
+                                <span class="reference-year">(2019).</span>
+                                <span class="reference-title">Dissecting Racial Bias in an Algorithm Used to Manage the Health of Populations.</span>
+                                <span class="reference-source">Science, 366(6464), 447-453.</span>
+                                <a href="https://doi.org/10.1126/science.aax2342" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Reveals how using healthcare costs as a proxy for health needs systematically disadvantaged Black patients.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Richardson, R., Schultz, J. M., & Crawford, K.</span>
+                                <span class="reference-year">(2019).</span>
+                                <span class="reference-title">Dirty Data, Bad Predictions: How Civil Rights Violations Impact Police Data, Predictive Policing Systems, and Justice.</span>
+                                <span class="reference-source">New York University Law Review Online, 94.</span>
+                                <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3333423" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    SSRN
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Documents how historical bias in policing data propagates through predictive systems, creating feedback loops.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Suresh, H., & Guttag, J. V.</span>
+                                <span class="reference-year">(2021).</span>
+                                <span class="reference-title">A Framework for Understanding Sources of Harm throughout the Machine Learning Life Cycle.</span>
+                                <span class="reference-source">Proceedings of the 1st ACM Conference on Equity and Access in Algorithms, Mechanisms, and Optimization (EAAMO).</span>
+                                <a href="https://arxiv.org/abs/1901.10002" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    arXiv
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Comprehensive taxonomy of bias sources across the ML lifecycle from data collection to deployment.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Yang, K., Stoyanovich, J., Asudeh, A., Howe, B., Jagadish, H. V., & Miklau, G.</span>
+                                <span class="reference-year">(2018).</span>
+                                <span class="reference-title">A Nutritional Label for Rankings.</span>
+                                <span class="reference-source">Proceedings of the 2018 International Conference on Management of Data (SIGMOD), 1773-1776.</span>
+                                <a href="https://doi.org/10.1145/3183713.3193568" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Proposes methods for measuring and communicating fairness in ranking systems.
+                                </p>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Ethical Frameworks -->
+                    <section id="ethical" class="reference-category">
+                        <div class="category-header">
+                            <div class="category-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                    <path d="M2 17l10 5 10-5"/>
+                                    <path d="M2 12l10 5 10-5"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="mt-0 mb-0">Ethical Frameworks<span class="category-count">6</span></h2>
+                                <p class="mb-0" style="color: var(--color-gray-600);">Philosophical and normative foundations for AI ethics</p>
+                            </div>
+                        </div>
+
+                        <ul class="reference-list">
+                            <li class="reference-item">
+                                <span class="reference-authors">Floridi, L., & Cowls, J.</span>
+                                <span class="reference-year">(2019).</span>
+                                <span class="reference-title">A Unified Framework of Five Principles for AI in Society.</span>
+                                <span class="reference-source">Harvard Data Science Review, 1(1).</span>
+                                <a href="https://doi.org/10.1162/99608f92.8cd550d1" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Open Access
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Synthesizes AI ethics principles into a unified framework: beneficence, non-maleficence, autonomy, justice, and explicability.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Mittelstadt, B.</span>
+                                <span class="reference-year">(2019).</span>
+                                <span class="reference-title">Principles Alone Cannot Guarantee Ethical AI.</span>
+                                <span class="reference-source">Nature Machine Intelligence, 1(11), 501-507.</span>
+                                <a href="https://doi.org/10.1038/s42256-019-0114-4" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Critical analysis of principle-based AI ethics, emphasizing the need for virtue ethics and institutional practices.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Sambasivan, N., Arnesen, E., Hutchinson, B., Doshi, T., & Prabhakaran, V.</span>
+                                <span class="reference-year">(2021).</span>
+                                <span class="reference-title">Re-imagining Algorithmic Fairness in India and Beyond.</span>
+                                <span class="reference-source">Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency (FAccT), 315-328.</span>
+                                <a href="https://doi.org/10.1145/3442188.3445896" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Examines how fairness conceptions differ across cultural contexts, with implications for global AI deployment.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Wong, P. H.</span>
+                                <span class="reference-year">(2020).</span>
+                                <span class="reference-title">Democratizing Algorithmic Fairness.</span>
+                                <span class="reference-source">Philosophy & Technology, 33(2), 225-244.</span>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Argues for democratic participation in defining fairness criteria, connecting technical and political dimensions.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Wong, P. H., & Khanna, A.</span>
+                                <span class="reference-year">(2022).</span>
+                                <span class="reference-title">Towards a Cross-cultural Approach to Algorithmic Fairness.</span>
+                                <span class="reference-source">AI & Society.</span>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Explores non-Western ethical traditions including Ubuntu, Confucian ethics, and Indigenous value systems for AI fairness.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Jobin, A., Ienca, M., & Vayena, E.</span>
+                                <span class="reference-year">(2019).</span>
+                                <span class="reference-title">The Global Landscape of AI Ethics Guidelines.</span>
+                                <span class="reference-source">Nature Machine Intelligence, 1(9), 389-399.</span>
+                                <a href="https://doi.org/10.1038/s42256-019-0088-2" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Comprehensive analysis of 84 AI ethics guidelines, identifying convergence and divergence in principles.
+                                </p>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Intersectionality -->
+                    <section id="intersectionality" class="reference-category">
+                        <div class="category-header">
+                            <div class="category-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="mt-0 mb-0">Intersectionality & Social Theory<span class="category-count">5</span></h2>
+                                <p class="mb-0" style="color: var(--color-gray-600);">Understanding how multiple forms of marginalization interact</p>
+                            </div>
+                        </div>
+
+                        <ul class="reference-list">
+                            <li class="reference-item">
+                                <span class="reference-authors">Collins, P. H.</span>
+                                <span class="reference-year">(2000).</span>
+                                <span class="reference-title">Black Feminist Thought: Knowledge, Consciousness, and the Politics of Empowerment (2nd ed.).</span>
+                                <span class="reference-source">Routledge.</span>
+                                <a href="https://doi.org/10.4324/9780203900055" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Foundational work on intersectional analysis and the matrix of domination, essential for understanding compound discrimination.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Crenshaw, K.</span>
+                                <span class="reference-year">(1989).</span>
+                                <span class="reference-title">Demarginalizing the Intersection of Race and Sex: A Black Feminist Critique of Antidiscrimination Doctrine, Feminist Theory and Antiracist Politics.</span>
+                                <span class="reference-source">University of Chicago Legal Forum, 1989(1), 139-167.</span>
+                                <a href="https://chicagounbound.uchicago.edu/uclf/vol1989/iss1/8/" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Open Access
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Introduces the concept of intersectionality, demonstrating how single-axis frameworks fail to capture compound discrimination.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Criado Perez, C.</span>
+                                <span class="reference-year">(2019).</span>
+                                <span class="reference-title">Invisible Women: Exposing Data Bias in a World Designed for Men.</span>
+                                <span class="reference-source">Abrams Press.</span>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Documents systematic gender bias in data collection and technology design across domains.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Hanna, A., Denton, E., Smart, A., & Smith-Loud, J.</span>
+                                <span class="reference-year">(2020).</span>
+                                <span class="reference-title">Towards a Critical Race Methodology in Algorithmic Fairness.</span>
+                                <span class="reference-source">Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency (FAT*), 501-512.</span>
+                                <a href="https://doi.org/10.1145/3351095.3372826" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Argues for applying critical race theory to algorithmic fairness research, questioning how race is operationalized in ML.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Roberts, D.</span>
+                                <span class="reference-year">(2011).</span>
+                                <span class="reference-title">Fatal Invention: How Science, Politics, and Big Business Re-create Race in the Twenty-first Century.</span>
+                                <span class="reference-source">The New Press.</span>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Examines how racial categories are constructed and reinforced through scientific and technological practices.
+                                </p>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Domain Applications -->
+                    <section id="applications" class="reference-category">
+                        <div class="category-header">
+                            <div class="category-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="3" y1="9" x2="21" y2="9"/>
+                                    <line x1="9" y1="21" x2="9" y2="9"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="mt-0 mb-0">Domain Applications<span class="category-count">6</span></h2>
+                                <p class="mb-0" style="color: var(--color-gray-600);">Fairness research in specific application domains</p>
+                            </div>
+                        </div>
+
+                        <ul class="reference-list">
+                            <li class="reference-item">
+                                <span class="reference-authors">Angwin, J., Larson, J., Mattu, S., & Kirchner, L.</span>
+                                <span class="reference-year">(2016).</span>
+                                <span class="reference-title">Machine Bias: There's Software Used Across the Country to Predict Future Criminals. And It's Biased Against Blacks.</span>
+                                <span class="reference-source">ProPublica.</span>
+                                <a href="https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Article
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Investigative analysis of COMPAS recidivism algorithm, catalyzing public debate on algorithmic fairness.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Bertrand, M., & Mullainathan, S.</span>
+                                <span class="reference-year">(2004).</span>
+                                <span class="reference-title">Are Emily and Greg More Employable Than Lakisha and Jamal? A Field Experiment on Labor Market Discrimination.</span>
+                                <span class="reference-source">American Economic Review, 94(4), 991-1013.</span>
+                                <a href="https://doi.org/10.1257/0002828042002561" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Classic study documenting racial discrimination in hiring, foundational for understanding bias in employment algorithms.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Ferguson, A. G.</span>
+                                <span class="reference-year">(2017).</span>
+                                <span class="reference-title">The Rise of Big Data Policing: Surveillance, Race, and the Future of Law Enforcement.</span>
+                                <span class="reference-source">NYU Press.</span>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Comprehensive examination of predictive policing technologies and their implications for racial justice.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Harcourt, B. E.</span>
+                                <span class="reference-year">(2007).</span>
+                                <span class="reference-title">Against Prediction: Profiling, Policing, and Punishing in an Actuarial Age.</span>
+                                <span class="reference-source">University of Chicago Press.</span>
+                                <a href="https://doi.org/10.7208/chicago/9780226315997.001.0001" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Historical analysis of actuarial methods in criminal justice, demonstrating longstanding patterns of discrimination.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Hinton, E.</span>
+                                <span class="reference-year">(2016).</span>
+                                <span class="reference-title">From the War on Poverty to the War on Crime: The Making of Mass Incarceration in America.</span>
+                                <span class="reference-source">Harvard University Press.</span>
+                                <a href="https://doi.org/10.4159/9780674969223" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Historical context for understanding racial disparities in criminal justice data used to train ML systems.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Keyes, O.</span>
+                                <span class="reference-year">(2018).</span>
+                                <span class="reference-title">The Misgendering Machines: Trans/HCI Implications of Automatic Gender Recognition.</span>
+                                <span class="reference-source">Proceedings of the ACM on Human-Computer Interaction, 2(CSCW), 1-22.</span>
+                                <a href="https://doi.org/10.1145/3274357" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Examines how automatic gender recognition systems harm transgender individuals through binary classification.
+                                </p>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- EU AI Act & Regulation -->
+                    <section id="euaia" class="reference-category">
+                        <div class="category-header">
+                            <div class="category-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="mt-0 mb-0">EU AI Act &amp; AI Regulation<span class="category-count">6</span></h2>
+                                <p class="mb-0" style="color: var(--color-gray-600);">Legal frameworks and regulatory analysis for AI systems in the EU</p>
+                            </div>
+                        </div>
+
+                        <ul class="reference-list">
+                            <li class="reference-item">
+                                <span class="reference-authors">European Parliament &amp; Council.</span>
+                                <span class="reference-year">(2024).</span>
+                                <span class="reference-title">Regulation (EU) 2024/1689 — The Artificial Intelligence Act.</span>
+                                <span class="reference-source">Official Journal of the European Union.</span>
+                                <a href="https://artificialintelligenceact.eu/" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Full Text
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    The world's first comprehensive AI regulation. Art. 5 defines prohibited practices; Annex III lists high-risk AI use cases requiring conformity assessment.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Barrett, L. F., Adolphs, R., Marsella, S., Martinez, A. M., &amp; Pollak, S. D.</span>
+                                <span class="reference-year">(2019).</span>
+                                <span class="reference-title">Emotional Expressions Reconsidered: Challenges to Inferring Emotion From Human Facial Movements.</span>
+                                <span class="reference-source">Psychological Science in the Public Interest, 20(1), 1-68.</span>
+                                <a href="https://doi.org/10.1177/1529100619832930" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Comprehensive review challenging the scientific validity of automated emotion recognition — foundational for the EU AI Act's prohibition of emotion recognition in workplace/education (Art. 5(1)(f)).
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Veale, M., &amp; Borgesius, F. Z.</span>
+                                <span class="reference-year">(2021).</span>
+                                <span class="reference-title">Demystifying the Draft EU Artificial Intelligence Act.</span>
+                                <span class="reference-source">Computer Law Review International, 22(4), 97-112.</span>
+                                <a href="https://doi.org/10.9785/cri-2021-220402" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Critical legal analysis of the AI Act's risk-based approach, including the definition of high-risk AI systems.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">European Banking Authority (EBA).</span>
+                                <span class="reference-year">(2023).</span>
+                                <span class="reference-title">Follow-up Report on Machine Learning for IRB Models.</span>
+                                <span class="reference-source">EBA/REP/2023/28.</span>
+                                <a href="https://www.eba.europa.eu/publications-and-media/press-releases/eba-publishes-follow-report-use-machine-learning-internal" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    EBA
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Regulatory guidance for AI-based credit scoring under the EU AI Act's Annex III, Area 5(b) high-risk classification.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">GDPR — Regulation (EU) 2016/679.</span>
+                                <span class="reference-year">(2016).</span>
+                                <span class="reference-title">Article 22: Automated individual decision-making, including profiling.</span>
+                                <span class="reference-source">Official Journal of the European Union.</span>
+                                <a href="https://gdpr-info.eu/art-22-gdpr/" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Text
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Right not to be subject to solely automated decisions with legal effects. Key for credit scoring and employment decisions.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">EU Race Equality Directive 2000/43/EC.</span>
+                                <span class="reference-year">(2000).</span>
+                                <span class="reference-title">Council Directive implementing the principle of equal treatment between persons irrespective of racial or ethnic origin.</span>
+                                <span class="reference-source">Official Journal of the European Union.</span>
+                                <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex%3A32000L0043" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    EUR-Lex
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Foundational EU anti-discrimination directive applying to employment, education, social protection, and access to goods and services.
+                                </p>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- European Case Law & Algorithmic Harms -->
+                    <section id="european-cases" class="reference-category">
+                        <div class="category-header">
+                            <div class="category-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="mt-0 mb-0">European Case Law &amp; Algorithmic Harms<span class="category-count">7</span></h2>
+                                <p class="mb-0" style="color: var(--color-gray-600);">Landmark European cases of algorithmic discrimination informing vfairness patterns</p>
+                            </div>
+                        </div>
+
+                        <ul class="reference-list">
+                            <li class="reference-item">
+                                <span class="reference-authors">Dutch Parliamentary Inquiry — Toeslagenaffaire.</span>
+                                <span class="reference-year">(2020).</span>
+                                <span class="reference-title">Ongekend Onrecht (Unprecedented Injustice): Report on the Dutch Childcare Benefits Scandal.</span>
+                                <span class="reference-source">Dutch House of Representatives.</span>
+                                <a href="https://www.houseofrepresentatives.nl/sites/default/files/atoms/files/verslag_pok_definitief-en-gb.docx.pdf" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Report (EN)
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Algorithm targeted dual-nationality families for welfare fraud, causing financial ruin for ~26,000 families. Led to government resignation.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">The Hague District Court.</span>
+                                <span class="reference-year">(2020).</span>
+                                <span class="reference-title">ECLI:NL:RBDHA:2020:1878 — NJCM v. Netherlands (SyRI Case).</span>
+                                <span class="reference-source">Dutch Case Law.</span>
+                                <a href="https://uitspraken.rechtspraak.nl/details?id=ECLI:NL:RBDHA:2020:1878" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Ruling
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    SyRI welfare fraud detection system ruled a violation of ECHR Art. 8 (right to privacy). First European court ruling striking down an algorithmic welfare system.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">CJEU — Case C-634/21.</span>
+                                <span class="reference-year">(2023).</span>
+                                <span class="reference-title">SCHUFA Holding: Automated credit scoring under GDPR Art. 22.</span>
+                                <span class="reference-source">Court of Justice of the European Union.</span>
+                                <a href="https://curia.europa.eu/juris/document/document.jsf?docid=280426&amp;doclang=en" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    CJEU
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    CJEU ruled that credit scoring by SCHUFA constitutes automated decision-making under GDPR Art. 22, requiring transparency and the right to explanation.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">AlgorithmWatch.</span>
+                                <span class="reference-year">(2019).</span>
+                                <span class="reference-title">Austria's Employment Agency Algorithm: How a System Biased Against Women and Disabled People Was Deployed.</span>
+                                <span class="reference-source">AlgorithmWatch Report.</span>
+                                <a href="https://algorithmwatch.org/en/austrias-employment-agency-ams-rolls-out-discriminatory-algorithm/" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Report
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Austrian AMS employment scoring algorithm penalised women (due to care responsibilities) and disabled jobseekers, allocating fewer resources.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Amnesty International UK.</span>
+                                <span class="reference-year">(2018).</span>
+                                <span class="reference-title">Trapped in the Matrix: Secrecy, stigma, and bias in the Met's Gangs Database.</span>
+                                <span class="reference-source">Amnesty International Report.</span>
+                                <a href="https://www.amnesty.org.uk/trapped-gangs-matrix" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Report
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Investigation showing 78% of Gangs Matrix entries were Black individuals despite comprising 13% of the borough population.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Ofqual.</span>
+                                <span class="reference-year">(2020).</span>
+                                <span class="reference-title">Awarding GCSE, AS &amp; A levels in summer 2020: interim report.</span>
+                                <span class="reference-source">UK Office of Qualifications and Examinations Regulation.</span>
+                                <a href="https://www.gov.uk/government/publications/awarding-gcse-as-a-levels-in-summer-2020-interim-report" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    GOV.UK
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    UK exam grading algorithm systematically disadvantaged students at state schools and from ethnic minority backgrounds compared to private schools.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">FRA — EU Agency for Fundamental Rights.</span>
+                                <span class="reference-year">(2017).</span>
+                                <span class="reference-title">EU-MIDIS II: Second European Union Minorities and Discrimination Survey.</span>
+                                <span class="reference-source">FRA.</span>
+                                <a href="https://fra.europa.eu/en/publication/2017/second-european-union-minorities-and-discrimination-survey-main-results" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Data
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Comprehensive EU-wide survey on discrimination experienced by minorities, including Roma, immigrants, and religious minorities.
+                                </p>
+                            </li>
+                        </ul>
+                    </section>
+
+
+                    <!-- Mitigation Methods & Statistical Foundations -->
+                    <section id="mitigation" class="reference-category">
+                        <div class="category-header">
+                            <div class="category-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="mt-0 mb-0">Mitigation Methods &amp; Statistical Foundations<span class="category-count">8</span></h2>
+                                <p class="mb-0" style="color: var(--color-gray-600);">Algorithmic interventions, constraint-based training, and statistical methods underpinning fairness tooling</p>
+                            </div>
+                        </div>
+
+                        <ul class="reference-list">
+                            <li class="reference-item">
+                                <span class="reference-authors">Agarwal, A., Beygelzimer, A., Dudík, M., Langford, J., &amp; Wallach, H.</span>
+                                <span class="reference-year">(2018).</span>
+                                <span class="reference-title">A Reductions Approach to Fair Classification.</span>
+                                <span class="reference-source">Proceedings of the 35th International Conference on Machine Learning (ICML), PMLR 80:60-69.</span>
+                                <a href="https://arxiv.org/abs/1803.02453" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    arXiv
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Introduces the exponentiated gradient reductions approach, converting fair classification into a sequence of cost-sensitive classification problems.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Zafar, M. B., Valera, I., Gomez Rodriguez, M., &amp; Gummadi, K. P.</span>
+                                <span class="reference-year">(2017).</span>
+                                <span class="reference-title">Fairness Constraints: Mechanisms for Fair Classification.</span>
+                                <span class="reference-source">Proceedings of the 20th International Conference on Artificial Intelligence and Statistics (AISTATS), PMLR 54:962-970.</span>
+                                <a href="https://proceedings.mlr.press/v54/zafar17a.html" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Paper
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Proposes convex relaxations for incorporating fairness constraints directly into classifier training objectives.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Cotter, A., Jiang, H., Gupta, M., Wang, S., Narayan, T., You, S., &amp; Sridharan, K.</span>
+                                <span class="reference-year">(2019).</span>
+                                <span class="reference-title">Optimization with Non-Differentiable Constraints with Applications to Fairness, Recall, Churn, and Other Goals.</span>
+                                <span class="reference-source">Journal of Machine Learning Research, 20(172), 1-59.</span>
+                                <a href="https://jmlr.org/papers/v20/18-616.html" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Paper
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Develops proxy-Lagrangian methods for optimizing non-differentiable fairness constraints during model training.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Kamiran, F., Karim, A., &amp; Zhang, X.</span>
+                                <span class="reference-year">(2012).</span>
+                                <span class="reference-title">Decision Theory for Discrimination-Aware Classification.</span>
+                                <span class="reference-source">Proceedings of the 2012 IEEE International Conference on Data Mining (ICDM), 924-929.</span>
+                                <a href="https://doi.org/10.1109/ICDM.2012.45" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Introduces the rejection option classifier for post-processing fairness, modifying predictions only in the uncertainty region near the decision boundary.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Dwork, C.</span>
+                                <span class="reference-year">(2006).</span>
+                                <span class="reference-title">Differential Privacy.</span>
+                                <span class="reference-source">Proceedings of the 33rd International Colloquium on Automata, Languages and Programming (ICALP), LNCS 4052, 1-12.</span>
+                                <a href="https://doi.org/10.1007/11787006_1" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Foundational work on differential privacy, providing mathematical guarantees for protecting individual data in statistical analyses.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Athey, S., &amp; Imbens, G. W.</span>
+                                <span class="reference-year">(2016).</span>
+                                <span class="reference-title">Recursive Partitioning for Heterogeneous Causal Effects.</span>
+                                <span class="reference-source">Proceedings of the National Academy of Sciences (PNAS), 113(27), 7353-7360.</span>
+                                <a href="https://doi.org/10.1073/pnas.1510489113" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Develops methods for estimating heterogeneous treatment effects, enabling subgroup-level causal analysis in fairness experimentation.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Baron, R. M., &amp; Kenny, D. A.</span>
+                                <span class="reference-year">(1986).</span>
+                                <span class="reference-title">The Moderator–Mediator Variable Distinction in Social Psychological Research.</span>
+                                <span class="reference-source">Journal of Personality and Social Psychology, 51(6), 1173-1182.</span>
+                                <a href="https://doi.org/10.1037//0022-3514.51.6.1173" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Seminal framework for mediation and moderation analysis, foundational for understanding proxy discrimination pathways.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Wald, A.</span>
+                                <span class="reference-year">(1945).</span>
+                                <span class="reference-title">Sequential Tests of Statistical Hypotheses.</span>
+                                <span class="reference-source">Annals of Mathematical Statistics, 16(2), 117-186.</span>
+                                <a href="https://doi.org/10.1214/aoms/1177731118" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    DOI
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Introduces the Sequential Probability Ratio Test (SPRT), the statistical foundation for early stopping in fairness A/B testing.
+                                </p>
+                            </li>
+                        </ul>
+                    </section>
+                    <!-- Swiss Research -->
+                    <section id="swiss" class="reference-category">
+                        <div class="category-header">
+                            <div class="category-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="mt-0 mb-0">Swiss Research &amp; Legal Sources<span class="category-count">7</span></h2>
+                                <p class="mb-0" style="color: var(--color-gray-600);">Swiss-specific discrimination research, case law, and data sources informing vfairness patterns</p>
+                            </div>
+                        </div>
+
+                        <ul class="reference-list">
+                            <li class="reference-item">
+                                <span class="reference-authors">Swiss Federal Supreme Court.</span>
+                                <span class="reference-year">(2003).</span>
+                                <span class="reference-title">BGE 129 I 217 — Emmen Naturalisation Case.</span>
+                                <span class="reference-source">Swiss Federal Court.</span>
+                                <a href="https://www.bger.ch/ext/eurospider/live/de/php/clir/http/index.php?highlight_docid=atf://129-I-217:de&amp;lang=de&amp;type=show_document" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Court
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Landmark ruling finding ballot-box naturalisations discriminatory. Led to 2018 BüG revision requiring written decisions with reasoning.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">SFM — Swiss Forum for Migration Studies, Uni Neuchâtel.</span>
+                                <span class="reference-year">(ongoing).</span>
+                                <span class="reference-title">Research on permit type as proxy for nationality-based discrimination in Switzerland.</span>
+                                <span class="reference-source">University of Neuchâtel.</span>
+                                <a href="https://www.unine.ch/sfm" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    SFM
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Documents how Swiss permit types (Ausweis B, C, F, N) function as nationality proxies in employment, housing, and credit decisions.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">Uni Zürich — Correspondence Studies.</span>
+                                <span class="reference-year">(various).</span>
+                                <span class="reference-title">Housing discrimination in Switzerland: Field experiments on name-based discrimination.</span>
+                                <span class="reference-source">University of Zürich.</span>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Field experiments showing 20-50% fewer callbacks for applicants with Balkan, Turkish, and African names compared to Swiss-German names in housing.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">EKR/CFR — Swiss Federal Commission against Racism.</span>
+                                <span class="reference-year">(ongoing).</span>
+                                <span class="reference-title">Reports on racial discrimination in Switzerland.</span>
+                                <span class="reference-source">Swiss Confederation.</span>
+                                <a href="https://www.ekr.admin.ch/" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    EKR
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Monitors discrimination across employment, housing, education, and public services. Key source for Swiss-specific bias patterns.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">SKOS/CSIAS — Swiss Conference for Social Welfare.</span>
+                                <span class="reference-year">(ongoing).</span>
+                                <span class="reference-title">Social welfare guidelines and statistics (Sozialhilfestatistik).</span>
+                                <span class="reference-source">SKOS.</span>
+                                <a href="https://skos.ch/" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    SKOS
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Sozialhilfe receipt can trigger permit consequences under AIG Art. 63, creating a punitive feedback loop disproportionately affecting immigrants.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">nDSG — Swiss Federal Act on Data Protection (revDSG).</span>
+                                <span class="reference-year">(2023).</span>
+                                <span class="reference-title">Federal Act on Data Protection (FADP), in force 1 September 2023.</span>
+                                <span class="reference-source">Swiss Confederation.</span>
+                                <a href="https://www.fedlex.admin.ch/eli/cc/2022/491/de" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Fedlex
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Switzerland's modernised data protection law, aligned with GDPR principles. Relevant for automated profiling and decision-making in Swiss AI systems.
+                                </p>
+                            </li>
+
+                            <li class="reference-item">
+                                <span class="reference-authors">SECO — State Secretariat for Economic Affairs.</span>
+                                <span class="reference-year">(ongoing).</span>
+                                <span class="reference-title">RAV/ORP employment profiling evaluations.</span>
+                                <span class="reference-source">Swiss Confederation.</span>
+                                <a href="https://www.seco.admin.ch/" target="_blank" class="reference-link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    SECO
+                                </a>
+                                <p style="margin-top: var(--spacing-2); margin-bottom: 0; color: var(--color-gray-600); font-size: var(--font-size-sm);">
+                                    Evaluations and studies on RAV/ORP employment profiling systems, including findings of bias against women and older workers.
+                                </p>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Citation Guide -->
+                    <section class="mt-12 py-8" style="border-top: 1px solid var(--color-gray-200);">
+                        <h2>Citing vfairness</h2>
+                        <p>If you use vfairness in your research, please cite it as:</p>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">BibTeX</span>
+                                <button class="code-copy">Copy</button>
+                            </div>
+                            <pre><code>@software{vfairness2026,
+  author = {validant.ai},
+  title = {vfairness: A Comprehensive Python Library for ML Fairness},
+  year = {2026},
+  version = {<span id="stat-version">0.1.0</span>},
+  url = {https://github.com/validantai/vfairness}
+}</code></pre>
+                        </div>
+                    </section>
+
+                <!-- Navigation -->
+                <div class="flex justify-between mt-12 py-8" style="border-top: 1px solid var(--color-gray-200);">
+                    <a href="index.html" class="btn btn-secondary">
+                        &larr; Core Concepts
+                    </a>
+                    <a href="changelog.html" class="btn btn-primary">
+                        Changelog &rarr;
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="brand-logo">
+                    <p>Systems for Trust & Agency. Building tools for responsible AI development.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Documentation</h4>
+                        <ul>
+                            <li><a href="../getting-started/index.html">Getting Started</a></li>
+                            <li><a href="../business-guide/index.html">Business Guide</a></li>
+                            <li><a href="../api-reference/index.html">API Reference</a></li>
+                            <li><a href="index.html">Concepts</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="references.html">Academic References</a></li>
+                            <li><a href="changelog.html">Changelog</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="https://validant.ai" target="_blank">validant.ai</a></li>
+                            <li><a href="https://validant.ai/imprint#publisher" target="_blank">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 validant.ai. vfairness is licensed under the Apache License 2.0.</p>
+                <div class="footer-legal">
+                    <a href="../legal/index.html">Legal</a>
+                    <span class="footer-dot">·</span>
+                    <a href="../legal/index.html#ai-usage" title="AI-Assisted Development Disclosure">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -1px; margin-right: 3px;"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/></svg>AI-Assisted
+                    </a>
+                </div>
+            </div>
+            <div class="footer-github-mobile">
+                <a href="https://github.com/validantai/vfairness" class="btn" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; vertical-align: -2px;"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="../js/main.js"></script>
+
+    <!-- Citation version: read the generated library stats so the BibTeX entry cannot
+         go stale. Mirrors the pattern in concepts/changelog.html. The HTML literal is
+         the build-time fallback used when this fetch does not run (e.g. file://). -->
+    <script>
+    (function () {
+        fetch('../data/library-stats.json', { cache: 'no-cache' })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function (s) {
+                var el = document.getElementById('stat-version');
+                if (el && s.version) { el.textContent = s.version; }
+            })
+            .catch(function () { /* keep the build-time fallback value */ });
+    })();
+    </script>
+</body>
+</html>

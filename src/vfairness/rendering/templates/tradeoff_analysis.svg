@@ -1,0 +1,160 @@
+{# ── Tradeoff Analysis SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set chart_h = 380 %}
+{% set legend_h = 36 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% endif %}
+{% set chart_y = header_h %}
+{% set legend_y = chart_y + chart_h + 10 %}
+{% set exp_y = legend_y + legend_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   The scatter panel, both marked optima and the legend all go. An empty plot
+   with a full pair of 0.00-to-1.00 axes and a five-entry legend reads as a
+   sweep that ran, not as a sweep that never happened, and the accompanying
+   "0 of 0 configurations satisfy the constraint" carries the same reading. #}
+{% if not_assessable %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = header_h %}
+{% set exp_y = na_y + na_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+
+{# ── Chart geometry ── #}
+{% set cl = 100 %}
+{% set cr = 620 %}
+{% set ct = header_h + 16 %}
+{% set cb = header_h + chart_h - 40 %}
+{% set cw = cr - cl %}
+{% set ch = cb - ct %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{% if not_assessable %}
+<text x="36" y="122" font-size="10" fill="#64748b">No lambda setting was evaluated</text>
+{% include '_could_not_check.svg' %}
+{% else %}
+<text x="36" y="122" font-size="10" fill="#64748b">Each dot represents one lambda setting, green = constraint satisfied</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Chart area (white panel)                                          #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ chart_y }}" width="644" height="{{ chart_h }}" rx="10" fill="#ffffff"/>
+
+{# ── Axes ── #}
+<line x1="{{ cl }}" y1="{{ cb }}" x2="{{ cr }}" y2="{{ cb }}" stroke="#cbd5e1" stroke-width="1"/>
+<line x1="{{ cl }}" y1="{{ ct }}" x2="{{ cl }}" y2="{{ cb }}" stroke="#cbd5e1" stroke-width="1"/>
+
+{# ── Grid lines ── #}
+{% for i in range(1, 5) %}
+<line x1="{{ cl }}" y1="{{ cb - (i * ch / 5)|int }}" x2="{{ cr }}" y2="{{ cb - (i * ch / 5)|int }}" stroke="#f1f5f9" stroke-width="0.5"/>
+<line x1="{{ cl + (i * cw / 5)|int }}" y1="{{ ct }}" x2="{{ cl + (i * cw / 5)|int }}" y2="{{ cb }}" stroke="#f1f5f9" stroke-width="0.5"/>
+{% endfor %}
+
+{# ── X-axis ticks (truncated to data range) ── #}
+{% for i in range(6) %}
+{% set xp = cl + (i * cw / 5)|int %}
+<line x1="{{ xp }}" y1="{{ cb }}" x2="{{ xp }}" y2="{{ cb + 4 }}" stroke="#94a3b8" stroke-width="1"/>
+<text x="{{ xp }}" y="{{ cb + 16 }}" text-anchor="middle" font-size="8" fill="#94a3b8">{{ (x_min + i * x_range / 5)|f2 }}</text>
+{% endfor %}
+<text x="{{ (cl + cr) / 2 }}" y="{{ cb + 32 }}" text-anchor="middle" font-size="10" fill="#64748b">Accuracy</text>
+
+{# ── Y-axis ticks (truncated to data range) ── #}
+{% for i in range(6) %}
+{% set yp = cb - (i * ch / 5)|int %}
+<line x1="{{ cl - 4 }}" y1="{{ yp }}" x2="{{ cl }}" y2="{{ yp }}" stroke="#94a3b8" stroke-width="1"/>
+<text x="{{ cl - 8 }}" y="{{ yp + 3 }}" text-anchor="end" font-size="8" fill="#94a3b8">{{ (i * y_max / 5)|f2 }}</text>
+{% endfor %}
+<text x="46" y="{{ (ct + cb) / 2 }}" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90, 46, {{ (ct + cb) / 2 }})">Fairness Violation</text>
+
+{# ── Pareto frontier line ── #}
+{% if pareto_points|length > 1 %}
+<polyline fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6,4" opacity="0.7"
+          points="{% for p in pareto_points %}{{ cl + (p.x * cw)|int }},{{ cb - (p.y * ch)|int }} {% endfor %}"/>
+{% endif %}
+
+{# ── Data points ── #}
+{% for p in points %}
+{% set px = cl + (p.x * cw)|int %}
+{% set py = cb - (p.y * ch)|int %}
+<circle cx="{{ px }}" cy="{{ py }}" r="5"
+        fill="{% if p.satisfied %}#059669{% else %}#dc2626{% endif %}"
+        stroke="#ffffff" stroke-width="1.5" opacity="0.85"/>
+{% endfor %}
+
+{# ── Best fair point ── #}
+{% if best_fair %}
+{% set bfx = cl + (best_fair.accuracy * cw)|int %}
+{% set bfy = cb - (best_fair.violation * ch)|int %}
+<circle cx="{{ bfx }}" cy="{{ bfy }}" r="9" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+<rect x="{{ bfx + 12 }}" y="{{ bfy - 14 }}" width="56" height="16" rx="4" fill="#eff6ff"/>
+<text x="{{ bfx + 16 }}" y="{{ bfy - 2 }}" font-size="8" fill="#3b82f6" font-weight="600">Best Fair</text>
+{% endif %}
+
+{# ── Best accurate point ── #}
+{% if best_accurate %}
+{% set bax = cl + (best_accurate.accuracy * cw)|int %}
+{% set bay = cb - (best_accurate.violation * ch)|int %}
+<circle cx="{{ bax }}" cy="{{ bay }}" r="9" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+<rect x="{{ bax + 12 }}" y="{{ bay - 14 }}" width="76" height="16" rx="4" fill="#fffbeb"/>
+<text x="{{ bax + 16 }}" y="{{ bay - 2 }}" font-size="8" fill="#f59e0b" font-weight="600">Best Accurate</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Legend row                                                         #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ legend_y }}" width="644" height="{{ legend_h }}" rx="10" fill="#ffffff"/>
+
+<circle cx="66" cy="{{ legend_y + 18 }}" r="4" fill="#059669"/>
+<text x="76" y="{{ legend_y + 22 }}" font-size="9" fill="#6b7280">Constraint satisfied</text>
+
+<circle cx="210" cy="{{ legend_y + 18 }}" r="4" fill="#dc2626"/>
+<text x="220" y="{{ legend_y + 22 }}" font-size="9" fill="#6b7280">Constraint violated</text>
+
+<line x1="350" y1="{{ legend_y + 18 }}" x2="368" y2="{{ legend_y + 18 }}" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,3"/>
+<text x="376" y="{{ legend_y + 22 }}" font-size="9" fill="#6b7280">Pareto frontier</text>
+
+<circle cx="496" cy="{{ legend_y + 18 }}" r="5" fill="none" stroke="#3b82f6" stroke-width="1.5"/>
+<text x="508" y="{{ legend_y + 22 }}" font-size="9" fill="#6b7280">Best fair</text>
+
+<circle cx="576" cy="{{ legend_y + 18 }}" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="588" y="{{ legend_y + 22 }}" font-size="9" fill="#6b7280">Best accurate</text>
+{% endif %}{# end: not not_assessable #}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation panel                                                  #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+
+</svg>

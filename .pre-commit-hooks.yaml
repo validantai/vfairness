@@ -1,0 +1,15 @@
+- id: vfairness-check-config
+  name: Check fairness config files
+  description: Verify that fairness configuration files contain required keys (metrics, thresholds).
+  entry: vfairness-precommit check-config
+  language: python
+  types: [file]
+  files: '(fairness|bias|gate)\.(json|ya?ml)$'
+
+- id: vfairness-check-model-card
+  name: Check model card fairness sections
+  description: Verify that model card files include fairness-related documentation.
+  entry: vfairness-precommit check-model-card
+  language: python
+  types: [markdown]
+  files: '(model.card|model-card|modelcard)\.md$'

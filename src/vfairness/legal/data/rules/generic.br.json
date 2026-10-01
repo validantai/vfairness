@@ -1,0 +1,16 @@
+{
+  "use_case": "generic",
+  "jurisdiction": "br",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "ethnicity": {"status": "restricted", "legal_basis": "LGPD Art. 5(II); Art. 11"},
+    "religion": {"status": "restricted", "legal_basis": "LGPD Art. 5(II); Art. 11"},
+    "political_opinion": {"status": "restricted", "legal_basis": "LGPD Art. 5(II); Art. 11"},
+    "union_membership": {"status": "restricted", "legal_basis": "LGPD Art. 5(II); Art. 11"},
+    "sexual_orientation": {"status": "restricted", "legal_basis": "LGPD Art. 5(II); Art. 11"},
+    "health": {"status": "restricted", "legal_basis": "LGPD Art. 5(II); Art. 11"},
+    "genetic": {"status": "restricted", "legal_basis": "LGPD Art. 5(II); Art. 11"},
+    "biometric": {"status": "restricted", "legal_basis": "LGPD Art. 5(II); Art. 11"},
+    "pregnancy": {"status": "forbidden", "legal_basis": "Law 9.029/1995; CLT Art. 391-A", "notes": "Pregnancy / sterilisation / HIV tests in hiring forbidden."}
+  }
+}

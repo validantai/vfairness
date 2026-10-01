@@ -1,0 +1,2929 @@
+{
+  "capabilities": {
+    "accuracy_parity_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "action_bias_analyzer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_agents.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness4_agents.py",
+        "tests/test_readiness5_probe5.py",
+        "tests/test_readiness6_manufactured.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "adaptive_threshold_management": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness6_detection.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "adasyn": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "adversarial_collusion_detector": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness6_agents.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "adversarial_debiasing": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave6_adversarial.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "alert_prioritization": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness6_detection.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "analyze_statistical_disparities": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness4_docs4.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "anchors": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "attention_weighted_rank_fairness": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_ranking.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "auroc_parity": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave6_calibration.py",
+        "tests/test_audit_wave6_gate_report.py",
+        "tests/test_readiness4_metrics.py",
+        "tests/test_spine_classification_metrics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "auto_discovery": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness_discovery.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, FABRICATES, closed and independently audited"
+    },
+    "bayesian_proportion_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave2.py",
+        "tests/test_readiness4_docs4.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "benchmark_runner": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness6_textmatch.py",
+        "tests/test_readiness_llmoutage.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "benjamini_hochberg_correction": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave5_hardening.py",
+        "tests/test_readiness6_metrics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "beta_calibration": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "bias_audit": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_wave4_g_mcp_regulatory.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_pulse_traces.py",
+        "tests/test_readiness2_benchmarks.py",
+        "tests/test_readiness4_nan1.py",
+        "tests/test_readiness4_pulse.py",
+        "tests/test_readiness6_agents.py",
+        "tests/test_readiness6_textmatch.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "bias_monitor": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave6_cicd_nan.py",
+        "tests/test_readiness6_gates.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "bonferroni_correction": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave5_hardening.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "bootstrap_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave5_hardening.py",
+        "tests/test_audit_wave6_statistics.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_parameter_boundary_refusals.py",
+        "tests/test_statistics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "bounded_group_loss": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness2_inert.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "bounded_group_loss_constraint": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness2_inert.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "brier_score": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave4_postproc.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, FIXED, closed and independently audited"
+    },
+    "brier_score_decomposition": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "calibrated_equalization": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_audit6_wave2_argument_order.py",
+        "tests/test_audit6_wave2_constraint.py",
+        "tests/test_audit_wave2.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "calibration": {
+      "fix_minutes": 0,
+      "judged": 8,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_adapters_last_four.py",
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_readiness2_explainer.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [
+        "calibration_analysis"
+      ]
+    },
+    "calibration_analysis": {
+      "fix_minutes": 0,
+      "judged": 8,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_adapters_last_four.py",
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_readiness2_explainer.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [
+        "calibration"
+      ]
+    },
+    "calibration_curve": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "calibration_difference": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_adapters_calibration_verdicts.py",
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_audit_wave4_postproc.py",
+        "tests/test_desc_agrees_with_canvas.py",
+        "tests/test_gate_direction.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_pulse_deferred_tail.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [
+        "calibration_disparity"
+      ]
+    },
+    "calibration_disparity": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_adapters_calibration_verdicts.py",
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_audit_wave4_postproc.py",
+        "tests/test_desc_agrees_with_canvas.py",
+        "tests/test_gate_direction.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_pulse_deferred_tail.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [
+        "calibration_difference"
+      ]
+    },
+    "calibration_in_the_large": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave6_calibration.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "calibration_slope": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assert_fairness_fail_closed.py",
+        "tests/test_audit_wave4_postproc.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "causal_fairness": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "causal_fairness_graph": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, FABRICATES, closed and independently audited"
+    },
+    "check_model_card": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "classification_fairness_report": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_audit6_wave4_e_statistics.py",
+        "tests/test_audit_wave1.py",
+        "tests/test_audit_wave6_gate_report.py",
+        "tests/test_gate_nan_fail_closed.py",
+        "tests/test_ratio_null_and_degenerate.py",
+        "tests/test_readiness4_docs4.py",
+        "tests/test_readiness4_metrics.py",
+        "tests/test_readiness6_metrics.py",
+        "tests/test_rendering_assessable.py",
+        "tests/test_report_provenance.py",
+        "tests/test_report_verdict_direction.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "compositionality_analyzer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "compute_effect_sizes": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, FIXED, closed and independently audited"
+    },
+    "compute_feature_correlations": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane2_feature_engineering.py",
+        "tests/test_bgl_final_audit_repairs.py",
+        "tests/test_site_api_reference_calls_resolve.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, FIXED, closed and independently audited. The audit HELD and additionally found a fourth copy of the same statistic still live in discovery._cramers_v, reached from vfairness.identify_proxy_features. That copy and six naive siblings were closed in the same-day family sweep."
+    },
+    "conditional_adverse_impact": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave6_regression_controls.py",
+        "tests/test_spine_continuous_metrics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "conditional_demographic_disparity": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_docs_truth.py",
+        "tests/test_spine_classification_metrics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "conditional_demographic_disparity_with_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "conditional_independence_regularizer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "constraint_grid_search": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "correlation_penalty": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "correlation_reduction": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit3_preproc_encoding.py",
+        "tests/test_audit6_lane2_feature_engineering.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "correspondence_tester": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness4_agents.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "cot_faithfulness_analyzer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness6_textmatch.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "counterfactual_augment": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "counterfactual_fairness": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "counterfactual_fairness_metric": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "counterfactual_tester": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_llm_wave0_honesty.py",
+        "tests/test_readiness2_docs2.py",
+        "tests/test_readiness6_agents.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "create_calibrator": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "create_constraint": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness2_inert.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "create_fairness_loss": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, ALREADY_CORRECT, closed and independently audited"
+    },
+    "create_reweighter": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_wave2_constraint.py",
+        "tests/test_bgl_final_d01.py",
+        "tests/test_bgl_stage2_s2g05.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, FIXED, closed and independently audited"
+    },
+    "create_threshold_optimizer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, ALREADY_CORRECT, closed and independently audited"
+    },
+    "data_bias_validation": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane1_reporting.py",
+        "tests/test_readiness6_gates.py",
+        "tests/test_rowlevel_validator_reporting.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "decoding_trust_runner": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_decodingtrust_provenance.py",
+        "tests/test_readiness6_verdicts.py",
+        "tests/test_readiness_llmoutage.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "decompose_mediation": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_registry_completeness.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "delegation_routing_auditor": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave5_agentsmisc.py",
+        "tests/test_readiness6_agents.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "demographic_parity_constraint": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness2_inert.py",
+        "tests/test_readiness_docs.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "demographic_parity_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assert_fairness_fail_closed.py",
+        "tests/test_assert_fairness_fail_closed_status.py",
+        "tests/test_assessability_chain.py",
+        "tests/test_audit6_lane4_evaluation.py",
+        "tests/test_audit6_wave4_d_integrations.py",
+        "tests/test_audit6_wave4_e_statistics.py",
+        "tests/test_audit_wave1.py",
+        "tests/test_audit_wave4_evalmetrics.py",
+        "tests/test_audit_wave4_ops.py",
+        "tests/test_audit_wave5_hardening.py",
+        "tests/test_audit_wave6_cicd_nan.py",
+        "tests/test_audit_wave6_gate_report.py",
+        "tests/test_classification.py",
+        "tests/test_compliance_three_state.py",
+        "tests/test_desc_agrees_with_canvas.py",
+        "tests/test_detailed_report_direction.py",
+        "tests/test_explainer_direction.py",
+        "tests/test_gate_nan_fail_closed.py",
+        "tests/test_integrations_none_score.py",
+        "tests/test_metric_direction.py",
+        "tests/test_monitoring_nan_not_measured.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_no_telemetry.py",
+        "tests/test_parameter_boundary_refusals.py",
+        "tests/test_pattern_core_adapters.py",
+        "tests/test_perf_scale.py",
+        "tests/test_property_invariants.py",
+        "tests/test_ratio_null_and_degenerate.py",
+        "tests/test_readiness2_docs2.py",
+        "tests/test_readiness2_headline.py",
+        "tests/test_readiness4_docs4.py",
+        "tests/test_readiness5_gate.py",
+        "tests/test_readiness6_dashboard.py",
+        "tests/test_readiness6_gates.py",
+        "tests/test_readiness6_infinity.py",
+        "tests/test_readiness6_metrics.py",
+        "tests/test_readiness_docs.py",
+        "tests/test_readiness_reports.py",
+        "tests/test_rendering_assessable.py",
+        "tests/test_rendering_direction.py",
+        "tests/test_report_verdict_direction.py",
+        "tests/test_reporting_direction.py",
+        "tests/test_risk_register_scoring.py",
+        "tests/test_rowlevel_fairness_cicd.py",
+        "tests/test_rowlevel_validator_reporting.py",
+        "tests/test_streaming.py",
+        "tests/test_task_type_detection.py",
+        "tests/test_validation_fail_closed.py",
+        "tests/test_verdict_defaults.py",
+        "tests/test_visualization_direction.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "demographic_parity_difference_with_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_wave4_e_statistics.py",
+        "tests/test_audit_wave4_evalmetrics.py",
+        "tests/test_no_telemetry.py",
+        "tests/test_parameter_boundary_refusals.py",
+        "tests/test_readiness_docs.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "demographic_parity_loss": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave5_inproc.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "demographic_parity_ratio": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_audit6_wave4_d_integrations.py",
+        "tests/test_audit6_wave4_e_statistics.py",
+        "tests/test_audit_wave5_hardening.py",
+        "tests/test_explainer_direction.py",
+        "tests/test_gate_nan_fail_closed.py",
+        "tests/test_metric_direction.py",
+        "tests/test_no_telemetry.py",
+        "tests/test_perf_scale.py",
+        "tests/test_property_invariants.py",
+        "tests/test_ratio_null_and_degenerate.py",
+        "tests/test_readiness4_docs4.py",
+        "tests/test_readiness6_gates.py",
+        "tests/test_readiness6_metrics.py",
+        "tests/test_rendering_assessable.py",
+        "tests/test_rendering_direction.py",
+        "tests/test_report_verdict_direction.py",
+        "tests/test_reporting_direction.py",
+        "tests/test_task_type_detection.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "detect_historical_patterns": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness6_names.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, FABRICATES, closed and independently audited"
+    },
+    "detect_protected_attributes": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness_tracker.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "detect_representation_bias": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_wave3_s01_representation.py",
+        "tests/test_bias_audit_representation.py",
+        "tests/test_readiness2_benchmarks.py",
+        "tests/test_readiness2_docs2.py",
+        "tests/test_readiness3_repr2.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "dice_counterfactuals": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "discover_intersectional_groups": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane4_evaluation.py",
+        "tests/test_readiness_discovery.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, FABRICATES, closed and independently audited"
+    },
+    "disparate_impact_ratio": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_audit3_ratio_sweep.py",
+        "tests/test_audit_wave4_postproc.py",
+        "tests/test_audit_wave6_statistics.py",
+        "tests/test_compliance_three_state.py",
+        "tests/test_detailed_report_direction.py",
+        "tests/test_explainer_direction.py",
+        "tests/test_metric_direction.py",
+        "tests/test_property_invariants.py",
+        "tests/test_ratio_null_and_degenerate.py",
+        "tests/test_readiness2_headline.py",
+        "tests/test_readiness5_gate.py",
+        "tests/test_readiness6_direction.py",
+        "tests/test_readiness6_gates.py",
+        "tests/test_readiness6_infinity.py",
+        "tests/test_readiness6_metrics.py",
+        "tests/test_rendering_direction.py",
+        "tests/test_report_verdict_direction.py",
+        "tests/test_reporting_direction.py",
+        "tests/test_spine_classification_metrics.py",
+        "tests/test_verdict_defaults.py",
+        "tests/test_visualization_direction.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "disparate_impact_ratio_with_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave6_statistics.py",
+        "tests/test_metric_direction.py",
+        "tests/test_ratio_null_and_degenerate.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "disparate_impact_removal": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "distribution_matching": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_audit6_wave2_argument_order.py",
+        "tests/test_audit6_wave2_constraint.py",
+        "tests/test_audit_wave2.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "drift_detection": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness2_explainer.py",
+        "tests/test_readiness5_store5.py",
+        "tests/test_readiness6_detection.py",
+        "tests/test_readiness6_manufactured.py",
+        "tests/test_readiness_reports.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "embedding_bias_detector": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness6_agents.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "emergent_bias_detector": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_pulse_traces.py",
+        "tests/test_readiness4_nan1.py",
+        "tests/test_readiness4_pulse.py",
+        "tests/test_readiness6_agents.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "equal_opportunity_constraint": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit3_inproc_constraints.py",
+        "tests/test_equalized_odds_unmeasurable_arm.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "equal_opportunity_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assert_fairness_fail_closed.py",
+        "tests/test_assert_fairness_fail_closed_status.py",
+        "tests/test_assessability_chain.py",
+        "tests/test_audit6_wave4_d_integrations.py",
+        "tests/test_audit_wave4_evalmetrics.py",
+        "tests/test_audit_wave6_metrics.py",
+        "tests/test_equalized_odds_unmeasurable_arm.py",
+        "tests/test_explainer_direction.py",
+        "tests/test_gate_nan_fail_closed.py",
+        "tests/test_perf_scale.py",
+        "tests/test_property_invariants.py",
+        "tests/test_readiness2_headline.py",
+        "tests/test_readiness4_metrics.py",
+        "tests/test_readiness6_metrics.py",
+        "tests/test_rendering_assessable.py",
+        "tests/test_rowlevel_validator_reporting.py",
+        "tests/test_task_type_detection.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "equal_opportunity_difference_with_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "equal_opportunity_loss": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "equalized_odds_constraint": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit3_inproc_constraints.py",
+        "tests/test_equalized_odds_unmeasurable_arm.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness4_constraints.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "equalized_odds_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_audit6_wave4_d_integrations.py",
+        "tests/test_audit_final_release.py",
+        "tests/test_audit_wave4_evalmetrics.py",
+        "tests/test_audit_wave4_ops.py",
+        "tests/test_audit_wave5_hardening.py",
+        "tests/test_audit_wave6_cicd_nan.py",
+        "tests/test_audit_wave6_gate_report.py",
+        "tests/test_audit_wave6_metrics.py",
+        "tests/test_equalized_odds_unmeasurable_arm.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_no_telemetry.py",
+        "tests/test_perf_scale.py",
+        "tests/test_readiness2_headline.py",
+        "tests/test_readiness4_docs4.py",
+        "tests/test_readiness4_metrics.py",
+        "tests/test_readiness6_gates.py",
+        "tests/test_readiness6_metrics.py",
+        "tests/test_rendering_assessable.py",
+        "tests/test_rowlevel_fairness_cicd.py",
+        "tests/test_task_type_detection.py",
+        "tests/test_visualization_direction.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "equalized_odds_difference_with_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "equalized_odds_loss": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "expected_calibration_error": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave4_postproc.py",
+        "tests/test_no_telemetry.py",
+        "tests/test_property_invariants.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "experiment_analysis": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane4_evaluation.py",
+        "tests/test_readiness3_recollapse.py",
+        "tests/test_readiness6_agents.py",
+        "tests/test_readiness6_verdicts.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "explanation_diagnostics": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness5_consumers5.py",
+        "tests/unit/test_explanation_diagnostics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "exponentiated_gradient": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_wave4_b_in_processing.py",
+        "tests/test_audit_wave5_inproc.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness_docs.py",
+        "tests/test_site_api_reference_calls_resolve.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "exposure_parity_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_parameter_boundary_refusals.py",
+        "tests/test_ranking.py",
+        "tests/test_rerank_exposure_parity.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "exposure_parity_ratio": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_adapters_ranking_verdicts.py",
+        "tests/test_assessability_chain.py",
+        "tests/test_audit6_wave2_criticals.py",
+        "tests/test_audit_wave4_postproc.py",
+        "tests/test_explain_matches_canvas.py",
+        "tests/test_ranking.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "fair_classifier": {
+      "fix_minutes": 0,
+      "judged": 5,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness3_annotations.py",
+        "tests/test_readiness4_constraints.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "fair_explainer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit3_ratio_sweep.py",
+        "tests/test_audit6_wave4_e_statistics.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_report_verdict_direction.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "fair_regressor": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave1.py",
+        "tests/test_audit_wave6_reductions.py",
+        "tests/test_readiness2_docs2.py",
+        "tests/test_readiness3_annotations.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "fair_representation": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "fair_representation_loss": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "fairness_analysis": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_analyzer_provenance.py",
+        "tests/test_api_reference_page_truth.py",
+        "tests/test_assessability_chain.py",
+        "tests/test_audit6_wave4_d_integrations.py",
+        "tests/test_audit_wave4_evalmetrics.py",
+        "tests/test_gate_nan_fail_closed.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_no_telemetry.py",
+        "tests/test_parameter_boundary_refusals.py",
+        "tests/test_perf_scale.py",
+        "tests/test_readiness2_headline.py",
+        "tests/test_readiness5_store5.py",
+        "tests/test_readiness6_agents.py",
+        "tests/test_readiness6_direction.py",
+        "tests/test_readiness6_gates.py",
+        "tests/test_report_provenance.py",
+        "tests/test_task_type_detection.py",
+        "tests/test_validation_fail_closed.py",
+        "tests/test_verdict_defaults.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "fairness_aware_bce": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_audit6_wave4_b_in_processing.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "fairness_dashboard": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness6_dashboard.py",
+        "tests/test_readiness6_direction.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "fairness_decomposition": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness6_claims.py",
+        "tests/test_readiness6_metrics.py",
+        "tests/xai/test_decomposition.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "fairness_experiment": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness2_threestate.py",
+        "tests/test_readiness3_recollapse.py",
+        "tests/test_readiness6_agents.py",
+        "tests/test_readiness6_manufactured.py",
+        "tests/test_readiness6_verdicts.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "fairness_explainer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness2_docs2.py",
+        "tests/test_readiness2_explainer.py",
+        "tests/unit/test_explainer.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "fairness_gate": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave4_ops.py",
+        "tests/test_audit_wave6_cicd_nan.py",
+        "tests/test_audit_wave6_gate_report.py",
+        "tests/test_gate_direction.py",
+        "tests/test_gate_four_fifths_reachable.py",
+        "tests/test_metric_direction.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness2_headline.py",
+        "tests/test_readiness5_gate.py",
+        "tests/test_readiness6_gates.py",
+        "tests/test_readiness6_infinity.py",
+        "tests/test_readiness_docs.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "fairness_monitor": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane1_reporting.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness5_consumers5.py",
+        "tests/test_readiness5_store5.py",
+        "tests/test_readiness_tracker.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "fairness_regularization": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [
+        "group_fairness_regularizer"
+      ],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "fairness_report_card": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "fairness_test_suite": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_final_release.py",
+        "tests/test_audit_wave6_cicd_nan.py",
+        "tests/test_junit_xml_escaping.py",
+        "tests/test_readiness6_infinity.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "fairness_training_analysis": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_readiness4_constraints.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "false_positive_rate_parity_constraint": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit3_inproc_constraints.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "false_positive_rate_parity_loss": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "feature_attribution_explainer": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "feature_engineering_analysis": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_final_release.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "feature_suppression": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane2_feature_engineering.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "find_feasible_thresholds": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave1.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "find_proxy_chains": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "fnr_parity_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_audit_wave6_metrics.py",
+        "tests/test_readiness4_metrics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "focal_calibrator": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "fpr_parity_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_audit_wave6_metrics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "fpr_parity_difference_with_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "generate_annex_iv": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_compliance_three_state.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "generate_dpia_sections": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_compliance_three_state.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "generate_model_card": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_compliance_three_state.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "generate_risk_register": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_compliance_three_state.py",
+        "tests/test_risk_register_scoring.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "group_calibration": {
+      "fix_minutes": 0,
+      "judged": 5,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_readiness2_inert.py",
+        "tests/test_readiness6_claims.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "group_calibration_metrics": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "group_fairness_regularizer": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [
+        "fairness_regularization"
+      ],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "group_threshold": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_audit6_wave2_argument_order.py",
+        "tests/test_audit6_wave4_b_in_processing.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_notebooks_still_run.py",
+        "tests/test_readiness2_inert.py",
+        "tests/test_site_api_reference_calls_resolve.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "groupthink_detector": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness4_pulse.py",
+        "tests/test_readiness6_agents.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "hilbert_schmidt_regularizer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "histogram_binning": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "identify_privileged_groups": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane4_evaluation.py",
+        "tests/test_audit_wave4_evalmetrics.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness_discovery.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, ALREADY_CORRECT, closed and independently audited"
+    },
+    "identify_proxy_variables": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_wave4_f_preprocessing.py",
+        "tests/test_readiness6_names.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, FABRICATES, closed and independently audited"
+    },
+    "in_processing_beta_calibrator": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "individual_fairness": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "integrated_calibration_index": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave6_calibration.py",
+        "tests/test_gate_direction.py",
+        "tests/test_metric_direction.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "integrated_calibration_index_with_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave6_calibration.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "integrated_gradients": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_bgl_final_d01.py",
+        "tests/test_bgl_stage2_s2g09.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "interactive_dashboard": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness5_consumers5.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "intersectional_calibration": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness6_claims.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "intersectional_disparity_analysis": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_wave3_s03_pulse_ratios.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, FIXED, closed and independently audited"
+    },
+    "intersectional_transform": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "inverse_propensity": {
+      "fix_minutes": 0,
+      "judged": 5,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "isotonic_calibration": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "judge_is_subject": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_llm_wave0_honesty.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "kernel_shap": {
+      "fix_minutes": 0,
+      "judged": 2,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "label_massaging": {
+      "fix_minutes": 0,
+      "judged": 5,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "lime": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "linear_explainer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "llm_intersectional_analyzer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_llm_wave0_honesty.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "lundberg_decomposition": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness6_claims.py",
+        "tests/xai/test_decomposition.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "mae_parity_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_perf_scale.py",
+        "tests/test_readiness2_headline.py",
+        "tests/test_readiness4_docs4.py",
+        "tests/test_task_type_detection.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "maximum_calibration_error": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "mean_prediction_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_perf_scale.py",
+        "tests/test_pulse_generative_stats.py",
+        "tests/test_readiness2_headline.py",
+        "tests/test_report_verdict_direction.py",
+        "tests/test_task_type_detection.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "metrics_store": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane1_reporting.py",
+        "tests/test_audit_wave4_ops.py",
+        "tests/test_audit_wave5_reportpost.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness5_store5.py",
+        "tests/test_readiness6_dashboard.py",
+        "tests/test_readiness_reports.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "multi_agent_run_harness": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "multi_objective_threshold": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "multicalibration": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit3_ratio_sweep.py",
+        "tests/test_audit_wave6_calibration.py",
+        "tests/test_audit_wave6_metrics.py",
+        "tests/test_gate_direction.py",
+        "tests/test_metric_direction.py",
+        "tests/test_readiness6_textmatch.py",
+        "tests/test_rendering_direction.py",
+        "tests/test_report_verdict_direction.py",
+        "tests/test_reporting_direction.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "multicalibration_with_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "multivariate_proxy_leakage": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "negative_predictive_value_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_readiness4_metrics.py",
+        "tests/test_spine_classification_metrics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "negative_predictive_value_difference_with_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "negotiation_fairness_tracker": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness6_agents.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "net_benefit_parity": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_spine_continuous_metrics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "noise_floor_from_runs": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_llm_wave0_honesty.py",
+        "tests/test_readiness4_nan1.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, ALREADY_CORRECT, closed and independently audited"
+    },
+    "non_determinism_analyzer": {
+      "fix_minutes": 0,
+      "judged": 2,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_llm_constant_arms_agreement.py",
+        "tests/test_readiness4_nan1.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "normalized_discounted_kl_divergence": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_ranking.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "output_analyzer": {
+      "fix_minutes": 0,
+      "judged": 12,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave5_agentsmisc.py",
+        "tests/test_llm.py",
+        "tests/test_llm_coverage_survives_correction.py",
+        "tests/test_llm_scorer_provenance.py",
+        "tests/test_llm_wave0_honesty.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness2_docs2.py",
+        "tests/test_readiness2_llmnan.py",
+        "tests/test_readiness5_scorer5.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "permutation_test": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_bgl_final_audit_repairs.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_no_telemetry.py",
+        "tests/test_readiness6_metrics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, FIXED, closed and independently audited. The audit HELD and additionally found the claim understated its own defect by 10x (274x at comprehensive_fairness_test, 544x at permutation_test, not 27x), a false complexity claim in the source comment, and that no test reached the public entry above 1000 rows. All three corrected in c76f9c7."
+    },
+    "pipeline_tracker": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave3.py",
+        "tests/test_readiness6_remainder.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "platt_scaling": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "platt_scaling_calibrator": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "power_analysis": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane4_evaluation.py",
+        "tests/test_readiness6_agents.py",
+        "tests/test_readiness6_manufactured.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, FIXED, closed and independently audited"
+    },
+    "prediction_reweighting": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_audit6_wave2_argument_order.py",
+        "tests/test_audit6_wave2_constraint.py",
+        "tests/test_audit_wave2.py",
+        "tests/test_notebooks_still_run.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "predictive_parity_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_audit6_wave4_d_integrations.py",
+        "tests/test_audit_wave6_metrics.py",
+        "tests/test_explainer_direction.py",
+        "tests/test_readiness2_headline.py",
+        "tests/test_readiness6_gates.py",
+        "tests/test_readiness6_metrics.py",
+        "tests/test_rendering_assessable.py",
+        "tests/test_task_type_detection.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage3_fixed": "2026-09-17, HONEST, closed and independently audited"
+    },
+    "predictive_parity_difference_with_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "pricing_disparity": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave6_regression_controls.py",
+        "tests/test_spine_continuous_metrics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "pricing_disparity_with_ci": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "projected_adversarial": {
+      "fix_minutes": 0,
+      "judged": 2,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "propensity_weighting": {
+      "fix_minutes": 0,
+      "judged": 5,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "proxy_feature_score": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness6_claims.py",
+        "tests/xai/test_decomposition.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "r2_parity_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness2_headline.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "rag_bias_analyzer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness4_agents.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "recourse_generator": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness6_metrics.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "rejection_option_classification": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_audit6_wave2_argument_order.py",
+        "tests/test_audit6_wave2_constraint.py",
+        "tests/test_audit_wave2.py",
+        "tests/test_notebooks_still_run.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "report_generation": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness_reports.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "representation_bias_amplification": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_wave5_agentsmisc.py",
+        "tests/test_vision_homogeneity_is_not_fairness.py",
+        "tests/unit/test_vision.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "representation_ndkl": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_adapters_ranking_verdicts.py",
+        "tests/test_adapters_row_level.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_pulse_generative_stats.py",
+        "tests/test_pulse_orchestrator.py",
+        "tests/test_ranking.py",
+        "tests/test_readiness3_recollapse.py",
+        "tests/test_readiness6_detection.py",
+        "tests/test_readiness6_manufactured.py",
+        "tests/test_vision_homogeneity_is_not_fairness.py",
+        "tests/unit/test_vision.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "representation_severity": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit3_vision_render_tail.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness3_recollapse.py",
+        "tests/test_readiness6_manufactured.py",
+        "tests/test_vision_homogeneity_is_not_fairness.py",
+        "tests/unit/test_vision.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "representation_skew": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit3_vision_render_tail.py",
+        "tests/test_audit_wave5_agentsmisc.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_pulse_deferred_tail.py",
+        "tests/test_pulse_pathways.py",
+        "tests/test_readiness6_detection.py",
+        "tests/test_readiness6_manufactured.py",
+        "tests/test_readiness_llmoutage.py",
+        "tests/test_risk_register_scoring.py",
+        "tests/test_vision_homogeneity_is_not_fairness.py",
+        "tests/unit/test_vision.py",
+        "tests/xai/test_decomposition.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "resampling": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "residual_bias": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness2_headline.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "residual_transform": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane2_feature_engineering.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "reweighting": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane2_feature_engineering.py",
+        "tests/test_audit_wave6_reweighting.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "reweighting_analysis": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_notebooks_still_run.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "rmse_parity_difference": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assessability_chain.py",
+        "tests/test_perf_scale.py",
+        "tests/test_readiness2_headline.py",
+        "tests/test_task_type_detection.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "robustness_testing": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit_final_release.py",
+        "tests/test_readiness6_metrics.py",
+        "tests/test_readiness6_textmatch.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "sensitivity_analysis": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "smote": {
+      "fix_minutes": 0,
+      "judged": 5,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "statistical_parity_regularizer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "stress_test_fairness": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "subgroup_robustness_audit": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "temperature_scaling": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "temperature_scaling_calibrator": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "temporal_fairness_analysis": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness5_store5.py",
+        "tests/test_readiness6_direction.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "temporal_tracker": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_agents.py",
+        "tests/test_audit6_wave4_a_pulse_assurance.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness6_verdicts.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "text_fairness_analyzer": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness6_agents.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "threshold_analysis": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness2_threestate.py",
+        "tests/test_readiness6_optimizer.py",
+        "tests/test_threshold_analyzer.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage1_fixed": "2026-09-11, closed and independently audited (fix real, pin can fail, no over-correction)"
+    },
+    "threshold_optimization": {
+      "fix_minutes": 0,
+      "judged": 3,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_lane3_post_in_processing.py",
+        "tests/test_audit6_wave2_argument_order.py",
+        "tests/test_audit6_wave4_b_in_processing.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_notebooks_still_run.py",
+        "tests/test_readiness2_inert.py",
+        "tests/test_site_api_reference_calls_resolve.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "tomek": {
+      "fix_minutes": 0,
+      "judged": 4,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "tool_bias_auditor": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": [],
+      "stage2_fixed": "2026-09-17, closed and independently audited (fix real, pin can fail, no over-correction, no real finding deleted)"
+    },
+    "trainable_group_calibrator": {
+      "fix_minutes": 0,
+      "judged": 2,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_readiness2_inert.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "tree_shap": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "worst_group_accuracy": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_assert_fairness_fail_closed.py",
+        "tests/test_audit_wave4_postproc.py",
+        "tests/test_no_aggregator_fabricates_a_verdict.py",
+        "tests/test_readiness_classification.py",
+        "tests/test_rendering_direction.py",
+        "tests/test_reporting_direction.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    },
+    "xai_explainer_routing": {
+      "fix_minutes": 0,
+      "judged": 1,
+      "open_defects": 0,
+      "pins": [
+        "tests/test_audit6_wave4_c_xai_router.py",
+        "tests/test_audit_wave3.py",
+        "tests/xai/test_router.py"
+      ],
+      "reached": true,
+      "severities": [],
+      "shared_with": []
+    }
+  },
+  "commit": "8559dda",
+  "measured_on": "2026-09-11",
+  "method": {
+    "aggregation": "Evidence is unioned across every registry key that resolves to the same live object. A name serving two dispatch keys used to land its evidence on one of them and leave the twin recorded as never checked, which is the reverse defect: real evidence discarded while reading as caution.",
+    "judge": "independent adjudication of every row that answered on degenerate input",
+    "probe": "506 entry points executed on healthy input plus 8 degenerate scenarios",
+    "reproduce": "third pass: re-run at the PUBLIC entry point, record the real returned value",
+    "verify": "adversarial refutation, default refuted, execution required to confirm"
+  },
+  "severity": {
+    "critical": {
+      "findings": 27,
+      "minutes": 950
+    },
+    "high": {
+      "findings": 104,
+      "minutes": 2970
+    },
+    "low": {
+      "findings": 3,
+      "minutes": 80
+    },
+    "medium": {
+      "findings": 23,
+      "minutes": 533
+    }
+  },
+  "stage1": {
+    "audit": "every closed finding re-checked by an independent agent told to refute it: fix real, pin can fail, no over-correction, on all 27",
+    "capabilities_cleared": 25,
+    "date": "2026-09-11",
+    "findings_closed": 27,
+    "new_defects_found_by_the_audit": [
+      "data_bias_validation: the fix swallowed a CRITICAL zero_outcome_rate finding for a measured 0.0 rate with only one defined group. Restored; the two facts now report side by side.",
+      "conditional_demographic_disparity: a stratum missing a valid group's cell was still scored at full weight, diluting 0.5000 to 0.2804. Now could-not-check.",
+      "decodingtrust: the stereotype lexicon could not read plain refusals, and negated agreements scored as agreement ('No, that is not correct.' -> 1.0, full agreement). Both fixed."
+    ]
+  },
+  "stage2": {
+    "audit_held": 86,
+    "capabilities_cleared": 86,
+    "date": "2026-09-17",
+    "findings_closed": 100,
+    "still_open": "the fixes the audit REJECTED stay recorded as defects until they are reworked and re-audited; they are not counted as fixed here",
+    "suite": "9154 passed, 0 failed"
+  },
+  "stage3": {
+    "audit_held": 17,
+    "date": "2026-09-17",
+    "defects_addressed": 12,
+    "fabricated_of_the_untested": 5,
+    "items": 18,
+    "never_tested_reached": 6,
+    "not_held": [
+      "integrated_gradients"
+    ],
+    "note": "the three the audit refused were repaired by hand and sabotage-verified, but stay recorded as open until an INDEPENDENT audit holds them"
+  },
+  "stage4": {
+    "agents": 27,
+    "date": "2026-09-17",
+    "files": [
+      "src/vfairness/evaluation/vfairness_metrics/discovery.py",
+      "src/vfairness/preprocessing/bias_detection/proxy.py",
+      "src/vfairness/preprocessing/bias_detection/statistical.py",
+      "src/vfairness/evaluation/vfairness_metrics/robustness.py",
+      "src/vfairness/multi_agent/delegation.py",
+      "src/vfairness/operations/pulse/agent_probe.py",
+      "src/vfairness/operations/pulse/orchestrator.py"
+    ],
+    "name": "Cramer's V family sweep",
+    "note": "Every site was reproduced by execution first, fixed to three states, then checked by an independent agent that sabotaged the pin in an isolated tree. One decision was made on the merits rather than by analogy: _correlation_ratio keeps its 0.0 for a constant numeric side, because there the degenerate side is the explained variable by contract and can never be the protected attribute.",
+    "pins": [
+      "tests/test_cramers_family_a.py",
+      "tests/test_cramers_family_b.py",
+      "tests/test_cramers_family_c.py"
+    ],
+    "sites_closed": 7,
+    "why": "The independent audit of compute_feature_correlations HELD and then found a FOURTH copy of the same bias-corrected statistic publishing 0.0 for a table it could not measure, reached from the exported vfairness.identify_proxy_features, from association_strength, and from find_proxy_chains inside the file that had just been repaired. Reproduced at the public entry before any change: a column that perfectly determines gender returned [] with no warning."
+  },
+  "totals": {
+    "confirmed": 158,
+    "judge_findings": 322,
+    "open_defects_by_severity": {
+      "critical": 27,
+      "high": 104,
+      "low": 3,
+      "medium": 23
+    },
+    "probe_rows": 618,
+    "refuted": 31,
+    "registered": 215,
+    "reproduced_public": 157,
+    "verified": 189
+  }
+}

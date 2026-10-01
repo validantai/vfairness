@@ -1,0 +1,71 @@
+{
+  "use_case": "recruitment",
+  "jurisdiction": "ch",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "_principle": {
+      "status": "info",
+      "legal_basis": "Code of Obligations (OR) Art. 328b",
+      "notes": "Switzerland applies the strictest principle in Europe: employers may process only data concerning the employee's suitability for the role or necessary for performance of the contract. Anything outside that is forbidden, and applicants have a recognised right to lie about forbidden questions."
+    },
+    "pregnancy": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "OR Art. 328b; Gender Equality Act (GlG) Art. 3"
+    },
+    "religion": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "OR Art. 328b; Federal Constitution Art. 15",
+      "notes": "Forbidden as a pre-hire question unless the employer is a tendency employer where the belief is job-essential."
+    },
+    "union_membership": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "OR Art. 328b"
+    },
+    "political_opinion": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "OR Art. 328b"
+    },
+    "sexual_orientation": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "OR Art. 328b; FADP Art. 5(c)"
+    },
+    "health": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "OR Art. 328b; FADP Art. 5(c)",
+      "notes": "Permitted only for illnesses directly affecting job suitability."
+    },
+    "disability": {
+      "status": "restricted",
+      "legal_basis": "OR Art. 328b; FADP Art. 5(c)"
+    },
+    "genetic": {
+      "status": "forbidden",
+      "legal_basis": "Genetic Testing of Humans Act (GUMG) Art. 21",
+      "notes": "Pre-symptomatic genetic testing in employment is flatly prohibited; results may not be requested even if a test was carried out for other reasons."
+    },
+    "criminal_record": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "OR Art. 328b; FADP",
+      "notes": "Lawful only when directly job-essential (financial-sector executive, public-trust roles)."
+    },
+    "ethnicity": {
+      "status": "restricted",
+      "legal_basis": "FADP Art. 5(c); Federal Constitution Art. 8"
+    },
+    "marital_status": {
+      "status": "restricted",
+      "legal_basis": "OR Art. 328b"
+    },
+    "salary_history": {
+      "status": "allowed",
+      "notes": "Not forbidden, but pay-equity case law (GlG) limits using it to justify lower pay for women."
+    }
+  }
+}

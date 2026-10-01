@@ -1,0 +1,206 @@
+{# ── FairnessMonitor · Live Dashboard SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set status_h = 66 %}
+{% set metrics_header_h = 40 %}
+{% set metrics_row_h = 32 %}
+{% set metrics_h = metrics_header_h + metrics|length * metrics_row_h + 10 %}
+{% set groups_header_h = 36 %}
+{% set groups_row_h = 28 %}
+{% set groups_h = groups_header_h + groups|length * groups_row_h + 16 %}
+{% set mmd_header_h = 36 %}
+{% set mmd_row_h = 28 %}
+{% set mmd_h = mmd_header_h + mmd_scores|length * mmd_row_h + 16 if mmd_scores else 0 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}
+{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 44 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{% set status_y = header_h %}
+{% set metrics_y = status_y + status_h + 16 %}
+{% set groups_y = metrics_y + metrics_h + 16 %}
+{% set mmd_y = groups_y + groups_h + 16 %}
+{% set exp_y = (mmd_y + mmd_h + 16) if mmd_scores else (groups_y + groups_h + 16) %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   A window with no metric, no group rate and no drift statistic collapses the
+   whole verdict stack to one panel: no STATUS badge, no alert count, no metric
+   table, no rate bars. "0 of 0 metrics alerting" is not a healthy window. #}
+{% if not_assessable %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = header_h %}
+{% set exp_y = na_y + na_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+<text x="644" y="32" text-anchor="end" font-size="9" fill="#b0b8c4">{{ timestamp_date }} {{ timestamp_time }}</text>
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{% if not_assessable %}
+<text x="36" y="122" font-size="10" fill="#64748b">No metric was monitored in this window</text>
+{% include '_could_not_check.svg' %}
+{% else %}
+{# "N metrics monitored" counted every metric that was COMPUTED. A metric with
+   no entry in WindowMetrics.alerts was never compared to a guardrail, so it was
+   not monitored, and putting it in this count is exactly the headline the
+   per-row rule forbids. The line only changes shape when the two differ. #}
+{% if n_checked is defined and n_checked != n_metrics %}
+<text x="36" y="122" font-size="10" fill="#64748b">{{ n_checked }} of {{ n_metrics }} metrics checked against a guardrail · {{ sample_count }} samples in window</text>
+{% else %}
+<text x="36" y="122" font-size="10" fill="#64748b">{{ n_metrics }} metrics monitored · {{ sample_count }} samples in window</text>
+{% endif %}
+
+{# ── Alert status badge ── #}
+{# Three states, never two. `{% if any_alert %}` sends every falsy value to the #}
+{# emerald OK branch, and a window that recorded no overall verdict and applied #}
+{# no guardrail is falsy, so STATUS OK was printed at 26px in green for a       #}
+{# window that never said whether anything fired. The adapter decides which of  #}
+{# the three this is; see monitoring_dashboard_to_svg. #}
+{% if any_alert_recorded is defined and not any_alert_recorded %}
+{% set badge_color = '#64748b' %}
+{% set badge_bg = '#f1f5f9' %}
+{% set badge_label = 'NOT RECORDED' %}
+{% elif any_alert %}
+{% set badge_color = '#dc2626' %}
+{% set badge_bg = '#fef2f2' %}
+{% set badge_label = 'ALERT' %}
+{% else %}
+{% set badge_color = '#059669' %}
+{% set badge_bg = '#ecfdf5' %}
+{% set badge_label = 'OK' %}
+{% endif %}
+<rect x="400" y="68" width="280" height="56" rx="10" fill="#ffffff"/>
+<rect x="400" y="68" width="2.5" height="56" rx="1" fill="{{ badge_color }}"/>
+<text x="416" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">STATUS</text>
+{# NOT RECORDED is twelve characters; at 26px it would run past the 680 edge.   #}
+{# Measured by rasterising, not by reading. #}
+{% if badge_label == 'NOT RECORDED' %}
+<text x="416" y="110" font-size="15" font-weight="700" fill="{{ badge_color }}">{{ badge_label }}</text>
+{% else %}
+<text x="416" y="112" font-size="26" font-weight="700" fill="{{ badge_color }}">{{ badge_label }}</text>
+{% endif %}
+<rect x="540" y="90" width="128" height="18" rx="9" fill="{{ badge_bg }}"/>
+{# "0 alerts" beside an unrecorded verdict is a count of firings, and a count   #}
+{# reads as a measurement. A window that applied no guardrail could not have    #}
+{# fired one, so the pill says that instead of printing the zero. #}
+{% if any_alert_recorded is defined and not any_alert_recorded %}
+<text x="604" y="103" text-anchor="middle" font-size="8" font-weight="600" fill="{{ badge_color }}">no guardrail applied</text>
+{% else %}
+<text x="604" y="103" text-anchor="middle" font-size="8" font-weight="600" fill="{{ badge_color }}">{{ n_alerts }} alert{{ 's' if n_alerts != 1 }}</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Fairness Metrics Table                                            #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ metrics_y }}" width="644" height="{{ metrics_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">METRIC</text>
+<text x="310" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">VALUE</text>
+<text x="580" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">STATUS</text>
+<line x1="56" y1="{{ metrics_y + 32 }}" x2="660" y2="{{ metrics_y + 32 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for m in metrics %}
+{% set ry = metrics_y + metrics_header_h + loop.index0 * metrics_row_h %}
+{# FAIL row background #}
+{% if m.alert %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ metrics_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ metrics_row_h }}" fill="#dc2626"/>
+{% endif %}
+
+{# Metric name #}
+<text x="56" y="{{ ry + 18 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ m.name|truncate_text(30) }}</text>
+
+{# Value + mini bar #}
+<text x="310" y="{{ ry + 18 }}" font-size="12" font-weight="700" fill="{{ m.color }}">{{ m.display_value }}</text>
+<rect x="380" y="{{ ry + 8 }}" width="80" height="10" rx="3" fill="#f1f5f9"/>
+<rect x="380" y="{{ ry + 8 }}" width="{{ m.bar_w }}" height="10" rx="3" fill="{{ m.color }}" opacity="0.7"/>
+
+{# Status badge. OK is a verdict about a metric that was compared to a threshold.
+   A metric with no entry in WindowMetrics.alerts was never compared, so it gets
+   no pill: an unchecked metric used to wear the same emerald OK as a metric
+   sitting comfortably inside its guardrail. #}
+{% if m.alert %}
+<rect x="566" y="{{ ry + 4 }}" width="72" height="20" rx="10" fill="#fef2f2"/>
+<text x="602" y="{{ ry + 18 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#dc2626">{{ m.status_label }}</text>
+{% elif m.checked %}
+<rect x="566" y="{{ ry + 4 }}" width="72" height="20" rx="10" fill="#ecfdf5"/>
+<text x="602" y="{{ ry + 18 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#059669">{{ m.status_label }}</text>
+{% else %}
+<text x="602" y="{{ ry + 18 }}" text-anchor="middle" font-size="8" font-style="italic" fill="#64748b">{{ m.status_label }}</text>
+{% endif %}
+
+{# Row separator #}
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + metrics_row_h }}" x2="660" y2="{{ ry + metrics_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Group Positive Rates                                              #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ groups_y }}" width="644" height="{{ groups_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ groups_y + 24 }}" font-size="11" font-weight="700" fill="#0f172a">Group Positive Rates</text>
+
+{% for g in groups %}
+{% set gy = groups_y + groups_header_h + loop.index0 * groups_row_h %}
+<text x="56" y="{{ gy + 14 }}" font-size="10" font-weight="500" fill="#0f172a">{{ g.label|truncate_text(18) }}</text>
+<rect x="200" y="{{ gy + 2 }}" width="{{ g.bar_w }}" height="14" rx="3" fill="{{ g.color }}" opacity="0.75"/>
+<text x="{{ 200 + g.bar_w + 8 }}" y="{{ gy + 14 }}" font-size="10" font-weight="600" fill="#475569">{{ g.display_rate }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# MMD Distribution Shift                                           #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if mmd_scores %}
+<rect x="36" y="{{ mmd_y }}" width="644" height="{{ mmd_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ mmd_y + 24 }}" font-size="11" font-weight="700" fill="#0f172a">Distribution Shift (MMD)</text>
+
+{% for s in mmd_scores %}
+{% set sy = mmd_y + mmd_header_h + loop.index0 * mmd_row_h %}
+<text x="56" y="{{ sy + 14 }}" font-size="10" font-weight="500" fill="#0f172a">{{ s.attribute|truncate_text(22) }}</text>
+<rect x="220" y="{{ sy + 2 }}" width="280" height="10" rx="3" fill="#f1f5f9"/>
+<rect x="220" y="{{ sy + 2 }}" width="{{ min(280, s.bar_w) }}" height="10" rx="3" fill="{{ s.color }}" opacity="0.7"/>
+<text x="510" y="{{ sy + 14 }}" font-size="9" font-weight="600" fill="{{ s.color }}">{{ s.display_score }}</text>
+{# Three states. The chip is decided in adapters_monitoring.py, where an
+   unmeasurable score can be named; deciding it here with a bare `s.score >=
+   0.1` made NaN fail the test exactly as a tiny score does, so a drift
+   statistic that could not be computed rendered as STABLE. #}
+<rect x="566" y="{{ sy }}" width="90" height="20" rx="10" fill="{{ s.status_bg }}"/>
+<text x="611" y="{{ sy + 14 }}" text-anchor="middle" font-size="9" font-weight="600" fill="{{ s.status_color }}">{{ s.status }}</text>
+{% endfor %}
+{% endif %}
+{% endif %}{# end: not not_assessable #}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

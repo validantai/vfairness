@@ -1,0 +1,134 @@
+{# ── Fairness Metrics · Disparity Heatmap ── #}
+{# ── vfairness G1 Design System ── #}
+
+{# ── Layout constants ── #}
+{% set row_h = min(38, (280 / max(1, n_rows))|int) %}
+{% set col_w = min(90, (480 / max(1, n_cols))|int) %}
+{% set header_zone = 80 %}
+{% set grid_y = 140 + header_zone %}
+{% set grid_h = n_rows * row_h + 20 %}
+{% set summary_h = 40 %}
+{% set content_h = header_zone + grid_h + 16 + summary_h %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% endif %}
+{% set exp_y = 140 + content_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   Keyed on `rows` being EMPTY, not on `not_assessable`. Those are two different
+   states here and both must keep working: an unbanded grid that still HAS
+   per-group rates keeps its cells (the rates are real, only the colour gradient
+   and the verdict band are withdrawn), while a grid with no row at all has
+   nothing to draw. Until 2026-08-27 the second case never reached this template
+   because the adapter returned "", so a caller with save_path wrote a 0-byte
+   file and got no error. #}
+{% if not rows %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = 140 %}
+{% set exp_y = na_y + na_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 {{ total_h }}" font-family="'Inter','Segoe UI',system-ui,sans-serif">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ── Ungraded group count, in the HEADLINE BAND (W-30) ──
+   A group whose every cell came back None is DRAWN, greyed, and read "N/A".
+   `explain._fr_disparity_heatmap` counts those rows and says so in the <desc>,
+   so a screen-reader user was told "1 group(s) reported no value on any metric"
+   while the canvas showed a green summary badge reading "Low disparity across
+   groups" and nothing else. The accessible layer was the more honest of the two,
+   which is the wrong way round for the surface most readers actually use.
+
+   Counted here from the SAME `rows` the grid draws, cell by cell, with the same
+   rule the finder applies (a row is measured if ANY cell carries a value), so
+   the chip and the sentence cannot drift apart. Absent when every row is
+   measured, so a fully graded heatmap is unchanged. #}
+{% set _blank = [] %}
+{% for _r in (rows or []) %}
+{% if not (_r.cells or []) | map(attribute='value') | select('ne', None) | list %}
+{% set _ = _blank.append(1) %}
+{% endif %}
+{% endfor %}
+{% if _blank | length %}
+<rect x="404" y="104" width="276" height="24" rx="12" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+<text x="420" y="120" font-size="9.5" font-weight="700" fill="#64748b">COULD NOT CHECK: {{ _blank | length }} group(s) not graded</text>
+{% endif %}
+
+{% if not rows %}
+{% include '_could_not_check.svg' %}
+{% else %}
+
+{# ── Column headers (above grid, rotated for readability) ── #}
+{% set col_start = 160 %}
+{% set label_y = grid_y - 8 %}
+{% for metric in col_labels %}
+{% set mx = col_start + loop.index0 * col_w + col_w // 2 %}
+<text x="{{ mx }}" y="{{ label_y }}" text-anchor="start" font-size="8.5" font-weight="600" fill="#334155" letter-spacing="0.3" transform="rotate(-45,{{ mx }},{{ label_y }})">{{ metric|truncate_text(20) }}</text>
+{% endfor %}
+
+{# ── Column sublabels (stat name, horizontal, just above grid) ── #}
+{% if col_sublabels %}
+{% for sub in col_sublabels %}
+{% set sx = col_start + loop.index0 * col_w + col_w // 2 %}
+<text x="{{ sx }}" y="{{ grid_y - 2 }}" text-anchor="middle" font-size="7" fill="#94a3b8" font-style="italic">{{ sub }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Row data ── #}
+{% set row_start = grid_y + 8 %}
+{% for row in rows %}
+{% set ry = row_start + loop.index0 * row_h %}
+
+{# Row label #}
+<text x="150" y="{{ ry + row_h // 2 + 4 }}" text-anchor="end" font-size="10" font-weight="500" fill="#0f172a">{{ row.label|truncate_text(18) }}</text>
+
+{# Cells #}
+{% for cell in row.cells %}
+{% set cell_x = col_start + loop.index0 * col_w %}
+<rect x="{{ cell_x + 2 }}" y="{{ ry + 2 }}" width="{{ col_w - 4 }}" height="{{ row_h - 4 }}" rx="4" fill="{{ cell.bg }}"/>
+<text x="{{ cell_x + col_w // 2 }}" y="{{ ry + row_h // 2 + 4 }}" text-anchor="middle" font-size="13" font-weight="700" fill="{{ cell.text_color }}">{{ cell.value|f2 }}</text>
+{% endfor %}
+{% endfor %}
+
+{# ── Summary panel ── #}
+{% set summary_y = row_start + n_rows * row_h + 16 %}
+<rect x="36" y="{{ summary_y }}" width="644" height="{{ summary_h }}" rx="10" fill="{{ summary_bg }}" stroke="{{ summary_border }}" stroke-width="1"/>
+<text x="358" y="{{ summary_y + 25 }}" text-anchor="middle" font-size="11" font-weight="700" fill="{{ summary_color }}">{{ summary_icon }} {{ summary_text }}</text>
+{% endif %}{# end: rows is not empty #}
+
+{# ── Explanation panel ── #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+
+</svg>

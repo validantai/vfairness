@@ -1,0 +1,78 @@
+{
+  "use_case": "recruitment",
+  "jurisdiction": "eu",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "ethnicity": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9(1) special category",
+      "carve_out": "ai_act_art_10_5",
+      "notes": "Processing prohibited absent an Art. 9(2) lawful basis. Consent in employment is generally invalid (EDPB Guidelines 05/2020). EU AI Act Art. 10(5) permits processing strictly for bias detection in high-risk AI (recruitment is Annex III §4)."
+    },
+    "religion": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9(1)",
+      "carve_out": "ai_act_art_10_5"
+    },
+    "political_opinion": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9(1)"
+    },
+    "union_membership": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9(1)"
+    },
+    "sexual_orientation": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9(1)",
+      "carve_out": "ai_act_art_10_5"
+    },
+    "gender_identity": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9(1) (sex life / orientation)"
+    },
+    "health": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9(1); Directive 2000/78/EC",
+      "notes": "Lawful only for an Art. 9(2) basis; pre-employment medical inquiries are tightly limited and must be job-essential."
+    },
+    "disability": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9(1); Directive 2000/78/EC; UN CRPD",
+      "carve_out": "reasonable_accommodation"
+    },
+    "genetic": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9(1); Member State law often forbids in employment",
+      "notes": "Several Member States flatly prohibit in employment (e.g. France Art. L1132-1 Code du travail)."
+    },
+    "biometric": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 9(1) when used for identification"
+    },
+    "pregnancy": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "Directive 2006/54/EC; CJEU C-177/88 (Dekker); CJEU C-32/93 (Webb)",
+      "notes": "Asking about pregnancy in recruitment is per-se direct sex discrimination across the EU."
+    },
+    "age": {
+      "status": "restricted",
+      "legal_basis": "Directive 2000/78/EC (Framework Directive)"
+    },
+    "ethnicity_self_id": {
+      "status": "monitoring_only",
+      "legal_basis": "EU AI Act Art. 10(5); some MS allow equality monitoring",
+      "carve_out": "ai_act_art_10_5"
+    },
+    "criminal_record": {
+      "status": "restricted",
+      "legal_basis": "GDPR Art. 10",
+      "notes": "Processing of criminal-conviction data requires Member State legal basis; not generally available to private employers."
+    },
+    "salary_history": {
+      "status": "allowed",
+      "notes": "EU Pay Transparency Directive (EU 2023/970) limits employer use; applicants cannot be required to disclose pre-hire from June 2026."
+    }
+  }
+}

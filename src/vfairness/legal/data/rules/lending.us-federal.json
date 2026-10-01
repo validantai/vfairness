@@ -1,0 +1,50 @@
+{
+  "use_case": "lending",
+  "jurisdiction": "us-federal",
+  "source_revision": "2026-05-20",
+  "rules": {
+    "ethnicity": {
+      "status": "monitoring_only",
+      "legal_basis": "ECOA (15 USC §1691); Reg B (12 CFR §1002); HMDA (Reg C)",
+      "carve_out": "hmda_ecoa_monitoring",
+      "notes": "Cannot be used as a decision factor. Collection required for mortgage applications under HMDA / Reg B §1002.13."
+    },
+    "gender": {
+      "status": "monitoring_only",
+      "legal_basis": "ECOA; HMDA",
+      "carve_out": "hmda_ecoa_monitoring"
+    },
+    "religion": {
+      "status": "forbidden",
+      "legal_basis": "ECOA §1691(a)(1)",
+      "notes": "ECOA prohibits using religion as a decision factor; not on the HMDA monitoring list."
+    },
+    "nationality": {
+      "status": "restricted",
+      "legal_basis": "ECOA §1691(a)(1) (national origin); Reg B"
+    },
+    "marital_status": {
+      "status": "restricted",
+      "legal_basis": "ECOA",
+      "notes": "Cannot be used to discriminate; may be collected only for joint-application or community-property states."
+    },
+    "age": {
+      "status": "restricted",
+      "legal_basis": "ECOA; Reg B §1002.6(b)(2)",
+      "notes": "Age may be used in an empirically derived, statistically sound credit scoring system but not as a categorical denial reason."
+    },
+    "criminal_record": {
+      "status": "allowed",
+      "notes": "Generally lawful; subject to FCRA reporting limits and increasing state-level scrutiny."
+    },
+    "genetic": {
+      "status": "restricted",
+      "legal_basis": "GINA Title I (covers health insurance, not lending); state laws vary"
+    },
+    "postcode": {
+      "status": "restricted",
+      "legal_basis": "Fair Housing Act §3604(a); CRA",
+      "notes": "Redlining risk. Pulse should flag postcode as a proxy for race."
+    }
+  }
+}

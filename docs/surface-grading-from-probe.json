@@ -1,0 +1,252 @@
+{
+ "_withdrawn": {
+  "vfairness._names.resolve_attribute_key": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness._not_assessed.warn_not_assessed": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.agents.temporal.TemporalTracker.detect_drift": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.branding.set_branding": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics._validation.reject_swapped_labels_and_scores": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics._validation.validate_binary_labels": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics._validation.validate_probabilities": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics.analyzer.FairnessAnalyzer.clear_cache": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics.analyzer.FairnessAnalyzer.compare_with_aequitas": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics.analyzer.FairnessAnalyzer.disable_fair_explainer": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics.analyzer.FairnessAnalyzer.enable_fair_explainer": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics.explainer.print_explanations": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics.report.print_report": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics.visualization.plot_confidence_intervals": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics.visualization.plot_effect_sizes": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics.visualization.plot_fairness_metrics": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.evaluation.vfairness_metrics.visualization.plot_group_comparison": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.in_processing.loss_functions.base.check_torch_available": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.in_processing.regularizers.fairness_regularizers.BaseRegularizer.reset_history": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.in_processing.regularizers.fairness_regularizers.check_torch_available": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.llm.model_identity.clean_model_name": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.llm.output_analysis.OutputAnalyzer.analyze_llm_judge": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.mcp.server.main": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.multi_agent.harness.MultiAgentRunHarness.record_routing": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.multi_agent.harness.MultiAgentRunHarness.record_turn": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.net.egress.GuardedSession.close": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.operations.causal.graph.CausalFairnessGraph.has_direct_discrimination": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.operations.causal.task_handlers.load_dataset_from_payload": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.compute_demographic_parity": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.operations.monitoring.tracker.FairnessMonitor.compute_disparate_impact": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.operations.pulse.traces.maybe_flatten_spans": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.preprocessing.bias_detection.geographic_data.fetch_holc_data": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.preprocessing.bias_detection.geographic_data.lookup_holc_grade_by_zip": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.preprocessing.bias_detection.geographic_data.print_data_quality_notes": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.preprocessing.bias_detection.historical.attribute_historical_pattern": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.preprocessing.bias_detection.historical.domain_historical_context": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.preprocessing.feature_engineering.visualization.plot_intersectional_heatmap": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.xai.sidecar_cli.main": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  },
+  "vfairness.xai.worker.runner.WorkerLoop.stop": {
+   "now": "NOT_EXAMINED",
+   "was": "SEMI-PROVEN",
+   "was_because": "measured on healthy input and refused on all 8 degenerate worlds that ran, by raising or by returning a refusal. Verified by execution; no test pins it.",
+   "withdrawn_because": "the healthy run did not produce a value (outcome: refused), so this evidence cannot tell an honest refusal from a call the probe got wrong"
+  }
+ },
+ "counts": {
+  "NEEDS_JUDGEMENT": 238,
+  "NOT_EXAMINED": 406,
+  "SEMI-PROVEN": 0,
+  "already graded": 417
+ },
+ "items": {},
+ "measured_on": "2026-09-18",
+ "method": "Assigned from scripts/surface_probe.py evidence by scripts/grade_from_probe.py, with no agent involved. The rule is in that script's docstring and every clause is load-bearing. These grades are SEMI-PROVEN and can never be PROVEN from this source: PROVEN requires a test that fails when the fix is removed, and no script can write one.",
+ "rule": {
+  "every_degenerate_world_must_refuse": true,
+  "healthy_run_must_produce_a_value": true,
+  "minimum_degenerate_worlds_run": 4
+ }
+}

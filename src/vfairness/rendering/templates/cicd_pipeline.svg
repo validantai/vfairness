@@ -1,0 +1,282 @@
+{# ── CI/CD Fairness Pipeline · Gate Report SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{# None-tolerant locals: nested keys (gate.reasons, gate.warnings, validation.issues,
+   tests) may arrive as None, and None|length raises TypeError. #}
+{% set _tests = tests if tests else [] %}
+{% set _reasons = gate.reasons if gate and gate.reasons else [] %}
+{% set _warnings = gate.warnings if gate and gate.warnings else [] %}
+{% set _val_issues = validation.issues if validation and validation.issues else [] %}
+{# The graded subset. A check whose status never arrived carries passed = None,
+   and None is neither a pass nor a failure: it belongs in no count that implies
+   the check ran. Split once, here, so every count below is taken over the rows
+   that were actually graded. #}
+{% set _graded_tests = _tests|rejectattr('passed', 'none')|list %}
+{% set n_test_ungraded = _tests|length - _graded_tests|length %}
+{% set header_h = 140 %}
+{% set gate_badge_h = 60 %}
+{% set validation_h = 60 + (_val_issues|length * 22 if _val_issues else 0) %}
+{% set test_header_h = 40 %}
+{% set test_row_h = 32 %}
+{% set test_h = test_header_h + _tests|length * test_row_h + 10 %}
+{% set decision_h = 60 + _reasons|length * 22 + _warnings|length * 22 %}
+{% if explanation %}{% set _pre_exp = explanation|wordwrap(105) %}{% set exp_h = 44 + _pre_exp.split('\n')|length * 16 %}{% else %}{% set exp_h = 0 %}{% endif %}
+
+{% set gate_y = header_h %}
+{% set val_y = gate_y + gate_badge_h + 16 %}
+{% set test_y = val_y + validation_h + 16 %}
+{% set decision_y = test_y + test_h + 16 %}
+{% set exp_y = decision_y + decision_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── Gate status colors ── #}
+{# Three states, never two. A gate that was never handed a decision has not
+   approved anything and has not blocked anything, and PENDING (a decision on
+   its way) is not the same claim as NOT RUN (no gate in this pipeline). #}
+{% if gate.state == 'not_run' %}
+{% set gate_color = '#64748b' %}
+{% set gate_bg = '#f1f5f9' %}
+{% set gate_label = 'NOT RUN' %}
+{% elif gate.approved %}
+{% set gate_color = '#059669' %}
+{% set gate_bg = '#ecfdf5' %}
+{% set gate_label = 'APPROVED' %}
+{% elif gate.approved is none %}
+{% set gate_color = '#3b82f6' %}
+{% set gate_bg = '#eff6ff' %}
+{% set gate_label = 'PENDING' %}
+{% else %}
+{% set gate_color = '#dc2626' %}
+{% set gate_bg = '#fef2f2' %}
+{% set gate_label = 'BLOCKED' %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" fill="url(#accent)"/>
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{# "executed" is a claim about what ran, so the number in front of it counts the
+   graded checks, not the table's rows. A row whose status never arrived is
+   named separately rather than being folded into the executed count. #}
+<text x="36" y="122" font-size="10" fill="#64748b">Fairness pipeline gate: {{ _graded_tests|length }} test{{ 's' if _graded_tests|length != 1 else '' }} executed{% if n_test_ungraded %}, {{ n_test_ungraded }} not executed{% endif %}</text>
+
+{# ── Gate status badge ── #}
+<rect x="520" y="68" width="160" height="56" rx="10" fill="#ffffff"/>
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="{{ gate_color }}"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">GATE STATUS</text>
+<rect x="536" y="90" width="120" height="26" rx="13" fill="{{ gate_bg }}"/>
+<text x="596" y="108" text-anchor="middle" font-size="12" font-weight="700" fill="{{ gate_color }}">{{ gate_label }}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Pipeline Status Row                                               #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ gate_y }}" width="644" height="{{ gate_badge_h }}" rx="10" fill="#ffffff"/>
+
+{# Validation status #}
+{# A validator that was never handed a result did not pass. The count line is
+   suppressed with it: "0 errors, 0 warnings" is a measured finding, and it is
+   not one this pipeline made. #}
+{% if validation.state == 'not_run' %}
+{% set val_color = '#64748b' %}
+{% set val_bg_badge = '#f1f5f9' %}
+{% set val_label = 'NOT RUN' %}
+{% elif validation.passed %}
+{% set val_color = '#059669' %}
+{% set val_bg_badge = '#ecfdf5' %}
+{% set val_label = 'PASS' %}
+{% else %}
+{% set val_color = '#dc2626' %}
+{% set val_bg_badge = '#fef2f2' %}
+{% set val_label = 'FAIL' %}
+{% endif %}
+<rect x="46" y="{{ gate_y + 10 }}" width="190" height="40" rx="8" fill="{{ val_bg_badge }}"/>
+<text x="60" y="{{ gate_y + 26 }}" font-size="8" font-weight="600" fill="{{ val_color }}" letter-spacing="0.5">DATA VALIDATION</text>
+<text x="60" y="{{ gate_y + 42 }}" font-size="11" font-weight="700" fill="{{ val_color }}">{{ val_label }}</text>
+{% if validation.state == 'not_run' %}
+<text x="118" y="{{ gate_y + 42 }}" font-size="9" fill="{{ val_color }}">no result supplied</text>
+{% else %}
+<text x="110" y="{{ gate_y + 42 }}" font-size="9" fill="{{ val_color }}">{{ validation.n_errors }} error{{ 's' if validation.n_errors != 1 else '' }}, {{ validation.n_warnings }} warning{{ 's' if validation.n_warnings != 1 else '' }}</text>
+{% endif %}
+
+{# Tests status #}
+{# n_test_fail == 0 is true of a suite that failed nothing AND of a suite that
+   ran nothing, so the count cannot decide this on its own. #}
+{% set n_test_pass = _graded_tests|selectattr('passed')|list|length %}
+{% set n_test_fail = _graded_tests|rejectattr('passed')|list|length %}
+{% if tests_state == 'not_run' or not _graded_tests %}
+{% set test_color = '#64748b' %}
+{% set test_bg_badge = '#f1f5f9' %}
+{% set test_label = 'NOT RUN' %}
+{% elif n_test_fail == 0 and not n_test_ungraded %}
+{% set test_color = '#059669' %}
+{% set test_bg_badge = '#ecfdf5' %}
+{% set test_label = 'ALL PASS' %}
+{% elif n_test_fail == 0 %}
+{# The graded checks all passed, so the tile stays green: a partly run suite
+   still reports what it measured. But "ALL PASS" is an all-clear over the whole
+   suite, and part of the suite did not run, so the word ALL is withheld. #}
+{% set test_color = '#059669' %}
+{% set test_bg_badge = '#ecfdf5' %}
+{% set test_label = 'PASS' %}
+{% else %}
+{% set test_color = '#dc2626' %}
+{% set test_bg_badge = '#fef2f2' %}
+{% set test_label = 'FAILURES' %}
+{% endif %}
+<rect x="246" y="{{ gate_y + 10 }}" width="190" height="40" rx="8" fill="{{ test_bg_badge }}"/>
+<text x="260" y="{{ gate_y + 26 }}" font-size="8" font-weight="600" fill="{{ test_color }}" letter-spacing="0.5">FAIRNESS TESTS</text>
+<text x="260" y="{{ gate_y + 42 }}" font-size="11" font-weight="700" fill="{{ test_color }}">{{ test_label }}</text>
+{% if tests_state == 'not_run' or not _graded_tests %}
+<text x="318" y="{{ gate_y + 42 }}" font-size="9" fill="{{ test_color }}">no test executed</text>
+{% elif n_test_ungraded %}
+<text x="{{ 300 if test_label == 'PASS' else 322 }}" y="{{ gate_y + 42 }}" font-size="7.5" fill="{{ test_color }}">{{ n_test_pass }} passed, {{ n_test_fail }} failed, {{ n_test_ungraded }} not run</text>
+{% else %}
+<text x="340" y="{{ gate_y + 42 }}" font-size="9" fill="{{ test_color }}">{{ n_test_pass }} passed, {{ n_test_fail }} failed</text>
+{% endif %}
+
+{# Gate status #}
+<rect x="446" y="{{ gate_y + 10 }}" width="224" height="40" rx="8" fill="{{ gate_bg }}"/>
+<text x="460" y="{{ gate_y + 26 }}" font-size="8" font-weight="600" fill="{{ gate_color }}" letter-spacing="0.5">FAIRNESS GATE</text>
+<text x="460" y="{{ gate_y + 42 }}" font-size="11" font-weight="700" fill="{{ gate_color }}">{{ gate_label }}</text>
+<text x="540" y="{{ gate_y + 42 }}" font-size="9" fill="{{ gate_color }}">{{ gate.status }}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Validation Issues                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ val_y }}" width="644" height="{{ validation_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ val_y }}" width="2.5" height="{{ validation_h }}" rx="1" fill="{{ val_color }}"/>
+<text x="56" y="{{ val_y + 20 }}" font-size="8" font-weight="600" fill="{{ val_color }}" letter-spacing="0.5">VALIDATION</text>
+<text x="140" y="{{ val_y + 20 }}" font-size="10.5" font-weight="600" fill="#0f172a">Data Bias Validation</text>
+<line x1="56" y1="{{ val_y + 30 }}" x2="660" y2="{{ val_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+{% if _val_issues %}
+{% for issue in _val_issues %}
+{% if issue.level is defined and (issue.level == 'error' or issue.level == 'critical') %}
+<text x="66" y="{{ val_y + 48 + loop.index0 * 22 }}" font-size="9.5" fill="#dc2626">{{ issue.message|truncate_text(95) }}</text>
+{% else %}
+<text x="66" y="{{ val_y + 48 + loop.index0 * 22 }}" font-size="9.5" fill="#f59e0b">{{ issue.message|truncate_text(95) }}</text>
+{% endif %}
+{% endfor %}
+{% elif validation.state == 'not_run' %}
+{# An empty issue list means "nothing was reported", which is what a validator
+   that never ran also produces. Only a validator that RAN earns the green line. #}
+<text x="66" y="{{ val_y + 48 }}" font-size="9.5" fill="#64748b">Data validation did not run; no result was supplied, so nothing here reports a clean dataset.</text>
+{% else %}
+<text x="66" y="{{ val_y + 48 }}" font-size="9.5" fill="#059669">All validation checks passed successfully.</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Test Results Table                                                #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ test_y }}" width="644" height="{{ test_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ test_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">TEST</text>
+<text x="260" y="{{ test_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">METRIC</text>
+<text x="380" y="{{ test_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">VALUE</text>
+<text x="470" y="{{ test_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">THRESHOLD</text>
+<text x="580" y="{{ test_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">STATUS</text>
+<line x1="56" y1="{{ test_y + 32 }}" x2="660" y2="{{ test_y + 32 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for t in _tests %}
+{% set ry = test_y + test_header_h + loop.index0 * test_row_h %}
+{# Three states per row, for the same reason the tiles above have three. This
+   was PASS-or-else-FAIL, so a check whose status never arrived was badged FAIL
+   in red, with the red row stripe beside it, under a headline that lent it
+   credibility. A check that did not run has not failed. #}
+{% if t.passed is none %}
+{% set t_color = '#64748b' %}
+{% set t_bg = '#f1f5f9' %}
+{% set t_status = 'NOT RUN' %}
+{% elif t.passed %}
+{% set t_color = '#059669' %}
+{% set t_bg = '#ecfdf5' %}
+{% set t_status = 'PASS' %}
+{% else %}
+{% set t_color = '#dc2626' %}
+{% set t_bg = '#fef2f2' %}
+{% set t_status = 'FAIL' %}
+{% endif %}
+
+{# FAIL row highlight #}
+{% if t.passed is not none and not t.passed %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ test_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ test_row_h }}" fill="#dc2626"/>
+{% endif %}
+
+<text x="56" y="{{ ry + 20 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ t.name|truncate_text(30) }}</text>
+<text x="260" y="{{ ry + 20 }}" font-size="10.5" fill="#6b7280">{{ t.metric }}</text>
+<text x="380" y="{{ ry + 20 }}" font-size="13" font-weight="700" fill="{{ t_color }}">{% if t.value is not none %}{{ t.value|f3 }}{% else %}n/a{% endif %}</text>
+<text x="470" y="{{ ry + 20 }}" font-size="10.5" fill="#6b7280">{% if t.threshold is not none %}{{ t.threshold|f3 }}{% else %}n/a{% endif %}</text>
+
+{# Status badge #}
+<rect x="{{ 556 if t.passed is none else 572 }}" y="{{ ry + 6 }}" width="{{ 76 if t.passed is none else 60 }}" height="20" rx="10" fill="{{ t_bg }}"/>
+<text x="{{ 594 if t.passed is none else 602 }}" y="{{ ry + 20 }}" text-anchor="middle" font-size="{{ 8 if t.passed is none else 9 }}" font-weight="600" fill="{{ t_color }}">{{ t_status }}</text>
+
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + test_row_h }}" x2="660" y2="{{ ry + test_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Gate Decision Panel                                               #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ decision_y }}" width="644" height="{{ decision_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ decision_y }}" width="2.5" height="{{ decision_h }}" rx="1" fill="{{ gate_color }}"/>
+<text x="56" y="{{ decision_y + 20 }}" font-size="8" font-weight="600" fill="{{ gate_color }}" letter-spacing="0.5">{{ gate_label }}</text>
+<text x="140" y="{{ decision_y + 20 }}" font-size="10.5" font-weight="600" fill="#0f172a">Gate Decision</text>
+<line x1="56" y1="{{ decision_y + 30 }}" x2="660" y2="{{ decision_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+
+{# A gate that was never handed a decision leaves this panel empty, and an empty
+   panel under an APPROVED-shaped heading reads as "nothing blocked it". Say it. #}
+{% if gate.state == 'not_run' %}
+<text x="66" y="{{ decision_y + 48 }}" font-size="9.5" fill="#64748b">No gate decision was supplied; this report neither approves nor blocks the model.</text>
+{% endif %}
+{# Reasons.
+   CRITICAL, do not reintroduce a {% set %} counter here. Jinja discards an
+   assignment made inside a {% for %} at the end of each iteration, so
+   `{% set line_idx = line_idx + 1 %}` left line_idx at 0 for EVERY blocking
+   reason: all of them were drawn at the same y, stacked on one another, and
+   only the last one painted was legible. A gate that blocks on four reasons
+   showed one, which understates the block and hides the other three entirely.
+   The markup was correct in the file, so a substring assertion over the SVG
+   passed straight over it; it is visible only when rasterised.
+   loop.index0 is the counter Jinja actually carries, and the warnings loop
+   directly below has always used it. #}
+{% for reason in _reasons %}
+<text x="66" y="{{ decision_y + 48 + loop.index0 * 22 }}" font-size="9.5" fill="{{ gate_color }}">{{ reason|truncate_text(95) }}</text>
+{% endfor %}
+
+{# Warnings #}
+{% for warning in _warnings %}
+<text x="66" y="{{ decision_y + 48 + (_reasons|length + loop.index0) * 22 }}" font-size="9.5" fill="#f59e0b">{{ warning|truncate_text(95) }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

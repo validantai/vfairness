@@ -1,0 +1,19 @@
+{
+  "use_case": "generic",
+  "jurisdiction": "eu",
+  "source_revision": "2026-05-20",
+  "notes": "Baseline GDPR Art. 9 special-category list. Applies when no use-case-specific pack is loaded for an EU run.",
+  "rules": {
+    "ethnicity": {"status": "restricted", "legal_basis": "GDPR Art. 9(1)"},
+    "religion": {"status": "restricted", "legal_basis": "GDPR Art. 9(1)"},
+    "political_opinion": {"status": "restricted", "legal_basis": "GDPR Art. 9(1)"},
+    "union_membership": {"status": "restricted", "legal_basis": "GDPR Art. 9(1)"},
+    "sexual_orientation": {"status": "restricted", "legal_basis": "GDPR Art. 9(1)"},
+    "gender_identity": {"status": "restricted", "legal_basis": "GDPR Art. 9(1) (sex life)"},
+    "health": {"status": "restricted", "legal_basis": "GDPR Art. 9(1)"},
+    "disability": {"status": "restricted", "legal_basis": "GDPR Art. 9(1); UN CRPD"},
+    "genetic": {"status": "restricted", "legal_basis": "GDPR Art. 9(1)"},
+    "biometric": {"status": "restricted", "legal_basis": "GDPR Art. 9(1) (for ID)"},
+    "criminal_record": {"status": "restricted", "legal_basis": "GDPR Art. 10"}
+  }
+}

@@ -1,0 +1,488 @@
+# Release pipeline for the PUBLIC vfairness repo (validantai/vfairness).
+#
+# This workflow lives in the vfairness/ subtree of the private monorepo and
+# becomes active only in the PUBLIC repo, where the subtree is the repo root
+# (pyproject.toml, src/, tests/ at the top level). It is intentionally
+# root-relative (no `vfairness/` prefix), unlike the monorepo's own release.yml.
+#
+# Tag-triggered. Builds sdist + wheel, gates on twine check and
+# check-wheel-contents, generates a CycloneDX SBOM, and publishes to PyPI via
+# PyPI Trusted Publishing (OIDC short-lived credentials, no stored token), with
+# build-provenance attestations requested EXPLICITLY on the publish step rather
+# than inherited from the action's default. Because it runs in the public repo,
+# that provenance points at inspectable source.
+#
+# PUBLISHING IS GUARDED ON EVENT, REF AND REPOSITORY. DO NOT REMOVE THE GUARDS.
+# Every publishing job below carries
+#   if: github.event_name == 'push'
+#       && startsWith(github.ref, 'refs/tags/v')
+#       && github.repository == 'validantai/vfairness'
+# so a publish requires all three: a pushed ref rather than a manual run, a
+# v-prefixed tag, and the public repository. The same file also sits in the
+# private monorepo's vfairness/ subtree, where the repository clause is false by
+# construction and a tag there is only a rehearsal. The event clause is what
+# makes workflow_dispatch a genuine dry run: a dispatch can be aimed at a TAG
+# ref (both the UI ref selector and POST .../dispatches accept refs/tags/v0.1.0),
+# and startsWith(github.ref, 'refs/tags/v') is TRUE for such a run, so the ref
+# clause on its own would NOT stop a dispatched publish.
+#
+# ONE-TIME SETUP (Daniel, not automated; see docs/PUBLISHING-RUNBOOK.md in the
+# private repo):
+#   1. On PyPI, add a Trusted Publisher for project "vfairness"
+#      bound to owner "validantai", repo "vfairness", workflow "release.yml".
+#   2. Create the GitHub Environment "pypi"; add a required reviewer
+#      to "pypi" so a human approves the production publish.
+# Until step 1 exists the publish jobs fail closed; build + verify + smoke still
+# run, so the pipeline is exercised end to end without publishing.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  suite-green-on-this-commit:
+    name: Refuse to publish unless the suite passed on THIS commit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: read
+    steps:
+      # WHY THIS JOB EXISTS.
+      #
+      # docs/RELEASE_PIPELINE.md step 1 is "Confirm the quality gates are green
+      # on main". That was a step a person was supposed to remember, and on
+      # 2026-09-10 nobody did: the full suite had been RED on main for ELEVEN
+      # consecutive commits while local runs reported green, and nothing
+      # anywhere would have stopped a tag being cut from any one of them.
+      #
+      # A published version is immutable. PyPI does not let you replace a
+      # release, so "we will notice afterwards" is not a recovery plan. This job
+      # turns the remembered step into a machine one: the suite must have
+      # actually passed, on the exact commit being tagged, before anything is
+      # built.
+      #
+      # IT FAILS CLOSED, and that is the whole design. A check that is missing,
+      # queued, cancelled or skipped is NOT a pass. It is a could-not-check, and
+      # a could-not-check at a publish boundary must block, because the state it
+      # cannot distinguish is "the tests never ran".
+      - name: Require a successful full-suite run on the tagged commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Every check whose name starts with this must have concluded success.
+          # It matches the matrix legs "Full suite + coverage (3.11|3.12|3.13)".
+          REQUIRED_PREFIX: "Full suite + coverage"
+        run: |
+          set -euo pipefail
+          sha="${{ github.sha }}"
+          echo "Commit under release: ${sha}"
+
+          runs="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${sha}/check-runs" \
+                    --paginate --jq '.check_runs[] | [.name, (.conclusion // .status)] | @tsv')"
+
+          echo "--- checks reported on this commit ---"
+          if [ -z "${runs}" ]; then
+            echo "(none)"
+          else
+            echo "${runs}"
+          fi
+          echo "--------------------------------------"
+
+          matching="$(printf '%s\n' "${runs}" | grep -F "${REQUIRED_PREFIX}" || true)"
+
+          # NON-VACUITY. Zero matching checks means the gate examined nothing,
+          # and a gate that examines nothing passes forever. This is the exact
+          # failure mode that let eleven red commits through, so it is the first
+          # thing checked and it is fatal.
+          count="$(printf '%s\n' "${matching}" | grep -c . || true)"
+          if [ "${count}" -eq 0 ]; then
+            echo "::error::No check named '${REQUIRED_PREFIX}*' ran on ${sha}." >&2
+            echo "That is not a pass. Either the test workflow did not run on this" >&2
+            echo "commit, or its job name changed and this gate is now looking for" >&2
+            echo "something that no longer exists. Refusing to publish." >&2
+            exit 1
+          fi
+
+          failed="$(printf '%s\n' "${matching}" | awk -F'\t' '$2 != "success"' || true)"
+          if [ -n "${failed}" ]; then
+            echo "::error::The full suite did not pass on ${sha}:" >&2
+            printf '%s\n' "${failed}" >&2
+            echo "" >&2
+            echo "A published version is immutable. Fix the suite, push, wait for" >&2
+            echo "it to go green, then retag." >&2
+            exit 1
+          fi
+
+          echo "OK: ${count} full-suite check(s) reported success on ${sha}."
+
+  build:
+    name: Build + verify distribution
+    needs: suite-green-on-this-commit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: "3.12"
+      - name: Assert the pushed tag matches the package version
+        # A mistyped tag would otherwise publish an artifact labelled with a
+        # version nobody tagged. src/vfairness/__init__.py is the single source
+        # of version truth (see [tool.hatch.version] in pyproject.toml).
+        # Skipped on workflow_dispatch, where there is no tag to compare.
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(python - <<'PY'
+          import pathlib, re
+          src = pathlib.Path("src/vfairness/__init__.py").read_text(encoding="utf-8")
+          m = re.search(r'^__version__ = "([^"]+)"', src, re.M)
+          if m is None:
+              raise SystemExit("could not read __version__ from src/vfairness/__init__.py")
+          print(m.group(1))
+          PY
+          )"
+          if [ "$tag" != "$pkg" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package version ${pkg}." >&2
+            echo "Bump __version__ or retag; refusing to build a mislabelled artifact." >&2
+            exit 1
+          fi
+          echo "Tag ${GITHUB_REF_NAME} matches package version ${pkg}."
+      - name: Install build tooling
+        # cyclonedx-bom is PINNED: its CLI flags have changed across majors, and
+        # an unpinned install once put a --outfile flag in this workflow that the
+        # installed version did not have, aborting every tagged release.
+        # pip itself is upgraded because the SBOM step needs `pip --python`,
+        # which only exists from pip 22.3.
+        run: python -m pip install --upgrade pip build twine check-wheel-contents 'cyclonedx-bom==7.3.1'
+      - name: Build sdist + wheel
+        run: python -m build
+      - name: twine check
+        run: python -m twine check dist/*
+      - name: check-wheel-contents
+        run: check-wheel-contents dist/*.whl
+      - name: Generate CycloneDX SBOM from the built wheel
+        # The SBOM must describe the PACKAGE, not the runner.
+        #
+        # `cyclonedx-py environment` with NO path argument snapshots its OWN
+        # interpreter. This job's interpreter also holds build, twine,
+        # check-wheel-contents and cyclonedx-bom, so the old bare command
+        # produced a 71-component SBOM claiming vfairness pulls in twine,
+        # keyring, lxml and pip. Measured 2026-08-27; the corrected command
+        # below yields 15 components, which is the 5 declared runtime
+        # dependencies plus their transitive closure plus vfairness itself.
+        # NEVER drop the interpreter path argument.
+        #
+        # The venv is created --without-pip so that pip does not appear in the
+        # SBOM as if it were a dependency of the library (verified: with pip in
+        # the venv the component count is 16, not 15). The wheel is therefore
+        # installed from the outer pip with `--python`, which must be placed
+        # BEFORE the `install` subcommand or pip refuses it.
+        run: |
+          set -euo pipefail
+          mkdir -p sbom
+          sbom_venv="${RUNNER_TEMP}/sbom-venv"
+          rm -rf "$sbom_venv"
+          python -m venv --without-pip "$sbom_venv"
+          python -m pip --python "$sbom_venv/bin/python" install dist/*.whl
+          # The flag is -o / --output-file. cyclonedx-bom has never had
+          # --outfile, and argparse aborts the whole job on an unknown flag.
+          cyclonedx-py environment "$sbom_venv/bin/python" \
+            --output-format JSON --output-file sbom/vfairness-sbom.cdx.json
+      - name: Assert the SBOM describes the package, not the runner
+        # Fail closed on the CONTENT, not on the exit code. An SBOM that had
+        # silently gone back to snapshotting the runner would still be valid
+        # CycloneDX and would still exit 0, which is exactly how the previous
+        # one shipped. The declared dependency list is read from pyproject.toml
+        # rather than restated here, so this cannot drift out of date.
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, pathlib, re, sys, tomllib
+
+          def norm(name: str) -> str:
+              return name.strip().lower().replace("_", "-")
+
+          sbom = json.loads(
+              pathlib.Path("sbom/vfairness-sbom.cdx.json").read_text(encoding="utf-8")
+          )
+          names = {norm(c["name"]) for c in sbom.get("components", [])}
+          project = tomllib.loads(
+              pathlib.Path("pyproject.toml").read_text(encoding="utf-8")
+          )["project"]
+          declared = [
+              norm(re.split(r"[<>=!~\[; ]", req, maxsplit=1)[0])
+              for req in project.get("dependencies", [])
+          ]
+
+          problems = []
+          if not declared:
+              problems.append("pyproject.toml declares no runtime dependencies to check against")
+          missing = [d for d in declared if d not in names]
+          if missing:
+              problems.append(f"declared runtime dependencies missing from the SBOM: {missing}")
+          if "vfairness" not in names:
+              problems.append("the package itself is missing from the SBOM")
+          # Present only if the SBOM snapshotted the CI interpreter.
+          tooling = {
+              "build", "twine", "check-wheel-contents", "cyclonedx-bom",
+              "cyclonedx-python-lib", "keyring", "pip", "readme-renderer",
+              "pip-requirements-parser", "wheel-filename", "pyproject-hooks",
+          }
+          leaked = sorted(tooling & names)
+          if leaked:
+              problems.append(
+                  f"build/publish tooling is in the SBOM: {leaked}. The SBOM is describing "
+                  "the CI runner, not the package."
+              )
+
+          if problems:
+              print("SBOM scope check FAILED:", file=sys.stderr)
+              for p in problems:
+                  print(f"  - {p}", file=sys.stderr)
+              print(f"  components ({len(names)}): {sorted(names)}", file=sys.stderr)
+              raise SystemExit(1)
+          print(f"SBOM scope check passed: {len(names)} components, all {len(declared)} declared runtime dependencies present, no build tooling.")
+          PY
+      - name: Upload distribution artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: dist
+          path: dist/*
+      - name: Upload SBOM
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: sbom
+          path: sbom/*
+      # RELEASE NOTES, handed to the github-release job as an artifact (2026-10-01).
+      # That job deliberately has no checkout (it reaches the repository through
+      # GH_REPO; see tests/test_release_mechanics.py), so it cannot read the notes
+      # file itself. This job has the source, so it stages docs/RELEASE_NOTES_<v>.md
+      # when one exists, and a marker when none does, so the download never fails.
+      - name: Stage the release notes for the release job
+        run: |
+          set -euo pipefail
+          meta="$GITHUB_WORKSPACE/release-meta"
+          mkdir -p "$meta"
+          version="${GITHUB_REF_NAME#v}"
+          if [ -f "docs/RELEASE_NOTES_${version}.md" ]; then
+            cp "docs/RELEASE_NOTES_${version}.md" "$meta/RELEASE_NOTES.md"
+            echo "staged docs/RELEASE_NOTES_${version}.md"
+          else
+            echo "no notes file for ${version}" > "$meta/NO_RELEASE_NOTES"
+            echo "no docs/RELEASE_NOTES_${version}.md; the release will generate its notes"
+          fi
+      - name: Upload the release notes
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: release-meta
+          path: release-meta/*
+
+  smoke:
+    name: Clean-room wheel install + import smoke
+    # Installs the freshly built wheel into a clean environment and exercises the
+    # public API from OUTSIDE the source tree (VB-REL-3): catches a missing data
+    # file, a wrong entry point, an unshipped subpackage, or a missing runtime
+    # dependency, none of which the source-tree suite can see. Blocks publishing.
+    #
+    # Each half of that sentence is produced by a step below, and the payload and
+    # entry-point halves only since 2026-08-28. Do not widen the claim without
+    # adding the step that earns it.
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: "3.12"
+      - name: Download built distribution
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: dist
+          path: dist
+      - name: Install the wheel into a clean environment
+        working-directory: ${{ github.workspace }}
+        run: python -m pip install dist/*.whl
+      - name: Public-API smoke, run outside the source tree
+        # cwd is a scratch dir so `import vfairness` resolves to the installed
+        # wheel in site-packages, never to ./src.
+        working-directory: ${{ runner.temp }}
+        run: python "$GITHUB_WORKSPACE/scripts/wheel_smoke.py"
+      - name: Shipped payload + entry-point smoke
+        # THE DATA-FILE AND ENTRY-POINT HALVES OF THIS JOB'S CLAIM LIVE HERE.
+        # scripts/wheel_smoke.py imports the package, computes a metric and reads
+        # a report; it opens none of the non-.py payload the wheel ships (the SVG
+        # templates under vfairness/rendering/templates/ and the legal rule JSON
+        # under vfairness/legal/data/) and runs neither console script. Measured
+        # 2026-08-28: with BOTH of those directories deleted from site-packages,
+        # wheel_smoke.py still printed "SMOKE OK" and exited 0, while this file
+        # and docs/RELEASE_PIPELINE.md told a reader the job catches a missing
+        # data file and a wrong entry point. A packaging gate that cannot see the
+        # payload is not a packaging gate, so the check was added rather than the
+        # claim narrowed. Loaded through importlib.resources, i.e. the package's
+        # own loader, so this fails the same way a consumer's code would.
+        #
+        # vfairness-mcp is checked only for HAVING BEEN SHIPPED, not for working:
+        # it imports mcp.server.fastmcp, which lives in the optional `mcp` extra
+        # a clean environment does not have, so its ImportError is the documented
+        # state and is accepted below. Anything else, including a script that was
+        # never installed, fails the job. Its import guard's wording is pinned
+        # separately in tests/test_release_mechanics.py.
+        working-directory: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from importlib.resources import files
+
+          # `is_dir()` first so an ABSENT directory reports the same clear
+          # sentence as an empty one, instead of a bare FileNotFoundError.
+          templates = files("vfairness.rendering") / "templates"
+          svgs = sorted(p.name for p in templates.iterdir() if p.name.endswith(".svg")) if templates.is_dir() else []
+          if not svgs:
+              raise SystemExit("the wheel ships no SVG template: vfairness/rendering/templates/ is empty or absent")
+          (templates / svgs[0]).read_text(encoding="utf-8")
+
+          rules = files("vfairness.legal") / "data" / "rules"
+          jsons = sorted(p.name for p in rules.iterdir() if p.name.endswith(".json")) if rules.is_dir() else []
+          if not jsons:
+              raise SystemExit("the wheel ships no legal rule file: vfairness/legal/data/rules/ is empty or absent")
+          json.loads((rules / jsons[0]).read_text(encoding="utf-8"))
+
+          print(f"payload OK: {len(svgs)} templates, {len(jsons)} legal rule files, both readable")
+          PY
+          vfairness-precommit --help >/dev/null
+          echo "entry point OK: vfairness-precommit is installed and runs"
+          # The second console script needs the optional `mcp` extra, which a
+          # clean environment does not have, so its ImportError says nothing
+          # about packaging. What IS checked here is that the script was SHIPPED
+          # at all: a "command not found" (or any other failure) is a packaging
+          # defect and fails the job.
+          if mcp_out="$(vfairness-mcp --help 2>&1)"; then
+            echo "entry point OK: vfairness-mcp is installed and runs"
+          else
+            case "$mcp_out" in
+              *'vfairness[mcp]'*)
+                echo "entry point OK: vfairness-mcp is installed; the optional mcp extra is absent, which is the documented state" ;;
+              *)
+                printf '%s\n' "$mcp_out" >&2
+                echo "vfairness-mcp did not run, and not for the documented missing-extra reason" >&2
+                exit 1 ;;
+            esac
+          fi
+
+
+  publish-pypi:
+    name: Publish to PyPI
+    # TestPyPI was REMOVED from this pipeline on 2026-08-28 (Daniel's call: a second
+    # account is real overhead for a solo maintainer). That removed the rehearsal, so
+    # the gates that remain carry more weight and none of them may be weakened:
+    #   1. the repository guard below, so only the public repo can publish;
+    #   2. the tag-versus-__version__ assert in `build`, before anything is built;
+    #   3. `smoke`, which installs the built wheel into a clean venv and runs it, so a
+    #      broken artifact fails here rather than on PyPI;
+    #   4. the required reviewer on the `pypi` environment, which is now the LAST
+    #      human checkpoint before an immutable upload;
+    #   5. the event clause below, which makes workflow_dispatch run build and smoke
+    #      and stop. That is the dry run.
+    # A PyPI version number cannot be reused, so this job is one-way.
+    needs: [build, smoke]
+    # STRUCTURAL GUARD, DO NOT REMOVE. Repeated on this job rather than left to
+    # `needs:`, so that removing or reordering a dependency cannot quietly
+    # re-enable a publish from the wrong repository.
+    #
+    # The event clause is load-bearing and is NOT redundant with the tag clause.
+    # workflow_dispatch accepts a TAG ref (the UI ref selector and POST
+    # .../dispatches both take refs/tags/v0.1.0), and for such a run
+    # startsWith(github.ref, 'refs/tags/v') evaluates TRUE, so on the ref clause
+    # alone a manual dispatch reaches this immutable upload. Requiring
+    # github.event_name == 'push' is what makes a dispatch structurally unable to
+    # publish. It is an allowlist, not a denylist of workflow_dispatch, so a
+    # trigger added to `on:` later cannot publish until someone decides it may.
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && github.repository == 'validantai/vfairness'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: dist
+          path: dist
+      - name: Publish (PyPI, OIDC + attestations)
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33  # release/v1
+        with:
+          packages-dir: dist
+          # SET EXPLICITLY, DO NOT DELETE AS "the default anyway".
+          # Build-provenance attestations are a SECURITY CLAIM this file's header
+          # makes to consumers, so they must be enforced by a line, not inherited
+          # from the default of a pinned SHA.
+          # Measured 2026-08-28: the pin above resolves to v1.14.2, whose
+          # `attestations` input already defaults to 'true', so this line changes
+          # no behaviour today. That IS the point. Before it, the claim in the
+          # header rested on a default living in someone else's repository, and
+          # the next SHA bump could have flipped it with nothing here to notice.
+          attestations: true
+
+  github-release:
+    name: Publish the GitHub Release and attach the SBOM
+    # The SBOM is only a credibility artifact if a consumer can fetch it. As a
+    # workflow artifact it expires and is invisible outside the Actions UI, so
+    # the release also lands it on the GitHub Release next to the wheel.
+    needs: publish-pypi
+    # STRUCTURAL GUARD, DO NOT REMOVE. See the header, and the note on
+    # publish-pypi for why the event clause is not redundant with the tag clause.
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && github.repository == 'validantai/vfairness'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download built distribution
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: dist
+          path: dist
+      - name: Download SBOM
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: sbom
+          path: sbom
+      - name: Download the release notes
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          name: release-meta
+          path: release-meta
+      - name: Create the release and upload the SBOM alongside the artifacts
+        working-directory: ${{ github.workspace }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # REQUIRED, DO NOT REMOVE. This job has no actions/checkout step (it
+          # only needs the two downloaded artifacts), so there is no .git in the
+          # workspace and `gh` has no remote to infer the repository from. Every
+          # gh call below would then fail with "could not determine what repo to
+          # use" AFTER the immutable PyPI upload in publish-pypi had already
+          # happened, leaving a release on PyPI with no GitHub Release and no
+          # SBOM attached anywhere a consumer can fetch it. GH_REPO is the
+          # cheap fix; a checkout would clone the whole tree to answer one
+          # question the context already knows the answer to.
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            # Written notes when the build staged them. --generate-notes builds the
+            # text from this repository's history, and the public repository's
+            # history is an export snapshot, so it would describe almost nothing.
+            if [ -f release-meta/RELEASE_NOTES.md ]; then
+              gh release create "$tag" --title "vfairness ${tag#v}" --notes-file release-meta/RELEASE_NOTES.md
+            else
+              gh release create "$tag" --title "vfairness ${tag#v}" --generate-notes
+            fi
+          fi
+          gh release upload "$tag" sbom/*.cdx.json dist/* --clobber

@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a3a4f">
+    <meta name="description" content="vfairness is a free and open-source ML fairness library (Apache-2.0). Support it with a Supporter sponsorship. Sponsor USD 50/mo or more and a free Validant AI Fairness Platform Pro membership is included; Corporate Patrons give from USD 1000/mo. Systems for Trust &amp; Agency.">
+    <meta name="keywords" content="AI fairness, vfairness, open source, Apache-2.0, validant.ai, iceberg.digital, Glinz &amp; Company, EU AI Act, ML fairness toolkit">
+    <meta name="author" content="validant.ai">
+    <meta name="version" content="0.1.0">
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Our Offering | vfairness">
+    <meta property="og:description" content="A free and open-source ML fairness library (Apache-2.0). Back it with a Supporter sponsorship; sponsor USD 50/mo or more to also get Validant Platform Pro. Corporate Patrons give from USD 1000/mo. Systems for Trust &amp; Agency.">
+    <meta property="og:image" content="../img/VALIDANT_AI_logo_v1.0_fancy_green.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Our Offering | vfairness">
+    <meta name="twitter:description" content="Systems for Trust &amp; Agency — Engineering Legitimate AI in the Age of Intelligent Infrastructure.">
+
+    <title>Our Offering | vfairness Documentation</title>
+
+    <link rel="icon" type="image/svg+xml" href="../img/favicon-v2.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script>/* theme before first paint: vf-theme = light | dark | system */(function(){var m='system';try{m=localStorage.getItem('vf-theme')||'system'}catch(e){}var d=m==='dark'||(m==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;r.setAttribute('data-theme',d?'dark':'light');r.setAttribute('data-theme-mode',m)})()</script>
+<script type="module" src="../js/sponsor-wall.js"></script>
+
+    <style>
+        /* ══════════════════════════════════════════════════════════════
+           OUR OFFERING — Page-Specific Styles
+           ══════════════════════════════════════════════════════════════ */
+
+        /* ── Page intro ── */
+        .offering-intro {
+            padding: var(--spacing-20) var(--spacing-6) var(--spacing-12);
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .offering-intro h1 {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            margin: 0 0 var(--spacing-5);
+            letter-spacing: -0.02em;
+            color: var(--color-gray-900);
+        }
+        .offering-intro .lead {
+            font-size: var(--font-size-lg);
+            color: var(--color-gray-600);
+            margin: 0 auto var(--spacing-6);
+            line-height: var(--line-height-relaxed);
+            max-width: 800px;
+        }
+
+        /* ── Gradient text utility ── */
+        .grad-text {
+            background: var(--grad-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .grad-badge {
+            display: inline-block;
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            padding: var(--spacing-1) var(--spacing-3);
+            border-radius: var(--radius-full);
+            background: var(--grad-badge);
+            color: var(--color-white);
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .grad-border-left {
+            border-left: 3px solid transparent;
+            border-image: var(--grad-btn) 1;
+        }
+
+        /* ── Sections ── */
+        .offering-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-20) var(--spacing-6);
+        }
+        .offering-section h2 {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-gray-900);
+            margin: 0 0 var(--spacing-3);
+            letter-spacing: -0.01em;
+        }
+        .offering-section .section-lead {
+            font-size: var(--font-size-base);
+            color: var(--color-gray-500);
+            margin: 0 0 var(--spacing-12);
+            max-width: 720px;
+            line-height: var(--line-height-relaxed);
+        }
+
+        /* ── Three-Entity Architecture ── */
+        .arch-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto 1fr;
+            gap: 0;
+            align-items: stretch;
+        }
+        .arch-card {
+            background: var(--color-white);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-6) var(--spacing-5);
+            text-align: center;
+            transition: box-shadow var(--transition-base);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .arch-card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        .arch-card .logo-wrap {
+            width: 100%;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-4);
+        }
+        .arch-card .logo-wrap img {
+            max-height: 48px;
+            max-width: 160px;
+            object-fit: contain;
+        }
+        .arch-card .entity-name {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            margin: 0 0 var(--spacing-1);
+        }
+        .arch-card .entity-role {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin: 0 0 var(--spacing-4);
+            min-height: 2em;
+            display: flex;
+            align-items: center;
+        }
+        .arch-card .entity-desc {
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-600);
+            line-height: var(--line-height-relaxed);
+            margin: 0;
+            flex: 1;
+        }
+        .arch-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 var(--spacing-3);
+            color: var(--color-gray-300);
+        }
+        .arch-arrow svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* ── Comparison Table ── */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-5);
+            overflow: visible;
+        }
+        @media (max-width: 1024px) and (min-width: 901px) {
+            .compare-grid { grid-template-columns: 1fr; max-width: 560px; margin: 0 auto; }
+        }
+        .compare-col {
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+        .compare-col.pro {
+            border: 1px solid var(--color-primary);
+            position: relative;
+            overflow: visible;
+        }
+        /* border overlay — paints on top of Dante so he peeks from behind it */
+        .compare-col.pro::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border: 1px solid var(--color-primary);
+            border-radius: var(--radius-xl);
+            z-index: 3;
+            pointer-events: none;
+        }
+        /* ── Pro ribbon — wraps around the box corner ── */
+        .pro-ribbon-wrap {
+            position: absolute;
+            top: -4px; right: -4px;
+            width: 150px; height: 150px;
+            overflow: hidden;
+            z-index: 100;
+            pointer-events: none;
+        }
+        .pro-ribbon {
+            display: block;
+            position: absolute;
+            top: 44px; right: -48px;
+            width: 200px;
+            text-align: center;
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #0f766e 100%);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            padding: 7px 0;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25),
+                        inset 0 1px 0 rgba(255,255,255,0.25);
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.2);
+            border-bottom: 1px solid rgba(0,0,0,0.15);
+        }
+        /* clean ribbon ends — no fold triangles */
+        .pro-ribbon::before,
+        .pro-ribbon::after {
+            content: none;
+        }
+        .compare-header {
+            padding: var(--spacing-6);
+            text-align: center;
+        }
+        .compare-col:not(.pro) .compare-header {
+            background: var(--color-gray-50);
+        }
+        .compare-col.pro .compare-header {
+            background: var(--grad-btn);
+            color: var(--color-white);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            position: relative;
+            z-index: 3;
+        }
+        .compare-col.pro .compare-footer {
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+        }
+        .compare-header h3 {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            margin: 0 0 var(--spacing-1);
+        }
+        .compare-col.pro .compare-header h3 {
+            color: var(--color-white);
+        }
+        .compare-header .compare-license {
+            font-size: var(--font-size-sm);
+            opacity: 0.8;
+            margin: 0 0 var(--spacing-3);
+        }
+        .compare-header .compare-install {
+            font-family: var(--font-mono);
+            font-size: var(--font-size-xs);
+            padding: var(--spacing-1) var(--spacing-3);
+            border-radius: var(--radius-md);
+            display: inline-block;
+        }
+        .compare-col:not(.pro) .compare-install {
+            background: var(--color-gray-200);
+            color: var(--color-gray-700);
+        }
+        .compare-col.pro .compare-install {
+            background: rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.95);
+        }
+        .compare-body {
+            padding: var(--spacing-4) var(--spacing-6) var(--spacing-6);
+        }
+        .compare-group {
+            margin-bottom: var(--spacing-4);
+        }
+        .compare-group-label {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin: 0 0 var(--spacing-2);
+            padding-bottom: var(--spacing-1);
+            border-bottom: 1px solid var(--color-gray-100);
+        }
+        .compare-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-2);
+            padding: var(--spacing-1) 0;
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-700);
+            line-height: var(--line-height-normal);
+        }
+        .compare-item svg {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            margin-top: 2px;
+        }
+        .check-green { color: #10b981; }
+        .check-blue { color: var(--color-primary); }
+
+        /* ── Featured tier (recommended column: colored background + elevation) ── */
+        .compare-col--featured {
+            background: linear-gradient(180deg, rgba(20,184,166,0.10), var(--color-white) 46%);
+            border-color: var(--color-primary);
+            box-shadow: 0 12px 34px rgba(20,184,166,0.16);
+            position: relative;
+            overflow: visible;
+            z-index: 2;
+        }
+        .compare-col.compare-col--featured .compare-header {
+            background: rgba(20,184,166,0.14);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        }
+
+        /* ── Price display (platform style: bold amount + /mo + struck original) ── */
+        .compare-price {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: var(--spacing-3);
+        }
+        .compare-price__amount {
+            font-size: 2rem;
+            font-weight: var(--font-weight-bold);
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+        .compare-price__period {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-normal);
+            opacity: 0.7;
+        }
+        .compare-price__strike {
+            font-size: var(--font-size-lg);
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+        .compare-price__from {
+            font-size: var(--font-size-sm);
+            opacity: 0.7;
+        }
+        .compare-footer {
+            padding: var(--spacing-4) var(--spacing-6);
+            border-top: 1px solid var(--color-gray-100);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-2);
+        }
+        .compare-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-size-xs);
+            color: var(--color-gray-500);
+        }
+        .compare-meta strong {
+            color: var(--color-gray-700);
+        }
+
+        /* ── Platform Vision ── */
+        .platform-section {
+            background: var(--color-gray-50);
+            border-top: 1px solid var(--color-gray-200);
+            border-bottom: 1px solid var(--color-gray-200);
+        }
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+            gap: var(--spacing-4);
+        }
+        .platform-card {
+            background: var(--color-white);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-5);
+            transition: box-shadow var(--transition-base);
+        }
+        .platform-card:hover { box-shadow: var(--shadow-md); }
+        .platform-card h4 {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-gray-900);
+            margin: 0 0 var(--spacing-2);
+        }
+        .platform-card p {
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-600);
+            margin: 0;
+            line-height: var(--line-height-relaxed);
+        }
+
+        /* ── Principles ── */
+        .principles-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-5);
+        }
+        .principle-card {
+            background: var(--color-white);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+        }
+        .principle-card h4 {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-gray-900);
+            margin: 0 0 var(--spacing-2);
+        }
+        .principle-card p {
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-600);
+            margin: 0;
+            line-height: var(--line-height-relaxed);
+        }
+
+        /* ── Manifesto Strip ── */
+        .manifesto-strip {
+            background: linear-gradient(135deg, #0f2b3c 0%, #1a3a4f 40%, #234e68 100%);
+            padding: var(--spacing-12) var(--spacing-6);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .manifesto-strip::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 30% 50%, rgba(20,184,166,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 50%, rgba(66,183,222,0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .manifesto-strip::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 18px 18px;
+            pointer-events: none;
+        }
+        .manifesto-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: var(--spacing-2);
+        }
+        .manifesto-mark {
+            font-size: 5rem;
+            line-height: 1;
+            font-family: Georgia, 'Times New Roman', serif;
+            background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.5;
+            user-select: none;
+            flex-shrink: 0;
+            margin-top: -0.15em;
+        }
+        .manifesto-mark--close {
+            align-self: flex-end;
+            margin-top: 0;
+            margin-bottom: -0.4em;
+        }
+        .manifesto-quote {
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+        .mq-line {
+            display: block;
+            font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+            font-weight: 500;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.6;
+            letter-spacing: -0.01em;
+        }
+        .mq-accent {
+            font-weight: 700;
+            font-size: clamp(1.25rem, 3vw, 1.85rem);
+            background: linear-gradient(135deg, #5ee4c0, #7dd3fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-top: var(--spacing-2);
+        }
+
+        /* ── Dante — the Responsible AI Advocate ── */
+        /* Peeks up from the top of the Platform card */
+        .dante-anchor {
+            position: absolute;
+            left: calc(50% - 75px);
+            top: 0;
+            transform: translateY(-100%);
+            width: 150px;
+            height: 120px;
+            clip-path: inset(0 -250px 0 0);
+            z-index: 2;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+        .dante-wrapper {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            transform: translateY(100%);
+            transition: transform 7s cubic-bezier(0.05, 0.4, 0.2, 1) 0.8s;
+        }
+        /* peek up state — head peeking cheekily over the card top edge */
+        .dante-wrapper.visible {
+            transform: translateY(15%);
+        }
+        /* shy away on hover — pause wiggle, smooth duck via translate */
+        .dante-anchor:hover .dante-wrapper.visible,
+        .dante-anchor:hover .dante-wrapper.visible.wiggle {
+            animation-play-state: paused !important;
+            translate: 0 50%;
+            opacity: 0.7;
+            transition: translate 1.8s ease-out, opacity 1.8s ease-out !important;
+        }
+        /* after hover ends, gently slide back (only once wiggle phase begins) */
+        .dante-anchor:not(:hover) .dante-wrapper.visible.wiggle {
+            transition: translate 1.4s ease-in-out, opacity 1s ease-in-out !important;
+        }
+        .dante-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.18));
+            animation: dante-blink 11s ease-in-out infinite;
+            transform-origin: center 60%;
+        }
+        /* blink — brief vertical squish at irregular intervals over an 11s cycle */
+        @keyframes dante-blink {
+            0%    { transform: scaleY(1); }
+            /* first blink at ~18% (2s) */
+            17.5% { transform: scaleY(1); }
+            18%   { transform: scaleY(0.85); }
+            19%   { transform: scaleY(1); }
+            /* pause */
+            /* double blink at ~55% (6s) */
+            54.5% { transform: scaleY(1); }
+            55%   { transform: scaleY(0.85); }
+            56%   { transform: scaleY(1); }
+            57.5% { transform: scaleY(0.85); }
+            58.5% { transform: scaleY(1); }
+            /* long pause — no blink until next cycle */
+            100%  { transform: scaleY(1); }
+        }
+        /* speech bubble — floats right of Dante */
+        .dante-bubble {
+            position: absolute;
+            left: 158px;
+            bottom: 55px;
+            background: var(--color-white);
+            border: 1.5px solid var(--color-gray-300);
+            border-radius: 12px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-gray-700);
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.4s ease 1.4s, transform 0.4s ease 1.4s;
+            z-index: 11;
+        }
+        .dante-anchor.peek .dante-bubble {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* hide bubble when Dante ducks (unless click-bubble is active) */
+        .dante-anchor:hover .dante-bubble:not(.dante-bubble--click) {
+            opacity: 0 !important;
+            transform: translateY(6px) !important;
+            transition: opacity 0.2s ease, transform 0.2s ease !important;
+        }
+        /* click-triggered bubble — always visible while active, highest specificity */
+        .dante-anchor .dante-bubble.dante-bubble--click {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+            transition: opacity 0.3s ease, transform 0.3s ease !important;
+            pointer-events: none;
+        }
+        .dante-bubble::after {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 50%;
+            margin-top: -5px;
+            border: 5px solid transparent;
+            border-right-color: var(--color-white);
+        }
+        .dante-bubble::before {
+            content: '';
+            position: absolute;
+            left: -9px;
+            top: 50%;
+            margin-top: -6px;
+            border: 6px solid transparent;
+            border-right-color: var(--color-gray-300);
+        }
+
+        /* Dante wiggle — random-feeling rocking via asymmetric bursts */
+        @keyframes dante-wiggle {
+            0%   { transform: translateY(15%) rotate(0deg); }
+            /* burst 1 — quick double twitch */
+            2%   { transform: translateY(14%) rotate(-4deg); }
+            4%   { transform: translateY(15%) rotate(3deg); }
+            6%   { transform: translateY(15%) rotate(-1deg); }
+            8%   { transform: translateY(15%) rotate(0deg); }
+            /* long pause */
+            22%  { transform: translateY(15%) rotate(0deg); }
+            /* burst 2 — slow heavy rock */
+            25%  { transform: translateY(16%) rotate(5.5deg); }
+            29%  { transform: translateY(13%) rotate(-6deg); }
+            33%  { transform: translateY(15%) rotate(4deg); }
+            36%  { transform: translateY(14%) rotate(-2deg); }
+            38%  { transform: translateY(15%) rotate(0deg); }
+            /* short pause */
+            46%  { transform: translateY(15%) rotate(0deg); }
+            /* burst 3 — single head tilt */
+            48%  { transform: translateY(14%) rotate(-3deg); }
+            51%  { transform: translateY(15%) rotate(0deg); }
+            /* medium pause */
+            65%  { transform: translateY(15%) rotate(0deg); }
+            /* burst 4 — excited triple wiggle */
+            67%  { transform: translateY(16%) rotate(4deg); }
+            69%  { transform: translateY(14%) rotate(-5deg); }
+            71%  { transform: translateY(15%) rotate(3.5deg); }
+            73%  { transform: translateY(14%) rotate(-4deg); }
+            75%  { transform: translateY(16%) rotate(2deg); }
+            77%  { transform: translateY(15%) rotate(-1deg); }
+            79%  { transform: translateY(15%) rotate(0deg); }
+            100% { transform: translateY(15%) rotate(0deg); }
+        }
+        .dante-wrapper.visible.wiggle {
+            animation: dante-wiggle 12s ease-in-out infinite !important;
+            transition: translate 1.4s ease-in-out, opacity 1s ease-in-out !important;
+        }
+
+        /* ── Utilities ── */
+        .mt-4 { margin-top: var(--spacing-4); }
+
+        /* ── Skip link (visible on focus) ── */
+        .sr-only:focus {
+            position: fixed !important;
+            left: var(--spacing-4) !important;
+            top: var(--spacing-4) !important;
+            width: auto !important;
+            height: auto !important;
+            overflow: visible !important;
+            padding: var(--spacing-2) var(--spacing-4);
+            background: var(--color-white);
+            color: var(--color-primary-dark);
+            font-weight: var(--font-weight-semibold);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* ── Nav active state ── */
+        .nav-link--active {
+            color: var(--color-primary) !important;
+            position: relative;
+        }
+        .nav-link--active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: var(--spacing-3);
+            right: var(--spacing-3);
+            height: 2px;
+            background: var(--grad-btn);
+            border-radius: 1px;
+        }
+
+        /* ── Overflow guard (prevents Dante pre-animation scrollbar) ── */
+        .page-wrapper {
+            overflow-x: hidden;
+        }
+
+        /* ── Section borders (replaces inline styles) ── */
+        .offering-section--bordered {
+            border-top: 1px solid var(--color-gray-200);
+        }
+        .offering-section--library {
+            border-top: 1px solid var(--color-gray-200);
+            position: relative;
+            overflow: visible;
+        }
+
+        /* ── Intro in the docs title style ── */
+        .offering-intro.page-intro { max-width: 1200px; margin: 0 auto; padding: 5rem var(--spacing-6) 0; text-align: left; }
+        @media (max-width: 768px) { .offering-intro.page-intro { padding-top: 2.5rem; } }
+        .offering-intro.page-intro h1 { font-size: 2.75rem; font-weight: 800; letter-spacing: -0.035em; line-height: 1.08; margin: 0 0 1.25rem; color: var(--color-gray-900); }
+        .offering-intro.page-intro .lead { margin: 0; max-width: 46rem; text-align: left; }
+        .offering-section--library { border-top: 0 !important; padding-top: var(--spacing-12) !important; }
+        /* ── Call to action at the foot of each pillar ── */
+        .compare-cta { padding: var(--spacing-4) var(--spacing-6) var(--spacing-6); display: flex; flex-direction: column; gap: var(--spacing-2); }
+        .compare-cta .btn { width: 100%; justify-content: center; }
+        .compare-cta__note { font-size: 0.8rem; line-height: 1.5; color: var(--color-gray-500); }
+        .support-notify { margin: 1.5rem 0 0 !important; font-size: 0.85rem; color: var(--color-gray-500); max-width: 72ch; text-align: left !important; }
+        .support-recognition { margin-top: 3rem; }
+        /* ── One row track per part, shared by the three pillars, so the three
+           coloured headers (and bodies, footers, buttons) are the same height. ── */
+        @media (min-width: 1025px) {
+            .compare-grid { grid-template-rows: auto 1fr auto auto; }
+            .compare-grid > .compare-col { display: grid; grid-row: span 4; grid-template-rows: subgrid; row-gap: 0; }
+        }
+
+        /* ── Compare columns equal-height ── */
+        .compare-col {
+            display: flex;
+            flex-direction: column;
+        }
+        .compare-body {
+            flex: 1;
+        }
+        .compare-footer {
+            margin-top: auto;
+        }
+
+        /* ── Install commands — easy copy ── */
+        .compare-install {
+            user-select: all;
+            -webkit-user-select: all;
+            cursor: text;
+        }
+
+        /* ── Principle card gradient border (pseudo-element for proper radius) ── */
+        .principle-card {
+            position: relative;
+            border-left: none;
+            border-image: none;
+            padding-left: calc(var(--spacing-6) + 3px);
+        }
+        .principle-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--grad-btn);
+            border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .arch-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-3);
+            }
+            .arch-arrow {
+                transform: rotate(90deg);
+                padding: var(--spacing-1) 0;
+            }
+            .compare-grid {
+                grid-template-columns: 1fr;
+            }
+            .principles-grid {
+                grid-template-columns: 1fr;
+            }
+            .dante-anchor {
+                display: none;
+            }
+        }
+        @media (max-width: 768px) {
+            .compare-body {
+                padding: var(--spacing-4);
+            }
+            .compare-footer {
+                padding: var(--spacing-3) var(--spacing-4);
+            }
+            .arch-card {
+                padding: var(--spacing-4);
+            }
+            .manifesto-mark {
+                font-size: clamp(2.5rem, 8vw, 5rem);
+            }
+        }
+        @media (max-width: 600px) {
+            .offering-intro {
+                padding: var(--spacing-12) var(--spacing-4) var(--spacing-8);
+            }
+            .offering-intro h1 {
+                font-size: var(--font-size-2xl);
+            }
+            .offering-section {
+                padding: var(--spacing-12) var(--spacing-4);
+            }
+            .arch-card .entity-desc {
+                font-size: var(--font-size-xs);
+            }
+            .manifesto-strip {
+                padding: var(--spacing-8) var(--spacing-4);
+            }
+        }
+
+        /* ── Support / Sponsorship payment outlet ── */
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-5);
+        }
+        /* The self-serve Pro checkout was removed (it never existed and is not
+           planned), leaving one card in a hardcoded two-up: it sat in the left
+           half with an equal amount of dead space beside it. Centre a lone card
+           at a readable width. If a second card ever returns, the two-up above
+           resumes on its own. */
+        .support-card:only-child {
+            grid-column: 1 / -1;
+            max-width: 640px;
+            margin-inline: auto;
+        }
+        .support-card {
+            background: var(--color-white);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-6);
+            display: flex;
+            flex-direction: column;
+        }
+        .support-card h4 {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-gray-900);
+            margin: 0 0 var(--spacing-1);
+        }
+        .support-card .support-rails {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin: 0 0 var(--spacing-3);
+        }
+        .support-card p {
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-600);
+            line-height: var(--line-height-relaxed);
+            margin: 0 0 var(--spacing-4);
+            flex: 1;
+        }
+        .support-price {
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-700);
+            margin: 0 0 var(--spacing-4);
+        }
+        .support-price strong { color: var(--color-gray-900); }
+        /* Pre-launch CTA — visually a button, but inert until sponsorship goes live */
+        .btn-prelaunch {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-2);
+            width: 100%;
+            padding: var(--spacing-3) var(--spacing-4);
+            border-radius: var(--radius-md);
+            border: 1px dashed var(--color-gray-300);
+            background: var(--color-gray-50);
+            color: var(--color-gray-500);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            cursor: default;
+        }
+        .support-notify {
+            text-align: center;
+            margin-top: var(--spacing-8);
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-600);
+        }
+
+        /* ── Patron bridge (USD 50+ → free Platform Pro) ── */
+        .patron-bridge {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: var(--spacing-8) var(--spacing-6) var(--spacing-4);
+            text-align: center;
+        }
+        .patron-card {
+            border: 1px solid var(--color-primary);
+            border-radius: var(--radius-xl);
+            background: linear-gradient(180deg, rgba(20,184,166,0.06), rgba(20,184,166,0.02));
+            padding: var(--spacing-8) var(--spacing-6);
+        }
+        .patron-card h3 {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-gray-900);
+            margin: var(--spacing-3) 0 var(--spacing-2);
+            letter-spacing: -0.01em;
+        }
+        .patron-card > p {
+            font-size: var(--font-size-base);
+            color: var(--color-gray-600);
+            max-width: 720px;
+            margin: 0 auto var(--spacing-5);
+            line-height: var(--line-height-relaxed);
+        }
+        .patron-steps {
+            list-style: none;
+            counter-reset: patron;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-4);
+            max-width: 820px;
+            margin: 0 auto var(--spacing-6);
+            padding: 0;
+            text-align: left;
+        }
+        .patron-steps li {
+            counter-increment: patron;
+            position: relative;
+            padding-left: var(--spacing-8);
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-700);
+            line-height: var(--line-height-relaxed);
+        }
+        .patron-steps li::before {
+            content: counter(patron);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: var(--radius-full);
+            background: var(--grad-btn);
+            color: var(--color-white);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .patron-card .btn-prelaunch {
+            width: auto;
+            min-width: 260px;
+        }
+        .support-card .btn-sponsor { width: 100%; padding: var(--spacing-3) var(--spacing-4); font-weight: var(--font-weight-semibold); }
+        .patron-card .btn-sponsor { min-width: 260px; padding: var(--spacing-3) var(--spacing-4); font-weight: var(--font-weight-semibold); }
+
+        @media (max-width: 768px) {
+            .support-grid { grid-template-columns: 1fr; }
+            .patron-steps { grid-template-columns: 1fr; }
+        }
+
+        /* ── Sponsor recognition wall ── */
+        .support-recognition {
+            max-width: none;   /* full content width, like the pillars above */
+            margin: var(--spacing-10) 0 0;
+            text-align: left;
+        }
+        .support-recognition h4 {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-gray-900);
+            margin: 0 0 var(--spacing-2);
+        }
+        .support-recognition p {
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-600);
+            line-height: var(--line-height-relaxed);
+            margin: 0 auto var(--spacing-5);
+            max-width: 640px;
+        }
+        .patron-bridge .patron-card + .patron-card { margin-top: var(--spacing-5); }
+        .patron-card--corporate { background: var(--color-white); }
+    </style>
+    <script src="https://validant.ai/consent/v1/consent.js" defer></script>
+  </head>
+
+<body>
+    <a href="#main-content" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:9999;">Skip to content</a>
+    <!-- ── Header ── -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="../index.html">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
+                </a>
+                <span class="logo-divider"></span>
+                <span class="lib-name"><span>v</span>fairness</span>
+            </div>
+            <nav class="main-nav" aria-label="Main navigation">
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="../getting-started/index.html" class="nav-link">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../api-reference/index.html" class="nav-link">API Reference</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Learn
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Learn submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../test-objects/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Find a Test Object</span>
+                                        <span class="nav-dropdown__desc">Data, models and agents to test, by access depth</span>
+                                    </span>
+                                </a>
+                                <a href="../business-guide/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Business Guide</span>
+                                        <span class="nav-dropdown__desc">Fairness strategy for decision-makers</span>
+                                    </span>
+                                </a>
+                                <div class="nav-dropdown__group">
+                                    <div class="nav-dropdown__group-label">
+                                        <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+                                        <span class="nav-dropdown__text">
+                                            <span class="nav-dropdown__label">Sample Assessments</span>
+                                            <span class="nav-dropdown__desc">End-to-end audits with EU AI Act compliance</span>
+                                        </span>
+                                    </div>
+                                    <div class="nav-dropdown__group-items">
+                                        <a href="../sample-assessment/index.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Binary Classifier</span> <span class="sub-desc">— Credit scoring</span></a>
+                                        <a href="../sample-assessment/llm-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Foundation LLM</span> <span class="sub-desc">— Resume screening</span></a>
+                                        <a href="../sample-assessment/cv-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Computer Vision</span> <span class="sub-desc">— Medical imaging</span></a>
+                                        <a href="../sample-assessment/ranking-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Ranking System</span> <span class="sub-desc">&mdash; Job platform</span></a>
+                                    </div>
+                                </div>
+                                <a href="../concepts/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Concepts</span>
+                                        <span class="nav-dropdown__desc">Fairness theory and metric foundations</span>
+                                    </span>
+                                </a>
+                                <a href="../quality-and-hardening/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Quality &amp; Hardening</span>
+                                        <span class="nav-dropdown__desc">Testing, security, and the road to beta</span>
+                                    </span>
+                                </a>
+                                <a href="../release-pipeline/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M12 22V12"/><path d="M3.3 7l8.7 5 8.7-5"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Releasing</span>
+                                        <span class="nav-dropdown__desc">How new versions ship to PyPI</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Explore
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Explore submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../svg-gallery/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">SVG Gallery</span>
+                                        <span class="nav-dropdown__desc">Interactive visualization templates</span>
+                                    </span>
+                                </a>
+                                <a href="../workflow-integration/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Workflow Integration</span>
+                                        <span class="nav-dropdown__desc">MLOps, CI/CD, and experiment tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../usage-map/index.html" role="menuitem" class="nav-dropdown__item" data-um-injected="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Library Usage Map</span>
+                                        <span class="nav-dropdown__desc">Where the platform uses each vfairness symbol</span>
+                                    </span>
+                                </a>
+<a href="../llm-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">LLM Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Counterfactual testing, benchmarks, output analysis for LLMs</span>
+                                    </span>
+                                </a>
+                                <a href="../agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Agent Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Correspondence testing, tool bias, RAG bias, pipeline tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../multi-agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Multi-Agent Testing</span>
+                                        <span class="nav-dropdown__desc">Emergent bias, groupthink, non-compositionality</span>
+                                    </span>
+                                </a>
+                                <a href="../explainability-and-xai/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Explainability &amp; XAI</span>
+                                        <span class="nav-dropdown__desc">SHAP attributions, fairness decomposition, counterfactuals</span>
+                                    </span>
+                                </a>
+                                <a href="../training-time-interventions/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Training-Time Interventions</span>
+                                        <span class="nav-dropdown__desc">Fairness-aware losses, constraints, calibration</span>
+                                    </span>
+                                </a>
+</div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../our-offering/index.html" class="nav-link nav-link--active" aria-current="page">Our Offering</a>
+                    </li>
+                </ul>
+
+                <div class="nav-cta">
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="Search docs...">
+                    </div>
+                    <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+
+                <button type="button" class="mobile-nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-panel">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mobile nav -->
+    <div class="mobile-nav-overlay" aria-hidden="true"></div>
+    <nav id="mobile-nav-panel" class="mobile-nav-panel" aria-hidden="true" role="dialog" aria-label="Mobile navigation">
+        <div class="mobile-nav-header">
+            <span class="mobile-nav-title">Navigation</span>
+            <button type="button" class="mobile-nav-close" aria-label="Close navigation">&times;</button>
+        </div>
+        <div class="mobile-nav-body">
+            <a href="../index.html" class="mobile-nav-link">Home</a>
+            <a href="../getting-started/index.html" class="mobile-nav-link">Getting Started</a>
+            <a href="../api-reference/index.html" class="mobile-nav-link">API Reference</a>
+            <div class="mobile-nav-group">
+                <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                    Learn
+                    <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </button>
+                <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                    <a href="../test-objects/index.html" class="mobile-nav-sublink">Find a Test Object</a>
+                    <a href="../business-guide/index.html" class="mobile-nav-sublink">Business Guide</a>
+                    <span class="mobile-nav-sublink" style="font-size:0.7rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:0.5rem 0 0.15rem;">Sample Assessments</span>
+                    <a href="../sample-assessment/index.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Binary Classifier</a>
+                    <a href="../sample-assessment/llm-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Foundation LLM</a>
+                    <a href="../sample-assessment/cv-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Computer Vision</a>
+                    <a href="../sample-assessment/ranking-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Ranking System</a>
+                    <a href="../concepts/index.html" class="mobile-nav-sublink">Concepts</a>
+                    <a href="../quality-and-hardening/index.html" class="mobile-nav-sublink">Quality &amp; Hardening</a>
+                    <a href="../release-pipeline/index.html" class="mobile-nav-sublink">Releasing</a>
+                </div></div>
+            </div>
+            <div class="mobile-nav-group">
+                <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                    Explore
+                    <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </button>
+                <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                    <a href="../svg-gallery/index.html" class="mobile-nav-sublink">SVG Gallery</a>
+                    <a href="../workflow-integration/index.html" class="mobile-nav-sublink">Workflow Integration</a>
+                <a href="../usage-map/index.html" class="mobile-nav-sublink" data-um-injected="1">Library Usage Map</a>
+<a href="../llm-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">LLM Fairness Testing</a>
+                <a href="../agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Agent Fairness Testing</a>
+                <a href="../multi-agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Multi-Agent Testing</a>
+                <a href="../explainability-and-xai/index.html" class="mobile-nav-sublink">Explainability &amp; XAI</a>
+                <a href="../training-time-interventions/index.html" class="mobile-nav-sublink">Training-Time Interventions</a>
+</div></div>
+            </div>
+        <a href="../our-offering/index.html" class="mobile-nav-link">Our Offering</a>
+        </div>
+        <div class="mobile-nav-footer">
+            <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                GitHub
+            </a>
+        </div>
+    </nav>
+<script>/* Mobile nav bootstrap — works before main.js loads */
+(function(){
+var t=document.querySelector(".mobile-nav-toggle"),p=document.querySelector(".mobile-nav-panel"),o=document.querySelector(".mobile-nav-overlay"),c=document.querySelector(".mobile-nav-close");
+if(!t||!p)return;t.setAttribute("data-nav-init","1");
+function open(){t.setAttribute("aria-expanded","true");p.classList.add("is-open");p.setAttribute("aria-hidden","false");if(o)o.classList.add("is-open");document.body.style.overflow="hidden";}
+function close(){t.setAttribute("aria-expanded","false");p.classList.remove("is-open");p.setAttribute("aria-hidden","true");if(o)o.classList.remove("is-open");document.body.style.overflow="";}
+t.addEventListener("click",function(){t.getAttribute("aria-expanded")==="true"?close():open();});
+if(c)c.addEventListener("click",close);
+if(o)o.addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList.contains("is-open"))close();});
+})()
+</script>
+
+    <!-- ── Page intro ── -->
+    <main id="main-content" class="page-wrapper">
+        <header class="offering-intro page-intro">
+            <p class="vf-eyebrow" data-dated>vfairness &middot; free, open source, supported by patronage</p>
+            <h1>Our Offering</h1>
+            <p class="lead">The library is free for everyone, for good. Here is how to support it, what sponsors receive, and the wider architecture vfairness belongs to: Systems for Trust &amp; Agency.</p>
+        </header>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         vfairness LIBRARY (free) + PLATFORM (managed)
+         ════════════════════════════════════════════════════════════════ -->
+    <section class="offering-section offering-section--library">
+        <h2>Free forever, <span class="grad-text">supported by patronage</span></h2>
+        <p class="section-lead">The whole library is free and open-source under Apache-2.0: every metric, every feature, no gates. If it helps you, support the work the way you back any public good, by sponsoring rather than buying. Patronage keeps fairness tooling free for everyone and funds what comes next. Beta sponsorships are 50% off.</p>
+
+        <div class="compare-grid">
+            <!-- FREE -->
+            <div class="compare-col">
+                <div class="compare-header">
+                    <h3>vfairness Library</h3>
+                    <div class="compare-price"><span class="compare-price__amount">Free</span></div>
+                    <p class="compare-license">The complete library, forever. Apache-2.0.</p>
+                    <code class="compare-install">pip install vfairness</code>
+                </div>
+                <div class="compare-body">
+                    <div class="compare-group">
+                        <div class="compare-group-label">Already the whole tool</div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-green"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Every metric and feature, no gates. The full standard, free.</span></div>
+                    </div>
+                    <div class="compare-group">
+                        <div class="compare-group-label">Evaluation &amp; Metrics</div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-green"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>10+ classification, regression, and ranking metrics with CI</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-green"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Effect sizes, intersectional analysis, FairExplAIner</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-green"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Bootstrap CI, Bayesian CI, Bonferroni/BH corrections</span></div>
+                    </div>
+                    <div class="compare-group">
+                        <div class="compare-group-label">Preprocessing</div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-green"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>BiasDetector, a full transformer toolkit, proxy detection</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-green"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Auto-discovery of protected attributes and proxy features</span></div>
+                    </div>
+                    <div class="compare-group">
+                        <div class="compare-group-label">In-Processing &amp; Post-Processing</div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-green"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>12 loss functions, constraints, ExponentiatedGradient</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-green"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>5 calibration methods, threshold optimisers, reweighting</span></div>
+                    </div>
+                    <div class="compare-group">
+                        <div class="compare-group-label">Operations</div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-green"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>CI/CD gates, hierarchical gates, pytest plugin</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-green"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Pre-commit hooks, CI/CD templates, robustness tests</span></div>
+                    </div>
+                    <div class="compare-group">
+                        <div class="compare-group-label">Rendering &amp; Monitoring</div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-green"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>SVG template library (carries the validant.ai mark)</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-green"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Drift detection, temporal analysis, MLflow &amp; W&amp;B</span></div>
+                    </div>
+                </div>
+                <div class="compare-footer">
+                    <div class="compare-meta"><span>Distribution</span><strong>PyPI (0.1.0 beta, first publish pending); GitHub source</strong></div>
+                    <div class="compare-meta"><span>Support</span><strong>Community / GitHub Issues</strong></div>
+                </div>
+                <div class="compare-cta">
+                    <a class="btn btn-secondary" href="../getting-started/index.html">Get started</a>
+                </div>
+            </div>
+
+            <!-- SUPPORTER / PRO -->
+            <div class="compare-col compare-col--featured">
+                <div class="compare-header">
+                    <h3>vfairness Pro</h3>
+                    <div class="compare-price"><span class="compare-price__strike">USD 19</span><span class="compare-price__amount">USD 9</span><span class="compare-price__period">/mo</span></div>
+                    <p class="compare-license">Supporter patronage &middot; beta price, rounded down from USD 19</p>
+                </div>
+                <div class="compare-body">
+                    <div class="compare-group">
+                        <div class="compare-group-label">Everything in Free, plus</div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Unbranded SVGs and reports with a clear conscience: the branding switch is free and unconditional, and sponsors are the people we ask to use it</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Private support: your sponsorship is not listed publicly. Public naming starts at Patron</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Directly fund new metrics, methods, and ongoing maintenance</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Your feature requests read first, and an open line on where the project goes next</span></div>
+                    </div>
+                    <div class="compare-group">
+                        <div class="compare-group-label">Suggested pricing</div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>USD 19/mo. Beta: USD 9/mo</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Pay what you want, per package, not per seat</span></div>
+                    </div>
+                    <div class="compare-group">
+                        <div class="compare-group-label">Patronage, not a purchase</div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Support for the project, not a purchase of guarantees, an SLA, or legal assurance. <a href="../legal/index.html#sponsorship-terms" style="color:inherit;text-decoration:underline;">See terms</a>.</span></div>
+                    </div>
+                </div>
+                <div class="compare-footer">
+                    <div class="compare-meta"><span>Distribution</span><strong>The same package and install route</strong></div>
+                    <div class="compare-meta"><span>Support</span><strong>Community</strong></div>
+                </div>
+                <div class="compare-cta">
+                    <a class="btn btn-primary btn-sponsor" href="https://github.com/sponsors/validantai" target="_blank" rel="noopener">Sponsor on GitHub</a>
+                    <span class="compare-cta__note">Recurring or one-time, public or private. Any amount.</span>
+                </div>
+                <div class="pro-ribbon-wrap"><span class="pro-ribbon" data-clip-ok>Pending approval</span></div>
+            </div>
+
+            <!-- SPONSOR / PATRON -->
+            <div class="compare-col pro">
+                <!-- Dante, the Responsible AI Advocate (peeks up from this column) -->
+                <div class="dante-anchor" id="dante-anchor" role="img" aria-label="Dante, the validant.ai Responsible AI Advocate, says: psst… USD 50+ gets the Platform!">
+                    <div class="dante-wrapper" id="dante">
+                        <img src="../img/Dante_closeup_trans.png" alt="" />
+                    </div>
+                    <span class="dante-bubble" aria-hidden="true">psst… USD 50+ gets the Platform!</span>
+                </div>
+                <div class="compare-header">
+                    <h3>Patron</h3>
+                    <div class="compare-price"><span class="compare-price__from">from</span><span class="compare-price__strike">USD 50</span><span class="compare-price__amount">USD 25</span><span class="compare-price__period">/mo</span></div>
+                    <p class="compare-license">Patronage for the mission &middot; 50% off in beta</p>
+                </div>
+                <div class="compare-body">
+                    <div class="compare-group">
+                        <div class="compare-group-label">Everything in Pro, plus</div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Sponsor USD 50/mo or more (beta USD 25) and Platform Pro is included: you already pay, so no double charge</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Corporate Patrons (from USD 1000/mo, beta USD 500): your company logo here and a named backer credit</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Validant Platform Pro for you (Corporate Patrons cover a whole organisation). Link your GitHub sponsorship once in the platform; Pro lapses if the sponsorship stops</span></div>
+                    </div>
+                    <div class="compare-group">
+                        <div class="compare-group-label">The most social mission</div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Your patronage keeps fairness tooling free and independent for everyone</span></div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Recognized as a backer of the open standard</span></div>
+                    </div>
+                    <div class="compare-group">
+                        <div class="compare-group-label">Still patronage</div>
+                        <div class="compare-item"><svg viewBox="0 0 16 16" fill="currentColor" class="check-blue"><path d="M8 0a8 8 0 110 16A8 8 0 018 0zm3.78 5.22a.75.75 0 00-1.06 0L7 8.94 5.28 7.22a.75.75 0 10-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.25-4.25a.75.75 0 000-1.06z"/></svg><span>Support for a good cause, not a purchase. No SLA, no warranty. <a href="../legal/index.html#sponsorship-terms" style="color:inherit;text-decoration:underline;">See terms</a>.</span></div>
+                    </div>
+                </div>
+                <div class="compare-footer">
+                    <div class="compare-meta"><span>Via</span><strong>GitHub Sponsors</strong></div>
+                    <div class="compare-meta"><span>Includes</span><strong>Validant Platform Pro</strong></div>
+                </div>
+                <div class="compare-cta">
+                    <a class="btn btn-primary btn-sponsor" href="https://github.com/sponsors/validantai" target="_blank" rel="noopener">Become a Patron</a>
+                    <span class="compare-cta__note">Corporate Patron from USD 1000/mo (beta USD 500) through the same page. Already sponsoring? <a href="https://platform.validant.ai/settings" target="_blank" rel="noopener">Link it in the platform</a> to unlock Pro.</span>
+                </div>
+                <div class="pro-ribbon-wrap"><span class="pro-ribbon" data-clip-ok>Pending approval</span></div>
+            </div>
+        </div>
+
+        <p class="support-notify">Sponsorship goes to the <strong>validantai</strong> organization on GitHub. GitHub is still reviewing that Sponsors profile; until it approves it, the buttons above open our GitHub organization page instead of the sponsor form. <a href="mailto:hello@validant.ai?subject=Notify%20me%20when%20vfairness%20sponsorship%20opens">Get notified when it opens.</a> <a href="../legal/index.html#sponsorship-terms">Read the sponsorship terms.</a></p>
+        <p class="section-lead" style="margin-top:2.5rem;">This is patronage, not procurement. Sponsors and Patrons are not buying features or guarantees: the full library is already free for everyone. They are backing a good cause, fairness tooling that stays open, honest, and independent. That is the real value, and the recognition below is our thank-you.</p>
+        <!-- The recognition wall is a shared custom element, not markup: the same
+             <sponsor-wall> renders on the docs landing, inside the platform and on
+             the platform docs, all reading ../data/sponsors.json. Add a sponsor
+             there and every surface updates. See js/sponsor-wall.js. -->
+        <div class="support-recognition">
+            <sponsor-wall src="../data/sponsors.json"></sponsor-wall>
+        </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         THREE-ENTITY ARCHITECTURE
+         ════════════════════════════════════════════════════════════════ -->
+    <section class="offering-section offering-section--bordered">
+        <h2>The Architecture for <span class="grad-text">Trust &amp; Agency</span></h2>
+        <p class="section-lead">Three organisations form an integrated architecture spanning foundation, system, and execution &mdash; together defining, encoding, and embedding trust in AI-driven organisations.</p>
+
+        <div class="arch-grid">
+            <!-- iceberg.digital -->
+            <div class="arch-card">
+                <div class="logo-wrap">
+                    <img src="../img/Iceberg_RG_Logo_v1_black_300.png" alt="Iceberg Research Group">
+                </div>
+                <div class="entity-name"><a href="https://www.iceberg.digital" target="_blank" style="color:inherit;text-decoration:none;">iceberg.digital</a></div>
+                <div class="entity-role grad-text">Defining the Structural Logic</div>
+                <p class="entity-desc">Explores sovereignty, governance, identity, reciprocity, and institutional design. Reframes trust as a systems property shaped by deep design decisions. Trust must be defined structurally before it can be implemented operationally.</p>
+            </div>
+
+            <!-- Arrow -->
+            <div class="arch-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+
+            <!-- validant.ai -->
+            <div class="arch-card">
+                <div class="logo-wrap">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai">
+                </div>
+                <div class="entity-name"><a href="https://www.validant.ai" target="_blank" style="color:inherit;text-decoration:none;">validant.ai</a></div>
+                <div class="entity-role grad-text">Encoding the Systemic Capability</div>
+                <p class="entity-desc">Transforms fairness and governance principles into structured capability frameworks. Embeds fairness objectives, intervention strategies, regulatory alignment, and monitoring logic into the AI lifecycle. Trust becomes measurable and scalable.</p>
+            </div>
+
+            <!-- Arrow -->
+            <div class="arch-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+
+            <!-- Glinz & Company -->
+            <div class="arch-card">
+                <div class="logo-wrap">
+                    <img src="../img/GCO_Logo_v0_7_Lightblue.svg" alt="Glinz &amp; Company GmbH" style="max-height:56px; max-width:200px;">
+                </div>
+                <div class="entity-name"><a href="https://glinz.co" target="_blank" style="color:inherit;text-decoration:none;">Glinz &amp; Company GmbH</a></div>
+                <div class="entity-role grad-text">Embedding in Enterprise Reality</div>
+                <p class="entity-desc">Partners with executive teams to redesign AI-enabled operating models. Aligns governance, analytics, product development, and leadership accountability. Trust becomes anchored in institutional practice.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         MANIFESTO STRIP
+         ════════════════════════════════════════════════════════════════ -->
+    <section class="manifesto-strip" aria-label="Manifesto">
+        <div class="manifesto-inner">
+            <span class="manifesto-mark" aria-hidden="true">&ldquo;</span>
+            <blockquote class="manifesto-quote">
+                <span class="mq-line">Digital trust is not a free lunch.</span>
+                <span class="mq-line">It takes work and it must be earned.</span>
+                <span class="mq-line mq-accent">We make it within reach.</span>
+            </blockquote>
+            <span class="manifesto-mark manifesto-mark--close" aria-hidden="true">&rdquo;</span>
+        </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         PLATFORM VISION
+         ════════════════════════════════════════════════════════════════ -->
+    <section class="platform-section">
+        <div class="offering-section">
+            <span class="grad-badge">Coming Soon</span>
+            <h2 class="mt-4">Validant AI Fairness <span class="grad-text">Platform</span></h2>
+            <p class="section-lead">A separate, hosted product for teams that want managed assurance beyond what a library provides. It is another way to work with us, not part of the library itself. Patrons who sponsor at USD 50/mo or more get Pro included; anyone else can subscribe directly.</p>
+
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <h4>Causal DAG Builder</h4>
+                    <p>Visual directed acyclic graph editor. Drag-and-drop variables, draw causal edges, auto-generate from proxy analysis, and compute path-specific fairness effects.</p>
+                </div>
+                <div class="platform-card">
+                    <h4>Decision Flip Testing</h4>
+                    <p>Automated perturbation of protected attributes with flip rate computation, severity scoring, SHAP/LIME attribution, and API endpoint probing for black-box models.</p>
+                </div>
+                <div class="platform-card">
+                    <h4>Counterfactual Suite</h4>
+                    <p>Twin test framework, counterfactual data generation from causal DAGs, group-level counterfactual analysis, and exportable explanation cards.</p>
+                </div>
+                <div class="platform-card">
+                    <h4>10-Phase Assessment Wizard</h4>
+                    <p>Step-by-step guided workflow automating the full EU AI Act compliance audit &mdash; from data validation through to model card generation.</p>
+                </div>
+                <div class="platform-card">
+                    <h4>What-If Simulator</h4>
+                    <p>Multi-dimensional real-time exploration of thresholds, constraints, and calibration methods. Pareto frontier search and shareable stakeholder views.</p>
+                </div>
+                <div class="platform-card">
+                    <h4>Evidence Packages</h4>
+                    <p>One-click export of the entire assessment &mdash; SVGs, metrics, DAGs, audit trail, model card &mdash; zipped and cryptographically signed for regulatory submission.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         WHY THIS ECOSYSTEM
+         ════════════════════════════════════════════════════════════════ -->
+    <section class="offering-section">
+        <h2>Why This <span class="grad-text">Ecosystem</span></h2>
+        <p class="section-lead">What you gain by building on the validant.ai, iceberg.digital, and Glinz &amp; Company trust architecture.</p>
+
+        <div class="principles-grid">
+            <div class="principle-card">
+                <h4>Full-pipeline fairness from day one</h4>
+                <p>vfairness covers detection, mitigation, calibration, and monitoring in a single Apache-2.0 licensed library. No stitching together five different tools &mdash; install once and run a complete audit from the command line.</p>
+            </div>
+            <div class="principle-card">
+                <h4>Regulatory readiness built in</h4>
+                <p>Pre-built templates for the EU AI Act, NYC Local Law 144, and EEOC guidelines mean your compliance team can produce audit-grade evidence packages without starting from scratch.</p>
+            </div>
+            <div class="principle-card">
+                <h4>Trust grounded in theory, not just tooling</h4>
+                <p>iceberg.digital&rsquo;s research on sovereignty, governance, and institutional design gives you a structural framework for trust &mdash; not just metrics, but a defensible logic for why your system is fair.</p>
+            </div>
+            <div class="principle-card">
+                <h4>Enterprise execution, not just advice</h4>
+                <p>Glinz &amp; Company embeds fairness into your actual operating model &mdash; aligning leadership, product development, analytics, and compliance into a single accountable structure.</p>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         FOOTER
+         ════════════════════════════════════════════════════════════════ -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="brand-logo">
+                    <p>Systems for Trust & Agency. Building tools for responsible AI development.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Documentation</h4>
+                        <ul>
+                            <li><a href="../getting-started/index.html">Getting Started</a></li>
+                            <li><a href="../business-guide/index.html">Business Guide</a></li>
+                            <li><a href="../api-reference/index.html">API Reference</a></li>
+                            <li><a href="../concepts/index.html">Concepts</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="../concepts/references.html">Academic References</a></li>
+                            <li><a href="../concepts/changelog.html">Changelog</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="https://validant.ai" target="_blank">validant.ai</a></li>
+                            <li><a href="https://validant.ai/imprint" target="_blank">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Glinz &amp; Company GmbH (validant.ai). vfairness is licensed under the Apache License 2.0.</p>
+                <div class="footer-legal">
+                    <a href="../legal/index.html">Legal</a>
+                    <span class="footer-dot">&middot;</span>
+                    <a href="../legal/index.html#ai-usage" title="AI-Assisted Development Disclosure">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/></svg>AI-Assisted
+                    </a>
+                </div>
+            </div>
+            <div class="footer-github-mobile">
+                <a href="https://github.com/validantai/vfairness" class="btn" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; vertical-align: -2px;"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    /* Dante peek-up animation — triggered by scroll */
+    (function(){
+        var anchor = document.getElementById('dante-anchor');
+        var d = document.getElementById('dante');
+        if (!d || !anchor) return;
+        var bubble = anchor.querySelector('.dante-bubble');
+        var clickTimer1 = null, clickTimer2 = null, clickTimer3 = null;
+
+        var triggered = false;
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(e) {
+                if (e.isIntersecting && !triggered) {
+                    triggered = true;
+                    observer.disconnect();
+                    /* small delay so the card is visible before Dante peeks */
+                    setTimeout(function() {
+                        d.classList.add('visible');
+                        /* bubble after Dante has mostly risen (transition is 7s + 0.8s delay) */
+                        setTimeout(function(){ anchor.classList.add('peek'); }, 5000);
+                        setTimeout(function(){ anchor.classList.remove('peek'); }, 9000);
+                        /* wiggle only after the peek transition is fully done */
+                        setTimeout(function(){ d.classList.add('wiggle'); }, 8500);
+                    }, 600);
+                }
+            });
+        }, { threshold: 0.5 });
+        observer.observe(anchor.closest('.compare-col') || anchor);
+
+        /* Click on Dante — greeting sequence + ribbon reveal */
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            /* clear any previous greeting timers */
+            clearTimeout(clickTimer1);
+            clearTimeout(clickTimer2);
+            clearTimeout(clickTimer3);
+
+            /* stop wiggle & duck so Dante holds still for the chat */
+            d.classList.remove('wiggle');
+            d.style.animation = 'none';
+            d.style.transform = 'translateY(15%)';
+            d.style.opacity = '1';
+
+            bubble.textContent = "Hey! I\u2019m Dante";
+            bubble.classList.add('dante-bubble--click');
+
+            clickTimer1 = setTimeout(function() {
+                bubble.textContent = "Nice to meet you!";
+            }, 2500);
+
+            clickTimer2 = setTimeout(function() {
+                bubble.classList.remove('dante-bubble--click');
+            }, 5000);
+
+            /* restore original text and wiggle after fade-out */
+            clickTimer3 = setTimeout(function() {
+                bubble.textContent = "psst\u2026 USD 50+ gets the Platform!";
+                d.style.animation = '';
+                d.style.transform = '';
+                d.style.opacity = '';
+                d.classList.add('wiggle');
+            }, 5400);
+        });
+    })();
+    </script>
+    <script defer src="../js/main.js"></script>
+</body>
+</html>

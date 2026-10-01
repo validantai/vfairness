@@ -1,0 +1,369 @@
+{# ── Fairness Detailed Report · vfairness Design System v4 · 680-width ── #}
+
+{# ══ Three states, never two ══════════════════════════════════════════════
+   A row is could-not-check when the adapter says so. It signals that two ways,
+   and either is enough: an explicit `state` field, or the "COULD NOT CHECK"
+   prefix it writes into the row's own interpretation line. The direction test
+   itself is NOT repeated here; the shared
+   evaluation.vfairness_metrics._metric_direction helper already decided it and
+   the adapter carries the answer onto the canvas.
+
+   Counted first, because the caveat it produces changes the page height. #}
+{% macro cnc_flag(m) %}{% if (m.state is defined and m.state == 'could_not_check') or (m.could_not_check is defined and m.could_not_check) or ('COULD NOT CHECK' in (m.interpretation|default('', true)|string|upper)) %}1{% endif %}{% endmacro %}
+
+{% set _ns = namespace(unchecked=0) %}
+{% for _m in metrics %}
+{% if cnc_flag(_m)|trim == '1' %}{% set _ns.unchecked = _ns.unchecked + 1 %}{% endif %}
+{% endfor %}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set score_h = 16 %}
+{% set stats_h = 54 %}
+{% set metrics_header_h = 36 %}
+{% set metrics_row_h = 36 %}
+{% set metrics_h = metrics_header_h + metrics|length * metrics_row_h + 16 %}
+{% set groups_header_h = 36 %}
+{% set groups_row_h = 32 %}
+{% set groups_h = groups_header_h + groups|length * groups_row_h + 16 %}
+{% set pairwise_header_h = 36 %}
+{% set pairwise_row_h = 28 %}
+{% set pairwise_h = pairwise_header_h + pairwise_comparisons|length * pairwise_row_h + 16 %}
+{% set findings_header_h = 36 %}
+{% set findings_item_h = 24 %}
+{% set findings_h = findings_header_h + key_findings|length * findings_item_h + 16 %}
+{% set rec_header_h = 36 %}
+{% set rec_item_h = 24 %}
+{% set rec_h = rec_header_h + recommendations|length * rec_item_h + 16 %}
+{% set exp_h = 0 %}
+{# One extra line in the explanation panel when metrics went unchecked, UNLESS
+   the paragraph already carries the caveat itself.
+
+   The auto-generated paragraph used to be written from the score alone, so it
+   read "Overall fairness is FAIR with a score of 90/100" beside a banner this
+   template had already downgraded, and the same sentence went into the
+   accessible <desc> (rendering.explain::_fr_detailed_report now derives both
+   from this same third state). This line stays as the backstop for a
+   CALLER-SUPPLIED explanation, which nothing downgrades: the caveat must reach
+   the canvas either way, and exactly once. #}
+{% set _exp_has_cnc = 'COULD NOT CHECK' in (explanation|default('', true)|string|upper) %}
+{% set _caveat_h = 16 if (_ns.unchecked and not _exp_has_cnc) else 0 %}
+{% if explanation %}
+{% set _pre_exp = explanation|wordwrap(105) %}
+{% set exp_h = 44 + _pre_exp.split('\n')|length * 16 + _caveat_h %}
+{% endif %}
+
+{% set score_y = header_h %}
+{% set stats_y = score_y + score_h %}
+{% set metrics_y = stats_y + stats_h %}
+{% set groups_y = metrics_y + metrics_h + 16 %}
+{% set pairwise_y = groups_y + groups_h + 16 %}
+{% set findings_y = pairwise_y + pairwise_h + 16 %}
+{% set rec_y = findings_y + findings_h + 16 %}
+{% set exp_y = rec_y + rec_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   Armed by the adapter when the report carried no score, no metric and no
+   group. Everything below the title goes: the score badge, the stats row, and
+   the four tables. Their headers alone were the claim, because an empty metrics
+   table under "0 metrics evaluated" beside GROUPS 0 is a count of zero, and a
+   count of zero is not a finding of zero. #}
+{% if not_assessable %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = 140 %}
+{% set exp_y = na_y + na_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+
+{# ── Assessment colors ──
+   The banner is a claim about the whole report, so it is downgraded whenever
+   ANY metric could not be checked: "FAIRNESS SCORE 90/100 FAIR" beside an
+   unchecked metric certifies work that never happened. A missing score is its
+   own third state and must not reach the numeric comparisons below, which
+   raised TypeError on None and took the whole render down. #}
+{% set _no_score = fairness_score is none or fairness_score is string %}
+{% set _downgraded = _no_score or _ns.unchecked > 0 %}
+{% if _downgraded %}
+{% set score_color = '#64748b' %}
+{% set score_bg = '#f1f5f9' %}
+{% else %}
+{% set score_color = '#059669' if fairness_score >= 70 else '#f59e0b' if fairness_score >= 40 else '#dc2626' %}
+{% set score_bg = '#ecfdf5' if fairness_score >= 70 else '#fef3c7' if fairness_score >= 40 else '#fef2f2' %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}
+<text x="644" y="32" text-anchor="end" font-size="9" fill="#b0b8c4">{{ timestamp }}</text>
+{% endif %}
+<rect x="36" y="52" width="644" height="1.5" fill="url(#accent)"/>
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{% if not_assessable %}
+<text x="36" y="122" font-size="10" fill="#64748b">No metric was evaluated and no group was compared</text>
+{% else %}
+<text x="36" y="122" font-size="10" fill="#64748b">{{ task_type|capitalize }} fairness analysis · {{ attribute_name }} · {{ metrics|length }} metrics evaluated</text>
+{% endif %}
+
+{% if not_assessable %}
+{% include '_could_not_check.svg' %}
+{% else %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Score badge                                                       #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="460" y="68" width="220" height="64" rx="10" fill="#ffffff"/>
+<rect x="460" y="68" width="2.5" height="64" rx="1" fill="{{ score_color }}"/>
+<text x="476" y="82" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.5">FAIRNESS SCORE</text>
+{% if _no_score %}
+{# No score at all. Printing it through |int would render a confident "0/100",
+   which is the opposite lie to the old "5000/100 FAIR".
+
+   This branch was unreachable until 2026-08-27: the adapter short-circuited a
+   missing score to a bespoke card that never came near this template, so the
+   third state written here had never once been drawn. The wording is
+   NOT ASSESSABLE, matching regression_fairness.svg and pinned by
+   tests/test_rendering_direction.py; no assessment badge is drawn beside it,
+   and rendering.explain::_fr_detailed_report leads the <desc> with
+   COULD NOT CHECK off the same absent score. #}
+<text x="476" y="106" font-size="14" font-weight="700" fill="#64748b">· NOT ASSESSABLE</text>
+<text x="476" y="122" font-size="8" fill="#94a3b8">no fairness score was produced for this report</text>
+{% else %}
+{% set _score_str = fairness_score|int|string %}
+{% set _score_x_end = 476 + _score_str|length * 16 %}
+{% set _slash100_end = _score_x_end + 28 %}
+<text x="476" y="112" font-size="26" font-weight="700" fill="{{ score_color }}">{{ fairness_score|int }}</text>
+<text x="{{ _score_x_end + 2 }}" y="112" font-size="11" fill="#94a3b8">/100</text>
+
+{# Assessment badge. It reads COULD NOT CHECK, not FAIR/MARGINAL/UNFAIR, as soon
+   as one metric went unchecked: the score was computed over the metrics that
+   WERE checked and cannot speak for the others. #}
+<rect x="{{ _slash100_end + 6 }}" y="98" width="{{ 668 - _slash100_end - 6 }}" height="18" rx="9" fill="{{ score_bg }}"/>
+<text x="{{ (_slash100_end + 6 + 668) // 2 }}" y="111" text-anchor="middle" font-size="8" font-weight="700" fill="{{ score_color }}">{% if _ns.unchecked %}COULD NOT CHECK{% else %}{{ overall_assessment }}{% endif %}</text>
+{% endif %}
+{% if _ns.unchecked %}
+<text x="668" y="146" text-anchor="end" font-size="8" font-weight="600" fill="#64748b">· {{ _ns.unchecked }} metric(s) could not be checked</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Stats row                                                         #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ stats_y }}" width="150" height="40" rx="8" fill="#ffffff"/>
+<text x="56" y="{{ stats_y + 14 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.5" font-weight="600">TASK TYPE</text>
+<text x="56" y="{{ stats_y + 30 }}" font-size="10" font-weight="600" fill="#0f172a">{{ task_type }}</text>
+
+<rect x="198" y="{{ stats_y }}" width="150" height="40" rx="8" fill="#ffffff"/>
+<text x="218" y="{{ stats_y + 14 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.5" font-weight="600">SAMPLES</text>
+<text x="218" y="{{ stats_y + 30 }}" font-size="10" font-weight="600" fill="#0f172a">{{ n_samples }}</text>
+
+<rect x="360" y="{{ stats_y }}" width="150" height="40" rx="8" fill="#ffffff"/>
+<text x="380" y="{{ stats_y + 14 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.5" font-weight="600">GROUPS</text>
+<text x="380" y="{{ stats_y + 30 }}" font-size="10" font-weight="600" fill="#0f172a">{{ n_groups }}</text>
+
+<rect x="522" y="{{ stats_y }}" width="158" height="40" rx="8" fill="#ffffff"/>
+<text x="542" y="{{ stats_y + 14 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.5" font-weight="600">ATTRIBUTE</text>
+<text x="542" y="{{ stats_y + 30 }}" font-size="10" font-weight="600" fill="#0f172a">{{ attribute_name|truncate_text(18) }}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Metrics table                                                     #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ metrics_y }}" width="644" height="{{ metrics_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ metrics_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">METRIC</text>
+<text x="280" y="{{ metrics_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">VALUE</text>
+<text x="380" y="{{ metrics_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">THRESHOLD</text>
+<text x="490" y="{{ metrics_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">STATUS</text>
+<line x1="56" y1="{{ metrics_y + 30 }}" x2="660" y2="{{ metrics_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for metric in metrics %}
+{% set ry = metrics_y + metrics_header_h + loop.index0 * metrics_row_h %}
+{% set _cnc = cnc_flag(metric)|trim == '1' %}
+
+{# Row highlight. Red is reserved for a MEASURED breach: "we could not check" is
+   not "we checked and it failed", so could-not-check takes the neutral slate
+   stripe instead. #}
+{% if _cnc %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ metrics_row_h }}" fill="#f1f5f9" opacity="0.5"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ metrics_row_h }}" fill="#64748b"/>
+{% elif not metric.passed %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ metrics_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ metrics_row_h }}" fill="#dc2626"/>
+{% endif %}
+
+{# Metric name + interpretation #}
+<text x="56" y="{{ ry + 16 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ metric.name|truncate_text(28) }}</text>
+{% if metric.interpretation %}
+<text x="56" y="{{ ry + 28 }}" font-size="8" fill="#94a3b8">{{ metric.interpretation|truncate_text(38) }}</text>
+{% endif %}
+
+{# Value #}
+<text x="280" y="{{ ry + 20 }}" font-size="13" font-weight="700" fill="{{ '#64748b' if _cnc else ('#dc2626' if not metric.passed else '#059669') }}">{{ metric.value|f4 }}</text>
+
+{# ── Threshold, stated in the metric's OWN direction ──
+   A hardcoded "<=" misstated the four-fifths rule to the reader: the rule is a
+   FLOOR, so "Disparate Impact Ratio | 1.0000 | <= 0.80 | PASS" contradicted the
+   very badge beside it. The direction is NOT re-derived from the metric name
+   here (the shared _metric_direction helper owns that, and this template cannot
+   call it): it is read back off the comparison the adapter already performed,
+   so the operator can never disagree with the verdict in the same row.
+
+   `metric.direction`, when an adapter supplies it, wins outright. Otherwise:
+     PASS  + only abs(v) <= t satisfied  -> the bound is a ceiling
+     PASS  + only v >= t satisfied       -> the bound is a floor
+     FAIL  + abs(v) > t                  -> the bound was a ceiling
+     FAIL  + v < t                       -> the bound was a floor
+   When both or neither relation fits, no operator is asserted at all. #}
+{% set _dir = metric.direction|default('', true)|string|lower %}
+{% set _num = metric.value is number and metric.threshold is number %}
+{% set _lo_ok = _num and (metric.value|abs) <= metric.threshold %}
+{% set _hi_ok = _num and metric.value >= metric.threshold %}
+{% if _dir == 'higher_is_better' %}{% set _op = '≥' %}
+{% elif _dir == 'lower_is_better' %}{% set _op = '≤' %}
+{% elif _cnc or not _num %}{% set _op = '' %}
+{% elif metric.passed %}{% set _op = '≤' if (_lo_ok and not _hi_ok) else ('≥' if (_hi_ok and not _lo_ok) else '') %}
+{% else %}{% set _op = '≤' if (_hi_ok and not _lo_ok) else ('≥' if (_lo_ok and not _hi_ok) else '') %}
+{% endif %}
+<text x="380" y="{{ ry + 20 }}" font-size="10.5" fill="#6b7280">{% if _op %}{{ _op }} {% endif %}{{ metric.threshold|f2 }}{% if _cnc %} (not applied){% endif %}</text>
+
+{# Status badge: three states, and the third borrows neither palette. #}
+{% if _cnc %}
+<rect x="480" y="{{ ry + 6 }}" width="56" height="20" rx="10" fill="#f1f5f9"/>
+<text x="508" y="{{ ry + 20 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#64748b">NO DATA</text>
+{% elif metric.passed %}
+<rect x="480" y="{{ ry + 6 }}" width="56" height="20" rx="10" fill="#ecfdf5"/>
+<text x="508" y="{{ ry + 20 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#059669">PASS</text>
+{% else %}
+<rect x="480" y="{{ ry + 6 }}" width="56" height="20" rx="10" fill="#fef2f2"/>
+<text x="508" y="{{ ry + 20 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#dc2626">FAIL</text>
+{% endif %}
+
+{# Row separator #}
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + metrics_row_h }}" x2="660" y2="{{ ry + metrics_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Group statistics table                                            #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ groups_y }}" width="644" height="{{ groups_h }}" rx="10" fill="#ffffff"/>
+
+{# Section title #}
+<text x="56" y="{{ groups_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">GROUP</text>
+<text x="220" y="{{ groups_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">SIZE</text>
+<text x="320" y="{{ groups_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">POS RATE</text>
+<text x="440" y="{{ groups_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">TPR</text>
+<text x="560" y="{{ groups_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">FPR</text>
+<line x1="56" y1="{{ groups_y + 30 }}" x2="660" y2="{{ groups_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for group in groups %}
+{% set gy = groups_y + groups_header_h + loop.index0 * groups_row_h %}
+
+<text x="56" y="{{ gy + 18 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ group.name|truncate_text(22) }}</text>
+{# "0" in the SIZE column says this stratum is EMPTY, which is the finding an
+   auditor hunts for, and it used to be printed for any row carrying neither a
+   "size" nor a "count" key. Absent is not zero. #}
+<text x="220" y="{{ gy + 18 }}" font-size="10.5" fill="{{ '#94a3b8' if group.size is none else '#6b7280' }}">{% if group.size is none %}not reported{% else %}{{ group.size }}{% endif %}</text>
+<text x="320" y="{{ gy + 18 }}" font-size="10.5" fill="#6b7280">{{ group.positive_rate|pct1 }}</text>
+<text x="440" y="{{ gy + 18 }}" font-size="10.5" fill="#6b7280">{{ group.tpr|pct1 }}</text>
+<text x="560" y="{{ gy + 18 }}" font-size="10.5" fill="#6b7280">{{ group.fpr|pct1 }}</text>
+
+{% if not loop.last %}
+<line x1="56" y1="{{ gy + groups_row_h }}" x2="660" y2="{{ gy + groups_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Pairwise disparities table                                       #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ pairwise_y }}" width="644" height="{{ pairwise_h }}" rx="10" fill="#ffffff"/>
+
+<text x="56" y="{{ pairwise_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">GROUP A</text>
+<text x="220" y="{{ pairwise_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">GROUP B</text>
+<text x="380" y="{{ pairwise_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">DISPARITY</text>
+<line x1="56" y1="{{ pairwise_y + 30 }}" x2="660" y2="{{ pairwise_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for comp in pairwise_comparisons %}
+{% set py = pairwise_y + pairwise_header_h + loop.index0 * pairwise_row_h %}
+<text x="56" y="{{ py + 16 }}" font-size="10" font-weight="500" fill="#0f172a">{{ comp.group_a|truncate_text(18) }}</text>
+<text x="220" y="{{ py + 16 }}" font-size="10" font-weight="500" fill="#0f172a">{{ comp.group_b|truncate_text(18) }}</text>
+
+{# Disparity value with bar. Three states, never two: this cell is BANDED
+   (green below 0.05, amber below 0.10, red above) and drawn as a bar whose
+   width is the value, so a defaulted 0 rendered the strongest all-clear the
+   table can express for a pair the report never compared. A pair with no
+   reported difference gets no number, no colour and no bar. #}
+{% if comp.disparity is none %}
+<text x="380" y="{{ py + 16 }}" font-size="10" font-weight="600" fill="#64748b">not reported</text>
+{% else %}
+{% set disp_abs = comp.disparity|abs %}
+{% set disp_color = '#dc2626' if disp_abs > 0.1 else '#f59e0b' if disp_abs > 0.05 else '#059669' %}
+{% set bar_w = min(180, disp_abs * 1000) %}
+<rect x="380" y="{{ py + 6 }}" width="{{ bar_w }}" height="10" rx="3" fill="{{ disp_color }}" opacity="0.2"/>
+<text x="380" y="{{ py + 16 }}" font-size="10" font-weight="600" fill="{{ disp_color }}">{{ comp.disparity|f3 }}</text>
+{% endif %}
+
+{% if not loop.last %}
+<line x1="56" y1="{{ py + pairwise_row_h }}" x2="660" y2="{{ py + pairwise_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Key findings panel                                                #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ findings_y }}" width="644" height="{{ findings_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ findings_y }}" width="2.5" height="{{ findings_h }}" rx="1" fill="#3b82f6"/>
+<text x="56" y="{{ findings_y + 22 }}" font-size="8" font-weight="600" fill="#3b82f6" letter-spacing="0.5">KEY FINDINGS</text>
+<line x1="56" y1="{{ findings_y + 30 }}" x2="660" y2="{{ findings_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+
+{% for finding in key_findings %}
+<circle cx="64" cy="{{ findings_y + findings_header_h + 6 + loop.index0 * findings_item_h }}" r="2.5" fill="#3b82f6"/>
+<text x="76" y="{{ findings_y + findings_header_h + 10 + loop.index0 * findings_item_h }}" font-size="9.5" fill="#6b7280">{{ finding|truncate_text(100) }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Recommendations panel                                             #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ rec_y }}" width="644" height="{{ rec_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ rec_y }}" width="2.5" height="{{ rec_h }}" rx="1" fill="#059669"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="8" font-weight="600" fill="#059669" letter-spacing="0.5">RECOMMENDATIONS</text>
+<line x1="56" y1="{{ rec_y + 30 }}" x2="660" y2="{{ rec_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+
+{% for rec in recommendations %}
+<text x="56" y="{{ rec_y + rec_header_h + 10 + loop.index0 * rec_item_h }}" font-size="9.5" font-weight="600" fill="#059669">{{ loop.index }}.</text>
+<text x="72" y="{{ rec_y + rec_header_h + 10 + loop.index0 * rec_item_h }}" font-size="9.5" fill="#6b7280">{{ rec|truncate_text(100) }}</text>
+{% endfor %}
+{% endif %}{# end: not not_assessable #}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 + _caveat_h }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% if _ns.unchecked and not _exp_has_cnc %}
+<text x="56" y="{{ exp_y + 50 + _exp_lines|length * 16 }}" font-size="9.5" font-weight="600" fill="#64748b">COULD NOT CHECK: {{ _ns.unchecked }} metric(s) were never compared to a threshold, so the score above does not cover them.</text>
+{% endif %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

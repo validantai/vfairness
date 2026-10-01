@@ -1,0 +1,142 @@
+{# ── Calibration · Reliability Diagram ── #}
+{# ── vfairness Design System G1 ── #}
+
+{# ── Height computation ── #}
+{% set chart_h_block = 440 %}
+{% set stats_h = 80 %}
+{% set content_start = 140 %}
+{% set chart_end = content_start + chart_h_block %}
+{% set stats_y = chart_end + 16 %}
+{% set stats_end = stats_y + stats_h %}
+{% set exp_y = stats_end + 20 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% else %}
+{% set exp_h = 0 %}
+{% endif %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 {{ total_h }}" font-family="'Inter','Segoe UI',system-ui,-apple-system,sans-serif">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header ── #}
+<rect x="0" y="0" width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ── Verdict badge (top right) ── #}
+<rect x="480" y="72" width="200" height="52" rx="10" fill="{{ verdict_bg }}"/>
+<text x="580" y="94" text-anchor="middle" font-size="16">{{ verdict_icon }}</text>
+<text x="580" y="110" text-anchor="middle" font-size="10" font-weight="700" fill="{{ verdict_color }}">{{ verdict_text }}</text>
+<text x="580" y="122" text-anchor="middle" font-size="8.5" fill="{{ verdict_color }}">{{ verdict_detail }}</text>
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Reliability Diagram Chart                                         #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ content_start }}" width="644" height="{{ chart_h_block }}" rx="10" fill="#ffffff"/>
+
+{# Chart area, adapter computes coordinates for: #}
+{#   chart_left=90  chart_right=520  chart_top=80  chart_bottom=370  #}
+{# We translate so adapter coords map into our layout area            #}
+{% set chart_ox = 56 %}
+{% set chart_oy = content_start + 10 %}
+<g transform="translate({{ chart_ox }},{{ chart_oy }})">
+  {# Local chart geometry (matches adapter) #}
+  {% set cl = 90 %}
+  {% set cr = 520 %}
+  {% set ct = 80 %}
+  {% set cb = 370 %}
+  {% set cw = cr - cl %}
+  {% set ch = cb - ct %}
+
+  {# Grid lines #}
+  {% for i in range(5) %}
+  {% set gy = ct + i * (ch // 4) %}
+  <line x1="{{ cl }}" y1="{{ gy }}" x2="{{ cr }}" y2="{{ gy }}" stroke="#f1f5f9" stroke-width="0.5"/>
+  {% endfor %}
+
+  {# Axes #}
+  <line x1="{{ cl }}" y1="{{ ct }}" x2="{{ cl }}" y2="{{ cb }}" stroke="#cbd5e1" stroke-width="1"/>
+  <line x1="{{ cl }}" y1="{{ cb }}" x2="{{ cr }}" y2="{{ cb }}" stroke="#cbd5e1" stroke-width="1"/>
+
+  {# Perfect calibration diagonal #}
+  <line x1="{{ cl }}" y1="{{ cb }}" x2="{{ cr }}" y2="{{ ct }}" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="{{ cr - 4 }}" y="{{ ct + 14 }}" text-anchor="end" font-size="7.5" fill="#94a3b8" letter-spacing="0.8">PERFECT</text>
+
+  {# Y axis labels #}
+  {% for i in range(6) %}
+  {% set val = (i * 0.2)|f2 %}
+  {% set ly = cb - (i * ch / 5)|int %}
+  <text x="{{ cl - 8 }}" y="{{ ly + 3 }}" text-anchor="end" font-size="8.5" fill="#94a3b8">{{ val }}</text>
+  {% endfor %}
+
+  {# X axis labels #}
+  {% for i in range(6) %}
+  {% set val = (i * 0.2)|f2 %}
+  {% set lx = cl + (i * cw / 5)|int %}
+  <text x="{{ lx }}" y="{{ cb + 16 }}" text-anchor="middle" font-size="8.5" fill="#94a3b8">{{ val }}</text>
+  {% endfor %}
+
+  {# Axis titles #}
+  <text x="{{ (cl + cr) // 2 }}" y="{{ cb + 34 }}" text-anchor="middle" font-size="10" fill="#64748b">Mean Predicted Probability</text>
+  <text x="{{ cl - 40 }}" y="{{ (ct + cb) // 2 }}" text-anchor="middle" font-size="10" fill="#64748b" transform="rotate(-90,{{ cl - 40 }},{{ (ct + cb) // 2 }})">Fraction of Positives</text>
+
+  {# Histogram bars (if enabled) #}
+  {% if show_histogram %}
+  {% for bin in histogram_bins %}
+  {% set bx = cl + (bin.center * cw)|int - 10 %}
+  {% set bh = max(2, (bin.height * 40)|int) %}
+  <rect x="{{ bx }}" y="{{ cb - bh }}" width="20" height="{{ bh }}" fill="#3b82f6" opacity="0.12" rx="2"/>
+  {% endfor %}
+  {% endif %}
+
+  {# Calibration curve #}
+  {% if curve_points %}
+  <polyline points="{{ curve_points }}" fill="none" stroke="{{ curve_color }}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  {% for pt in curve_dots %}
+  <circle cx="{{ pt.x }}" cy="{{ pt.y }}" r="4" fill="{{ curve_color }}" stroke="#ffffff" stroke-width="1.5"/>
+  {% endfor %}
+  {% endif %}
+</g>
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# ECE / MCE Stats Panel                                             #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ stats_y }}" width="310" height="{{ stats_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ stats_y + 18 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">ECE</text>
+<text x="56" y="{{ stats_y + 44 }}" font-size="24" font-weight="700" fill="{{ ece_color }}">{{ ece|f3 }}</text>
+<text x="56" y="{{ stats_y + 62 }}" font-size="8.5" fill="#6b7280">Expected Calibration Error</text>
+
+<rect x="370" y="{{ stats_y }}" width="310" height="{{ stats_h }}" rx="10" fill="#ffffff"/>
+<text x="390" y="{{ stats_y + 18 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.8">MCE</text>
+<text x="390" y="{{ stats_y + 44 }}" font-size="24" font-weight="700" fill="{{ mce_color }}">{{ mce|f3 }}</text>
+<text x="390" y="{{ stats_y + 62 }}" font-size="8.5" fill="#6b7280">Maximum Calibration Error</text>
+
+{# ═══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                  #}
+{# ═══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

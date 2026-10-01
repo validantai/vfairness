@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a3a4f">
+    <meta name="description" content="vfairness Multi-Agent Fairness Testing - Detect emergent bias that no individual agent has">
+    <title>Multi-Agent Fairness Testing | vfairness Documentation</title>
+
+    <link rel="icon" type="image/svg+xml" href="../img/favicon-v2.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script>/* theme before first paint: vf-theme = light | dark | system */(function(){var m='system';try{m=localStorage.getItem('vf-theme')||'system'}catch(e){}var d=m==='dark'||(m==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;r.setAttribute('data-theme',d?'dark':'light');r.setAttribute('data-theme-mode',m)})()</script>
+    <style>
+        /* ── Pipeline module cards ─────────────────────────────────── */
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0;
+            margin: 2rem 0;
+        }
+        .pipeline-module {
+            display: grid;
+            grid-template-columns: 44px 1fr;
+            gap: 0 1.25rem;
+            padding: 1.25rem 1.5rem;
+            border-left: 3px solid var(--mod-color, #94a3b8);
+            background: #fff;
+            border-bottom: 1px solid var(--color-gray-100, #f3f4f6);
+            transition: background 0.15s;
+        }
+        .pipeline-module:hover {
+            background: var(--color-gray-50, #f8fafc);
+        }
+        .pipeline-module:first-child {
+            border-radius: 10px 10px 0 0;
+        }
+        .pipeline-module:last-child {
+            border-radius: 0 0 10px 10px;
+            border-bottom: none;
+        }
+        .mod-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #fff;
+            background: var(--mod-color, #94a3b8);
+            grid-row: span 2;
+            align-self: start;
+            margin-top: 2px;
+        }
+        .mod-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--color-gray-900, #111827);
+            line-height: 1.3;
+        }
+        .mod-title code {
+            font-size: 0.72rem;
+            color: var(--color-gray-500, #6b7280);
+            background: var(--color-gray-100, #f3f4f6);
+            padding: 1px 6px;
+            border-radius: 3px;
+            margin-left: 6px;
+            font-weight: 400;
+        }
+        .mod-desc {
+            font-size: 0.84rem;
+            color: var(--color-gray-600, #4b5563);
+            line-height: 1.45;
+            margin-top: 2px;
+        }
+
+        /* ── Section dividers ──────────────────────────────────────── */
+        .stage-divider {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 3rem 0 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--stage-color, #e2e8f0);
+        }
+        .stage-divider .stage-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--stage-color, #94a3b8);
+            flex-shrink: 0;
+        }
+        .stage-divider h2 {
+            margin: 0;
+            font-size: 1.35rem;
+        }
+
+        /* ── Scenario cards ──────────────────────────────────────── */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0 2rem;
+        }
+        .scenario-card {
+            background: #fff;
+            border: 1px solid var(--color-gray-200, #e5e7eb);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: box-shadow 0.15s;
+        }
+        .scenario-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+        .scenario-card h4 {
+            margin: 0 0 0.5rem;
+            font-size: 0.95rem;
+            color: var(--color-gray-900, #111827);
+        }
+        .scenario-card p {
+            margin: 0;
+            font-size: 0.84rem;
+            color: var(--color-gray-600, #4b5563);
+            line-height: 1.5;
+        }
+
+        /* ── Citation list ───────────────────────────────────────── */
+        .citation-list {
+            list-style: none;
+            padding: 0;
+            margin: 1.5rem 0;
+        }
+        .citation-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--color-gray-100, #f3f4f6);
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: var(--color-gray-700, #374151);
+        }
+        .citation-list li:last-child {
+            border-bottom: none;
+        }
+        .citation-list .citation-title {
+            font-weight: 600;
+            color: var(--color-gray-900, #111827);
+        }
+        .citation-list .citation-authors {
+            color: var(--color-gray-500, #6b7280);
+            font-size: 0.82rem;
+        }
+    </style>
+    <script src="https://validant.ai/consent/v1/consent.js" defer></script>
+  </head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="../index.html">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
+                </a>
+                <span class="logo-divider"></span>
+                <span class="lib-name"><span>v</span>fairness</span>
+            </div>
+            <nav class="main-nav" aria-label="Main navigation">
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="../getting-started/index.html" class="nav-link">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../api-reference/index.html" class="nav-link">API Reference</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Learn
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Learn submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../test-objects/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Find a Test Object</span>
+                                        <span class="nav-dropdown__desc">Data, models and agents to test, by access depth</span>
+                                    </span>
+                                </a>
+                                <a href="../business-guide/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Business Guide</span>
+                                        <span class="nav-dropdown__desc">Fairness strategy for decision-makers</span>
+                                    </span>
+                                </a>
+                                <div class="nav-dropdown__group">
+                                    <div class="nav-dropdown__group-label">
+                                        <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+                                        <span class="nav-dropdown__text">
+                                            <span class="nav-dropdown__label">Sample Assessments</span>
+                                            <span class="nav-dropdown__desc">End-to-end audits with EU AI Act compliance</span>
+                                        </span>
+                                    </div>
+                                    <div class="nav-dropdown__group-items">
+                                        <a href="../sample-assessment/index.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Binary Classifier</span> <span class="sub-desc">— Credit scoring</span></a>
+                                        <a href="../sample-assessment/llm-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Foundation LLM</span> <span class="sub-desc">— Resume screening</span></a>
+                                        <a href="../sample-assessment/cv-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Computer Vision</span> <span class="sub-desc">— Medical imaging</span></a>
+                                        <a href="../sample-assessment/ranking-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Ranking System</span> <span class="sub-desc">&mdash; Job platform</span></a>
+                                    </div>
+                                </div>
+                                <a href="../concepts/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Concepts</span>
+                                        <span class="nav-dropdown__desc">Fairness theory and metric foundations</span>
+                                    </span>
+                                </a>
+                                <a href="../quality-and-hardening/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Quality &amp; Hardening</span>
+                                        <span class="nav-dropdown__desc">Testing, security, and the road to beta</span>
+                                    </span>
+                                </a>
+                                <a href="../release-pipeline/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M12 22V12"/><path d="M3.3 7l8.7 5 8.7-5"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Releasing</span>
+                                        <span class="nav-dropdown__desc">How new versions ship to PyPI</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../our-offering/index.html" class="nav-link">Our Offering</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Explore
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Explore submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../svg-gallery/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">SVG Gallery</span>
+                                        <span class="nav-dropdown__desc">Interactive visualization templates</span>
+                                    </span>
+                                </a>
+                                <a href="../workflow-integration/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Workflow Integration</span>
+                                        <span class="nav-dropdown__desc">MLOps, CI/CD, and experiment tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../usage-map/index.html" role="menuitem" class="nav-dropdown__item" data-um-injected="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Library Usage Map</span>
+                                        <span class="nav-dropdown__desc">Where the platform uses each vfairness symbol</span>
+                                    </span>
+                                </a>
+<a href="../llm-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">LLM Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Counterfactual testing, benchmarks, output analysis for LLMs</span>
+                                    </span>
+                                </a>
+                                <a href="../agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Agent Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Correspondence testing, tool bias, RAG bias, pipeline tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../multi-agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Multi-Agent Testing</span>
+                                        <span class="nav-dropdown__desc">Emergent bias, groupthink, non-compositionality</span>
+                                    </span>
+                                </a>
+                                <a href="../explainability-and-xai/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Explainability &amp; XAI</span>
+                                        <span class="nav-dropdown__desc">SHAP attributions, fairness decomposition, counterfactuals</span>
+                                    </span>
+                                </a>
+                                <a href="../training-time-interventions/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Training-Time Interventions</span>
+                                        <span class="nav-dropdown__desc">Fairness-aware losses, constraints, calibration</span>
+                                    </span>
+                                </a>
+</div>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="nav-cta">
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="Search docs...">
+                    </div>
+                    <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+
+                <button type="button" class="mobile-nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-panel">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+<!-- Mobile Navigation -->
+<div class="mobile-nav-overlay" aria-hidden="true"></div>
+<nav class="mobile-nav-panel" id="mobile-nav-panel" aria-label="Mobile navigation" aria-hidden="true">
+    <div class="mobile-nav-header">
+        <span class="mobile-nav-title">Menu</span>
+        <button type="button" class="mobile-nav-close" aria-label="Close navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div class="mobile-nav-body">
+        <a href="../getting-started/index.html" class="mobile-nav-link">Getting Started</a>
+        <a href="../api-reference/index.html" class="mobile-nav-link">API Reference</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Learn
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../test-objects/index.html" class="mobile-nav-sublink">Find a Test Object</a>
+                <a href="../business-guide/index.html" class="mobile-nav-sublink">Business Guide</a>
+                <span class="mobile-nav-sublink" style="font-size:0.7rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:0.5rem 0 0.15rem;">Sample Assessments</span>
+                <a href="../sample-assessment/index.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Binary Classifier</a>
+                <a href="../sample-assessment/llm-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Foundation LLM</a>
+                <a href="../sample-assessment/cv-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Computer Vision</a>
+                <a href="../sample-assessment/ranking-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Ranking System</a>
+                <a href="../concepts/index.html" class="mobile-nav-sublink">Concepts</a>
+                <a href="../quality-and-hardening/index.html" class="mobile-nav-sublink">Quality &amp; Hardening</a>
+                <a href="../release-pipeline/index.html" class="mobile-nav-sublink">Releasing</a>
+            </div></div>
+        </div>
+        <a href="../our-offering/index.html" class="mobile-nav-link">Our Offering</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Explore
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../svg-gallery/index.html" class="mobile-nav-sublink">SVG Gallery</a>
+                <a href="../workflow-integration/index.html" class="mobile-nav-sublink">Workflow Integration</a>
+                <a href="../usage-map/index.html" class="mobile-nav-sublink" data-um-injected="1">Library Usage Map</a>
+<a href="../llm-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">LLM Fairness Testing</a>
+                <a href="../agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Agent Fairness Testing</a>
+                <a href="../multi-agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Multi-Agent Testing</a>
+                <a href="../explainability-and-xai/index.html" class="mobile-nav-sublink">Explainability &amp; XAI</a>
+                <a href="../training-time-interventions/index.html" class="mobile-nav-sublink">Training-Time Interventions</a>
+</div></div>
+        </div>
+    </div>
+    <div class="mobile-nav-footer">
+        <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            GitHub
+        </a>
+    </div>
+</nav>
+<script>/* Mobile nav bootstrap */
+(function(){
+var t=document.querySelector(".mobile-nav-toggle"),p=document.querySelector(".mobile-nav-panel"),o=document.querySelector(".mobile-nav-overlay"),c=document.querySelector(".mobile-nav-close");
+if(!t||!p)return;t.setAttribute("data-nav-init","1");
+function open(){t.setAttribute("aria-expanded","true");p.classList.add("is-open");p.setAttribute("aria-hidden","false");if(o)o.classList.add("is-open");document.body.style.overflow="hidden";}
+function close(){t.setAttribute("aria-expanded","false");p.classList.remove("is-open");p.setAttribute("aria-hidden","true");if(o)o.classList.remove("is-open");document.body.style.overflow="";}
+t.addEventListener("click",function(){t.getAttribute("aria-expanded")==="true"?close():open();});
+if(c)c.addEventListener("click",close);
+if(o)o.addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList.contains("is-open"))close();});
+})()
+</script>
+
+    <div class="page-wrapper docs-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Multi-Agent Testing</div>
+                <ul class="sidebar-nav">
+                    <li><a href="#why-multi-agent">Why Multi-Agent Testing?</a></li>
+                    <li><a href="#three-tests">The Six Detectors + Capture Harness</a></li>
+                    <li><a href="#quick-start">Quick Start</a></li>
+                    <li><a href="#research-foundation">Research Foundation</a></li>
+                    <li><a href="#when-to-use">When to Use</a></li>
+                    <li><a href="#enterprise-features">Enterprise Features</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Related</div>
+                <ul class="sidebar-nav">
+                    <li><a href="../agent-testing/index.html">Agent Testing</a></li>
+                    <li><a href="../getting-started/index.html">Getting Started</a></li>
+                    <li><a href="../api-reference/index.html">API Reference</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-container">
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     HERO
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="why-multi-agent">
+                    <p class="vf-eyebrow" data-dated>Explore &middot; Multi-agent testing</p>
+                    <h1>Multi-Agent Fairness Testing</h1>
+                    <p class="lead">
+                        Detect emergent bias that no individual agent has.
+                    </p>
+
+                    <h2>Why Multi-Agent Testing?</h2>
+                    <p>
+                        Madigan et al. (2025, arXiv:2512.16433): <em>&ldquo;multi-agent decision systems must be
+                        evaluated as holistic entities rather than through reductionist analyses of their
+                        constituent components.&rdquo;</em> Testing each agent in isolation does not establish
+                        the fairness of the composed system.
+                    </p>
+                    <p>
+                        When multiple AI agents interact, three distinct scenarios arise:
+                    </p>
+
+                    <div class="scenario-grid">
+                        <div class="scenario-card">
+                            <h4>Amplification</h4>
+                            <p>Small biases in individual agents compound through interaction. In a hypothetical
+                            illustration, a 3% disparity in Agent A and a 4% disparity in Agent B could produce a
+                            12% system-level disparity when composed.</p>
+                        </div>
+                        <div class="scenario-card">
+                            <h4>Reduction</h4>
+                            <p>Agents with opposing biases can partially cancel each other out. A system may be fairer
+                            than its worst component &mdash; but only if the cancellation is reliable and not coincidental.</p>
+                        </div>
+                        <div class="scenario-card">
+                            <h4>Novel Emergence</h4>
+                            <p>Bias patterns appear in the composed system that exist in none of the individual agents.
+                            This is the most dangerous scenario because component-level audits will never detect it.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     THE THREE TESTS
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="three-tests">
+                    <div class="stage-divider" style="--stage-color: #9333ea;">
+                        <span class="stage-dot"></span>
+                        <h2>The Six Detectors + Capture Harness</h2>
+                    </div>
+
+                    <p>vfairness provides six specialized detectors for multi-agent fairness analysis plus a framework-agnostic capture harness. Each detector targets a different failure mode and grounds in published methodology.</p>
+                    <a class="notebook-link notebook-link-jupyter" href="https://github.com/validantai/vfairness/blob/main/notebooks/vfairness_9_multi_agent_demo.ipynb"><svg class="jupyter-mark" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="5.2" cy="4.4" r="1.6" fill="#F37726"/><circle cx="18.8" cy="19.6" r="2.0" fill="#F37726"/><circle cx="19.2" cy="4.0" r="1.3" fill="#F37726"/><path d="M12 7.4c4.1 0 7.6 1.5 9 3.6-1.1-3.9-4.7-6.6-9-6.6S4.1 7.1 3 11c1.4-2.1 4.9-3.6 9-3.6z" fill="#F37726"/><path d="M12 16.6c-4.1 0-7.6-1.5-9-3.6 1.1 3.9 4.7 6.6 9 6.6s7.9-2.7 9-6.6c-1.4 2.1-4.9 3.6-9 3.6z" fill="#F37726"/></svg><span><strong>Jupyter notebook, Multi-Agent Demo:</strong> <code>vfairness_9_multi_agent_demo.ipynb</code> The six detectors and the capture harness on a worked multi-agent run.<span class="notebook-link-run">Open it to see this run end to end. Every notebook is executed on each build, so the code here matches the library you installed.</span></span></a>
+
+                    <div class="pipeline-grid">
+                        <div class="pipeline-module" style="--mod-color: #9333ea;">
+                            <div class="mod-num" style="background: #9333ea;">1</div>
+                            <div class="mod-title">CompositionalityAnalyzer <code>multi_agent.compositionality</code></div>
+                            <div class="mod-desc">Compares aggregate component bias against measured system bias. Classifies into four scenarios &mdash; amplification, reduction, novel emergence, consistent &mdash; with a threshold-based test.</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #e11d48;">
+                            <div class="mod-num" style="background: #e11d48;">2</div>
+                            <div class="mod-title">GroupthinkDetector <code>multi_agent.groupthink</code></div>
+                            <div class="mod-desc">Detects echo-chamber convergence via per-round cosine-similarity trajectories, Kendall&rsquo;s tau trend test, coalition detection on the agreement matrix, and a 500-permutation significance test.</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #059669;">
+                            <div class="mod-num" style="background: #059669;">3</div>
+                            <div class="mod-title">EmergentBiasDetector <code>multi_agent.emergent</code></div>
+                            <div class="mod-desc">Tests whether system-level bias exceeds the maximum component bias (amplification factor &gt; 1.5). Bootstrap CI vs. max component bias gives the significance verdict.</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #db2777;">
+                            <div class="mod-num" style="background: #db2777;">4</div>
+                            <div class="mod-title">AdversarialCollusionDetector <code>multi_agent.collusion</code></div>
+                            <div class="mod-desc">Isolates bias <em>amplified by inter-agent interaction</em> (vs. bias already present at the outset). Compares pre- and post-interaction disparity per agent; paired sample-level permutation test for significance. Grounded in Khan et al. (2023), Du et al. (2023), Bianchi et al. (2024).</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #0891b2;">
+                            <div class="mod-num" style="background: #0891b2;">5</div>
+                            <div class="mod-title">DelegationRoutingAuditor <code>multi_agent.delegation</code></div>
+                            <div class="mod-desc">Audits orchestrator routing for demographic-conditional patterns. Categorical generalization of correspondence testing (Bertrand &amp; Mullainathan 2004). Fisher&rsquo;s exact (2&times;2) or chi-square + Cramér&rsquo;s V (k&times;m).</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #d97706;">
+                            <div class="mod-num" style="background: #d97706;">6</div>
+                            <div class="mod-title">NegotiationFairnessTracker <code>multi_agent.negotiation</code></div>
+                            <div class="mod-desc">Per-turn fairness drift in multi-turn dialogues. Mann-Kendall trend test on the per-turn group-conditional disparity series catches gaps that widen or narrow over the negotiation. Davidson et al. (2024); Bianchi et al. (2024).</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #475569;">
+                            <div class="mod-num" style="background: #475569;">7</div>
+                            <div class="mod-title">MultiAgentRunHarness <code>multi_agent.harness</code></div>
+                            <div class="mod-desc">Framework-agnostic capture surface. Wrap your autogen / crewai / langgraph run with <code>record_sample()</code>, <code>record_routing()</code>, <code>record_turn()</code>; the harness produces the exact input shapes each analyzer expects.</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     QUICK START
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="quick-start">
+                    <div class="stage-divider" style="--stage-color: #2c5f7c;">
+                        <span class="stage-dot"></span>
+                        <h2>Quick Start</h2>
+                    </div>
+
+                    <p>Compare individual agent fairness against the composed system.</p>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-lang">python</span>
+                            <button class="code-copy">Copy</button>
+                        </div>
+                        <pre><code class="language-python">from vfairness.multi_agent import CompositionalityAnalyzer, EmergentBiasDetector
+
+# Measure each component on its own, then measure the composed system,
+# and hand both to the analyzer as plain bias scores.
+analyzer = CompositionalityAnalyzer()
+result = analyzer.analyze(
+    component_biases={"screener": 0.05, "evaluator": 0.03, "decision_maker": 0.04},
+    system_bias=0.15,
+)
+
+# Component vs. system comparison
+for agent_name, component_bias in result.component_scores.items():
+    print(f"  {agent_name}: bias = {component_bias:.3f}")
+
+print(f"  System (composed): bias = {result.system_score:.3f}")
+print(result.scenario)     # 'amplification' | 'reduction' | 'novel_emergence' | 'consistent'
+print(result.divergence)   # system bias minus the aggregated component bias
+
+# For the amplification factor, work from the raw outputs instead
+detector = EmergentBiasDetector()
+emergent = detector.analyze(component_outputs, system_outputs, groups)
+print(f"  Amplification factor: {emergent.amplification_factor:.2f}x")
+print(f"  Emergent bias: {emergent.is_emergent}")</code></pre>
+                    </div>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     RESEARCH FOUNDATION
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="research-foundation">
+                    <div class="stage-divider" style="--stage-color: #d97706;">
+                        <span class="stage-dot"></span>
+                        <h2>Research Foundation</h2>
+                    </div>
+
+                    <p>The multi-agent fairness module is grounded in recent academic work on emergent behavior in composed AI systems.</p>
+
+                    <ul class="citation-list">
+                        <li>
+                            <span class="citation-title">Madigan, M., Kamalaruban, P., Moynihan, G., Kempton, T., Sutton, D., &amp; Burrell, S. (2025).</span>
+                            &ldquo;Emergent Bias and Fairness in Multi-Agent Decision Systems.&rdquo;
+                            <em>arXiv:2512.16433 (preprint).</em>
+                            <br><span class="citation-authors">Large-scale simulations of financial multi-agent systems showing patterns of emergent bias that cannot be traced to individual agent components; argues these systems must be evaluated as holistic entities.</span>
+                        </li>
+                        <li>
+                            <span class="citation-title">Coppolillo, E., Manco, G., &amp; Aiello, L. M. (2025).</span>
+                            &ldquo;Unmasking Conversational Bias in AI Multiagent Systems.&rdquo;
+                            <em>arXiv:2501.14844.</em>
+                            <br><span class="citation-authors">Echo-chamber effects in multi-agent LLM conversations: interacting agents can converge on biased outcomes that single-model evaluations miss.</span>
+                        </li>
+                        <li>
+                            <span class="citation-title">Ashery, A. F., Aiello, L. M., &amp; Baronchelli, A. (2025).</span>
+                            &ldquo;Emergent social conventions and collective bias in LLM populations.&rdquo;
+                            <em>arXiv:2410.08948.</em>
+                            <br><span class="citation-authors">Collective bias can emerge in a population of interacting LLM agents even when individual agents show no prior bias.</span>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     WHEN TO USE
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="when-to-use">
+                    <div class="stage-divider" style="--stage-color: #059669;">
+                        <span class="stage-dot"></span>
+                        <h2>When to Use</h2>
+                    </div>
+
+                    <p><strong>Use this when your system has 2+ AI agents that interact.</strong></p>
+
+                    <p>Specifically, multi-agent fairness testing is needed when:</p>
+                    <ul>
+                        <li><strong>Sequential pipelines</strong> &mdash; Agent A's output becomes Agent B's input (e.g., screening then evaluation then decision)</li>
+                        <li><strong>Deliberative systems</strong> &mdash; Multiple agents discuss and reach consensus (e.g., committee-style review)</li>
+                        <li><strong>Orchestrated workflows</strong> &mdash; A coordinator agent delegates to specialist agents based on input characteristics</li>
+                        <li><strong>Feedback loops</strong> &mdash; Agents consume each other's outputs over time (e.g., recommendation + engagement tracking)</li>
+                    </ul>
+
+                    <div class="callout callout-limitation">
+                        <div class="callout-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                            Component Audits Are Necessary but Not Sufficient
+                            <span class="limitation-label">Limitation</span>
+                        </div>
+                        <p>Even if every individual agent passes its fairness audit, the composed system may still be unfair. Multi-agent testing is <strong>not a replacement</strong> for component-level testing &mdash; it is an additional, required layer. Run both.</p>
+                    </div>
+
+                    <p>If your system uses a single LLM or a single model with no agent interactions, use the standard <a href="../agent-testing/index.html">Agent Testing</a> module or the core <a href="../getting-started/index.html">fairness evaluation</a> pipeline instead.</p>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     ENTERPRISE FEATURES
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="enterprise-features">
+                    <div class="stage-divider" style="--stage-color: #059669;">
+                        <div class="stage-dot"></div>
+                        <h2>Enterprise Features</h2>
+                    </div>
+
+                    <p>All multi-agent testing results include production-ready features for audit compliance and system integration.</p>
+
+                    <h3>Audit Trail &amp; Serialization</h3>
+                    <p>Every result carries <code>RunMetadata</code> with timestamp, library version, and full parameter snapshot:</p>
+                    <div class="code-block"><div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+                        <pre><code class="language-python">from vfairness.multi_agent import CompositionalityAnalyzer
+
+analyzer = CompositionalityAnalyzer()
+result = analyzer.analyze(
+    component_biases={"agent_A": 0.08, "agent_B": 0.05},
+    system_bias=0.25
+)
+
+# Audit metadata on every result
+print(result.metadata.timestamp)        # ISO 8601 UTC
+print(result.metadata.library_version)  # the installed vfairness version
+print(result.metadata.parameters)       # {"aggregation_method": "max", "threshold": 0.05, ...}
+
+# Serialize for database storage or reporting
+data = result.to_dict()    # Plain dict
+json_str = result.to_json()  # JSON string</code></pre>
+                    </div>
+
+                    <h3>Structured Logging</h3>
+                    <p>All operations emit structured logs via Python's <code>logging</code> module:</p>
+                    <div class="code-block"><div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+                        <pre><code class="language-python">import logging
+logging.basicConfig(level=logging.INFO)
+
+# Operations now emit structured logs:
+# INFO:vfairness.multi_agent.compositionality:Analyzing 3 components against system bias
+# INFO:vfairness.multi_agent.groupthink:Detecting convergence across 5 rounds
+# WARNING:vfairness.multi_agent.emergent:Bootstrap sample size (50) may produce wide CIs</code></pre>
+                    </div>
+                </section>
+
+                <!-- Navigation -->
+                <div class="flex justify-between mt-12 py-8" style="border-top: 1px solid var(--color-gray-200);">
+                    <a href="../agent-testing/index.html" class="btn btn-secondary">
+                        &larr; Agent Testing
+                    </a>
+                    <a href="../getting-started/index.html" class="btn btn-primary">
+                        Getting Started &rarr;
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="brand-logo">
+                    <p>Systems for Trust & Agency. Building tools for responsible AI development.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Documentation</h4>
+                        <ul>
+                            <li><a href="../getting-started/index.html">Getting Started</a></li>
+                            <li><a href="../business-guide/index.html">Business Guide</a></li>
+                            <li><a href="../api-reference/index.html">API Reference</a></li>
+                            <li><a href="../concepts/index.html">Concepts</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="../concepts/references.html">Academic References</a></li>
+                            <li><a href="../concepts/changelog.html">Changelog</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="https://validant.ai" target="_blank">validant.ai</a></li>
+                            <li><a href="https://validant.ai/imprint#publisher" target="_blank">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 validant.ai. vfairness is licensed under the Apache License 2.0.</p>
+                <div class="footer-legal">
+                    <a href="../legal/index.html">Legal</a>
+                    <span class="footer-dot">&middot;</span>
+                    <a href="../legal/index.html#ai-usage" title="AI-Assisted Development Disclosure">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -1px; margin-right: 3px;"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/></svg>AI-Assisted
+                    </a>
+                </div>
+            </div>
+            <div class="footer-github-mobile">
+                <a href="https://github.com/validantai/vfairness" class="btn" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; vertical-align: -2px;"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="../js/main.js"></script>
+
+    <!-- Scroll-based active section tracking -->
+    <script>
+    (function() {
+        'use strict';
+
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+
+        const sidebarLinks = Array.from(sidebar.querySelectorAll('.sidebar-nav a[href^="#"]'));
+
+        const sectionMap = new Map();
+        const sectionIds = [];
+
+        sidebarLinks.forEach(function(link) {
+            const id = link.getAttribute('href').substring(1);
+            const section = document.getElementById(id);
+            if (section) {
+                sectionMap.set(id, { link: link, element: section });
+                sectionIds.push(id);
+            }
+        });
+
+        if (sectionIds.length === 0) return;
+
+        let currentActiveId = null;
+
+        function setActiveLink(id) {
+            if (id === currentActiveId) return;
+            currentActiveId = id;
+
+            sidebarLinks.forEach(function(link) {
+                link.classList.remove('active');
+            });
+
+            sidebar.querySelectorAll('.sidebar-title.has-active').forEach(function(t) {
+                t.classList.remove('has-active');
+            });
+
+            const current = sectionMap.get(id);
+            if (current) {
+                current.link.classList.add('active');
+
+                if (typeof window.ensureSidebarSectionExpanded === 'function') {
+                    window.ensureSidebarSectionExpanded(current.link);
+                }
+
+                var parentSection = current.link.closest('.sidebar-section');
+                if (parentSection) {
+                    var sectionTitle = parentSection.querySelector('.sidebar-title');
+                    if (sectionTitle) sectionTitle.classList.add('has-active');
+                }
+
+                var linkRect = current.link.getBoundingClientRect();
+                var sidebarRect = sidebar.getBoundingClientRect();
+                if (linkRect.top < sidebarRect.top + 50 || linkRect.bottom > sidebarRect.bottom - 50) {
+                    current.link.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+
+        function updateOnScroll() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const headerHeight = 70;
+            let activeId = sectionIds[0];
+
+            for (let i = 0; i < sectionIds.length; i++) {
+                const id = sectionIds[i];
+                const section = sectionMap.get(id);
+                if (section) {
+                    const rect = section.element.getBoundingClientRect();
+                    const offsetTop = rect.top + scrollTop;
+                    if (scrollTop >= offsetTop - headerHeight - 20) {
+                        activeId = id;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            setActiveLink(activeId);
+        }
+
+        let scrollTimeout;
+        function handleScroll() {
+            if (scrollTimeout) return;
+            scrollTimeout = requestAnimationFrame(function() {
+                updateOnScroll();
+                scrollTimeout = null;
+            });
+        }
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        updateOnScroll();
+
+        sidebarLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                const id = link.getAttribute('href').substring(1);
+                setTimeout(function() { setActiveLink(id); }, 100);
+            });
+        });
+    })();
+    </script>
+</body>
+</html>

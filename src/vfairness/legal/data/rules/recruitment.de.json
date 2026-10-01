@@ -1,0 +1,52 @@
+{
+  "use_case": "recruitment",
+  "jurisdiction": "de",
+  "source_revision": "2026-05-20",
+  "inherits": "recruitment.eu",
+  "rules": {
+    "pregnancy": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "AGG §11; BAG 6.2.2003 - 2 AZR 621/01",
+      "notes": "Pre-hire pregnancy questions are direct sex discrimination; applicants have an established right to lie. Column should not appear in recruitment data."
+    },
+    "religion": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "AGG §1, §11 (exception: tendency employer §9 AGG)",
+      "notes": "Forbidden as a pre-hire question for ordinary employers; tendency employers (church, party, union) may inquire if the belief is essential to the role."
+    },
+    "union_membership": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "AGG §1; Art. 9(3) GG (freedom of association)"
+    },
+    "health": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "AGG §11; BDSG §26(3); BAG 7.6.1984 - 2 AZR 270/83",
+      "notes": "Pre-employment health questions only when directly job-essential (e.g. pilot). Generic health columns are not lawful."
+    },
+    "disability": {
+      "status": "restricted",
+      "legal_basis": "AGG §11; SGB IX §164",
+      "notes": "Severely disabled status may be asked post-contract for the §164 SGB IX framework."
+    },
+    "criminal_record": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "AGG; BAG 20.3.2014 - 2 AZR 1037/12; BZRG",
+      "notes": "Permitted only for job-essential roles (e.g. banking executive, childcare). Generic collection unlawful."
+    },
+    "ethnicity": {
+      "status": "restricted",
+      "legal_basis": "AGG §1; BDSG §26",
+      "notes": "Equality monitoring as a German concept is narrower than UK/US; works council co-determination (§87 BetrVG) applies."
+    },
+    "family_status_planning": {
+      "status": "forbidden",
+      "lifecycle": "pre_hire",
+      "legal_basis": "AGG §11; BAG case law on family-planning questions"
+    }
+  }
+}

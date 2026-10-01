@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#fcfbfa">
+    <meta name="description" content="vfairness - A comprehensive Python library for measuring fairness in machine learning models and detecting bias. Built by validant.ai">
+    <meta name="keywords" content="AI fairness, machine learning, bias detection, algorithmic fairness, ethical AI, MLOps">
+    <meta name="author" content="validant.ai">
+    <meta name="version" content="0.1.0">
+
+    <title>vfairness Documentation | validant.ai</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="img/favicon-v2.svg">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <script>/* theme before first paint: vf-theme = light | dark | system */(function(){var m='system';try{m=localStorage.getItem('vf-theme')||'system'}catch(e){}var d=m==='dark'||(m==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;r.setAttribute('data-theme',d?'dark':'light');r.setAttribute('data-theme-mode',m)})()</script>
+    <script type="module" src="js/sponsor-wall.js"></script>
+
+    <!-- Mermaid for diagrams -->
+    <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { if (typeof mermaid !== 'undefined') { mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { fontFamily: "'Plus Jakarta Sans', -apple-system, 'Segoe UI', sans-serif", primaryColor: '#f4f3f1', primaryBorderColor: '#293b51', primaryTextColor: '#1b2735', lineColor: '#66737e', secondaryColor: '#e6f1f3', tertiaryColor: '#fcfbfa' }}); } });</script>
+    <style>
+        #why-vfairness {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+        #why-vfairness > * { position: relative; z-index: 2; }
+        /* Living gradient background */
+        #why-vfairness::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.06) 0%,
+                rgba(240, 240, 240, 0.04) 25%,
+                rgba(255, 255, 255, 0.07) 50%,
+                rgba(240, 240, 240, 0.04) 75%,
+                rgba(255, 255, 255, 0.06) 100%
+            );
+            background-size: 300% 300%;
+            animation: living-gradient 12s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes living-gradient {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        /* Dot pattern on why-vfairness: scroll-reveal + mouse-reactive */
+        #why-vfairness::before {
+            content: '';
+            position: absolute;
+            inset: -20%;
+            background-image: url("img/aas-pattern-overlay.svg");
+            background-repeat: repeat;
+            background-position:
+                calc(50% + var(--mouse-x, 0px))
+                calc(52% + var(--parallax-y, 0px) + var(--mouse-y, 0px));
+            background-size: 67%;
+            opacity: 0;
+            transform: scale(1.20);
+            filter: blur(6px);
+            transition: opacity 1.2s ease-out, transform 1.6s ease-out, filter 1.4s ease-out;
+            pointer-events: none;
+            z-index: 1;
+            mask-image: linear-gradient(to bottom, transparent 0%, transparent 18%, rgba(0,0,0,0.3) 25%, rgba(0,0,0,1) 35%), radial-gradient(ellipse 60% 54% at 50% 46%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0.35) 68%, rgba(0,0,0,0.08) 84%, transparent 94%);
+            mask-composite: intersect;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 18%, rgba(0,0,0,0.3) 25%, rgba(0,0,0,1) 35%), radial-gradient(ellipse 60% 54% at 50% 46%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0.35) 68%, rgba(0,0,0,0.08) 84%, transparent 94%);
+            -webkit-mask-composite: source-in;
+        }
+        /* Revealed: fade in + de-blur, then JS lerp drives transform */
+        #why-vfairness.dots-revealed::before {
+            opacity: 0.30;
+            transform: scale(var(--dot-scale, 1)) rotate(var(--dot-rotate, 0deg));
+            filter: blur(0px);
+            transition: opacity 0.5s ease-out, filter 0.5s ease-out;
+        }
+        /* Pipeline at-a-glance strip */
+        .pipeline-strip {
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            gap: 0;
+            max-width: 900px;
+            margin: 2.5rem auto 0;
+        }
+        .pipeline-stage {
+            flex: 1;
+            max-width: 220px;
+            text-align: left;
+            padding: 1.1rem 1rem 1rem;
+            position: relative;
+            background: #fff;
+            border: 1px solid var(--rule);
+            transition: border-color 0.2s ease;
+        }
+        .pipeline-stage:hover {
+            border-color: var(--rule-strong);
+        }
+        /* Ink outline, not four hues: the stages are a sequence, and the
+           sequence is carried by the arrows, not by colour. */
+        .pipeline-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: transparent !important;
+            border: 1px solid var(--rule-strong);
+            color: var(--color-gray-800);
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            flex-shrink: 0;
+        }
+        .pipeline-verb {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--color-gray-900);
+            margin-bottom: 0.25rem;
+        }
+        .pipeline-desc {
+            font-size: 0.78rem;
+            color: var(--color-gray-500);
+            line-height: 1.4;
+        }
+        .pipeline-arrow {
+            display: flex;
+            align-items: center;
+            padding: 0 0.15rem;
+            flex-shrink: 0;
+        }
+        .pipeline-arrow svg {
+            width: 28px;
+            height: 28px;
+            color: var(--color-gray-300);
+        }
+        @media (max-width: 700px) {
+            .pipeline-strip {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: center;
+            }
+            .pipeline-stage { max-width: 44%; flex-basis: 44%; }
+            .pipeline-arrow { display: none; }
+        }
+        /* Mobile: disable heavy dot pattern, living gradient, and blur effects */
+        @media (max-width: 768px) {
+            #why-vfairness::before,
+            #why-vfairness::after {
+                display: none;
+            }
+            #why-vfairness {
+                animation: none;
+            }
+        }
+
+        /* Pipeline filter: active stage highlight */
+        .pipeline-stage {
+            cursor: pointer;
+            user-select: none;
+        }
+        .pipeline-stage.ps-active {
+            border-color: var(--color-primary);
+            box-shadow: inset 0 -2px 0 var(--color-primary);
+        }
+        /* FLIP grid: positioning context */
+        #feature-cards { position: relative; }
+
+        /* Integration logo strip */
+        .integration-section { text-align: center; }
+        .integration-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 0;
+        }
+        .integration-logo {
+            height: 36px;
+            width: auto;
+            opacity: 0.4;
+            filter: grayscale(1);
+            transition: all 0.3s ease;
+        }
+        .integration-logo:hover {
+            opacity: 1;
+            filter: grayscale(0);
+        }
+    </style>
+    <script src="https://validant.ai/consent/v1/consent.js" defer></script>
+  </head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="index.html">
+                    <img src="img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
+                </a>
+                <span class="logo-divider"></span>
+                <span class="lib-name"><span>v</span>fairness</span>
+            </div>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="getting-started/index.html" class="nav-link">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="api-reference/index.html" class="nav-link">API Reference</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Learn
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Learn submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="test-objects/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Find a Test Object</span>
+                                        <span class="nav-dropdown__desc">Data, models and agents to test, by access depth</span>
+                                    </span>
+                                </a>
+                                <a href="business-guide/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Business Guide</span>
+                                        <span class="nav-dropdown__desc">Fairness strategy for decision-makers</span>
+                                    </span>
+                                </a>
+                                <div class="nav-dropdown__group">
+                                    <div class="nav-dropdown__group-label">
+                                        <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+                                        <span class="nav-dropdown__text">
+                                            <span class="nav-dropdown__label">Sample Assessments</span>
+                                            <span class="nav-dropdown__desc">End-to-end audits with EU AI Act compliance</span>
+                                        </span>
+                                    </div>
+                                    <div class="nav-dropdown__group-items">
+                                        <a href="sample-assessment/index.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Binary Classifier</span> <span class="sub-desc">Credit scoring</span></a>
+                                        <a href="sample-assessment/llm-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Foundation LLM</span> <span class="sub-desc">Resume screening</span></a>
+                                        <a href="sample-assessment/cv-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Computer Vision</span> <span class="sub-desc">Medical imaging</span></a>
+                                        <a href="sample-assessment/ranking-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Ranking System</span> <span class="sub-desc">Job platform</span></a>
+                                    </div>
+                                </div>
+                                <a href="concepts/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Concepts</span>
+                                        <span class="nav-dropdown__desc">Fairness theory and metric foundations</span>
+                                    </span>
+                                </a>
+                                <a href="quality-and-hardening/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Quality &amp; Hardening</span>
+                                        <span class="nav-dropdown__desc">Testing, security, and the road to beta</span>
+                                    </span>
+                                </a>
+                                <a href="release-pipeline/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M12 22V12"/><path d="M3.3 7l8.7 5 8.7-5"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Releasing</span>
+                                        <span class="nav-dropdown__desc">How new versions ship to PyPI</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a href="our-offering/index.html" class="nav-link">Our Offering</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Explore
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Explore submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="svg-gallery/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">SVG Gallery</span>
+                                        <span class="nav-dropdown__desc">Interactive visualization templates</span>
+                                    </span>
+                                </a>
+                                <a href="workflow-integration/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Workflow Integration</span>
+                                        <span class="nav-dropdown__desc">MLOps, CI/CD, and experiment tracking</span>
+                                    </span>
+                                </a>
+                                <a href="usage-map/index.html" role="menuitem" class="nav-dropdown__item" data-um-injected="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Library Usage Map</span>
+                                        <span class="nav-dropdown__desc">Where the platform uses each vfairness symbol</span>
+                                    </span>
+                                </a>
+<a href="llm-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">LLM Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Counterfactual testing, benchmarks, output analysis for LLMs</span>
+                                    </span>
+                                </a>
+                                <a href="agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Agent Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Correspondence testing, tool bias, RAG bias, pipeline tracking</span>
+                                    </span>
+                                </a>
+                                <a href="multi-agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Multi-Agent Testing</span>
+                                        <span class="nav-dropdown__desc">Emergent bias, groupthink, non-compositionality</span>
+                                    </span>
+                                </a>
+                                <a href="explainability-and-xai/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Explainability &amp; XAI</span>
+                                        <span class="nav-dropdown__desc">SHAP attributions, fairness decomposition, counterfactuals</span>
+                                    </span>
+                                </a>
+                                <a href="training-time-interventions/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Training-Time Interventions</span>
+                                        <span class="nav-dropdown__desc">Fairness-aware losses, constraints, calibration</span>
+                                    </span>
+                                </a>
+
+
+</div>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="nav-cta">
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="Search docs...">
+                    </div>
+                    <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+
+                <button type="button" class="mobile-nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-panel">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav-overlay" aria-hidden="true"></div>
+    <nav class="mobile-nav-panel" id="mobile-nav-panel" aria-label="Mobile navigation" aria-hidden="true">
+        <div class="mobile-nav-header">
+            <span class="mobile-nav-title">Menu</span>
+            <button type="button" class="mobile-nav-close" aria-label="Close navigation">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="mobile-nav-body">
+            <a href="getting-started/index.html" class="mobile-nav-link">Getting Started</a>
+            <a href="api-reference/index.html" class="mobile-nav-link">API Reference</a>
+            <div class="mobile-nav-group">
+                <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                    Learn
+                    <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </button>
+                <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                    <a href="test-objects/index.html" class="mobile-nav-sublink">Find a Test Object</a>
+                    <a href="business-guide/index.html" class="mobile-nav-sublink">Business Guide</a>
+                    <span class="mobile-nav-sublink" style="font-size:0.7rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:0.5rem 0 0.15rem;">Sample Assessments</span>
+                    <a href="sample-assessment/index.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Binary Classifier</a>
+                    <a href="sample-assessment/llm-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Foundation LLM</a>
+                    <a href="sample-assessment/cv-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Computer Vision</a>
+                    <a href="sample-assessment/ranking-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Ranking System</a>
+                    <a href="concepts/index.html" class="mobile-nav-sublink">Concepts</a>
+                <a href="quality-and-hardening/index.html" class="mobile-nav-sublink">Quality &amp; Hardening</a>
+                <a href="release-pipeline/index.html" class="mobile-nav-sublink">Releasing</a>
+                </div></div>
+            </div>
+        <a href="our-offering/index.html" class="mobile-nav-link">Our Offering</a>
+            <div class="mobile-nav-group">
+                <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                    Explore
+                    <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </button>
+                <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                    <a href="svg-gallery/index.html" class="mobile-nav-sublink">SVG Gallery</a>
+                    <a href="workflow-integration/index.html" class="mobile-nav-sublink">Workflow Integration</a>
+                <a href="usage-map/index.html" class="mobile-nav-sublink" data-um-injected="1">Library Usage Map</a>
+<a href="llm-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">LLM Fairness Testing</a>
+                <a href="agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Agent Fairness Testing</a>
+                <a href="multi-agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Multi-Agent Testing</a>
+                <a href="explainability-and-xai/index.html" class="mobile-nav-sublink">Explainability &amp; XAI</a>
+                <a href="training-time-interventions/index.html" class="mobile-nav-sublink">Training-Time Interventions</a>
+
+
+</div></div>
+            </div>
+        </div>
+        <div class="mobile-nav-footer">
+            <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                GitHub
+            </a>
+        </div>
+    </nav>
+<script>/* Mobile nav bootstrap: works before main.js loads */
+(function(){
+var t=document.querySelector(".mobile-nav-toggle"),p=document.querySelector(".mobile-nav-panel"),o=document.querySelector(".mobile-nav-overlay"),c=document.querySelector(".mobile-nav-close");
+if(!t||!p)return;t.setAttribute("data-nav-init","1");
+function open(){t.setAttribute("aria-expanded","true");p.classList.add("is-open");p.setAttribute("aria-hidden","false");if(o)o.classList.add("is-open");document.body.style.overflow="hidden";}
+function close(){t.setAttribute("aria-expanded","false");p.classList.remove("is-open");p.setAttribute("aria-hidden","true");if(o)o.classList.remove("is-open");document.body.style.overflow="";}
+t.addEventListener("click",function(){t.getAttribute("aria-expanded")==="true"?close():open();});
+if(c)c.addEventListener("click",close);
+if(o)o.addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList.contains("is-open"))close();});
+})()
+</script>
+
+    <!-- Hero Section -->
+    <section class="hero hero--landing hero--split">
+        <div class="hero-content">
+            <div class="hero-copy">
+            <p class="vf-eyebrow hero-kicker"><span class="hero-kicker-dot" aria-hidden="true"></span>validant.ai &middot; open-source library</p>
+            <h1><span class="hero-brand">vfairness</span><span class="hero-kind">bias, measured.</span></h1>
+            <p class="tagline">
+                A comprehensive Python library for measuring fairness in machine learning models and detecting bias.
+            </p>
+            <div class="hero-cta">
+                <a href="getting-started/index.html" class="btn btn-primary btn-lg">
+                    Get Started
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="api-reference/index.html" class="btn btn-secondary btn-lg">
+                    API Reference
+                </a>
+            </div>
+            <p class="hero-stages" aria-label="The four stages the library covers">
+                <span>Detect</span><i aria-hidden="true">+</i><span>Mitigate</span><i aria-hidden="true">+</i><span>Calibrate</span><i aria-hidden="true">+</i><span>Monitor</span>
+            </p>
+            </div>
+            <figure class="hero-plate" aria-hidden="true"><img src="img/hero-blueprint.jpg" alt="" width="1536" height="1024"></figure>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="page-wrapper">
+        <!-- Audience Selection -->
+        <section class="py-16" style="background: var(--color-gray-50);">
+            <div class="content-container">
+                <div class="vf-section-head"><div><p class="vf-eyebrow">Two ways in</p><h2>Choose your path.</h2></div><p class="vf-lede">Select the documentation view that matches your role.</p></div>
+
+                <div class="audience-cards">
+                    <a href="business-guide/index.html" class="audience-card">
+                        <div class="audience-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                                <path d="M20 7h-9M14 17H5M17 17a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM7 7a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                            </svg>
+                        </div>
+                        <h3>Business User Guide</h3>
+                        <p>For AI Product Managers, Compliance Officers, and Business Stakeholders responsible for delivering fair AI products.</p>
+                        <span class="btn btn-primary">View Business Guide</span>
+                    </a>
+
+                    <a href="api-reference/index.html" class="audience-card">
+                        <div class="audience-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                                <path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/>
+                            </svg>
+                        </div>
+                        <h3>Developer Documentation</h3>
+                        <p>For Data Scientists, ML Engineers, and Developers who need the API reference, code examples, and integration guides.</p>
+                        <span class="btn btn-primary">View API Reference</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Features -->
+        <section id="why-vfairness" class="py-16">
+            <div class="content-container">
+                <div class="vf-section-head"><div><p class="vf-eyebrow">The pipeline</p><h2>Why vfairness?</h2></div><p class="vf-lede">A full-pipeline fairness library: detect, mitigate, calibrate, and monitor. Select a stage to filter the capabilities below.</p></div>
+
+                <!-- Pipeline at-a-glance -->
+                <div class="pipeline-strip" id="pipeline-strip">
+                    <div class="pipeline-stage" data-filter="detect" style="--ps-color:#f59e0b;">
+                        <div class="pipeline-num">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                        </div>
+                        <div class="pipeline-verb">Detect</div>
+                        <div class="pipeline-desc">35+ metrics, proxy variables, intersectional subgroups, statistical validation</div>
+                    </div>
+                    <div class="pipeline-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+                    </div>
+                    <div class="pipeline-stage" data-filter="mitigate" style="--ps-color:#0891b2;">
+                        <div class="pipeline-num">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                        </div>
+                        <div class="pipeline-verb">Mitigate</div>
+                        <div class="pipeline-desc">12 fair losses, constraint training, adversarial debiasing</div>
+                    </div>
+                    <div class="pipeline-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+                    </div>
+                    <div class="pipeline-stage" data-filter="calibrate" style="--ps-color:#6366f1;">
+                        <div class="pipeline-num">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        </div>
+                        <div class="pipeline-verb">Calibrate</div>
+                        <div class="pipeline-desc">5 calibrators, threshold optimization, group-aware tuning</div>
+                    </div>
+                    <div class="pipeline-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+                    </div>
+                    <div class="pipeline-stage" data-filter="monitor" style="--ps-color:#059669;">
+                        <div class="pipeline-num">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </div>
+                        <div class="pipeline-verb">Monitor</div>
+                        <div class="pipeline-desc">Drift detection, CI/CD gates, adaptive alerts, reporting</div>
+                    </div>
+                </div>
+
+                <div class="feature-subhead"><h3>What&rsquo;s inside</h3><p>Capabilities that cover every stage of the fairness lifecycle. Open any one for the detail.</p></div>
+
+                <div class="cards-grid mt-8" id="feature-cards">
+                    <div class="card" data-stage="mitigate">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Full ML Pipeline</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">A 6-stage pipeline plus 8 specialized analysis surfaces, from data preprocessing to multi-agent testing.</p>
+                        <details class="card-more"><summary>Detail</summary><p>A 6-stage pipeline plus 8 specialized analysis surfaces and a cross-cutting egress guard, covering the entire fairness lifecycle: data preprocessing, feature engineering, training-time interventions, post-processing calibration, evaluation, CI/CD operations, LLM testing, agent testing, and multi-agent testing. The LLM surface plugs in production scorers (VADER sentiment, alt-profanity-check toxicity) through the <code>[llm]</code> extra, and warns loudly when it falls back to its keyword placeholder.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="detect">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Statistical Rigor</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">Bootstrap and Bayesian confidence intervals, permutation tests, effect sizes and multiple-testing corrections.</p>
+                        <details class="card-more"><summary>Detail</summary><p>Built-in bootstrap &amp; Bayesian confidence intervals, permutation testing, effect sizes (Cohen's d, odds ratio), and multiple testing corrections. Publication-ready statistical validation.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="mitigate">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Training-Time Interventions</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">12 fairness-aware loss functions, adversarial debiasing, constraint-based training and scikit-learn compatible wrappers.</p>
+                        <details class="card-more"><summary>Detail</summary><p>12 fairness-aware loss functions, adversarial debiasing, counterfactual losses, constraint-based training (Exponentiated Gradient, Grid Search), 5 regularizers, and scikit-learn compatible <code>FairClassifier</code>/<code>FairRegressor</code> wrappers.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="calibrate">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Post-Processing &amp; Calibration</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">5 calibration methods, group-aware calibrators, threshold optimization and trade-off diagnostics.</p>
+                        <details class="card-more"><summary>Detail</summary><p>5 calibration methods (Platt, Isotonic, Beta, Temperature, Histogram), group-aware calibrators, threshold optimization, prediction reweighting, and impossibility theorem trade-off diagnostics.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="calibrate">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                                    <path d="M12 17h.01"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>FairExplAIner</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">A human-readable explanation, severity and recommendation for every metric.</p>
+                        <details class="card-more"><summary>Detail</summary><p>Human-readable explanations for every metric. Understand what numbers mean, get severity assessments, and receive actionable recommendations, with no fairness PhD required.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="detect">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <polyline points="10 9 9 9 8 9"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Regulatory Compliance</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">Historical discrimination patterns with risk levels and precedents, and legal rule packs for seven jurisdictions.</p>
+                        <details class="card-more"><summary>Detail</summary><p>43 historical discrimination patterns (as of 2026-08-28; run <code>len(HISTORICAL_RISK_PATTERNS)</code> for the current figure), each with a risk level, the affected groups and the precedent behind it. Seven of them cite EU AI Act Art.&nbsp;5 prohibited practices and eight cite Annex&nbsp;III high-risk systems, four naming the EU AI Act penalty ceiling (up to &euro;35&nbsp;million or 7% of global turnover) in their recommendations. Separately, the <code>legal</code> rule packs cover seven jurisdictions: <code>us-federal</code>, <code>us-ca</code>, <code>eu</code>, <code>uk</code>, <code>de</code>, <code>ch</code> and <code>br</code>.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="detect">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Intersectional Analysis</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">Hidden disparities at group intersections: auto-discovered attributes, proxy variables and subgroup audits.</p>
+                        <details class="card-more"><summary>Detail</summary><p>Detect hidden disparities at group intersections. Auto-discover protected attributes, identify proxy variables via correlation &amp; mutual information, and audit subgroups for fairness gerrymandering.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="monitor">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                    <path d="M2 17l10 5 10-5"/>
+                                    <path d="M2 12l10 5 10-5"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>MLOps &amp; CI/CD</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">MLflow, pytest assertions, training callbacks, fairness gates and drift detection for production.</p>
+                        <details class="card-more"><summary>Detail</summary><p>MLflow integration, pytest assertions, training callbacks for Keras/PyTorch/sklearn, <code>DataBiasValidator</code>, <code>ModelFairnessGate</code>, real-time drift detection, adaptive alert thresholds, and prioritized alert routing for production monitoring.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="monitor">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Privacy-Preserving Reporting</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">A three-tier privacy scheme, on by default: small groups suppressed, mid-size groups noised, large groups exact.</p>
+                        <details class="card-more"><summary>Detail</summary><p>Built-in three-tier privacy scheme, on by default in <code>MetricsStore</code>: groups under 10 are suppressed by k-anonymity, groups of 10 to 50 receive &epsilon;-differential-privacy Laplace noise, groups above 50 report exact values. Every row is labelled with the tier it came from, and the library says plainly that at the default &epsilon;&nbsp;=&nbsp;1.0 the noisy tier is close to uninformative: treat a <code>privacy_level == "noisy"</code> row as withheld unless you have knowingly raised &epsilon;.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="monitor">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="3" y1="9" x2="21" y2="9"/>
+                                    <line x1="9" y1="21" x2="9" y2="9"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Clean, Unified API</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">One analyzer pattern across all modules, for classification, regression and ranking metrics.</p>
+                        <details class="card-more"><summary>Detail</summary><p>Consistent analyzer pattern across all modules: <code>FairnessAnalyzer</code>, <code>BiasDetector</code>, <code>CalibrationAnalyzer</code>, <code>FairnessTrainingAnalyzer</code>, <code>ThresholdAnalyzer</code>. Classification, regression, and ranking metrics with sensible defaults.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="monitor">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="2" width="20" height="20" rx="2"/>
+                                    <path d="M7 13l3-3 2 2 5-5"/>
+                                    <circle cx="17" cy="7" r="1" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Publication-Ready SVG Reports</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">Templated, self-contained SVG reports: dashboards, bias audits, calibration diagrams, drift reports and more.</p>
+                        <details class="card-more"><summary>Detail</summary><p>A library of templated SVG visualizations: fairness dashboards, bias audits, calibration diagrams, drift reports, Pareto frontiers, and more. Beautiful, self-contained vector graphics ready for papers, presentations, and stakeholder reports.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="mitigate">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M2 12h4l3-9 6 18 3-9h4"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Fairness A/B Testing</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">Experiments with per-intersection power analysis, sequential testing and Pareto trade-off optimization.</p>
+                        <details class="card-more"><summary>Detail</summary><p>Full experiment framework with per-intersection power analysis, sequential testing (SPRT) for early stopping, and Pareto frontier optimization across fairness/accuracy trade-offs.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="detect">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <path d="M21 21l-4.35-4.35"/>
+                                    <path d="M8 11h6"/>
+                                    <path d="M11 8v6"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Auto-Discovery</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">Finds protected attributes, proxy variables, violations and intersectional subgroups without manual configuration.</p>
+                        <details class="card-more"><summary>Detail</summary><p>Automatically detect protected attributes, identify proxy variables, scan for fairness violations, and discover intersectional subgroups, so you can run a full audit without manual configuration.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="detect">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>LLM Fairness Testing</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">Bias tests for LLMs without training data: counterfactual prompts, BBQ, BOLD, HolisticBias and DecodingTrust.</p>
+                        <details class="card-more"><summary>Detail</summary><p>Test LLMs for bias without training data. Counterfactual prompt testing (9 strategies including persona-based), standardized benchmarks (BBQ, BOLD, HolisticBias), the 8-dimensional DecodingTrust suite (Wang et al. 2023, NeurIPS), output analysis, and non-determinism management for foundation models.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="detect">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="8.5" cy="7" r="4"/>
+                                    <path d="M20 8v6M23 11h-6"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Agent Fairness Testing</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">Bias tests for AI agents: tool selection, RAG retrieval, action outcomes and delegation patterns.</p>
+                        <details class="card-more"><summary>Detail</summary><p>Test AI agents for bias in tool selection, RAG retrieval, action outcomes, and delegation patterns. Includes correspondence testing and temporal trajectory tracking across agent lifecycles.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="detect">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Multi-Agent Fairness Testing</h3>
+                            </div>
+                        </div>
+                        <p class="card-sum">Six analyzers for bias that only appears when agents interact, plus a framework-agnostic run harness.</p>
+                        <details class="card-more"><summary>Detail</summary><p>Detect emergent bias in multi-agent systems. Six analyzers: compositionality, groupthink/echo-chamber, emergent amplification, adversarial collusion (Khan et al. 2023), demographic-conditional delegation routing (Bertrand &amp; Mullainathan 2004), and turn-by-turn negotiation drift (Bianchi et al. 2024), plus a framework-agnostic <code>MultiAgentRunHarness</code> for autogen / crewai / langgraph.</p></details>
+                    </div>
+
+                    <div class="card" data-stage="monitor">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                    <path d="M9 12l2 2 4-4"/>
+                                </svg>
+                            </div>
+                            <div><h3>Audit Trail on Every Result</h3></div>
+                        </div>
+                        <p class="card-sum">Structured logging and audit metadata on every result, with a methodology version stamped into every report.</p>
+                        <details class="card-more"><summary>Detail</summary><p>Structured logging via Python <code>logging</code>, audit-trail metadata (ISO&nbsp;8601 UTC timestamp, library version, parameters) on every result, a <code>methodology_version</code> stamped into every report, <code>to_dict()</code>/<code>to_json()</code> serialization, progress callbacks for batch operations, and configurable thresholds. That is the record-keeping material an obligation such as EU AI Act Art.&nbsp;12 asks for; conformity is a judgement about a deployment, which no library can make on its own.</p></details>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Integration Strip -->
+        <section class="py-16 integration-section">
+            <div class="content-container">
+                <p class="vf-eyebrow">Integrates with your ML stack</p>
+                <div class="integration-strip mt-8">
+                    <img src="img/logos/sklearn.svg" alt="scikit-learn" class="integration-logo">
+                    <img src="img/logos/pytorch.svg" alt="PyTorch" class="integration-logo">
+                    <img src="img/logos/tensorflow.svg" alt="TensorFlow" class="integration-logo">
+                    <img src="img/logos/keras.svg" alt="Keras" class="integration-logo">
+                    <img src="img/logos/mlflow.svg" alt="MLflow" class="integration-logo">
+                    <img src="img/logos/pandas.svg" alt="pandas" class="integration-logo">
+                    <img src="img/logos/numpy.svg" alt="NumPy" class="integration-logo">
+                    <img src="img/logos/plotly.svg" alt="Plotly" class="integration-logo">
+                    <img src="img/logos/pytest.svg" alt="pytest" class="integration-logo">
+                    <img src="img/logos/jinja2.svg" alt="Jinja2" class="integration-logo">
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Start -->
+        <section class="py-16" style="background: var(--color-gray-50);">
+            <div class="content-container">
+                <div class="vf-section-head"><div><p class="vf-eyebrow">Quick start</p><h2>From install to a verdict.</h2></div><p class="vf-lede">What running vfairness looks like, once 0.1.0 ships.</p></div>
+
+                <div class="callout callout-limitation" style="max-width: 780px; margin: 1.5rem auto 0;">
+                    <div class="callout-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                        Install vfairness
+                        <span class="limitation-label">Availability</span>
+                    </div>
+                    <p>0.1.0 was published on 2026-10-01. The early 0.0.1 placeholder that held this name from March 2026 has been yanked, so a resolver will not select it.</p>
+                </div>
+
+                <div class="code-block mt-8">
+                    <div class="code-header">
+                        <span class="code-lang">bash</span>
+                        <button class="code-copy">Copy</button>
+                    </div>
+                    <pre><code># 0.1.0 beta: prepared, no tag, not yet on PyPI
+pip install vfairness</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">python</span>
+                        <button class="code-copy">Copy</button>
+                    </div>
+                    <pre><code class="language-python">from vfairness import FairnessAnalyzer
+
+# Create analyzer with your model predictions
+analyzer = FairnessAnalyzer(
+    y_true=actual_outcomes,
+    y_pred=model_predictions,
+    sensitive_attr=demographic_groups,
+    fair_explainer=True  # Enable human-readable explanations
+)
+
+# Generate comprehensive report with confidence intervals
+report = analyzer.get_report(include_ci=True, n_bootstrap=5000)
+
+# The verdict, the rows it was computed over, and anything it could not check
+print(report['assessment']['summary'])
+
+# Access metrics
+print(f"Demographic Parity: {report['metrics']['demographic_parity_difference']:.3f}")
+print(f"Equal Opportunity: {report['metrics']['equal_opportunity_difference']:.3f}")
+
+# Get explanations
+for metric, explanation in report['explanations']['metrics'].items():
+    print(f"\n{metric}: {explanation['severity']}")
+    print(f"  {explanation['evaluation']}")
+    print(f"  {explanation['recommendation']}")</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-lang">output (first lines, on 1,200 rows)</span>
+                    </div>
+                    <pre><code>0/5 metrics within thresholds (data provenance: 1200 of 1200 rows assessed, 0 excluded, missing_strategy='exclude')
+Demographic Parity: 0.255
+Equal Opportunity: 0.280
+
+demographic_parity_difference: critical
+  Critical. The difference of 0.2553 indicates severe disparity that requires immediate investigation and remediation.
+  URGENT: Review deployment decisions for this model. ...</code></pre>
+                </div>
+
+                <p class="vf-note">
+                    The <strong>data provenance</strong> clause is on every summary, and the count is over the metrics that were actually graded. A metric or a group that could not be measured is named separately and never folded into that count. See <a href="getting-started/index.html#three-states">Three States, Not Two</a>.
+                </p>
+
+                <div class="mt-8">
+                    <a href="getting-started/index.html" class="btn btn-primary btn-lg">
+                        View Full Tutorial
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Library Structure -->
+        <section class="py-16">
+            <div class="content-container">
+                <div class="vf-section-head"><div><p class="vf-eyebrow">15 sub-packages</p><h2>Library architecture.</h2></div><p class="vf-lede">15 top-level sub-packages: a 6-stage fairness pipeline, 8 specialized analysis surfaces and 1 cross-cutting infrastructure package. The main areas follow the ML fairness pipeline from data to production.</p></div>
+
+                <!-- Vertically stacked module cards -->
+                <div style="display: flex; flex-direction: column; gap: 0.85rem; margin: 2rem 0 0;">
+
+                    <!-- 1. Data & Preprocessing -->
+                    <a href="api-reference/index.html#preprocessing-overview" class="module-card module-card--row" data-module="preprocessing" style="gap: 1.2rem; padding: 1rem 1.25rem; border-radius: 12px;">
+                        <span class="card-icon card-icon--lg" style="background: #d97706;">1</span>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="card-title" style="font-size: 0.95rem;">Data &amp; Preprocessing</div>
+                            <div class="card-desc" style="font-size: 0.8rem; margin-top: 2px;">BiasDetector &middot; FeatureEngineeringAnalyzer &middot; Proxy variable detection &middot; Historical pattern analysis</div>
+                        </div>
+                        <code class="card-code">vfairness.preprocessing</code>
+                    </a>
+
+                    <!-- 2. Training-Time -->
+                    <a href="api-reference/index.html#in-processing-overview" class="module-card module-card--row" data-module="training" style="gap: 1.2rem; padding: 1rem 1.25rem; border-radius: 12px;">
+                        <span class="card-icon card-icon--lg" style="background: #0891b2;">2</span>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="card-title" style="font-size: 0.95rem;">Training-Time Interventions</div>
+                            <div class="card-desc" style="font-size: 0.8rem; margin-top: 2px;">Fairness-aware loss functions &middot; Constraint-based training &middot; Adversarial debiasing</div>
+                        </div>
+                        <code class="card-code">vfairness.in_processing</code>
+                    </a>
+
+                    <!-- 3. Prediction-Time -->
+                    <a href="api-reference/index.html#post-processing-overview" class="module-card module-card--row" data-module="prediction" style="gap: 1.2rem; padding: 1rem 1.25rem; border-radius: 12px;">
+                        <span class="card-icon card-icon--lg" style="background: #6366f1;">3</span>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="card-title" style="font-size: 0.95rem;">Prediction-Time Interventions</div>
+                            <div class="card-desc" style="font-size: 0.8rem; margin-top: 2px;">GroupCalibrator &middot; CalibrationAnalyzer &middot; Platt, Isotonic, Beta, Temperature scaling &middot; Trade-off analysis</div>
+                        </div>
+                        <code class="card-code">vfairness.post_processing</code>
+                    </a>
+
+                    <!-- 4. Evaluation & Measurement -->
+                    <a href="api-reference/index.html#evaluation-overview" class="module-card module-card--row" data-module="evaluation" style="gap: 1.2rem; padding: 1rem 1.25rem; border-radius: 12px;">
+                        <span class="card-icon card-icon--lg" style="background: #2c5f7c;">4</span>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="card-title" style="font-size: 0.95rem;">Evaluation &amp; Measurement</div>
+                            <div class="card-desc" style="font-size: 0.8rem; margin-top: 2px;">FairnessAnalyzer &middot; Classification, regression, ranking metrics &middot; FairExplAIner &middot; Statistical validation &middot; MLOps integration</div>
+                        </div>
+                        <code class="card-code">vfairness.evaluation</code>
+                    </a>
+
+                    <!-- 5. Monitoring -->
+                    <a href="api-reference/index.html#operations-overview" class="module-card module-card--row" data-module="monitoring" style="gap: 1.2rem; padding: 1rem 1.25rem; border-radius: 12px;">
+                        <span class="card-icon card-icon--lg" style="background: #059669;">5</span>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="card-title" style="font-size: 0.95rem;">Monitoring</div>
+                            <div class="card-desc" style="font-size: 0.8rem; margin-top: 2px;">FairnessMonitor &middot; FairnessDriftDetector &middot; AdaptiveThresholdManager &middot; TemporalFairnessAnalyzer</div>
+                        </div>
+                        <code class="card-code">vfairness.operations.monitoring</code>
+                    </a>
+
+                    <!-- 6. Reporting & Dashboards -->
+                    <a href="api-reference/index.html#reporting-overview" class="module-card module-card--row" data-module="reporting" style="gap: 1.2rem; padding: 1rem 1.25rem; border-radius: 12px;">
+                        <span class="card-icon card-icon--lg" style="background: #db2777;">6</span>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="card-title" style="font-size: 0.95rem;">Reporting &amp; Dashboards</div>
+                            <div class="card-desc" style="font-size: 0.8rem; margin-top: 2px;">MetricsStore &middot; FairnessDashboard &middot; ReportGenerator &middot; InteractiveDashboard</div>
+                        </div>
+                        <code class="card-code">vfairness.operations.reporting</code>
+                    </a>
+
+                    <!-- 7. Experimentation -->
+                    <a href="api-reference/index.html#experimentation-overview" class="module-card module-card--row" data-module="experimentation" style="gap: 1.2rem; padding: 1rem 1.25rem; border-radius: 12px;">
+                        <span class="card-icon card-icon--lg" style="background: #b45309;">7</span>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="card-title" style="font-size: 0.95rem;">Experimentation</div>
+                            <div class="card-desc" style="font-size: 0.8rem; margin-top: 2px;">FairnessExperiment &middot; ExperimentAnalysis &middot; Pareto &middot; Causal Inference (DoWhy: identify, mediate, refute, counterfactual, attribute)</div>
+                        </div>
+                        <code class="card-code">vfairness.operations.experimentation</code>
+                    </a>
+
+                    <!-- 8. Workflow Integration -->
+                    <a href="workflow-integration/index.html" class="module-card module-card--row" data-module="workflow" style="gap: 1.2rem; padding: 1rem 1.25rem; border-radius: 12px;">
+                        <span class="card-icon card-icon--lg" style="background: #475569;">8</span>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="card-title" style="font-size: 0.95rem;">Workflow Integration</div>
+                            <div class="card-desc" style="font-size: 0.8rem; margin-top: 2px;">ModelFairnessGate &middot; HierarchicalGateConfig &middot; FairnessReportCard &middot; Pre-commit hooks &middot; pytest plugin</div>
+                        </div>
+                        <code class="card-code">vfairness.operations.cicd</code>
+                    </a>
+
+                    <!-- 9. LLM Fairness Testing -->
+                    <a href="llm-testing/index.html" class="module-card module-card--row" data-module="llm" style="gap: 1.2rem; padding: 1rem 1.25rem; border-radius: 12px;">
+                        <span class="card-icon card-icon--lg" style="background: #E67E22;">9</span>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="card-title" style="font-size: 0.95rem;">LLM Fairness Testing</div>
+                            <div class="card-desc" style="font-size: 0.8rem; margin-top: 2px;">9-strategy counterfactual tester &middot; BBQ / BOLD / HolisticBias &middot; DecodingTrust (8 dims) &middot; OutputAnalyzer &middot; non-determinism</div>
+                        </div>
+                        <code class="card-code">vfairness.llm</code>
+                    </a>
+
+                    <!-- 10. Agent Fairness Testing -->
+                    <a href="agent-testing/index.html" class="module-card module-card--row" data-module="agents" style="gap: 1.2rem; padding: 1rem 1.25rem; border-radius: 12px;">
+                        <span class="card-icon card-icon--lg" style="background: #E74C3C;">10</span>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="card-title" style="font-size: 0.95rem;">Agent Fairness Testing</div>
+                            <div class="card-desc" style="font-size: 0.8rem; margin-top: 2px;">Correspondence testing &middot; Tool bias &middot; RAG bias &middot; Delegation patterns &middot; Temporal trajectory tracking</div>
+                        </div>
+                        <code class="card-code">vfairness.agents</code>
+                    </a>
+
+                    <!-- 11. Multi-Agent Fairness Testing -->
+                    <a href="multi-agent-testing/index.html" class="module-card module-card--row" data-module="multi-agent" style="gap: 1.2rem; padding: 1rem 1.25rem; border-radius: 12px;">
+                        <span class="card-icon card-icon--lg" style="background: #9B59B6;">11</span>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="card-title" style="font-size: 0.95rem;">Multi-Agent Fairness Testing</div>
+                            <div class="card-desc" style="font-size: 0.8rem; margin-top: 2px;">Compositionality &middot; Groupthink &middot; Emergent amplification &middot; Adversarial collusion &middot; Delegation routing &middot; Negotiation drift &middot; Framework-agnostic harness</div>
+                        </div>
+                        <code class="card-code">vfairness.multi_agent</code>
+                    </a>
+
+                </div>
+
+                <!-- Pipeline flow diagram (Mermaid LR) -->
+                <div class="mermaid-container" style="margin-top: 2rem; cursor: default;">
+                    <div class="mermaid" style="text-align: center;">
+flowchart LR
+    A["1 &middot; Data &amp;<br/>Preprocessing"] --> B["2 &middot; Training-Time<br/>Interventions"]
+    B --> C["3 &middot; Prediction-Time<br/>Interventions"]
+    C --> D["4 &middot; Evaluation &amp;<br/>Measurement"]
+    D --> E["5 &middot; Monitoring"]
+    D --> F["6 &middot; Reporting &amp;<br/>Dashboards"]
+    D --> G["7 &middot; Experimentation"]
+    D --> H["8 &middot; Workflow<br/>Integration"]
+    D --> I["9 &middot; LLM Fairness<br/>Testing"]
+    I --> J["10 &middot; Agent Fairness<br/>Testing"]
+    J --> K["11 &middot; Multi-Agent<br/>Testing"]
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison Table -->
+        <section class="py-16" style="background: var(--color-gray-50);">
+            <div class="content-container">
+                <div class="vf-section-head"><div><p class="vf-eyebrow">AIF360 &middot; Fairlearn &middot; Aequitas</p><h2>How vfairness compares.</h2></div><p class="vf-lede">Other open-source fairness libraries are excellent at what they do. vfairness focuses on an end-to-end, audit-grade workflow that spans data and modelling, production monitoring, and regulatory evidence.</p></div>
+
+                <div class="table-container mt-8">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>vfairness</th>
+                                <th>AIF360</th>
+                                <th>Fairlearn</th>
+                                <th>Aequitas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Group fairness metrics</td>
+                                <td><span class="badge badge-success">Extensive</span></td>
+                                <td><span class="badge badge-success">70+</span></td>
+                                <td><span class="badge badge-success">Yes</span></td>
+                                <td><span class="badge badge-success">Yes</span></td>
+                            </tr>
+                            <tr>
+                                <td>Bias mitigation (pre / in / post-processing)</td>
+                                <td><span class="badge badge-success">Full</span></td>
+                                <td><span class="badge badge-success">Full</span></td>
+                                <td><span class="badge badge-success">Yes</span></td>
+                                <td><span class="badge badge-outline">Audit-only</span></td>
+                            </tr>
+                            <tr>
+                                <td>Prediction-time interventions (calibration, thresholds)</td>
+                                <td><span class="badge badge-success">Full</span></td>
+                                <td><span class="badge badge-success">Yes</span></td>
+                                <td><span class="badge badge-success">Yes</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                            </tr>
+                            <tr>
+                                <td>Data &amp; preprocessing bias auditing</td>
+                                <td><span class="badge badge-success">Full</span></td>
+                                <td><span class="badge badge-success">Yes</span></td>
+                                <td><span class="badge badge-warning">Partial</span></td>
+                                <td><span class="badge badge-success">Full</span></td>
+                            </tr>
+                            <tr>
+                                <td>Fairness explainability (SHAP / IG / counterfactual)</td>
+                                <td><span class="badge badge-success">Yes</span></td>
+                                <td><span class="badge badge-warning">Partial</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                            </tr>
+                            <tr>
+                                <td>Confidence intervals &amp; small-sample (Bayesian)</td>
+                                <td><span class="badge badge-success">Built-in</span></td>
+                                <td><span class="badge badge-outline">Manual</span></td>
+                                <td><span class="badge badge-outline">Manual</span></td>
+                                <td><span class="badge badge-outline">Manual</span></td>
+                            </tr>
+                            <tr>
+                                <td>Auto-discovery (protected attributes &amp; proxies)</td>
+                                <td><span class="badge badge-success">Yes</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                            </tr>
+                            <tr>
+                                <td>Ranking / recommender fairness</td>
+                                <td><span class="badge badge-success">Yes</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                            </tr>
+                            <tr>
+                                <td>Production monitoring &amp; drift gates (CI/CD)</td>
+                                <td><span class="badge badge-success">Built-in</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                            </tr>
+                            <tr>
+                                <td>pytest fairness assertions</td>
+                                <td><span class="badge badge-success">Built-in</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                            </tr>
+                            <tr>
+                                <td>MLflow / experiment logging</td>
+                                <td><span class="badge badge-success">Native</span></td>
+                                <td><span class="badge badge-outline">Manual</span></td>
+                                <td><span class="badge badge-outline">Manual</span></td>
+                                <td><span class="badge badge-outline">Manual</span></td>
+                            </tr>
+                            <tr>
+                                <td>LLM &amp; agent fairness testing</td>
+                                <td><span class="badge badge-success">Yes</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                            </tr>
+                            <tr>
+                                <td>Regulatory compliance mapping</td>
+                                <td><span class="badge badge-success">7 jurisdictions</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                                <td><span class="badge badge-outline">No</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="vf-note">
+                    Compared against each library's out-of-the-box capabilities from public documentation (reviewed June 2026). AIF360 and Fairlearn both provide mature, well-validated mitigation algorithms, and Aequitas is a focused bias-audit toolkit; all are actively developed and may add capabilities over time.
+                </p>
+            </div>
+        </section>
+
+        <!-- Known Limitations -->
+        <section class="py-16">
+            <div class="content-container">
+                <div class="vf-section-head"><div><p class="vf-eyebrow">What it does not do</p><h2>Known limitations.</h2></div><p class="vf-lede">Transparency about what vfairness does and does not do.</p></div>
+
+                <div class="cards-grid mt-8">
+                    <div class="callout callout-limitation" style="margin: 0;">
+                        <div class="callout-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                            Beta Software
+                            <span class="limitation-label">Maturity</span>
+                        </div>
+                        <p>vfairness is in <strong>beta</strong> (v<span id="stat-version">0.1.0</span>) published 2026-10-01. APIs may change before the stable v1.0.0 release. The version number says beta, and the beta gate agrees: <code>scripts/release_gate.py</code> reports <strong>BETA READY</strong>, with all eight beta conditions met and no known defect open. The stricter 1.0 gate is not met yet: a second, independent examiner still has to confirm part of the graded code. <a href="quality-and-hardening/index.html">Quality and Hardening</a> carries the standing figures.</p>
+                        <div class="limitation-mitigation">
+                            <strong>Note:</strong> <code>pip install vfairness</code> currently resolves to our own early 0.0.1 placeholder, not this library. Pin an exact version in requirements.txt once 0.1.0 ships.
+                        </div>
+                    </div>
+
+                    <div class="callout callout-limitation" style="margin: 0;">
+                        <div class="callout-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                            Benchmarks Not Auto-Generated
+                            <span class="limitation-label">Data</span>
+                        </div>
+                        <p>Population benchmarks for representation analysis must be <strong>user-provided</strong>. Defaults are US Census 2020 only.</p>
+                        <div class="limitation-mitigation">
+                            <strong>Source:</strong> Census Bureau, Eurostat, BFS, or your domain demographics.
+                        </div>
+                    </div>
+
+                    <div class="callout callout-limitation" style="margin: 0;">
+                        <div class="callout-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                            Keyword-Based Matching
+                            <span class="limitation-label">Detection</span>
+                        </div>
+                        <p>Historical pattern and protected attribute detection uses <strong>column name keyword matching</strong>, not NLP or semantic analysis.</p>
+                        <div class="limitation-mitigation">
+                            <strong>Do:</strong> Manually review all columns; rename ambiguous ones.
+                        </div>
+                    </div>
+
+                    <div class="callout callout-limitation" style="margin: 0;">
+                        <div class="callout-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                            Small Groups Cannot Be Assessed
+                            <span class="limitation-label">Statistics</span>
+                        </div>
+                        <p>Groups below <code>min_group_size</code> (30) are <strong>excluded from the disparity metrics</strong>, so they get no verdict. Minority and intersectional groups are most affected. The exclusion is reported, not silent: a <code>UserWarning</code> names each dropped group and its size, and the report lists it under <code>insufficient_evidence_groups</code> with a reason, outside the pass/fail count.</p>
+                        <div class="limitation-mitigation">
+                            <strong>Do:</strong> Lower threshold for exploration; use Bayesian CI; read <code>insufficient_evidence_groups</code> before quoting the headline.
+                        </div>
+                    </div>
+
+                    <div class="callout callout-limitation" style="margin: 0;">
+                        <div class="callout-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                            Metrics Are Incompatible
+                            <span class="limitation-label">Theory</span>
+                        </div>
+                        <p>Demographic parity, equalized odds, and calibration <strong>cannot all be satisfied simultaneously</strong> (Impossibility Theorem). Choose your metric before analysis.</p>
+                        <div class="limitation-mitigation">
+                            <strong>See:</strong> <a href="concepts/index.html#impossibility">Impossibility Theorem</a> in Concepts.
+                        </div>
+                    </div>
+
+                    <div class="callout callout-limitation" style="margin: 0;">
+                        <div class="callout-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                            Geographic Data US-Only
+                            <span class="limitation-label">Coverage</span>
+                        </div>
+                        <p>HOLC redlining data covers <strong>~40 US cities</strong> only. No European, Swiss, or APAC geographic discrimination data is included.</p>
+                        <div class="limitation-mitigation">
+                            <strong>Do:</strong> Build custom geographic risk datasets for non-US jurisdictions.
+                        </div>
+                    </div>
+                </div>
+
+                <p class="vf-note">
+                    Detailed limitation callouts appear throughout the documentation, marked with the
+                    <span class="limitation-label">Limitation</span>
+                    badge.
+                </p>
+            </div>
+        </section>
+
+        <!-- Resources -->
+        <section class="py-16">
+            <div class="content-container">
+                <div class="vf-section-head"><div><p class="vf-eyebrow">Read next</p><h2>Resources.</h2></div></div>
+
+                <div class="cards-grid mt-8">
+                    <a href="getting-started/index.html" class="card">
+                        <h3>Getting Started Guide</h3>
+                        <p>Installation, first fairness analysis, and basic concepts.</p>
+                    </a>
+                    <a href="business-guide/index.html" class="card">
+                        <h3>Business User Guide</h3>
+                        <p>Comprehensive guide for product managers and compliance officers.</p>
+                    </a>
+                    <a href="api-reference/index.html" class="card">
+                        <h3>API Reference</h3>
+                        <p>Reference for the library&rsquo;s classes, functions, parameters and return types. It does not yet cover every public code unit.</p>
+                    </a>
+                    <a href="concepts/index.html" class="card">
+                        <h3>Core Concepts</h3>
+                        <p>Deep dives into fairness definitions, metrics, and methodology.</p>
+                    </a>
+                    <a href="svg-gallery/index.html" class="card">
+                        <h3>SVG Templates</h3>
+                        <p>Interactive gallery of fairness visualisations, dashboards, and report templates.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <!-- Shared recognition wall. Same element and same roster as the offering
+         page, the platform and the platform docs; see js/sponsor-wall.js. -->
+    <section class="py-16 sponsor-band" id="sponsor-band" hidden>
+        <div class="container">
+            <sponsor-wall src="data/sponsors.json" variant="compact"
+                          heading="Sponsors get the credit"></sponsor-wall>
+        </div>
+    </section>
+    <!-- The landing shows the wall only once someone is on it. An all-open wall
+         is sales inventory, and it is sold on the offering page, where it always
+         renders. The roster stays the single source: add a member and this band
+         appears with no other edit. -->
+    <script>
+    (function () {
+        fetch('data/sponsors.json', { cache: 'no-cache' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) {
+                if (!d || !d.tiers) return;
+                var named = d.tiers.some(function (t) { return (t.members || []).length > 0; });
+                if (named) document.getElementById('sponsor-band').hidden = false;
+            })
+            .catch(function () {});
+    })();
+    </script>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <p class="footer-signoff">Fairness is not a default. It is measured, or it is not known.</p>
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="brand-logo">
+                    <p>Systems for Trust & Agency. Building tools for responsible AI development.</p>
+                </div>
+
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Documentation</h4>
+                        <ul>
+                            <li><a href="getting-started/index.html">Getting Started</a></li>
+                            <li><a href="business-guide/index.html">Business Guide</a></li>
+                            <li><a href="api-reference/index.html">API Reference</a></li>
+                            <li><a href="concepts/index.html">Concepts</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
+                            <li><a href="release-pipeline/index.html">Release Pipeline (0.1.0, published 2026-10-01)</a></li>
+                            <li><a href="concepts/references.html">Academic References</a></li>
+                            <li><a href="concepts/changelog.html">Changelog</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="https://validant.ai" target="_blank">validant.ai</a></li>
+                            <li><a href="https://validant.ai/imprint#publisher" target="_blank">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 validant.ai. vfairness is licensed under the Apache License 2.0.</p>
+                <div class="footer-legal">
+                    <a href="legal/index.html">Legal</a>
+                    <span class="footer-dot">·</span>
+                    <a href="legal/index.html#ai-usage" title="AI-Assisted Development Disclosure">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -1px; margin-right: 3px;"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/></svg>AI-Assisted
+                    </a>
+                </div>
+            </div>
+            <div class="footer-github-mobile">
+                <a href="https://github.com/validantai/vfairness" class="btn" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; vertical-align: -2px;"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script defer src="js/main.js"></script>
+
+    <!-- Dot background: scroll-reveal + continuous scroll/mouse reactivity -->
+    <script>
+    (function() {
+        var section = document.getElementById('why-vfairness');
+        if (!section) return;
+
+        var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reducedMotion) {
+            section.classList.add('dots-revealed');
+            return;
+        }
+
+        // ── State (smoothed via lerp) ──
+        var current = { mx: 0, my: 0, py: 0, sc: 1, rot: 0 };
+        var target  = { mx: 0, my: 0, py: 0, sc: 1, rot: 0 };
+        var revealed = false;
+        var animating = false;
+
+        // ── One-shot reveal ──
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(e) {
+                if (e.isIntersecting) {
+                    section.classList.add('dots-revealed');
+                    revealed = true;
+                    observer.disconnect();
+                    if (!animating) { animating = true; requestAnimationFrame(tick); }
+                }
+            });
+        }, { threshold: 0.10 });
+        observer.observe(section);
+
+        // ── Mouse tracking (relative to section center) ──
+        section.addEventListener('mousemove', function(e) {
+            var rect = section.getBoundingClientRect();
+            var cx = rect.left + rect.width  / 2;
+            var cy = rect.top  + rect.height / 2;
+            // normalise to -1..+1
+            var nx = (e.clientX - cx) / (rect.width  / 2);
+            var ny = (e.clientY - cy) / (rect.height / 2);
+            // clamp
+            nx = Math.max(-1, Math.min(1, nx));
+            ny = Math.max(-1, Math.min(1, ny));
+            target.mx = nx * 34;   // max 34px shift
+            target.my = ny * 24;   // max 24px shift
+            target.rot = nx * 1.8; // max 1.8deg tilt
+            if (!animating) { animating = true; requestAnimationFrame(tick); }
+        }, { passive: true });
+
+        section.addEventListener('mouseleave', function() {
+            target.mx = 0;
+            target.my = 0;
+            target.rot = 0;
+            if (!animating) { animating = true; requestAnimationFrame(tick); }
+        }, { passive: true });
+
+        // ── Scroll tracking (parallax + subtle scale/opacity pulse) ──
+        window.addEventListener('scroll', function() {
+            var rect = section.getBoundingClientRect();
+            var viewH = window.innerHeight;
+            var progress = 1 - (rect.bottom / (viewH + rect.height));
+            target.py = (progress - 0.5) * 180;
+            // scale pulse: 0.94..1.06 as section scrolls through
+            target.sc = 1.0 + Math.sin(progress * Math.PI) * 0.06;
+            if (!animating) { animating = true; requestAnimationFrame(tick); }
+        }, { passive: true });
+
+        // ── Lerp helper ──
+        function lerp(a, b, t) { return a + (b - a) * t; }
+
+        // ── Animation loop ──
+        function tick() {
+            var ease = 0.07; // smooth interpolation factor
+            current.mx  = lerp(current.mx,  target.mx,  ease);
+            current.my  = lerp(current.my,  target.my,  ease);
+            current.py  = lerp(current.py,  target.py,  ease);
+            current.sc  = lerp(current.sc,  target.sc,  ease);
+            current.rot = lerp(current.rot, target.rot, ease);
+
+            var s = section.style;
+            s.setProperty('--mouse-x',    current.mx.toFixed(2) + 'px');
+            s.setProperty('--mouse-y',    current.my.toFixed(2) + 'px');
+            s.setProperty('--parallax-y', current.py.toFixed(2) + 'px');
+
+            // Scale + rotation via CSS custom props (picked up by transform in .dots-revealed)
+            if (revealed) {
+                s.setProperty('--dot-scale', current.sc.toFixed(4));
+                s.setProperty('--dot-rotate', current.rot.toFixed(3) + 'deg');
+            }
+
+            // keep looping while values are still converging
+            var delta = Math.abs(current.mx - target.mx)
+                      + Math.abs(current.my - target.my)
+                      + Math.abs(current.py - target.py)
+                      + Math.abs(current.sc - target.sc)
+                      + Math.abs(current.rot - target.rot);
+            if (delta > 0.01) {
+                requestAnimationFrame(tick);
+            } else {
+                animating = false;
+            }
+        }
+
+        // initial scroll position
+        window.dispatchEvent(new Event('scroll'));
+    })();
+    </script>
+
+    <!-- Pipeline-stage FLIP filter for feature cards -->
+    <script>
+    (function() {
+        var strip  = document.getElementById('pipeline-strip');
+        var grid   = document.getElementById('feature-cards');
+        if (!strip || !grid) return;
+        var stages = strip.querySelectorAll('.pipeline-stage[data-filter]');
+        var cards  = Array.from(grid.querySelectorAll('.card[data-stage]'));
+        if (!stages.length || !cards.length) return;
+
+        var DUR = 450;
+        var EASE = 'cubic-bezier(.4,0,.2,1)';
+        var timer = null;
+        var active = null;
+
+        /* ── helpers ── */
+        function rect(el) { return el.getBoundingClientRect(); }
+
+        function clearInline(c) {
+            c.style.transition = 'none';
+            c.style.transform = '';
+            c.style.opacity = '';
+            c.style.position = '';
+            c.style.top = '';
+            c.style.left = '';
+            c.style.width = '';
+            c.style.zIndex = '';
+            c.style.margin = '';
+            c.style.display = '';
+            c.style.pointerEvents = '';
+        }
+
+        /* ── filter to a single stage ── */
+        function flipFilter(stage) {
+            if (active === stage) return;
+            clearTimeout(timer);
+            active = stage;
+
+            stages.forEach(function(s) {
+                s.classList.toggle('ps-active', s.getAttribute('data-filter') === stage);
+            });
+
+            /* FIRST: snapshot every visible card */
+            var first = new Map();
+            cards.forEach(function(c) {
+                if (c.style.display !== 'none') first.set(c, rect(c));
+            });
+            var gr = rect(grid);
+            grid.style.minHeight = gr.height + 'px';
+
+            /* Reset every card to natural flow so grid can measure */
+            cards.forEach(function(c) { clearInline(c); });
+
+            /* Classify */
+            var show = [], hide = [];
+            cards.forEach(function(c) {
+                (c.getAttribute('data-stage') === stage ? show : hide).push(c);
+            });
+
+            /* Pull hide-cards out of flow at their snapshot position */
+            hide.forEach(function(c) {
+                if (first.has(c)) {
+                    var f = first.get(c);
+                    c.style.position = 'absolute';
+                    c.style.top    = (f.top  - gr.top)  + 'px';
+                    c.style.left   = (f.left - gr.left) + 'px';
+                    c.style.width  = f.width + 'px';
+                    c.style.margin = '0';
+                    c.style.zIndex = '0';
+                    c.style.opacity = '1';
+                } else {
+                    c.style.display = 'none';
+                }
+            });
+
+            /* LAST: new positions of show-cards */
+            var last = new Map();
+            show.forEach(function(c) { last.set(c, rect(c)); });
+
+            /* INVERT show-cards */
+            show.forEach(function(c) {
+                var l = last.get(c);
+                if (first.has(c)) {
+                    var f = first.get(c);
+                    c.style.transform = 'translate(' + (f.left - l.left) + 'px,' + (f.top - l.top) + 'px)';
+                    c.style.opacity = '1';
+                } else {
+                    c.style.transform = 'scale(0.88)';
+                    c.style.opacity = '0';
+                }
+            });
+
+            /* force reflow */
+            grid.offsetHeight;
+
+            /* PLAY: everything animates simultaneously */
+            show.forEach(function(c) {
+                c.style.transition = 'transform ' + DUR + 'ms ' + EASE + ', opacity ' + (DUR - 100) + 'ms ' + EASE;
+                c.style.transform = '';
+                c.style.opacity = '';
+            });
+            hide.forEach(function(c) {
+                if (c.style.display !== 'none') {
+                    c.style.transition = 'transform ' + DUR + 'ms ' + EASE + ', opacity ' + (DUR - 120) + 'ms ' + EASE;
+                    c.style.transform = 'scale(0.88)';
+                    c.style.opacity = '0';
+                    c.style.pointerEvents = 'none';
+                }
+            });
+
+            timer = setTimeout(function() {
+                hide.forEach(function(c) { c.style.display = 'none'; });
+                grid.style.minHeight = '';
+            }, DUR + 20);
+        }
+
+        /* ── restore all cards ── */
+        function showAll() {
+            if (active === null) return;
+            clearTimeout(timer);
+            active = null;
+
+            stages.forEach(function(s) { s.classList.remove('ps-active'); });
+
+            /* FIRST: snapshot visible cards */
+            var first = new Map();
+            cards.forEach(function(c) {
+                if (c.style.display !== 'none' && c.style.position !== 'absolute') {
+                    first.set(c, rect(c));
+                }
+            });
+            var gr = rect(grid);
+            grid.style.minHeight = gr.height + 'px';
+
+            /* Reset all to flow */
+            cards.forEach(function(c) { clearInline(c); });
+
+            /* LAST */
+            var last = new Map();
+            cards.forEach(function(c) { last.set(c, rect(c)); });
+
+            /* INVERT */
+            cards.forEach(function(c) {
+                var l = last.get(c);
+                if (first.has(c)) {
+                    var f = first.get(c);
+                    c.style.transform = 'translate(' + (f.left - l.left) + 'px,' + (f.top - l.top) + 'px)';
+                    c.style.opacity = '1';
+                } else {
+                    c.style.transform = 'scale(0.88)';
+                    c.style.opacity = '0';
+                }
+            });
+
+            grid.offsetHeight;
+
+            /* PLAY */
+            cards.forEach(function(c) {
+                c.style.transition = 'transform ' + DUR + 'ms ' + EASE + ', opacity ' + (DUR - 100) + 'ms ' + EASE;
+                c.style.transform = '';
+                c.style.opacity = '';
+            });
+
+            timer = setTimeout(function() {
+                cards.forEach(function(c) { clearInline(c); });
+                grid.style.minHeight = '';
+            }, DUR + 20);
+        }
+
+        /* ── bind events (hover for desktop, tap for mobile) ── */
+        var isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+        stages.forEach(function(s) {
+            if (isTouchDevice) {
+                s.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var stage = s.getAttribute('data-filter');
+                    if (active === stage) {
+                        showAll();
+                    } else {
+                        flipFilter(stage);
+                    }
+                });
+            } else {
+                s.addEventListener('mouseenter', function() {
+                    flipFilter(s.getAttribute('data-filter'));
+                });
+            }
+        });
+        if (!isTouchDevice) {
+            strip.addEventListener('mouseleave', showAll);
+        }
+    })();
+    </script>
+
+    <!-- Version: read the generated library stats so the maturity note cannot go stale.
+         Mirrors the pattern in concepts/changelog.html. The HTML literal is the
+         build-time fallback used when this fetch does not run (e.g. file://). -->
+    <script>
+    (function () {
+        fetch('data/library-stats.json', { cache: 'no-cache' })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function (s) {
+                var el = document.getElementById('stat-version');
+                if (el && s.version) { el.textContent = s.version; }
+                /* The wider-surface figures in the maturity note. Filled from the
+                   same file the hardening page reads, because the literals here
+                   said 420 graded and 95 defect open for nine days after both
+                   stopped being true. A class that does not resolve keeps its
+                   literal; a figure is never blanked. */
+                var g = s && s.kpis && s.kpis.hardening && s.kpis.hardening.grading;
+                if (!g || !g.available) { return; }
+                function put(sel, v) {
+                    if (v == null || isNaN(v)) { return; }
+                    var n = document.querySelectorAll(sel);
+                    for (var i = 0; i < n.length; i++) {
+                        n[i].textContent = Number(v).toLocaleString('en-US');
+                    }
+                }
+                put('.stat-grade-items', g.items);
+                put('.stat-grade-unaudited', g.unaudited);
+                put('.stat-grade-defect', (g.by_grade || {})['DEFECT OPEN'] || 0);
+            })
+            .catch(function () { /* keep the build-time fallback value */ });
+    })();
+    </script>
+
+</body>
+</html>

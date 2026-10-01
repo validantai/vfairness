@@ -1,0 +1,147 @@
+{# ── FairnessMonitor · Alert Timeline SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set stats_h = 56 %}
+{% set table_header_h = 40 %}
+{% set table_row_h = 34 %}
+{% set table_h = table_header_h + entries|length * table_row_h + 10 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}
+{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 40 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{% set stats_y = header_h %}
+{% set table_y = stats_y + stats_h + 16 %}
+{% set exp_y = table_y + table_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   An empty history collapses the tiles and the table to one panel. TOTAL EVENTS
+   0 / WITH ALERTS 0 / CLEAN 0 in emerald is the canvas for a monitored period
+   that stayed clean, and nothing here was monitored: 0 clean out of 0 is not a
+   clean bill of health. #}
+{% if not_assessable %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = header_h %}
+{% set exp_y = na_y + na_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{% if not_assessable %}
+<text x="36" y="122" font-size="10" fill="#64748b">No monitoring window in this history</text>
+{% include '_could_not_check.svg' %}
+{% else %}
+<text x="36" y="122" font-size="10" fill="#64748b">{{ n_total }} monitoring events · {{ n_alerted }} with alerts · {{ n_clean }} clean{% if n_unmonitored|default(0) > 0 %} · {{ n_unmonitored }} not monitored{% endif %}</text>
+
+{# ── Stats badges row ── #}
+<rect x="36" y="{{ stats_y }}" width="200" height="{{ stats_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ stats_y }}" width="2.5" height="{{ stats_h }}" rx="1" fill="#3b82f6"/>
+<text x="56" y="{{ stats_y + 20 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">TOTAL EVENTS</text>
+<text x="56" y="{{ stats_y + 42 }}" font-size="20" font-weight="700" fill="#0f172a">{{ n_total }}</text>
+
+<rect x="252" y="{{ stats_y }}" width="200" height="{{ stats_h }}" rx="10" fill="#ffffff"/>
+<rect x="252" y="{{ stats_y }}" width="2.5" height="{{ stats_h }}" rx="1" fill="#dc2626"/>
+<text x="272" y="{{ stats_y + 20 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">WITH ALERTS</text>
+<text x="272" y="{{ stats_y + 42 }}" font-size="20" font-weight="700" fill="#dc2626">{{ n_alerted }}</text>
+
+<rect x="468" y="{{ stats_y }}" width="212" height="{{ stats_h }}" rx="10" fill="#ffffff"/>
+<rect x="468" y="{{ stats_y }}" width="2.5" height="{{ stats_h }}" rx="1" fill="#059669"/>
+<text x="488" y="{{ stats_y + 20 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">CLEAN</text>
+<text x="488" y="{{ stats_y + 42 }}" font-size="20" font-weight="700" fill="#059669">{{ n_clean }}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Timeline Table                                                    #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ table_y }}" width="644" height="{{ table_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">TIMESTAMP</text>
+<text x="220" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">SAMPLES</text>
+<text x="290" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">ALERTS</text>
+<text x="360" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">FLAGGED METRICS</text>
+<text x="610" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">STATUS</text>
+<line x1="56" y1="{{ table_y + 32 }}" x2="660" y2="{{ table_y + 32 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for e in entries %}
+{% set ry = table_y + table_header_h + loop.index0 * table_row_h %}
+{# Alert row background #}
+{% if e.any_alert %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ table_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ table_row_h }}" fill="#dc2626"/>
+{% endif %}
+
+{# Timestamp #}
+<text x="56" y="{{ ry + 20 }}" font-size="10" font-weight="500" fill="#0f172a">{{ e.timestamp }}</text>
+
+{# Sample count #}
+<text x="220" y="{{ ry + 20 }}" font-size="10" fill="#475569">{{ e.sample_count }}</text>
+
+{# Alert count. Three states, never two: a window that applied no guardrail has
+   no alert count to print, and the emerald 0 it used to get is exactly the cell
+   a genuinely clean window prints. Slate italic, and the word says which. #}
+{% if not e.checked %}
+<text x="290" y="{{ ry + 20 }}" font-size="8" font-style="italic" fill="#64748b">{{ e.n_alerts_display }}</text>
+{% elif e.n_alerts > 0 %}
+<text x="290" y="{{ ry + 20 }}" font-size="10" font-weight="600" fill="#dc2626">{{ e.n_alerts }}</text>
+{% else %}
+<text x="290" y="{{ ry + 20 }}" font-size="10" fill="#059669">0</text>
+{% endif %}
+
+{# Flagged metric names #}
+<text x="360" y="{{ ry + 20 }}" font-size="9" fill="#6b7280">{{ e.flagged_names|truncate_text(35) }}</text>
+
+{# Status badge. OK is a VERDICT about a window that was watched, so it is not
+   available to a window that watched nothing: no alert fired there because no
+   guardrail was applied, not because the metrics were healthy. The third state
+   gets no pill at all, so it cannot be read as a verdict at a glance. #}
+{% if e.any_alert %}
+<rect x="594" y="{{ ry + 6 }}" width="60" height="20" rx="10" fill="#fef2f2"/>
+<text x="624" y="{{ ry + 20 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#dc2626">{{ e.status_label }}</text>
+{% elif e.checked %}
+<rect x="594" y="{{ ry + 6 }}" width="60" height="20" rx="10" fill="#ecfdf5"/>
+<text x="624" y="{{ ry + 20 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#059669">{{ e.status_label }}</text>
+{% else %}
+<text x="624" y="{{ ry + 20 }}" text-anchor="middle" font-size="7.5" font-style="italic" fill="#64748b">{{ e.status_label }}</text>
+{% endif %}
+
+{# Row separator #}
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + table_row_h }}" x2="660" y2="{{ ry + table_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+{% endif %}{# end: not not_assessable #}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

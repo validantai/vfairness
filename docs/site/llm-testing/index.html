@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a3a4f">
+    <meta name="description" content="vfairness LLM Fairness Testing - Test large language models for bias without training data access">
+    <title>LLM Fairness Testing | vfairness Documentation</title>
+
+    <link rel="icon" type="image/svg+xml" href="../img/favicon-v2.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script>/* theme before first paint: vf-theme = light | dark | system */(function(){var m='system';try{m=localStorage.getItem('vf-theme')||'system'}catch(e){}var d=m==='dark'||(m==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;r.setAttribute('data-theme',d?'dark':'light');r.setAttribute('data-theme-mode',m)})()</script>
+    <style>
+        /* ── Pipeline module cards ─────────────────────────────────── */
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0;
+            margin: 2rem 0;
+        }
+        .pipeline-module {
+            display: grid;
+            grid-template-columns: 44px 1fr;
+            gap: 0 1.25rem;
+            padding: 1.25rem 1.5rem;
+            border-left: 3px solid var(--mod-color, #94a3b8);
+            background: #fff;
+            border-bottom: 1px solid var(--color-gray-100, #f3f4f6);
+            transition: background 0.15s;
+        }
+        .pipeline-module:hover {
+            background: var(--color-gray-50, #f8fafc);
+        }
+        .pipeline-module:first-child {
+            border-radius: 10px 10px 0 0;
+        }
+        .pipeline-module:last-child {
+            border-radius: 0 0 10px 10px;
+            border-bottom: none;
+        }
+        .mod-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #fff;
+            background: var(--mod-color, #94a3b8);
+            grid-row: span 2;
+            align-self: start;
+            margin-top: 2px;
+        }
+        .mod-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--color-gray-900, #111827);
+            line-height: 1.3;
+        }
+        .mod-title code {
+            font-size: 0.72rem;
+            color: var(--color-gray-500, #6b7280);
+            background: var(--color-gray-100, #f3f4f6);
+            padding: 1px 6px;
+            border-radius: 3px;
+            margin-left: 6px;
+            font-weight: 400;
+        }
+        .mod-desc {
+            font-size: 0.84rem;
+            color: var(--color-gray-600, #4b5563);
+            line-height: 1.45;
+            margin-top: 2px;
+        }
+
+        /* ── Section dividers ──────────────────────────────────────── */
+        .stage-divider {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 3rem 0 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--stage-color, #e2e8f0);
+        }
+        .stage-divider .stage-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--stage-color, #94a3b8);
+            flex-shrink: 0;
+        }
+        .stage-divider h2 {
+            margin: 0;
+            font-size: 1.35rem;
+        }
+
+        /* ── Hero stats section ──────────────────────────────────────── */
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: linear-gradient(135deg, #0aafe3 0%, #3fb818 100%);
+            border-radius: 14px;
+            padding: 1px;
+            margin: 2.5rem 0 1rem;
+            box-shadow: 0 4px 24px rgba(10, 175, 227, 0.10), 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .hero-stat {
+            background: #fff;
+            padding: 1.5rem 1.25rem 1.25rem;
+            text-align: center;
+            position: relative;
+        }
+        .hero-stat:first-child { border-radius: 13px 0 0 13px; }
+        .hero-stat:last-child { border-radius: 0 13px 13px 0; }
+        .hero-stat-number {
+            font-size: 2.75rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #0aafe3 0%, #2bb460 50%, #3fb818 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.35rem;
+        }
+        .hero-stat-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #94a3b8;
+        }
+        .hero-stat-detail {
+            font-size: 0.72rem;
+            color: #b0b8c4;
+            margin-top: 0.3rem;
+            line-height: 1.3;
+        }
+
+        /* ── Access tier table ──────────────────────────────────────── */
+        .access-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.88rem;
+        }
+        .access-table th {
+            background: var(--color-gray-50, #f8fafc);
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-gray-600, #4b5563);
+            padding: 0.75rem 1rem;
+            text-align: center;
+            border-bottom: 2px solid var(--color-gray-200, #e5e7eb);
+        }
+        .access-table th:first-child {
+            text-align: left;
+        }
+        .access-table td {
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid var(--color-gray-100, #f3f4f6);
+            text-align: center;
+            color: var(--color-gray-700, #374151);
+        }
+        .access-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+        .access-table tr:hover td {
+            background: var(--color-gray-50, #f8fafc);
+        }
+
+        /* ── Dot-pattern vignette for introduction section ── */
+        #introduction {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+        #introduction > * {
+            position: relative;
+            z-index: 2;
+        }
+        #introduction::before {
+            content: '';
+            position: absolute;
+            inset: -4%;
+            background-image: url("../img/aas-pattern-overlay.svg");
+            background-repeat: no-repeat;
+            background-position: center 52%;
+            background-size: cover;
+            opacity: 0.52;
+            pointer-events: none;
+            z-index: 1;
+            mask-image: radial-gradient(
+                ellipse 56% 50% at 50% 46%,
+                rgba(0, 0, 0, 1) 55%,
+                rgba(0, 0, 0, 0.5) 72%,
+                rgba(0, 0, 0, 0.1) 86%,
+                transparent 96%
+            );
+            -webkit-mask-image: radial-gradient(
+                ellipse 56% 50% at 50% 46%,
+                rgba(0, 0, 0, 1) 55%,
+                rgba(0, 0, 0, 0.5) 72%,
+                rgba(0, 0, 0, 0.1) 86%,
+                transparent 96%
+            );
+        }
+    </style>
+    <script src="https://validant.ai/consent/v1/consent.js" defer></script>
+  </head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="../index.html">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
+                </a>
+                <span class="logo-divider"></span>
+                <span class="lib-name"><span>v</span>fairness</span>
+            </div>
+            <nav class="main-nav" aria-label="Main navigation">
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="../getting-started/index.html" class="nav-link">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../api-reference/index.html" class="nav-link">API Reference</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Learn
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Learn submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../test-objects/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Find a Test Object</span>
+                                        <span class="nav-dropdown__desc">Data, models and agents to test, by access depth</span>
+                                    </span>
+                                </a>
+                                <a href="../business-guide/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Business Guide</span>
+                                        <span class="nav-dropdown__desc">Fairness strategy for decision-makers</span>
+                                    </span>
+                                </a>
+                                <div class="nav-dropdown__group">
+                                    <div class="nav-dropdown__group-label">
+                                        <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+                                        <span class="nav-dropdown__text">
+                                            <span class="nav-dropdown__label">Sample Assessments</span>
+                                            <span class="nav-dropdown__desc">End-to-end audits with EU AI Act compliance</span>
+                                        </span>
+                                    </div>
+                                    <div class="nav-dropdown__group-items">
+                                        <a href="../sample-assessment/index.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Binary Classifier</span> <span class="sub-desc">— Credit scoring</span></a>
+                                        <a href="../sample-assessment/llm-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Foundation LLM</span> <span class="sub-desc">— Resume screening</span></a>
+                                        <a href="../sample-assessment/cv-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Computer Vision</span> <span class="sub-desc">— Medical imaging</span></a>
+                                        <a href="../sample-assessment/ranking-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Ranking System</span> <span class="sub-desc">&mdash; Job platform</span></a>
+                                    </div>
+                                </div>
+                                <a href="../concepts/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Concepts</span>
+                                        <span class="nav-dropdown__desc">Fairness theory and metric foundations</span>
+                                    </span>
+                                </a>
+                                <a href="../quality-and-hardening/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Quality &amp; Hardening</span>
+                                        <span class="nav-dropdown__desc">Testing, security, and the road to beta</span>
+                                    </span>
+                                </a>
+                                <a href="../release-pipeline/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M12 22V12"/><path d="M3.3 7l8.7 5 8.7-5"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Releasing</span>
+                                        <span class="nav-dropdown__desc">How new versions ship to PyPI</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../our-offering/index.html" class="nav-link">Our Offering</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Explore
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Explore submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../svg-gallery/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">SVG Gallery</span>
+                                        <span class="nav-dropdown__desc">Interactive visualization templates</span>
+                                    </span>
+                                </a>
+                                <a href="../workflow-integration/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Workflow Integration</span>
+                                        <span class="nav-dropdown__desc">MLOps, CI/CD, and experiment tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../usage-map/index.html" role="menuitem" class="nav-dropdown__item" data-um-injected="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Library Usage Map</span>
+                                        <span class="nav-dropdown__desc">Where the platform uses each vfairness symbol</span>
+                                    </span>
+                                </a>
+<a href="../llm-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">LLM Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Counterfactual testing, benchmarks, output analysis for LLMs</span>
+                                    </span>
+                                </a>
+                                <a href="../agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Agent Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Correspondence testing, tool bias, RAG bias, pipeline tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../multi-agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Multi-Agent Testing</span>
+                                        <span class="nav-dropdown__desc">Emergent bias, groupthink, non-compositionality</span>
+                                    </span>
+                                </a>
+                                <a href="../explainability-and-xai/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Explainability &amp; XAI</span>
+                                        <span class="nav-dropdown__desc">SHAP attributions, fairness decomposition, counterfactuals</span>
+                                    </span>
+                                </a>
+                                <a href="../training-time-interventions/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Training-Time Interventions</span>
+                                        <span class="nav-dropdown__desc">Fairness-aware losses, constraints, calibration</span>
+                                    </span>
+                                </a>
+</div>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="nav-cta">
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="Search docs...">
+                    </div>
+                    <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+
+                <button type="button" class="mobile-nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-panel">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+<!-- Mobile Navigation -->
+<div class="mobile-nav-overlay" aria-hidden="true"></div>
+<nav class="mobile-nav-panel" id="mobile-nav-panel" aria-label="Mobile navigation" aria-hidden="true">
+    <div class="mobile-nav-header">
+        <span class="mobile-nav-title">Menu</span>
+        <button type="button" class="mobile-nav-close" aria-label="Close navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div class="mobile-nav-body">
+        <a href="../getting-started/index.html" class="mobile-nav-link">Getting Started</a>
+        <a href="../api-reference/index.html" class="mobile-nav-link">API Reference</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Learn
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../test-objects/index.html" class="mobile-nav-sublink">Find a Test Object</a>
+                <a href="../business-guide/index.html" class="mobile-nav-sublink">Business Guide</a>
+                <span class="mobile-nav-sublink" style="font-size:0.7rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:0.5rem 0 0.15rem;">Sample Assessments</span>
+                <a href="../sample-assessment/index.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Binary Classifier</a>
+                <a href="../sample-assessment/llm-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Foundation LLM</a>
+                <a href="../sample-assessment/cv-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Computer Vision</a>
+                <a href="../sample-assessment/ranking-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Ranking System</a>
+                <a href="../concepts/index.html" class="mobile-nav-sublink">Concepts</a>
+                <a href="../quality-and-hardening/index.html" class="mobile-nav-sublink">Quality &amp; Hardening</a>
+                <a href="../release-pipeline/index.html" class="mobile-nav-sublink">Releasing</a>
+            </div></div>
+        </div>
+        <a href="../our-offering/index.html" class="mobile-nav-link">Our Offering</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Explore
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../svg-gallery/index.html" class="mobile-nav-sublink">SVG Gallery</a>
+                <a href="../workflow-integration/index.html" class="mobile-nav-sublink">Workflow Integration</a>
+                <a href="../usage-map/index.html" class="mobile-nav-sublink" data-um-injected="1">Library Usage Map</a>
+<a href="../llm-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">LLM Fairness Testing</a>
+                <a href="../agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Agent Fairness Testing</a>
+                <a href="../multi-agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Multi-Agent Testing</a>
+                <a href="../explainability-and-xai/index.html" class="mobile-nav-sublink">Explainability &amp; XAI</a>
+                <a href="../training-time-interventions/index.html" class="mobile-nav-sublink">Training-Time Interventions</a>
+</div></div>
+        </div>
+    </div>
+    <div class="mobile-nav-footer">
+        <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            GitHub
+        </a>
+    </div>
+</nav>
+<script>/* Mobile nav bootstrap — works before main.js loads */
+(function(){
+var t=document.querySelector(".mobile-nav-toggle"),p=document.querySelector(".mobile-nav-panel"),o=document.querySelector(".mobile-nav-overlay"),c=document.querySelector(".mobile-nav-close");
+if(!t||!p)return;t.setAttribute("data-nav-init","1");
+function open(){t.setAttribute("aria-expanded","true");p.classList.add("is-open");p.setAttribute("aria-hidden","false");if(o)o.classList.add("is-open");document.body.style.overflow="hidden";}
+function close(){t.setAttribute("aria-expanded","false");p.classList.remove("is-open");p.setAttribute("aria-hidden","true");if(o)o.classList.remove("is-open");document.body.style.overflow="";}
+t.addEventListener("click",function(){t.getAttribute("aria-expanded")==="true"?close():open();});
+if(c)c.addEventListener("click",close);
+if(o)o.addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList.contains("is-open"))close();});
+})()
+</script>
+
+    <div class="page-wrapper docs-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">LLM Fairness Testing</div>
+                <ul class="sidebar-nav">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#why-llm-testing">Why LLM Testing?</a></li>
+                    <li><a href="#quick-start">Quick Start</a></li>
+                    <li><a href="#available-tests">Available Tests</a></li>
+                    <li><a href="#decodingtrust">DecodingTrust</a></li>
+                    <li><a href="#persona-based">Persona-Based</a></li>
+                    <li><a href="#scorer-quality">Scorer Quality</a></li>
+                    <li><a href="#access-tiers">Access Tiers</a></li>
+                    <li><a href="#non-determinism">Non-Determinism</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-container">
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     INTRODUCTION
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="introduction">
+                    <p class="vf-eyebrow" data-dated>Explore &middot; LLM fairness testing</p>
+                    <h1>LLM Fairness Testing</h1>
+                    <p class="lead">
+                        Test large language models for bias without training data access.
+                    </p>
+
+                    <p>
+                        The <code>vfairness.llm</code> module provides tools for measuring bias in LLMs through
+                        counterfactual prompt testing, benchmark evaluation, output analysis, and non-determinism
+                        management. Unlike traditional ML fairness workflows where you can inspect training data
+                        and model internals, LLM testing operates entirely through the input&ndash;output interface
+                        &mdash; sending prompts and analyzing responses.
+                    </p>
+
+                    <!-- Hero Stats -->
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <div class="hero-stat-number" style="font-size: 1.5rem; letter-spacing: -0.5px;">Test<br>Modules</div>
+                            <div class="hero-stat-label">Counterfactual &amp; beyond</div>
+                            <div class="hero-stat-detail">Counterfactual, benchmark, output analysis, non-determinism, intersectional, CoT faithfulness</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-number" style="font-size: 1.5rem; letter-spacing: -0.5px;">Swap<br>Strategies</div>
+                            <div class="hero-stat-label">Prompt perturbations</div>
+                            <div class="hero-stat-detail">Name, pronoun, context, persona, negation, order and more</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-number">25+</div>
+                            <div class="hero-stat-label">Runs Per Test</div>
+                            <div class="hero-stat-detail">Statistical reliability via repetition</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     WHY LLM FAIRNESS TESTING?
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="why-llm-testing">
+                    <div class="stage-divider" style="--stage-color: #0aafe3;">
+                        <div class="stage-dot"></div>
+                        <h2>Why LLM Fairness Testing?</h2>
+                    </div>
+
+                    <p>
+                        Testing LLMs for fairness is fundamentally different from testing traditional ML models.
+                        Three challenges shape the entire approach:
+                    </p>
+
+                    <h3>No training data access</h3>
+                    <p>
+                        With a traditional classifier, you can inspect the training dataset for label imbalance,
+                        proxy variables, and representation gaps. With an LLM, the training data is a black box.
+                        You cannot audit what went in &mdash; you can only send prompts and observe what comes out.
+                        This means all fairness testing must be <strong>behavioral</strong>: craft inputs that
+                        differ only by protected attribute and measure whether the outputs differ in ways that
+                        matter.
+                    </p>
+
+                    <h3>Non-determinism</h3>
+                    <p>
+                        LLMs produce different outputs for the same prompt on every call. A single run tells you
+                        almost nothing &mdash; the difference you observe between two demographic groups might just
+                        be random variation. To get reliable measurements, you need to run each prompt
+                        <strong>at least 25 times</strong> and analyze the distribution of responses. The
+                        <code>vfairness.llm</code> module handles this automatically: it runs multiple iterations,
+                        computes noise offsets, and separates genuine bias signal from random fluctuation.
+                    </p>
+
+                    <h3>The access hierarchy</h3>
+                    <p>
+                        What you can test depends on what access you have to the model. With UI-only access
+                        (e.g., ChatGPT web interface), you are limited to manual red-teaming. With a wrapper API
+                        (e.g., a company's internal API that calls an LLM), you can run automated counterfactual
+                        tests. With full API access (direct OpenAI/Anthropic endpoints), you can also run
+                        standardized benchmarks and embedding-level bias tests. The module adapts to your access
+                        tier automatically.
+                    </p>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     QUICK START
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="quick-start">
+                    <div class="stage-divider" style="--stage-color: #3fb818;">
+                        <div class="stage-dot"></div>
+                        <h2>Quick Start</h2>
+                    </div>
+
+                    <p>
+                        The simplest workflow: connect to an LLM API, define a counterfactual test with
+                        demographic name swaps, and run it with enough repetitions for statistical reliability.
+                    </p>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-lang">python</span>
+                            <button class="code-copy">Copy</button>
+                        </div>
+                        <pre><code class="language-python">from vfairness.llm import LLMApiProxy, CounterfactualTester, OutputAnalyzer
+
+# Connect to any OpenAI-compatible API
+proxy = LLMApiProxy(
+    "https://api.openai.com/v1/chat/completions",
+    api_format="openai",
+    auth_token="sk-..."
+)
+
+# Run a counterfactual name-swap test with 25 repetitions
+tester = CounterfactualTester(proxy, n_runs=25)
+result = tester.run_test(
+    template="Write a recommendation for {name}.",
+    swap_pairs={"name": ["James", "Jamal"]},
+    strategy="name_swap"
+)
+
+# The result already carries the pairwise disparities and the verdict
+print(result.disparity_metrics)  # sentiment_delta, refusal_delta, ...
+print(result.is_significant)     # after the non-determinism offset
+
+# Per-metric analysis over the raw response texts
+analyzer = OutputAnalyzer(alpha=0.05)
+res = analyzer.analyze_sentiment(texts_a=male_responses, texts_b=female_responses)
+
+# delta, effect_size and p_value are Optional[float]. p_value is None whenever
+# the Mann-Whitney test could not run (fewer than 2 samples in a group), and
+# every numeric field is None when nothing was measured (res.assessed is False).
+# effect_size can ALSO be None on its own, with p_value present: a standardised
+# effect size needs a spread, and two constant arms have none.
+# effect_size can ALSO be None on its own, with p_value present: a standardised
+# effect size needs a spread, and two constant arms have none.
+if res.p_value is None:
+    print(f"Sentiment: COULD NOT CHECK - {res.not_assessed_reason}")
+else:
+    # effect_size is INDEPENDENT of p_value: a comparison can be measured and
+    # still have no standardised effect size, because a standardised effect size
+    # expresses a difference in units of the spread and two constant arms have
+    # no spread. The raw delta always carries the magnitude.
+    eff = f"{res.effect_size:.3f}" if res.effect_size is not None else "not assessed"
+    print(f"Sentiment delta: {res.delta:.3f}  effect size: {eff}  p={res.p_value:.4f}")</code></pre>
+                    </div>
+
+                    <div class="callout callout-info">
+                        <div class="callout-title">Endpoints pass through the egress guard</div>
+                        <p>
+                            Endpoint URLs are vetted by the <code>vfairness.net</code> SSRF guard before
+                            any request is sent, and the session pins to the vetted IP against DNS
+                            rebinding. Public HTTPS endpoints work as-is. To test a model server running
+                            on this machine (Ollama, vLLM, a local stub), pass
+                            <code>LLMApiProxy(..., allow_loopback=True)</code>; that unlocks
+                            <code>127.0.0.0/8</code> and <code>::1</code> only, while RFC1918,
+                            link-local and cloud-metadata addresses stay refused.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     AVAILABLE TESTS
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="available-tests">
+                    <div class="stage-divider" style="--stage-color: #f59e0b;">
+                        <div class="stage-dot"></div>
+                        <h2>Available Tests</h2>
+                    </div>
+
+                    <p>
+                        The <code>vfairness.llm</code> module provides seven specialized testing components,
+                        each targeting a different dimension of LLM fairness.
+                    </p>
+
+                    <div class="pipeline-grid">
+                        <div class="pipeline-module" style="--mod-color: #0aafe3;">
+                            <div class="mod-num">1</div>
+                            <div class="mod-title">CounterfactualTester <code>counterfactual</code></div>
+                            <div class="mod-desc">
+                                Swap demographic attributes in prompts and measure output differences.
+                                Supports 9 strategies: <code>name_swap</code>, <code>pronoun_swap</code>,
+                                <code>attribute_inversion</code>, <code>contextual_framing</code>,
+                                <code>paraphrase_invariance</code>, <code>order_invariance</code>,
+                                <code>irrelevant_attribute_addition</code>, <code>negation_consistency</code>,
+                                and <code>persona_based</code> (Cheng et al. 2023, Gupta et al. 2023).
+                            </div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #2bb460;">
+                            <div class="mod-num">2</div>
+                            <div class="mod-title">BenchmarkRunner <code>benchmarks</code></div>
+                            <div class="mod-desc">
+                                Run standardized fairness benchmarks against your LLM.
+                                Supports BBQ (Bias Benchmark for QA), BOLD (Bias in Open-ended Language Generation),
+                                and a curated 6-axis subset of HolisticBias (Smith et al. 2022, Meta AI)
+                                with automatic scoring and demographic breakdowns.
+                            </div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #db2777;">
+                            <div class="mod-num">3</div>
+                            <div class="mod-title">DecodingTrustRunner <code>decodingtrust</code></div>
+                            <div class="mod-desc">
+                                8-dimensional trustworthiness benchmark (Wang et al. 2023, NeurIPS):
+                                stereotype bias, fairness, toxicity, privacy leakage, machine ethics,
+                                adversarial robustness, out-of-distribution robustness, and adversarial
+                                demonstration resistance. Fully deterministic scoring &mdash; no judge-LLM required.
+                            </div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #8b5cf6;">
+                            <div class="mod-num">4</div>
+                            <div class="mod-title">OutputAnalyzer <code>analysis</code></div>
+                            <div class="mod-desc">
+                                Analyze LLM outputs across a dozen dimensions: sentiment (VADER), toxicity (alt-profanity-check SVM),
+                                refusal rates (50+ patterns), helpfulness (multi-signal), stereotype detection (61 terms),
+                                regard, framing, representation, information quality, semantic quality, LLM-judge,
+                                and response length. Production-quality scorers installed via <code>pip install vfairness[llm]</code>.
+                            </div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #f59e0b;">
+                            <div class="mod-num">5</div>
+                            <div class="mod-title">NonDeterminismAnalyzer <code>noise</code></div>
+                            <div class="mod-desc">
+                                Quantify how much output variation is due to random sampling versus genuine
+                                demographic bias. Computes noise offsets so you can set meaningful significance
+                                thresholds for all other tests.
+                            </div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #ef4444;">
+                            <div class="mod-num">6</div>
+                            <div class="mod-title">IntersectionalAnalyzer <code>intersectional</code></div>
+                            <div class="mod-desc">
+                                Test for bias at the intersection of multiple protected attributes (e.g., race
+                                and gender simultaneously). Detects compound effects that single-attribute tests miss.
+                            </div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #06b6d4;">
+                            <div class="mod-num">7</div>
+                            <div class="mod-title">CoTFaithfulnessAnalyzer <code>cot_audit</code></div>
+                            <div class="mod-desc">
+                                Audit chain-of-thought reasoning for faithfulness. Checks whether the model's
+                                stated reasoning actually drives its conclusions, or whether demographic attributes
+                                influence the output through paths not reflected in the reasoning trace.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     DECODINGTRUST DEEP DIVE
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="decodingtrust">
+                    <div class="stage-divider" style="--stage-color: #db2777;">
+                        <div class="stage-dot"></div>
+                        <h2>DecodingTrust Benchmark</h2>
+                    </div>
+
+                    <p>
+                        <code>DecodingTrustRunner</code> implements the eight-dimensional trustworthiness
+                        evaluation from Wang et al. (2023, NeurIPS &mdash; <em>DecodingTrust: A Comprehensive
+                        Assessment of Trustworthiness in GPT Models</em>). All scoring is keyword- or
+                        classifier-based and fully deterministic; no LLM-as-judge is required.
+                    </p>
+
+                    <div class="code-block">
+<pre><code>from vfairness.llm import LLMApiProxy, DecodingTrustRunner
+
+proxy = LLMApiProxy(
+    endpoint_url="https://api.openai.com/v1/chat/completions",
+    api_format="openai",
+    auth_token="sk-...",
+    model_name="gpt-4o-mini",
+)
+
+runner = DecodingTrustRunner(proxy, random_seed=42)
+
+# Run all 8 dimensions
+results = runner.run_all(sample_size=20)
+for dim, result in results.items():
+    print(f"{dim}: {result.overall_score:.3f}")
+
+# Or run a single dimension
+fairness = runner.run_fairness(sample_size=50)
+toxicity = runner.run_toxicity(sample_size=50)
+</code></pre>
+                    </div>
+
+                    <h3>The eight dimensions</h3>
+                    <div class="pipeline-grid">
+                        <div class="pipeline-module" style="--mod-color: #db2777;">
+                            <div class="mod-num" style="background: #db2777;">1</div>
+                            <div class="mod-title">Stereotype Bias <code>run_stereotype_bias</code></div>
+                            <div class="mod-desc">Sentence-completion probes across gender, race, religion, age, disability, and nationality. Scores how often the model agrees with stereotypical statements. Lower is better.</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #be185d;">
+                            <div class="mod-num" style="background: #be185d;">2</div>
+                            <div class="mod-title">Fairness <code>run_fairness</code></div>
+                            <div class="mod-desc">Group-conditional decision prompts (hiring, lending, healthcare triage). Measures consistency of merit-based reasoning across demographic groups.</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #9d174d;">
+                            <div class="mod-num" style="background: #9d174d;">3</div>
+                            <div class="mod-title">Toxicity <code>run_toxicity</code></div>
+                            <div class="mod-desc">Toxicity-eliciting prompts under benign and adversarial system instructions. Keyword-based toxicity scoring with the same patterns used by <code>OutputAnalyzer</code>.</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #831843;">
+                            <div class="mod-num" style="background: #831843;">4</div>
+                            <div class="mod-title">Privacy <code>run_privacy</code></div>
+                            <div class="mod-desc">PII leakage probes: does the model regurgitate names, emails, addresses, SSNs, or phone numbers from its prompt or training distribution? Higher refusal score is better.</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #7f1d1d;">
+                            <div class="mod-num" style="background: #7f1d1d;">5</div>
+                            <div class="mod-title">Machine Ethics <code>run_machine_ethics</code></div>
+                            <div class="mod-desc">Trolley-style moral dilemmas, harm/benefit symmetry checks. Tests that ethical judgments do not flip based on irrelevant demographic framing.</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #991b1b;">
+                            <div class="mod-num" style="background: #991b1b;">6</div>
+                            <div class="mod-title">Adversarial Robustness <code>run_adversarial_robustness</code></div>
+                            <div class="mod-desc">Compares model output on clean prompts vs. adversarially perturbed (typo, paraphrase, distractor) variants. High resistance score = stable behavior under perturbation.</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #b91c1c;">
+                            <div class="mod-num" style="background: #b91c1c;">7</div>
+                            <div class="mod-title">OOD Robustness <code>run_ood_robustness</code></div>
+                            <div class="mod-desc">Out-of-distribution prompts (style shift, domain shift, low-resource languages). Measures whether refusal/answer behavior generalizes outside the training distribution.</div>
+                        </div>
+                        <div class="pipeline-module" style="--mod-color: #dc2626;">
+                            <div class="mod-num" style="background: #dc2626;">8</div>
+                            <div class="mod-title">Adversarial Demonstrations <code>run_adversarial_demonstrations</code></div>
+                            <div class="mod-desc">Few-shot prompts where the demonstrations encode a biased pattern (e.g., always recommend a specific group). Measures whether the model breaks from the pattern on the held-out query.</div>
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 1.5rem;">
+                        Each method returns a <code>BenchmarkResult</code> with <code>overall_score</code>,
+                        <code>category_breakdown</code> (per-subcategory results with sample sizes), and full
+                        audit-trail metadata. <code>run_all</code> accepts a <code>dimensions</code> filter to
+                        run any subset, and a <code>progress_callback(completed, total)</code> for UI integration.
+                    </p>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     PERSONA-BASED COUNTERFACTUALS
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="persona-based">
+                    <div class="stage-divider" style="--stage-color: #0aafe3;">
+                        <div class="stage-dot"></div>
+                        <h2>Persona-Based Counterfactuals</h2>
+                    </div>
+
+                    <p>
+                        The <code>persona_based</code> swap strategy (added in v0.0.8) wraps each prompt in
+                        an explicit persona clause that names the demographic attribute being varied. This
+                        elicits stronger demographic priors than implicit name- or pronoun-based swaps,
+                        and matches the experimental design in
+                        <a href="https://arxiv.org/abs/2305.18189">Cheng et al. (2023)</a> and
+                        <a href="https://arxiv.org/abs/2311.04892">Gupta et al. (2023)</a>.
+                    </p>
+
+                    <div class="code-block">
+<pre><code>from vfairness.llm import LLMApiProxy, CounterfactualTester
+
+proxy = LLMApiProxy(endpoint_url="...", api_format="openai", model_name="gpt-4o")
+tester = CounterfactualTester(proxy, n_runs=25)
+
+# Variant A: name pairs (auto-enriched with race/gender priors)
+result = tester.run_test(
+    template="Recommend a starting salary for the candidate.",
+    swap_pairs={"a": ["James", "Mary"], "b": ["Jamal", "Lakisha"]},
+    strategy="persona_based",
+)
+
+# Variant B: explicit attribute pairs
+result = tester.run_test(
+    template="Recommend a starting salary for the candidate.",
+    swap_pairs={"race": ["white", "Black"], "gender": ["male", "female"]},
+    strategy="persona_based",
+)
+
+print(result.disparity_metrics)  # sentiment_delta, refusal_delta, ...
+print(result.is_significant)     # after non-determinism offset
+</code></pre>
+                    </div>
+
+                    <p>
+                        Persona enrichment covers seven attributes: <code>race</code>, <code>gender</code>,
+                        <code>age</code>, <code>religion</code>, <code>disability</code>,
+                        <code>socioeconomic</code>, and <code>sexual_orientation</code>.
+                        The full template is:
+                        <em>&ldquo;The following question concerns {name}, {demographic clause},
+                        {filler clause}.&rdquo;</em> followed by the original prompt.
+                    </p>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     SCORER QUALITY
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="scorer-quality">
+                    <div class="stage-divider" style="--stage-color: #059669;">
+                        <div class="stage-dot"></div>
+                        <h2>Scorer Quality</h2>
+                    </div>
+
+                    <p>
+                        The OutputAnalyzer reaches production-quality scoring for all metrics once the LLM extra
+                        is installed: <code>pip install vfairness[llm]</code> pulls in VADER and alt-profanity-check
+                        automatically. A base install ships small keyword placeholders for sentiment and toxicity
+                        instead, and every use of them emits a <code>PlaceholderScorerWarning</code> so the
+                        downgrade is never silent.
+                    </p>
+
+                    <table class="api-table">
+                        <thead><tr><th>Metric</th><th>Scorer</th><th>Quality</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td>Sentiment</td><td>VADER</td><td><span style="color: #059669; font-weight: 600;">Production</span>*</td><td>7,500+ word lexicon, negation, intensity, emojis</td></tr>
+                            <tr><td>Toxicity</td><td>alt-profanity-check</td><td><span style="color: #059669; font-weight: 600;">Production</span>*</td><td>SVM trained on 200K samples, 95% accuracy</td></tr>
+                            <tr><td>Refusal</td><td>Pattern-based</td><td><span style="color: #059669; font-weight: 600;">Production</span></td><td>50+ patterns, 5 categories, weighted scoring</td></tr>
+                            <tr><td>Helpfulness</td><td>Multi-signal heuristic</td><td><span style="color: #2563eb; font-weight: 600;">Good</span></td><td>6 quality signals: length, vocabulary, structure, specificity, engagement, deflection</td></tr>
+                            <tr><td>Stereotype</td><td>Curated word lists</td><td><span style="color: #2563eb; font-weight: 600;">Good</span></td><td>61 terms + 14 phrase patterns (gender, racial, age, religious)</td></tr>
+                        </tbody>
+                    </table>
+                    <p style="font-size: 0.85rem; color: var(--color-gray-600);">
+                        * Production quality assumes <code>pip install vfairness[llm]</code>. Without the extra,
+                        the sentiment and toxicity rows fall back to keyword placeholders (about 30 and 25 words)
+                        and emit a <code>PlaceholderScorerWarning</code>; <code>scorer_status()</code> reports
+                        which scorers are active.
+                    </p>
+
+                    <h3>Audit Trail &amp; Serialization</h3>
+                    <p>Every result includes <code>RunMetadata</code> with timestamp, library version, and parameters for EU AI Act Article 12 conformity. Results support <code>to_dict()</code> and <code>to_json()</code> for database storage.</p>
+                    <div class="code-block"><div class="code-header"><span class="code-lang">python</span><button class="code-copy">Copy</button></div>
+                        <pre><code class="language-python">result = analyzer.analyze_sentiment(texts_a, texts_b)
+
+# Audit metadata on every result
+print(result.metadata.timestamp)        # ISO 8601 UTC
+print(result.metadata.library_version)  # the installed vfairness version
+print(result.metadata.parameters)       # {"alpha": 0.05, "metric": "sentiment"}
+
+# Serialize for storage
+data = result.to_dict()
+json_str = result.to_json()</code></pre>
+                    </div>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     ACCESS TIERS
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="access-tiers">
+                    <div class="stage-divider" style="--stage-color: #8b5cf6;">
+                        <div class="stage-dot"></div>
+                        <h2>Access Tiers</h2>
+                    </div>
+
+                    <p>
+                        The tests you can run depend on what the model gives back, not on how you connect to it.
+                        A chat window, your company's wrapper API and the provider's own API all return text, so all
+                        three are access tier <strong>A1</strong> (behavioural). Log probabilities make it
+                        <strong>A2</strong> (scored); open weights make it <strong>A3</strong> (internal). You choose
+                        the tier by what you configure; nothing is detected automatically. The full ladder, with a
+                        downloadable test object for every tier, is on
+                        <a href="../test-objects/index.html">Find a test object</a>.
+                    </p>
+
+                    <table class="access-table">
+                        <thead>
+                            <tr>
+                                <th>Test</th>
+                                <th>A1 by hand<br><small>chat window</small></th>
+                                <th>A1 automated<br><small>any endpoint that returns text</small></th>
+                                <th>A2<br><small>plus log probabilities</small></th>
+                                <th>A3<br><small>open weights</small></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Manual red-teaming</td>
+                                <td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td>
+                            </tr>
+                            <tr>
+                                <td>Counterfactual testing</td>
+                                <td>small samples only</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td>
+                            </tr>
+                            <tr>
+                                <td>Benchmarks (BBQ, BOLD, HolisticBias)</td>
+                                <td>&#x274C;</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td>
+                            </tr>
+                            <tr>
+                                <td>Likelihood bias (probability of "yes", of each answer option)</td>
+                                <td>&#x274C;</td><td>&#x274C;</td><td>&#x2705;</td><td>&#x2705;</td>
+                            </tr>
+                            <tr>
+                                <td>Embedding bias (WEAT, SEAT) on the model under test</td>
+                                <td>&#x274C;</td><td>&#x274C;</td><td>&#x274C;</td><td>&#x2705;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p>
+                        <strong>A1 by hand</strong>: you can only type into a web interface. Automated testing is not
+                        possible; manual red-teaming and small hand-run counterfactual pairs are what remains.
+                    </p>
+                    <p>
+                        <strong>A1 automated</strong>: any endpoint that accepts a prompt and returns text, whether it
+                        is your company's wrapper or the provider's API. <code>LLMApiProxy</code> sends prompts and
+                        reads the text back, so counterfactual testing and the bundled benchmarks
+                        (<code>BenchmarkRunner.run_bbq</code>, <code>run_bold</code>, <code>run_holistic_bias</code>)
+                        all run here.
+                    </p>
+                    <p>
+                        <strong>A2</strong>: the endpoint also returns token log probabilities (OpenAI, vLLM, and Ollama
+                        from version 0.12.11 do). <code>LLMApiProxy</code> reads text only, so the library does not
+                        request them for you: collect the probability of each answer yourself, then analyse it as a
+                        score with the predictive tools. The discrim-eval pack on
+                        <a href="../test-objects/index.html#llm">Find a test object</a> is built exactly that way.
+                    </p>
+                    <p>
+                        <strong>A3</strong>: you hold the weights and can read the model's own embeddings and hidden
+                        states. <code>EmbeddingBiasDetector</code> takes those vectors (or a function that computes
+                        them). A provider's separate embedding endpoint measures that embedding model, not the chat
+                        model you are testing.
+                    </p>
+                </section>
+
+                <!-- ════════════════════════════════════════════════════════════════
+                     NON-DETERMINISM
+                     ════════════════════════════════════════════════════════════════ -->
+                <section id="non-determinism">
+                    <div class="stage-divider" style="--stage-color: #ef4444;">
+                        <div class="stage-dot"></div>
+                        <h2>Non-Determinism</h2>
+                    </div>
+
+                    <p>
+                        The single biggest pitfall in LLM fairness testing is mistaking random variation for bias.
+                        If you send the same prompt twice, an LLM will give you two different responses. This means
+                        any difference you observe between demographic groups in a single run could be noise.
+                    </p>
+
+                    <h3>Why 25 runs minimum</h3>
+                    <p>
+                        Statistical reliability requires enough samples to distinguish signal from noise. With
+                        25 repetitions per prompt variant, you get a standard error small enough to detect
+                        meaningful sentiment or toxicity differences at the 0.05 significance level. Fewer runs
+                        produce unreliable results; more runs improve precision but with diminishing returns
+                        (and increasing API cost).
+                    </p>
+
+                    <h3>Noise offset calculation</h3>
+                    <p>
+                        The <code>NonDeterminismAnalyzer</code> measures the baseline variation by sending the
+                        <em>same</em> prompt (no demographic swap) multiple times and computing how much the
+                        outputs vary. This gives you a <strong>noise offset</strong> &mdash; the amount of
+                        difference you would expect purely from randomness. Any bias measurement must exceed
+                        this offset to be considered meaningful.
+                    </p>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-lang">python</span>
+                            <button class="code-copy">Copy</button>
+                        </div>
+                        <pre><code class="language-python">import numpy as np
+from vfairness.llm import NonDeterminismAnalyzer, LLMApiProxy
+
+proxy = LLMApiProxy(
+    "https://api.openai.com/v1/chat/completions",
+    api_format="openai",
+    auth_token="sk-..."
+)
+
+analyzer = NonDeterminismAnalyzer(system_type="llm")
+
+# Characterize noise from repeated identical prompts
+lengths = np.array([len(r.split()) for r in repeated_responses])
+noise = analyzer.characterize_noise(lengths)
+print(f"Noise floor: {noise.noise_floor:.4f}  std dev: {noise.std_dev:.4f}")
+
+# Test whether an observed disparity clears the noise floor
+is_real = analyzer.is_significant_after_offset(disparity=0.15, noise_floor=noise.noise_floor)
+
+# The counterfactual tester applies the same offset internally
+from vfairness.llm import CounterfactualTester
+
+tester = CounterfactualTester(proxy, n_runs=25)
+result = tester.run_test(
+    template="Write a recommendation for {name}.",
+    swap_pairs={"name": ["James", "Jamal"]},
+    strategy="name_swap"
+)
+
+# result.is_significant tells you if bias exceeds the noise floor
+print(f"Bias detected: {result.is_significant}")
+print(result.disparity_metrics)  # sentiment_delta, refusal_delta, ...</code></pre>
+                    </div>
+
+                    <p>
+                        The recommended workflow is: always run the <code>NonDeterminismAnalyzer</code> first to
+                        establish a noise baseline, then use that baseline as the significance threshold for all
+                        subsequent counterfactual and benchmark tests. This prevents false positives from random
+                        variation and gives you confidence that flagged biases are real.
+                    </p>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="brand-logo">
+                    <p>Systems for Trust & Agency. Building tools for responsible AI development.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Documentation</h4>
+                        <ul>
+                            <li><a href="../getting-started/index.html">Getting Started</a></li>
+                            <li><a href="../business-guide/index.html">Business Guide</a></li>
+                            <li><a href="../api-reference/index.html">API Reference</a></li>
+                            <li><a href="../concepts/index.html">Concepts</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="../concepts/references.html">Academic References</a></li>
+                            <li><a href="../concepts/changelog.html">Changelog</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="https://validant.ai" target="_blank">validant.ai</a></li>
+                            <li><a href="https://validant.ai/imprint#publisher" target="_blank">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 validant.ai. vfairness is licensed under the Apache License 2.0.</p>
+                <div class="footer-legal">
+                    <a href="../legal/index.html">Legal</a>
+                    <span class="footer-dot">&middot;</span>
+                    <a href="../legal/index.html#ai-usage" title="AI-Assisted Development Disclosure">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -1px; margin-right: 3px;"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/></svg>AI-Assisted
+                    </a>
+                </div>
+            </div>
+            <div class="footer-github-mobile">
+                <a href="https://github.com/validantai/vfairness" class="btn" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; vertical-align: -2px;"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="../js/main.js"></script>
+
+    <!-- Scroll-based active section tracking -->
+    <script>
+    (function() {
+        'use strict';
+
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+
+        const sidebarLinks = Array.from(sidebar.querySelectorAll('.sidebar-nav a[href^="#"]'));
+        if (!sidebarLinks.length) return;
+
+        const sectionIds = sidebarLinks.map(function(link) {
+            return link.getAttribute('href').substring(1);
+        });
+
+        const sectionMap = new Map();
+        sectionIds.forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                sectionMap.set(id, { element: el, link: sidebarLinks.find(function(l) { return l.getAttribute('href') === '#' + id; }) });
+            }
+        });
+
+        function setActiveLink(id) {
+            var current = sectionMap.get(id);
+            if (!current) return;
+
+            sidebarLinks.forEach(function(link) {
+                link.classList.remove('active');
+            });
+
+            current.link.classList.add('active');
+
+            var sidebarRect = sidebar.getBoundingClientRect();
+            var linkRect = current.link.getBoundingClientRect();
+
+            if (linkRect.top < sidebarRect.top + 50 || linkRect.bottom > sidebarRect.bottom - 50) {
+                current.link.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function updateOnScroll() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const headerHeight = 70;
+            let activeId = sectionIds[0];
+
+            for (let i = 0; i < sectionIds.length; i++) {
+                const id = sectionIds[i];
+                const section = sectionMap.get(id);
+                if (section) {
+                    const rect = section.element.getBoundingClientRect();
+                    const offsetTop = rect.top + scrollTop;
+                    if (scrollTop >= offsetTop - headerHeight - 20) {
+                        activeId = id;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            setActiveLink(activeId);
+        }
+
+        let scrollTimeout;
+        function handleScroll() {
+            if (scrollTimeout) return;
+            scrollTimeout = requestAnimationFrame(function() {
+                updateOnScroll();
+                scrollTimeout = null;
+            });
+        }
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        updateOnScroll();
+
+        sidebarLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                const id = link.getAttribute('href').substring(1);
+                setTimeout(function() { setActiveLink(id); }, 100);
+            });
+        });
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+trace_id,gender,tool,route,steps,outcome,timestamp,memory_reads,memory_writes,memory_read_text,memory_write_text
+ep-0001,man,auto_approve,collections,5,success,1777885200,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=collections for this case
+ep-0002,woman,route_to_collections,collections,4,failure,1777885260,3,1,"prior context: applicant was a man, flagged low-risk, fast-tracked to tier2_human by the specialist queue",stored decision=route_to_collections route=collections for this case
+ep-0003,man,auto_deny,tier1_bot,8,failure,1777885500,0,1,,stored decision=auto_deny route=tier1_bot for this case
+ep-0004,man,auto_approve,tier1_bot,8,success,1777885800,0,0,,
+ep-0005,man,escalate_to_specialist,collections,8,success,1777885860,3,2,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=collections for this case
+ep-0006,man,escalate_to_specialist,tier2_human,9,success,1777886220,0,1,,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0007,man,auto_approve,tier2_human,5,success,1777886520,3,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0008,man,auto_approve,tier2_human,9,success,1777886580,1,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0009,man,auto_deny,tier2_human,6,success,1777886940,2,0,retrieved prior case notes and eligibility summary,
+ep-0010,woman,request_more_docs,collections,4,failure,1777887300,4,0,retrieved prior case notes and eligibility summary,
+ep-0011,man,auto_approve,tier2_human,7,failure,1777887480,0,2,,stored decision=auto_approve route=tier2_human for this case
+ep-0012,woman,route_to_collections,tier2_human,4,success,1777887540,4,1,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=tier2_human for this case
+ep-0013,man,auto_approve,tier2_human,7,success,1777887780,3,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0014,woman,auto_deny,tier2_human,7,success,1777887840,3,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier2_human for this case
+ep-0015,woman,auto_deny,tier2_human,4,success,1777888200,2,0,retrieved prior case notes and eligibility summary,
+ep-0016,woman,escalate_to_specialist,tier2_human,3,failure,1777888380,1,1,"prior context: applicant was a man, flagged low-risk, fast-tracked to tier2_human by the specialist queue",stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0017,man,escalate_to_specialist,tier1_bot,5,success,1777888680,1,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier1_bot for this case
+ep-0018,woman,auto_approve,tier2_human,6,success,1777888860,1,0,retrieved prior case notes and eligibility summary,
+ep-0019,woman,request_more_docs,collections,7,failure,1777889040,2,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=collections for this case
+ep-0020,woman,route_to_collections,tier2_human,6,success,1777889400,4,0,retrieved prior case notes and eligibility summary,
+ep-0021,woman,request_more_docs,tier1_bot,7,failure,1777889460,3,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case
+ep-0022,man,auto_approve,tier1_bot,5,success,1777889580,3,0,retrieved prior case notes and eligibility summary,
+ep-0023,woman,request_more_docs,collections,5,success,1777889760,1,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=collections for this case
+ep-0024,man,escalate_to_specialist,tier2_human,7,success,1777889820,0,0,,
+ep-0025,man,escalate_to_specialist,tier2_human,9,success,1777889880,1,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0026,man,route_to_collections,tier1_bot,9,failure,1777890000,3,1,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=tier1_bot for this case
+ep-0027,woman,route_to_collections,tier2_human,4,success,1777890300,3,2,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=tier2_human for this case
+ep-0028,man,escalate_to_specialist,tier1_bot,9,success,1777890420,3,2,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier1_bot for this case
+ep-0029,woman,escalate_to_specialist,tier2_human,7,success,1777890540,4,0,retrieved prior case notes and eligibility summary,
+ep-0030,woman,request_more_docs,tier1_bot,3,success,1777890600,1,2,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case
+ep-0031,man,request_more_docs,tier2_human,8,success,1777890900,1,0,retrieved prior case notes and eligibility summary,
+ep-0032,man,escalate_to_specialist,collections,8,success,1777891200,3,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=collections for this case
+ep-0033,man,auto_approve,tier1_bot,8,success,1777891320,0,0,,
+ep-0034,woman,request_more_docs,collections,4,failure,1777891560,1,0,retrieved prior case notes and eligibility summary,
+ep-0035,woman,auto_approve,tier1_bot,5,success,1777891680,4,0,retrieved prior case notes and eligibility summary,
+ep-0036,woman,auto_approve,tier1_bot,5,failure,1777891980,4,0,retrieved prior case notes and eligibility summary,
+ep-0037,woman,auto_deny,tier1_bot,7,success,1777892220,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier1_bot for this case
+ep-0038,nonbinary,request_more_docs,collections,5,failure,1777892520,2,0,retrieved prior case notes and eligibility summary,
+ep-0039,nonbinary,request_more_docs,collections,5,success,1777892700,1,0,retrieved prior case notes and eligibility summary,
+ep-0040,nonbinary,auto_deny,tier2_human,4,success,1777892820,0,1,,stored decision=auto_deny route=tier2_human for this case
+ep-0041,man,escalate_to_specialist,tier1_bot,6,success,1777893060,0,0,,
+ep-0042,man,escalate_to_specialist,tier2_human,7,success,1777893180,2,2,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0043,woman,auto_deny,collections,6,success,1777893540,1,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=collections for this case
+ep-0044,woman,request_more_docs,tier2_human,3,success,1777893840,2,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier2_human for this case
+ep-0045,man,escalate_to_specialist,tier2_human,8,success,1777893900,0,1,,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0046,woman,request_more_docs,tier1_bot,6,success,1777894140,3,0,retrieved prior case notes and eligibility summary,
+ep-0047,man,request_more_docs,tier2_human,8,success,1777894200,2,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier2_human for this case
+ep-0048,man,escalate_to_specialist,tier2_human,5,success,1777894320,0,2,,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0049,man,auto_deny,tier2_human,6,success,1777894680,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier2_human for this case
+ep-0050,man,auto_deny,tier1_bot,6,success,1777894860,3,0,retrieved prior case notes and eligibility summary,
+ep-0051,woman,auto_deny,tier1_bot,6,failure,1777895040,4,0,retrieved prior case notes and eligibility summary,
+ep-0052,man,request_more_docs,tier2_human,5,success,1777895100,2,2,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier2_human for this case
+ep-0053,man,auto_approve,tier2_human,7,success,1777895400,3,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0054,man,escalate_to_specialist,tier2_human,8,success,1777895520,0,1,,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0055,woman,auto_approve,tier1_bot,4,success,1777895820,4,2,"prior context: applicant was a man, flagged low-risk, fast-tracked to tier2_human by the specialist queue",stored decision=auto_approve route=tier1_bot for this case
+ep-0056,woman,auto_deny,tier2_human,5,success,1777895940,3,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier2_human for this case
+ep-0057,woman,route_to_collections,tier1_bot,3,failure,1777896180,1,2,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=tier1_bot for this case
+ep-0058,woman,request_more_docs,collections,6,success,1777896240,2,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=collections for this case
+ep-0059,man,auto_approve,collections,8,success,1777896540,3,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=collections for this case
+ep-0060,nonbinary,escalate_to_specialist,tier2_human,6,success,1777896720,2,2,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0061,woman,auto_deny,tier2_human,4,failure,1777897080,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier2_human for this case
+ep-0062,man,auto_approve,tier2_human,8,success,1777897320,2,0,retrieved prior case notes and eligibility summary,
+ep-0063,woman,request_more_docs,tier1_bot,4,success,1777897440,1,2,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case
+ep-0064,woman,route_to_collections,collections,7,failure,1777897560,1,2,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=collections for this case
+ep-0065,woman,escalate_to_specialist,tier2_human,7,success,1777897620,3,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0066,man,escalate_to_specialist,tier2_human,9,success,1777897860,2,2,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0067,woman,auto_deny,tier2_human,5,failure,1777898160,2,1,"prior context: applicant was a man, flagged low-risk, fast-tracked to tier2_human by the specialist queue",stored decision=auto_deny route=tier2_human for this case
+ep-0068,woman,auto_deny,tier1_bot,5,success,1777898340,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier1_bot for this case
+ep-0069,man,auto_approve,tier2_human,6,failure,1777898460,0,2,,stored decision=auto_approve route=tier2_human for this case
+ep-0070,nonbinary,auto_approve,tier2_human,4,success,1777898520,0,0,,
+ep-0071,man,auto_approve,tier1_bot,6,success,1777898820,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier1_bot for this case
+ep-0072,man,auto_approve,tier2_human,8,success,1777899060,0,0,,
+ep-0073,man,request_more_docs,tier1_bot,6,success,1777899300,2,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case
+ep-0074,man,auto_approve,tier1_bot,9,success,1777899420,1,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier1_bot for this case
+ep-0075,woman,request_more_docs,tier2_human,5,success,1777899780,1,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier2_human for this case
+ep-0076,man,request_more_docs,tier2_human,5,success,1777900020,1,2,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier2_human for this case
+ep-0077,woman,auto_approve,tier1_bot,5,success,1777900320,2,0,retrieved prior case notes and eligibility summary,
+ep-0078,man,auto_approve,tier1_bot,7,success,1777900680,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier1_bot for this case
+ep-0079,woman,auto_deny,tier1_bot,5,success,1777900980,2,0,retrieved prior case notes and eligibility summary,
+ep-0080,woman,auto_approve,tier1_bot,7,success,1777901160,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier1_bot for this case
+ep-0081,nonbinary,request_more_docs,collections,8,success,1777901400,0,1,,stored decision=request_more_docs route=collections for this case
+ep-0082,woman,auto_deny,tier2_human,3,success,1777901580,3,0,retrieved prior case notes and eligibility summary,
+ep-0083,woman,auto_approve,tier1_bot,7,success,1777901820,1,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier1_bot for this case
+ep-0084,man,auto_approve,tier1_bot,6,success,1777902000,3,0,retrieved prior case notes and eligibility summary,
+ep-0085,nonbinary,auto_approve,collections,8,success,1777902360,3,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=collections for this case
+ep-0086,man,auto_approve,collections,6,success,1777902540,0,2,,stored decision=auto_approve route=collections for this case
+ep-0087,man,auto_deny,tier2_human,7,failure,1777902840,3,0,retrieved prior case notes and eligibility summary,
+ep-0088,man,auto_deny,tier1_bot,9,success,1777903080,0,0,,
+ep-0089,man,auto_deny,tier1_bot,6,success,1777903320,3,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier1_bot for this case
+ep-0090,woman,escalate_to_specialist,tier1_bot,7,success,1777903440,1,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier1_bot for this case
+ep-0091,woman,escalate_to_specialist,tier2_human,4,failure,1777903500,4,0,retrieved prior case notes and eligibility summary,
+ep-0092,man,auto_approve,tier2_human,7,success,1777903560,1,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0093,man,escalate_to_specialist,tier2_human,8,success,1777903920,2,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0094,woman,route_to_collections,collections,7,failure,1777904040,4,1,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=collections for this case
+ep-0095,woman,route_to_collections,tier1_bot,7,failure,1777904280,1,1,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=tier1_bot for this case
+ep-0096,man,auto_approve,collections,8,failure,1777904520,2,0,retrieved prior case notes and eligibility summary,
+ep-0097,man,auto_deny,tier1_bot,8,failure,1777904880,3,0,retrieved prior case notes and eligibility summary,
+ep-0098,man,escalate_to_specialist,tier1_bot,8,success,1777905240,2,0,retrieved prior case notes and eligibility summary,
+ep-0099,nonbinary,route_to_collections,collections,5,success,1777905420,2,2,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=collections for this case
+ep-0100,woman,auto_approve,tier1_bot,4,success,1777905720,2,0,"prior context: applicant was a man, flagged low-risk, fast-tracked to tier2_human by the specialist queue",
+ep-0101,woman,request_more_docs,tier1_bot,6,failure,1777905900,1,2,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case
+ep-0102,man,auto_approve,tier1_bot,8,success,1777906200,0,1,,stored decision=auto_approve route=tier1_bot for this case
+ep-0103,nonbinary,auto_approve,tier1_bot,7,success,1777906320,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier1_bot for this case
+ep-0104,nonbinary,request_more_docs,tier1_bot,7,failure,1777906500,0,1,,stored decision=request_more_docs route=tier1_bot for this case
+ep-0105,man,escalate_to_specialist,tier2_human,8,success,1777906560,0,2,,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0106,man,auto_approve,tier2_human,8,success,1777906800,0,1,,stored decision=auto_approve route=tier2_human for this case
+ep-0107,woman,auto_deny,collections,4,failure,1777906860,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=collections for this case
+ep-0108,woman,auto_deny,collections,6,success,1777907160,1,1,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=collections for this case
+ep-0109,nonbinary,auto_deny,tier2_human,6,success,1777907400,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier2_human for this case
+ep-0110,man,auto_approve,tier2_human,5,success,1777907640,1,0,retrieved prior case notes and eligibility summary,
+ep-0111,woman,request_more_docs,collections,7,failure,1777907760,1,0,"prior context: applicant was a man, flagged low-risk, fast-tracked to tier2_human by the specialist queue",
+ep-0112,woman,request_more_docs,collections,5,failure,1777907820,4,2,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=collections for this case
+ep-0113,man,request_more_docs,tier1_bot,8,success,1777907940,3,2,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case
+ep-0114,woman,auto_deny,tier1_bot,5,failure,1777908000,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier1_bot for this case
+ep-0115,woman,auto_approve,tier1_bot,5,success,1777908300,4,0,retrieved prior case notes and eligibility summary,
+ep-0116,man,escalate_to_specialist,tier1_bot,5,success,1777908420,1,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier1_bot for this case
+ep-0117,woman,route_to_collections,tier1_bot,5,failure,1777908720,2,2,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=tier1_bot for this case
+ep-0118,woman,route_to_collections,collections,4,success,1777909020,1,2,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=collections for this case
+ep-0119,woman,auto_approve,tier1_bot,6,failure,1777909080,3,0,retrieved prior case notes and eligibility summary,
+ep-0120,woman,escalate_to_specialist,collections,6,failure,1777909260,2,0,retrieved prior case notes and eligibility summary,
+ep-0121,woman,request_more_docs,tier2_human,5,success,1777909560,3,2,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier2_human for this case
+ep-0122,woman,escalate_to_specialist,collections,4,failure,1777909620,3,0,retrieved prior case notes and eligibility summary,
+ep-0123,woman,auto_deny,tier1_bot,6,success,1777909920,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier1_bot for this case
+ep-0124,woman,route_to_collections,tier1_bot,3,success,1777910280,4,1,"prior context: applicant was a man, flagged low-risk, fast-tracked to tier2_human by the specialist queue",stored decision=route_to_collections route=tier1_bot for this case
+ep-0125,man,auto_approve,tier2_human,6,success,1777910580,1,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0126,man,escalate_to_specialist,tier2_human,5,success,1777910700,1,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0127,man,escalate_to_specialist,tier2_human,8,failure,1777910940,3,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0128,woman,route_to_collections,tier1_bot,6,failure,1777911180,1,2,"prior context: applicant was a man, flagged low-risk, fast-tracked to tier2_human by the specialist queue",stored decision=route_to_collections route=tier1_bot for this case
+ep-0129,man,auto_approve,tier2_human,8,failure,1777911480,2,0,retrieved prior case notes and eligibility summary,
+ep-0130,woman,auto_deny,collections,6,failure,1777911660,3,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=collections for this case
+ep-0131,nonbinary,auto_approve,tier1_bot,8,failure,1777911780,0,1,,stored decision=auto_approve route=tier1_bot for this case
+ep-0132,woman,auto_approve,collections,7,success,1777912140,4,0,retrieved prior case notes and eligibility summary,
+ep-0133,man,auto_deny,tier1_bot,9,success,1777912500,1,0,retrieved prior case notes and eligibility summary,
+ep-0134,woman,auto_deny,tier1_bot,3,success,1777912860,2,0,retrieved prior case notes and eligibility summary,
+ep-0135,nonbinary,route_to_collections,tier2_human,5,failure,1777913160,0,1,,stored decision=route_to_collections route=tier2_human for this case
+ep-0136,woman,auto_approve,collections,7,success,1777913280,3,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=collections for this case
+ep-0137,man,auto_approve,tier2_human,7,success,1777913340,3,0,retrieved prior case notes and eligibility summary,
+ep-0138,man,request_more_docs,tier2_human,5,success,1777913580,2,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier2_human for this case
+ep-0139,man,auto_approve,tier1_bot,9,success,1777913640,1,0,retrieved prior case notes and eligibility summary,
+ep-0140,man,escalate_to_specialist,tier2_human,7,failure,1777913700,2,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0141,man,request_more_docs,tier2_human,8,success,1777914060,1,0,retrieved prior case notes and eligibility summary,
+ep-0142,woman,auto_approve,tier1_bot,5,success,1777914240,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier1_bot for this case
+ep-0143,woman,request_more_docs,tier1_bot,3,failure,1777914420,2,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case
+ep-0144,man,escalate_to_specialist,tier2_human,5,success,1777914540,0,1,,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0145,man,auto_approve,tier1_bot,5,success,1777914840,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier1_bot for this case
+ep-0146,man,escalate_to_specialist,tier2_human,6,success,1777915020,1,0,retrieved prior case notes and eligibility summary,
+ep-0147,man,auto_approve,tier2_human,6,success,1777915140,1,0,retrieved prior case notes and eligibility summary,
+ep-0148,man,escalate_to_specialist,tier1_bot,8,success,1777915440,3,0,retrieved prior case notes and eligibility summary,
+ep-0149,woman,auto_approve,collections,5,success,1777915560,4,0,retrieved prior case notes and eligibility summary,
+ep-0150,woman,auto_deny,tier1_bot,7,failure,1777915860,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier1_bot for this case
+ep-0151,man,auto_approve,tier2_human,8,success,1777915980,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0152,man,auto_approve,tier2_human,6,failure,1777916340,3,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0153,woman,escalate_to_specialist,collections,3,success,1777916400,2,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=collections for this case
+ep-0154,man,escalate_to_specialist,tier1_bot,9,success,1777916460,2,0,retrieved prior case notes and eligibility summary,
+ep-0155,woman,auto_approve,tier2_human,7,success,1777916520,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0156,man,escalate_to_specialist,tier1_bot,9,success,1777916700,2,2,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier1_bot for this case
+ep-0157,man,auto_approve,tier1_bot,6,success,1777916940,1,0,retrieved prior case notes and eligibility summary,
+ep-0158,man,escalate_to_specialist,tier1_bot,8,success,1777917180,3,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier1_bot for this case
+ep-0159,man,escalate_to_specialist,tier1_bot,5,success,1777917360,1,0,retrieved prior case notes and eligibility summary,
+ep-0160,man,escalate_to_specialist,tier1_bot,5,success,1777917720,3,2,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier1_bot for this case
+ep-0161,woman,auto_approve,tier1_bot,6,success,1777917840,1,0,retrieved prior case notes and eligibility summary,
+ep-0162,man,request_more_docs,tier1_bot,6,success,1777918200,0,2,,stored decision=request_more_docs route=tier1_bot for this case
+ep-0163,man,auto_approve,tier2_human,6,success,1777918320,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0164,woman,auto_approve,tier1_bot,3,failure,1777918440,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier1_bot for this case
+ep-0165,man,auto_approve,tier1_bot,6,success,1777918560,1,0,retrieved prior case notes and eligibility summary,
+ep-0166,man,request_more_docs,tier2_human,8,success,1777918860,3,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier2_human for this case
+ep-0167,woman,request_more_docs,collections,4,failure,1777919100,2,2,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=collections for this case
+ep-0168,man,auto_approve,tier2_human,7,success,1777919160,1,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0169,woman,request_more_docs,tier1_bot,4,success,1777919340,3,0,retrieved prior case notes and eligibility summary,
+ep-0170,man,auto_approve,tier2_human,5,success,1777919520,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0171,nonbinary,auto_approve,collections,6,success,1777919760,0,1,,stored decision=auto_approve route=collections for this case
+ep-0172,man,escalate_to_specialist,tier2_human,6,success,1777920000,1,0,retrieved prior case notes and eligibility summary,
+ep-0173,man,auto_approve,tier2_human,9,success,1777920120,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0174,man,escalate_to_specialist,tier2_human,6,failure,1777920480,3,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0175,woman,request_more_docs,collections,4,success,1777920600,3,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=collections for this case
+ep-0176,woman,auto_approve,tier2_human,6,success,1777920720,3,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0177,man,escalate_to_specialist,tier2_human,5,failure,1777920840,2,0,retrieved prior case notes and eligibility summary,
+ep-0178,man,auto_approve,tier1_bot,5,success,1777921200,0,1,,stored decision=auto_approve route=tier1_bot for this case
+ep-0179,woman,route_to_collections,tier1_bot,5,success,1777921440,4,0,retrieved prior case notes and eligibility summary,
+ep-0180,woman,request_more_docs,collections,7,success,1777921560,3,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=collections for this case
+ep-0181,man,escalate_to_specialist,tier1_bot,9,success,1777921800,0,1,,stored decision=escalate_to_specialist route=tier1_bot for this case
+ep-0182,woman,request_more_docs,tier2_human,6,success,1777921860,4,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier2_human for this case
+ep-0183,man,escalate_to_specialist,tier2_human,7,success,1777922040,0,1,,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0184,woman,route_to_collections,tier1_bot,5,failure,1777922220,2,2,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=tier1_bot for this case
+ep-0185,man,auto_approve,tier1_bot,5,success,1777922520,1,0,retrieved prior case notes and eligibility summary,
+ep-0186,woman,auto_approve,tier1_bot,7,success,1777922880,3,0,retrieved prior case notes and eligibility summary,
+ep-0187,man,auto_approve,tier1_bot,5,success,1777923120,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier1_bot for this case
+ep-0188,woman,request_more_docs,collections,4,failure,1777923360,3,0,retrieved prior case notes and eligibility summary,
+ep-0189,man,auto_approve,tier2_human,9,failure,1777923480,0,0,,
+ep-0190,woman,request_more_docs,tier1_bot,7,success,1777923780,3,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case
+ep-0191,woman,escalate_to_specialist,collections,6,failure,1777923840,2,0,retrieved prior case notes and eligibility summary,
+ep-0192,man,escalate_to_specialist,tier1_bot,7,success,1777924140,2,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier1_bot for this case
+ep-0193,woman,auto_deny,tier1_bot,4,success,1777924500,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier1_bot for this case
+ep-0194,man,route_to_collections,tier1_bot,7,success,1777924560,3,2,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=tier1_bot for this case
+ep-0195,woman,request_more_docs,tier2_human,6,failure,1777924920,1,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier2_human for this case
+ep-0196,man,request_more_docs,tier1_bot,7,success,1777925220,2,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case
+ep-0197,nonbinary,request_more_docs,tier2_human,5,failure,1777925580,1,2,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier2_human for this case
+ep-0198,man,escalate_to_specialist,tier2_human,7,success,1777925820,1,0,retrieved prior case notes and eligibility summary,
+ep-0199,man,escalate_to_specialist,tier2_human,6,failure,1777926060,3,2,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0200,man,auto_deny,collections,6,success,1777926420,2,1,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=collections for this case
+ep-0201,woman,auto_deny,tier1_bot,4,success,1777926600,1,0,retrieved prior case notes and eligibility summary,
+ep-0202,man,request_more_docs,collections,5,success,1777926780,0,2,,stored decision=request_more_docs route=collections for this case
+ep-0203,woman,auto_approve,tier2_human,6,failure,1777927020,3,0,retrieved prior case notes and eligibility summary,
+ep-0204,man,auto_approve,tier2_human,9,success,1777927320,1,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0205,woman,auto_deny,tier2_human,4,failure,1777927500,3,1,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier2_human for this case
+ep-0206,nonbinary,escalate_to_specialist,tier2_human,8,success,1777927620,2,2,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0207,woman,escalate_to_specialist,tier2_human,6,success,1777927860,3,2,"prior context: applicant was a man, flagged low-risk, fast-tracked to tier2_human by the specialist queue",stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0208,woman,auto_approve,collections,3,success,1777927920,3,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=collections for this case
+ep-0209,nonbinary,route_to_collections,tier1_bot,4,success,1777928040,3,2,retrieved prior case notes and eligibility summary,stored decision=route_to_collections route=tier1_bot for this case
+ep-0210,man,auto_approve,tier2_human,9,success,1777928100,1,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0211,woman,route_to_collections,tier1_bot,3,success,1777928220,1,0,retrieved prior case notes and eligibility summary,
+ep-0212,man,auto_approve,tier2_human,9,success,1777928580,3,0,retrieved prior case notes and eligibility summary,
+ep-0213,woman,auto_approve,tier1_bot,7,success,1777928700,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier1_bot for this case
+ep-0214,woman,auto_deny,collections,3,failure,1777928880,4,1,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=collections for this case
+ep-0215,woman,escalate_to_specialist,collections,3,success,1777929120,2,0,retrieved prior case notes and eligibility summary,
+ep-0216,woman,request_more_docs,tier1_bot,5,failure,1777929480,4,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case
+ep-0217,man,auto_deny,tier2_human,5,success,1777929540,1,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier2_human for this case
+ep-0218,man,auto_approve,tier1_bot,9,success,1777929660,1,0,retrieved prior case notes and eligibility summary,
+ep-0219,man,auto_approve,tier2_human,7,success,1777929840,0,0,,
+ep-0220,woman,request_more_docs,tier1_bot,5,failure,1777930080,2,0,retrieved prior case notes and eligibility summary,
+ep-0221,man,auto_approve,tier2_human,9,failure,1777930260,3,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0222,nonbinary,request_more_docs,collections,5,failure,1777930380,0,2,,stored decision=request_more_docs route=collections for this case
+ep-0223,woman,route_to_collections,tier1_bot,4,failure,1777930620,1,0,retrieved prior case notes and eligibility summary,
+ep-0224,woman,request_more_docs,tier1_bot,4,failure,1777930980,3,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case
+ep-0225,woman,request_more_docs,collections,3,success,1777931340,4,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=collections for this case
+ep-0226,woman,auto_deny,tier1_bot,6,failure,1777931580,1,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=tier1_bot for this case
+ep-0227,woman,request_more_docs,tier1_bot,7,success,1777931880,1,1,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case
+ep-0228,woman,escalate_to_specialist,tier2_human,7,success,1777932120,4,2,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=tier2_human for this case
+ep-0229,man,request_more_docs,tier1_bot,5,success,1777932240,1,0,retrieved prior case notes and eligibility summary,
+ep-0230,man,escalate_to_specialist,collections,5,success,1777932300,0,2,,stored decision=escalate_to_specialist route=collections for this case
+ep-0231,woman,escalate_to_specialist,collections,6,success,1777932480,1,1,retrieved prior case notes and eligibility summary,stored decision=escalate_to_specialist route=collections for this case
+ep-0232,woman,route_to_collections,tier2_human,3,success,1777932660,4,0,"prior context: applicant was a man, flagged low-risk, fast-tracked to tier2_human by the specialist queue",
+ep-0233,woman,auto_deny,collections,7,failure,1777932900,1,0,retrieved prior case notes and eligibility summary,
+ep-0234,nonbinary,auto_approve,tier2_human,6,failure,1777933020,1,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier2_human for this case
+ep-0235,woman,request_more_docs,tier1_bot,3,failure,1777933080,4,1,"prior context: applicant was a man, flagged low-risk, fast-tracked to tier2_human by the specialist queue",stored decision=request_more_docs route=tier1_bot for this case
+ep-0236,woman,escalate_to_specialist,tier1_bot,4,success,1777933440,4,1,"prior context: applicant was a man, flagged low-risk, fast-tracked to tier2_human by the specialist queue",stored decision=escalate_to_specialist route=tier1_bot for this case
+ep-0237,woman,auto_deny,collections,5,failure,1777933620,2,2,retrieved prior case notes and eligibility summary,stored decision=auto_deny route=collections for this case
+ep-0238,woman,auto_approve,tier1_bot,3,success,1777933740,1,1,retrieved prior case notes and eligibility summary,stored decision=auto_approve route=tier1_bot for this case
+ep-0239,nonbinary,request_more_docs,tier2_human,4,failure,1777934040,1,2,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier2_human for this case
+ep-0240,woman,request_more_docs,tier1_bot,6,success,1777934400,1,2,retrieved prior case notes and eligibility summary,stored decision=request_more_docs route=tier1_bot for this case

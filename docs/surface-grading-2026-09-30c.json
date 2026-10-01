@@ -1,0 +1,22 @@
+{
+ "_what_this_is": "One row. BoundRole was the last public code unit the beta gate counted as UNEXAMINED, and criterion B1 asks for a unit to have been executed AND its result recorded. An enum can never satisfy that by execution alone: its class body runs at import, and the census rule says plainly that running a class body is not recording a result. So it was examined, and this is the record.",
+ "_why_this_matters": "The examination found a live defect, which is the reason the row is not simply a tidy-up. vacuous_bound_reason applies a DIFFERENT rule per role, and the rules point in opposite directions: a THRESHOLD is unusable when bound >= worst, a REQUIRED_IMPROVEMENT when bound <= -span. The THRESHOLD case was the FALL-THROUGH, so every role the function did not handle was judged by the threshold rule. Measured on values in [0, 1] with bound=60, the string 'required_baseline_floor', the integer 0 and None all returned the threshold reason, while the real REQUIRED_IMPROVEMENT role is correctly silent there. A fourth member, or a caller that lost the role, would have been judged by the wrong rule in the wrong direction: the exact substitution this function exists to prevent, and a direct contradiction of its own docstring's promise of one rule and one vocabulary.",
+ "measured_on": "2026-09-30",
+ "wave": "bgl5",
+ "counts": {
+  "examined": 1,
+  "defect_found_and_fixed": 1
+ },
+ "items": {
+  "vfairness.evaluation.vfairness_metrics._metric_direction.BoundRole": {
+   "grade": "PROVEN",
+   "wave": "bgl5",
+   "audited": false,
+   "fabricated": false,
+   "fixed": true,
+   "test_file": "tests/test_the_bound_role_vocabulary_is_exhaustive.py",
+   "sabotage": "The fall-through restored (`if role is not BoundRole.THRESHOLD` -> `if False`): 5 failed, 8 passed. The five that fail are the five roles outside the vocabulary; the flagged-in-its-own-direction and silent-on-a-usable-bound controls stayed green for all three real members, which is what shows the fix did not simply start refusing everything. Restored byte-identical, and 1943 tests pass across every file touching the bound rule or the gate.",
+   "judgement": "PROVEN. Every one of the three members is CONSUMED, each is flagged in its own direction (THRESHOLD at 60.0, REQUIRED_IMPROVEMENT at -2.0, ALLOWED_DEGRADATION at 60.0 on a metric whose values lie in [0, 1]) and silent on a genuinely usable bound. The fail-closed pole is deliberately silent: a required improvement of 60 can never be MET, so the check always blocks, and routing that here would turn a refusal into an approval, which is the reasoning already recorded for an infinite group-size minimum. A role outside the vocabulary now FAILS CLOSED with a reason naming what it was given, rather than being judged by the threshold rule. It does not raise, because the gate reads a non-None return as 'refuse this bound' and puts the string in front of a reader, so an accurate refusal is more useful here than an exception that stops the run, and it needed no change at any of the five call sites. THIS GRADE HAS NOT BEEN INDEPENDENTLY CHECKED."
+  }
+ }
+}

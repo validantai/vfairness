@@ -1,0 +1,32 @@
+{
+ "_what_this_is": "The dated milestones of the hardening work, rendered as the timeline on the quality page by scripts/render_readiness.py. Each entry is a measurement taken on its date and must NOT be updated to today's numbers: it is a record of what was found then.",
+ "milestones": [
+  {
+   "date": "2026-08-22",
+   "title": "Second deep audit",
+   "text": "An audit of the whole library found 84 code problems (71 confirmed by an independent reviewer) and 124 documentation problems. Every critical and high one was fixed and pinned by a test within the week."
+  },
+  {
+   "date": "2026-09-09",
+   "title": "Release held",
+   "text": "The first release was stopped: one bug kept coming back. When the library could not measure something it returned a harmless-looking number such as 0.0, which reads as \"no bias\". New detectors found about 140 more places by running the code."
+  },
+  {
+   "date": "2026-09-11",
+   "title": "Every capability examined",
+   "text": "All 215 capabilities were run on data where nothing could be measured. 122 were proved to report a number nobody had measured, giving 157 defects to fix.",
+   "evidence": "docs/BETA_GO_LIVE_PLAN.md (commit 8559dda)"
+  },
+  {
+   "date": "2026-09-30",
+   "title": "All defects fixed, and a second examiner",
+   "text": "All 157 defects were fixed, each with a test that was broken on purpose to prove it can fail. A second, independent examiner re-checked 872 grades and overturned 291 of them, about one in three, which is why that second check matters."
+  },
+  {
+   "date": "2026-10-01",
+   "title": "The two-check gate",
+   "text": "The gate became two programs anyone can re-run: compare with established libraries, and feed every measuring capability broken data. They found 6 more defects, all fixed the same day.",
+   "evidence": "tests/test_reference_parity_registry.py, tests/test_honest_on_broken_data.py"
+  }
+ ]
+}

@@ -1,0 +1,73 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+build/
+dist/
+*.egg
+
+# Virtual environments
+.venv/
+.venv-*/
+venv/
+env/
+ENV/
+
+# Test + coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Mutation testing (VB-TEST-9)
+.mutmut-cache
+html/
+
+# Plot files the DOCUMENTED examples write into the working directory.
+# docs/API_REFERENCE.md saves fairness_figure.pdf to the CWD, so anyone who runs
+# the docs verbatim from the repo root leaves an untracked artifact sitting in
+# the tree, ready for a careless `git add -A` to publish.
+#
+# ANCHORED to the repo root on purpose. An unanchored `*_report.svg` would also
+# match src/vfairness/rendering/templates/fairness_detailed_report.svg and every
+# future template with that shape, silently ignoring a real source file the day
+# someone adds one. Ignore only the drop zone, never the whole tree.
+/fairness_figure.pdf
+/fairness.svg
+/*_report.svg
+/*_dashboard.png
+# The NOTEBOOKS write here too, and now that tests/test_notebooks_still_run.py
+# executes all thirteen on every run, these appear after any local test run.
+# Same anchoring rule: only the repo-root drop zone, never the whole tree.
+/method_comparison.svg
+/tradeoff_analysis.svg
+/report_builtin.svg
+/output/
+
+# matplotlib font cache, created when the gallery renders
+.matplotlib/
+
+# Test artifact from an OLDER version of tests/test_notebooks_still_run.py, which
+# wrote the notebook's cells into the source tree. The test uses pytest's
+# tmp_path now and writes nothing here, but an interrupted run from a checkout
+# predating READINESS-6 (2026-09-10) can still have left one behind, and it must
+# never be committable.
+notebooks/.*.cells.json

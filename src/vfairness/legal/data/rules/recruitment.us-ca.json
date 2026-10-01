@@ -1,0 +1,38 @@
+{
+  "use_case": "recruitment",
+  "jurisdiction": "us-ca",
+  "source_revision": "2026-05-20",
+  "inherits": "recruitment.us-federal",
+  "rules": {
+    "salary_history": {
+      "status": "forbidden",
+      "legal_basis": "California Labor Code §432.3",
+      "notes": "Employers may not seek salary history, including via agents or background checks. Applicants may volunteer it."
+    },
+    "criminal_record": {
+      "status": "forbidden",
+      "lifecycle": "pre_offer",
+      "legal_basis": "California Fair Chance Act, Gov. Code §12952",
+      "notes": "No criminal-history inquiry until after a conditional offer; individualised assessment required if used post-offer."
+    },
+    "ethnicity": {
+      "status": "monitoring_only",
+      "legal_basis": "FEHA (Gov. Code §12940) + CPRA sensitive-personal-information",
+      "carve_out": "feha_monitoring"
+    },
+    "gender": {
+      "status": "monitoring_only",
+      "legal_basis": "FEHA + CPRA sensitive-personal-information",
+      "carve_out": "feha_monitoring"
+    },
+    "marital_status": {
+      "status": "restricted",
+      "legal_basis": "FEHA Gov. Code §12940 (protected class)"
+    },
+    "health": {
+      "status": "forbidden",
+      "lifecycle": "pre_offer",
+      "legal_basis": "FEHA + ADA"
+    }
+  }
+}

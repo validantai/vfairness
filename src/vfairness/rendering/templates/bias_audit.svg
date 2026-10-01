@@ -1,0 +1,238 @@
+{# ── BiasDetector · Audit Report SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set score_h = 16 %}
+{% set modules_h = 60 %}
+{% set issues_header_h = 48 %}
+{% set issue_row_h = 44 %}
+{% set issues_h = issues_header_h + issues|length * issue_row_h + 10 %}
+{# An empty grid still needs room for the sentence that says it is empty. #}
+{% if not issues %}{% set issues_h = issues_header_h + 34 %}{% endif %}
+{% set bars_header_h = 36 %}
+{% set bar_row_h = 40 %}
+{% set bars_h = bars_header_h + bars|length * bar_row_h + 16 %}
+{% if not bars %}{% set bars_h = bars_header_h + 34 %}{% endif %}
+{% set recs_h = 60 + recommendations|length * 22 if recommendations else 0 %}
+{% if explanation %}{% set _pre_exp = explanation|wordwrap(105) %}{% set exp_h = 44 + _pre_exp.split('\n')|length * 16 %}{% else %}{% set exp_h = 0 %}{% endif %}
+
+{% set modules_y = header_h + score_h %}
+{% set issues_y = modules_y + modules_h + 16 %}
+{% set bars_y = issues_y + issues_h + 16 %}
+{% set recs_y = bars_y + bars_h + 16 %}
+{% set exp_y = recs_y + recs_h + 16 if recommendations else bars_y + bars_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}
+<text x="644" y="32" text-anchor="end" font-size="9" fill="#b0b8c4">{{ timestamp }}</text>
+{% endif %}
+<rect x="36" y="52" width="644" height="1.5" fill="url(#accent)"/>
+
+{# ── COULD NOT CHECK band ── #}
+{# DO NOT REMOVE, and do not move this into the <desc>. An SVG is an export and #}
+{# outlives the run that made it. An audit whose four modules all returned      #}
+{# nothing used to render an emerald "OVERALL RISK 0% / MINIMAL" here, because  #}
+{# BiasDetector._calculate_overall_risk returns 0.0 for a run where NO module   #}
+{# executed exactly as it does for a dataset every module cleared. This band is #}
+{# where a reader learns the difference was never established. It is NOT a      #}
+{# rejection: could-not-check is neither a pass nor a fail. #}
+{% if not_assessable %}
+<rect x="0" y="54" width="680" height="20" fill="{{ unknown_bg|default('#f1f5f9') }}"/>
+<text x="340" y="68" text-anchor="middle" font-size="9" font-weight="600" fill="{{ unknown_color|default('#64748b') }}">{{ not_assessable_text|default('NOT ASSESSABLE') }}: {{ not_assessable_reason|default('no module of this audit returned a finding, so no risk was established.') }}</text>
+{% endif %}
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{# "0 critical issues found" is a count of zero worded as a finding, and the #}
+{# zero case is exactly the one where the sentence is doing the most work.   #}
+{# A non-zero count still reads "N critical issue(s) found", unchanged.      #}
+<text x="36" y="122" font-size="10" fill="#64748b">Bias audit across {{ modules|length }} modules: {% if n_critical %}{{ n_critical }} critical issue{{ 's' if n_critical != 1 else '' }} found{% elif not_assessable %}no critical issue was returned{% else %}no critical issue was returned by the modules that ran{% endif %}</text>
+{# The qualifiers sit on their OWN line. Appended to the line above they ran #}
+{# under the score card at x=520 and the reader lost the end of the only     #}
+{# sentence saying the audit clears nothing. #}
+{# The qualifier wording is decided in the adapter (na_line / ungraded_line), so
+   it can say the true thing for each case and be tested there. The old text was
+   hard-coded "this audit neither clears the dataset nor faults it", which is
+   wrong for a report that DOES carry findings and merely reports no aggregate
+   score: that audit faults the dataset, it just cannot total it up. #}
+{% if coverage == 'partial' or na_line %}
+<text x="36" y="136" font-size="9" fill="#94a3b8">{% if coverage == 'partial' %}Only {{ n_modules_run }} of {{ n_modules }} audit modules ran{% if na_line %} · {% endif %}{% endif %}{{ na_line|default('') }}</text>
+{% endif %}
+
+{# ── Score badge ── #}
+<rect x="520" y="68" width="160" height="56" rx="10" fill="#ffffff"/>
+{# `score_assessable` is the badge's OWN third state and defaults to true for a
+   caller that does not set it. It is separate from `not_assessable` on purpose:
+   a report can carry real findings and no aggregate score, and withholding the
+   BADGE for that must not also tell rendering.explain that nothing on the
+   canvas was assessed. See the note at adapters.bias_audit_to_svg. #}
+{% set _score_shown = (score_assessable is not defined or score_assessable) and not not_assessable %}
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="{{ unknown_color|default('#64748b') if not _score_shown else overall_color }}"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">OVERALL RISK</text>
+{# The percentage and the band label are WITHHELD, not greyed: a slate "0%" is #}
+{# still the number, and a reader takes a printed number for a measurement. #}
+{% if not _score_shown %}
+<text x="536" y="110" font-size="14" font-weight="700" fill="{{ unknown_color|default('#64748b') }}">{{ not_assessable_text|default('NOT ASSESSABLE') }}</text>
+{% else %}
+<text x="536" y="112" font-size="26" font-weight="700" fill="{{ overall_color }}">{{ (overall_score * 100)|int }}%</text>
+<rect x="600" y="90" width="68" height="18" rx="9" fill="{{ overall_bg }}"/>
+<text x="634" y="103" text-anchor="middle" font-size="8" font-weight="600" fill="{{ overall_color }}">{{ overall_label }}</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Module Scores Row                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ modules_y }}" width="644" height="{{ modules_h }}" rx="10" fill="#ffffff"/>
+{# max(1, n) guard: an empty modules list must render an empty row, not ZeroDivisionError #}
+{% set mod_w = (608 // max(1, modules|length)) - 8 %}
+{% for m in modules %}
+{% set mx = 46 + loop.index0 * (mod_w + 8) %}
+<rect x="{{ mx }}" y="{{ modules_y + 8 }}" width="{{ mod_w }}" height="44" rx="8" fill="{{ m.bg }}"/>
+<text x="{{ mx + 10 }}" y="{{ modules_y + 26 }}" font-size="9" font-weight="600" fill="{{ m.color }}">{{ m.name|truncate_text(16) }}</text>
+<text x="{{ mx + mod_w - 10 }}" y="{{ modules_y + 26 }}" text-anchor="end" font-size="16" font-weight="700" fill="{{ m.color }}">{{ m.score|f2 }}</text>
+<text x="{{ mx + 10 }}" y="{{ modules_y + 42 }}" font-size="8" fill="{{ m.color }}">{{ m.detail|truncate_text(18) }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Critical Issues Table                                             #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ issues_y }}" width="644" height="{{ issues_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ issues_y + 24 }}" font-size="11" font-weight="700" fill="#0f172a">Critical Issues</text>
+
+{# Column headers #}
+<text x="56" y="{{ issues_y + issues_header_h - 4 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">TYPE</text>
+<text x="210" y="{{ issues_y + issues_header_h - 4 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">ISSUE</text>
+<text x="560" y="{{ issues_y + issues_header_h - 4 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">SEVERITY</text>
+<line x1="56" y1="{{ issues_y + issues_header_h }}" x2="660" y2="{{ issues_y + issues_header_h }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for issue in issues %}
+{% set iy = issues_y + issues_header_h + loop.index0 * issue_row_h %}
+{% if issue.severity == 'high' or issue.severity == 'critical' %}
+{% set sev_color = '#dc2626' %}
+{% set sev_bg = '#fef2f2' %}
+{% else %}
+{% set sev_color = '#f59e0b' %}
+{% set sev_bg = '#fef3c7' %}
+{% endif %}
+
+{# FAIL row highlight for high/critical #}
+{% if issue.severity == 'high' or issue.severity == 'critical' %}
+<rect x="36" y="{{ iy }}" width="644" height="{{ issue_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ iy }}" width="2.5" height="{{ issue_row_h }}" fill="#dc2626"/>
+{% endif %}
+
+<text x="56" y="{{ iy + 18 }}" font-size="10" font-weight="500" fill="#0f172a">{{ issue.type|truncate_text(22) }}</text>
+<text x="210" y="{{ iy + 18 }}" font-size="10" font-weight="500" fill="#0f172a">{{ issue.title|truncate_text(52) }}</text>
+<text x="210" y="{{ iy + 34 }}" font-size="8.5" fill="#94a3b8">{{ issue.detail|truncate_text(58) }}</text>
+
+{# Severity badge #}
+<rect x="548" y="{{ iy + 6 }}" width="90" height="20" rx="10" fill="{{ sev_bg }}"/>
+<text x="593" y="{{ iy + 20 }}" text-anchor="middle" font-size="9" font-weight="600" fill="{{ sev_color }}">{{ issue.severity|upper }}</text>
+
+{% if not loop.last %}
+<line x1="56" y1="{{ iy + issue_row_h }}" x2="660" y2="{{ iy + issue_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+{# An empty grid is silent, and silence under a header row reads as agreement. #}
+{% if not issues %}
+<text x="56" y="{{ issues_y + issues_header_h + 20 }}" font-size="10" fill="#64748b">{% if not_assessable %}No issue was returned, and with no module finding behind it that is not the same as no issue existing.{% else %}No critical issue was returned by the modules that ran.{% endif %}</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Representation Bars                                               #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ bars_y }}" width="644" height="{{ bars_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ bars_y + 24 }}" font-size="11" font-weight="700" fill="#0f172a">Representation Analysis</text>
+{# The ungraded count belongs ON the panel, not only in the per-row sentence.
+   The adapter computed `n_groups_without_benchmark` and the template printed it
+   nowhere, so a reader scanning the header saw a benchmarked chart and had to
+   notice the missing grey bars row by row. The count is taken from the rows
+   drawn here, so it can never disagree with them. #}
+{% if bars and n_groups_without_benchmark %}
+<text x="220" y="{{ bars_y + 24 }}" font-size="8.5" fill="#64748b">{{ n_groups_without_benchmark }} of {{ bars|length }} groups had no population benchmark; those are neither cleared nor faulted here</text>
+{% endif %}
+
+{% for bar in bars %}
+{% set by = bars_y + bars_header_h + loop.index0 * bar_row_h %}
+<text x="56" y="{{ by + 14 }}" font-size="10" font-weight="500" fill="#0f172a">{{ bar.group }}</text>
+<text x="56" y="{{ by + 28 }}" font-size="8.5" fill="#94a3b8">{{ bar.attribute }}</text>
+
+{# Dataset bar. Three states per row: a share the finding did not carry has no
+   length to draw, and drawing it at the 4px floor would show a group with
+   almost no presence in the data. #}
+{% if bar.dataset_pct is not none %}
+{% set dw = max(4, (bar.dataset_pct * 350)|int) %}
+<rect x="200" y="{{ by + 2 }}" width="{{ dw }}" height="12" rx="3" fill="#475569"/>
+<text x="{{ 200 + dw + 6 }}" y="{{ by + 12 }}" font-size="9" font-weight="600" fill="#475569">{{ (bar.dataset_pct * 100)|int }}%</text>
+{% else %}
+{% set dw = 0 %}
+<text x="200" y="{{ by + 12 }}" font-size="9" fill="#64748b">dataset share not reported</text>
+{% endif %}
+
+{# Benchmark bar. Same three states, and this is the one that mattered: the
+   adapter used to default a missing representation ratio to 1.0, which makes
+   the benchmark EQUAL the dataset share and draws two bars of identical length
+   under a "Dataset / Population benchmark" legend. That is a picture of perfect
+   representation for a group nobody benchmarked. No ratio, no bar. #}
+{% if bar.benchmark_pct is not none %}
+{% set bw = max(4, (bar.benchmark_pct * 350)|int) %}
+<rect x="200" y="{{ by + 18 }}" width="{{ bw }}" height="8" rx="3" fill="#cbd5e1" opacity="0.6"/>
+<text x="{{ 200 + bw + 6 }}" y="{{ by + 26 }}" font-size="8" fill="#94a3b8">{{ (bar.benchmark_pct * 100)|int }}% benchmark</text>
+{% else %}
+<text x="200" y="{{ by + 26 }}" font-size="8" fill="#64748b">no population benchmark was reported for this group</text>
+{% endif %}
+{% endfor %}
+
+{# Legend. A legend under an empty chart labels bars that are not there, so the #}
+{# empty panel carries the sentence instead. #}
+{% if bars %}
+{% set legend_y = bars_y + bars_header_h + bars|length * bar_row_h + 2 %}
+<rect x="200" y="{{ legend_y }}" width="8" height="8" rx="2" fill="#475569"/>
+<text x="212" y="{{ legend_y + 8 }}" font-size="8" fill="#94a3b8">Dataset</text>
+<rect x="270" y="{{ legend_y }}" width="8" height="8" rx="2" fill="#cbd5e1" opacity="0.6"/>
+<text x="282" y="{{ legend_y + 8 }}" font-size="8" fill="#94a3b8">Population benchmark</text>
+{% else %}
+<text x="56" y="{{ bars_y + bars_header_h + 16 }}" font-size="10" fill="#64748b">No representation finding was returned, so no group here is shown over- or under-represented.</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Recommendations Panel                                             #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if recommendations %}
+<rect x="36" y="{{ recs_y }}" width="644" height="{{ recs_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ recs_y }}" width="2.5" height="{{ recs_h }}" rx="1" fill="#3b82f6"/>
+<text x="56" y="{{ recs_y + 20 }}" font-size="8" font-weight="600" fill="#3b82f6" letter-spacing="0.5">RECOMMENDATIONS</text>
+<text x="200" y="{{ recs_y + 20 }}" font-size="10.5" font-weight="600" fill="#0f172a">Suggested Actions</text>
+<line x1="56" y1="{{ recs_y + 30 }}" x2="660" y2="{{ recs_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+{% for rec in recommendations %}
+<text x="66" y="{{ recs_y + 48 + loop.index0 * 22 }}" font-size="9.5" fill="#6b7280">{{ loop.index }}. {{ rec|truncate_text(105) }}</text>
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

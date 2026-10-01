@@ -1,0 +1,139 @@
+{# ── Fairness Metrics · Confidence Intervals (Forest Plot) ── #}
+{# ── vfairness G1 Design System ── #}
+
+{# ── Height computation ── #}
+{# n_ticks reaches range() below, which requires an int: coerce floats and
+   numeric strings (a non-numeric value becomes 0 -> no grid, no crash). #}
+{% set n_ticks = n_ticks|int(0) %}
+{% set badge_h = 36 %}
+{% set row_h = min(42, (260 / max(1, intervals|length))|int) %}
+{% set chart_h = 30 + intervals|length * row_h + 40 %}
+{% set content_h = badge_h + 16 + chart_h %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% endif %}
+{% set exp_y = 140 + content_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 {{ total_h }}" font-family="'Inter','Segoe UI',system-ui,sans-serif">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title / Subtitle ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ── Summary badge ── #}
+{% set badge_y = 140 %}
+<rect x="36" y="{{ badge_y }}" width="300" height="{{ badge_h }}" rx="10" fill="{{ summary_bg }}"/>
+<text x="56" y="{{ badge_y + 22 }}" font-size="11" font-weight="700" fill="{{ summary_color }}">{{ summary_icon }} {{ summary_text }}</text>
+
+{# The SIGNIFICANT tile is a claim about confidence intervals. With no computed
+   interval there is no claim to make, so the tile is SUPPRESSED rather than
+   reporting "0 / n" over bands that were never computed. Absent flag keeps the
+   historical render. #}
+{% if n_ci_computed is not defined or n_ci_computed %}
+<rect x="346" y="{{ badge_y }}" width="160" height="{{ badge_h }}" rx="10" fill="#ffffff"/>
+<text x="366" y="{{ badge_y + 14 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.8">SIGNIFICANT</text>
+<text x="366" y="{{ badge_y + 30 }}" font-size="13" font-weight="700" fill="#0f172a">{{ n_significant }} / {{ n_total }}</text>
+{% else %}
+<rect x="346" y="{{ badge_y }}" width="230" height="{{ badge_h }}" rx="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+<text x="366" y="{{ badge_y + 14 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.8">SIGNIFICANCE</text>
+<text x="366" y="{{ badge_y + 30 }}" font-size="13" font-weight="700" fill="#64748b">· CI not computed</text>
+{% endif %}
+
+{# ── Forest plot ── #}
+{% set chart_y = badge_y + badge_h + 16 %}
+{% set plot_left = 200 %}
+{% set plot_right = 640 %}
+{% set plot_w = plot_right - plot_left %}
+
+{# Table header #}
+<text x="36" y="{{ chart_y + 10 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.8">METRIC</text>
+<text x="{{ plot_left }}" y="{{ chart_y + 10 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.8">{{ x_axis_label|upper|truncate_text(30) }}</text>
+<line x1="36" y1="{{ chart_y + 16 }}" x2="680" y2="{{ chart_y + 16 }}" stroke="#cbd5e1" stroke-width="0.5"/>
+
+{# Grid lines and tick labels #}
+{% for i in range(n_ticks) %}
+{% set gx = (plot_left + i * (plot_w / max(1, n_ticks - 1)))|int %}
+<line x1="{{ gx }}" y1="{{ chart_y + 20 }}" x2="{{ gx }}" y2="{{ chart_y + 20 + intervals|length * row_h }}" stroke="#cbd5e1" stroke-width="0.25"/>
+{% endfor %}
+
+{# Threshold line #}
+{% if threshold_x is not none %}
+<line x1="{{ threshold_x }}" y1="{{ chart_y + 18 }}" x2="{{ threshold_x }}" y2="{{ chart_y + 22 + intervals|length * row_h }}" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"/>
+{% endif %}
+
+{# ── Interval rows ── #}
+{% for iv in intervals %}
+{% set iy = chart_y + 22 + loop.index0 * row_h %}
+
+{# Row separator #}
+{% if not loop.first %}
+<line x1="36" y1="{{ iy - 4 }}" x2="680" y2="{{ iy - 4 }}" stroke="#cbd5e1" stroke-width="0.25"/>
+{% endif %}
+
+{# Metric label #}
+<text x="190" y="{{ iy + 14 }}" text-anchor="end" font-size="10" font-weight="500" fill="#0f172a">{{ iv.label|truncate_text(24) }}</text>
+
+{# CI whisker + end caps. Drawn ONLY for a computed interval: a whisker is the
+   visual claim "the true value lies in here", so drawing one for a metric that
+   has no interval is a fabricated band. The point estimate is still shown. #}
+{% if iv.ci_computed is not defined or iv.ci_computed %}
+<line x1="{{ iv.ci_left_px }}" y1="{{ iy + 10 }}" x2="{{ iv.ci_right_px }}" y2="{{ iy + 10 }}" stroke="{{ iv.color }}" stroke-width="2"/>
+<line x1="{{ iv.ci_left_px }}" y1="{{ iy + 5 }}" x2="{{ iv.ci_left_px }}" y2="{{ iy + 15 }}" stroke="{{ iv.color }}" stroke-width="2"/>
+<line x1="{{ iv.ci_right_px }}" y1="{{ iy + 5 }}" x2="{{ iv.ci_right_px }}" y2="{{ iy + 15 }}" stroke="{{ iv.color }}" stroke-width="2"/>
+{% endif %}
+
+{# Central diamond (point estimate) #}
+<polygon points="{{ iv.point_px }},{{ iy + 4 }} {{ iv.point_px + 5 }},{{ iy + 10 }} {{ iv.point_px }},{{ iy + 16 }} {{ iv.point_px - 5 }},{{ iy + 10 }}" fill="{{ iv.color }}"/>
+
+{# Value annotation #}
+{% if iv.ci_computed is not defined or iv.ci_computed %}
+<text x="{{ iv.point_px }}" y="{{ iy + 28 }}" text-anchor="middle" font-size="8" fill="{{ iv.color }}">{{ iv.value|f3 }} [{{ iv.ci_low|f3 }}, {{ iv.ci_high|f3 }}]</text>
+{% else %}
+<text x="{{ iv.point_px }}" y="{{ iy + 28 }}" text-anchor="middle" font-size="8" fill="{{ iv.color }}">{{ iv.value|f3 }} (CI not computed)</text>
+{% endif %}
+{% endfor %}
+
+{# Tick labels below chart #}
+{% set tick_y = chart_y + 22 + intervals|length * row_h + 12 %}
+{% for i in range(n_ticks) %}
+{% set gx = (plot_left + i * (plot_w / max(1, n_ticks - 1)))|int %}
+{# Index guard: fewer labels than ticks must not raise #}
+{% if tick_labels and loop.index0 < tick_labels|length %}
+<text x="{{ gx }}" y="{{ tick_y }}" text-anchor="middle" font-size="7.5" fill="#94a3b8">{{ tick_labels[loop.index0] }}</text>
+{% endif %}
+{% endfor %}
+
+{# X axis label #}
+<text x="{{ (plot_left + plot_right) // 2 }}" y="{{ tick_y + 16 }}" text-anchor="middle" font-size="9" fill="#64748b">{{ x_axis_label }}</text>
+
+{# ── Explanation panel ── #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+
+</svg>

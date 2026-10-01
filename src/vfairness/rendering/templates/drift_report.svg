@@ -1,0 +1,169 @@
+{# ── FairnessDriftDetector · Drift Report SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set status_h = 66 %}
+{% set table_header_h = 40 %}
+{% set table_row_h = 48 %}
+{% set table_h = table_header_h + scales|length * table_row_h + 10 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}
+{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 40 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{% set status_y = header_h %}
+{% set table_y = status_y + status_h + 16 %}
+{% set exp_y = table_y + table_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   With no scale analysed, overall_drift_score is the maximum over an empty set,
+   so the STABLE badge and its 0.00 are a sentinel dressed as a measurement. The
+   badge, the score and the scale table all go. #}
+{% if not_assessable %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = header_h %}
+{% set exp_y = na_y + na_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+{% if not_assessable %}
+<text x="36" y="122" font-size="10" fill="#64748b">{{ metric_name }} · no scale analysed</text>
+{% include '_could_not_check.svg' %}
+{% else %}
+<text x="36" y="122" font-size="10" fill="#64748b">{{ metric_name }} · {{ scales|length }} scale{{ 's' if scales|length != 1 }} analysed</text>
+
+{# ── Drift status badge ── #}
+{# Three states, never two. `{% if drift_detected %}` sent every falsy value to #}
+{# the green STABLE branch, and a result that recorded NO overall verdict is    #}
+{# falsy, so silence was crowned with the calmest word this chart has. The      #}
+{# recorded flag is tested FIRST; the slate is the same could-not-check tone    #}
+{# used for an unmeasured statistic elsewhere on this canvas. #}
+{% if overall_verdict_recorded is defined and not overall_verdict_recorded %}
+{% set badge_color = '#64748b' %}
+{% set badge_bg = '#f1f5f9' %}
+{% set badge_label = 'NOT RECORDED' %}
+{% elif drift_detected %}
+{% set badge_color = '#dc2626' %}
+{% set badge_bg = '#fef2f2' %}
+{% set badge_label = 'DETECTED' %}
+{% else %}
+{% set badge_color = '#059669' %}
+{% set badge_bg = '#ecfdf5' %}
+{% set badge_label = 'STABLE' %}
+{% endif %}
+<rect x="520" y="68" width="160" height="56" rx="10" fill="#ffffff"/>
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="{{ badge_color }}"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">DRIFT STATUS</text>
+{# NOT RECORDED is twelve characters; at font-size 20 it runs off the 680 edge, #}
+{# so it is set at 13 like the NOT ASSESSABLE badge on regression_fairness.svg. #}
+{# Verified by rasterising, not by reading. #}
+{% if badge_label == 'NOT RECORDED' %}
+<text x="536" y="106" font-size="13" font-weight="700" fill="{{ badge_color }}">{{ badge_label }}</text>
+{% else %}
+<text x="536" y="108" font-size="20" font-weight="700" fill="{{ badge_color }}">{{ badge_label }}</text>
+{% endif %}
+<text x="536" y="120" font-size="9" fill="#94a3b8">overall score: <tspan font-weight="700" fill="{{ overall_color }}">{{ overall_drift_score|f2 }}</tspan></text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Scale-by-Scale Results Table                                      #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ table_y }}" width="644" height="{{ table_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">SCALE</text>
+<text x="230" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">DRIFT SCORE</text>
+<text x="380" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">KS STAT</text>
+<text x="440" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">P-VALUE</text>
+<text x="510" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">MEAN SHIFT</text>
+<text x="600" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">STATUS</text>
+<line x1="56" y1="{{ table_y + 32 }}" x2="660" y2="{{ table_y + 32 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for s in scales %}
+{% set ry = table_y + table_header_h + loop.index0 * table_row_h %}
+{# FAIL row background for detected drift #}
+{% if s.drift_detected %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ table_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ table_row_h }}" fill="#dc2626"/>
+{% endif %}
+
+{# Scale name #}
+<text x="56" y="{{ ry + 18 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ s.scale_name }}</text>
+<text x="56" y="{{ ry + 32 }}" font-size="8" fill="#94a3b8">ref={{ s.ref_mean|f3 }} / cur={{ s.cur_mean|f3 }}</text>
+
+{# Drift score + bar #}
+<rect x="230" y="{{ ry + 8 }}" width="100" height="10" rx="3" fill="#f1f5f9"/>
+<rect x="230" y="{{ ry + 8 }}" width="{{ min(100, s.score_bar_w) }}" height="10" rx="3" fill="{{ s.color }}" opacity="0.7"/>
+<text x="230" y="{{ ry + 32 }}" font-size="10" font-weight="600" fill="{{ s.color }}">{{ s.drift_score|f3 }}</text>
+
+{# KS stat #}
+<text x="380" y="{{ ry + 20 }}" font-size="10" font-weight="500" fill="#475569">{{ s.ks_stat|f3 }}</text>
+
+{# p-value #}
+<text x="440" y="{{ ry + 20 }}" font-size="10" font-weight="500" fill="{{ '#dc2626' if s.p_value < 0.05 else '#475569' }}">{{ s.p_value|f4 }}</text>
+
+{# Mean shift #}
+{% if s.mean_shift >= 0 %}
+<text x="510" y="{{ ry + 20 }}" font-size="10" font-weight="500" fill="#475569">+{{ s.mean_shift|f4 }}</text>
+{% else %}
+<text x="510" y="{{ ry + 20 }}" font-size="10" font-weight="500" fill="#475569">{{ s.mean_shift|f4 }}</text>
+{% endif %}
+
+{# Status badge #}
+{# CRITICAL, three states PER ROW, never two. This was `{% if s.drift_detected #}
+{# %}DRIFT{% else %}STABLE`, and a scale that recorded no verdict at all is     #}
+{# falsy, so it took the emerald STABLE pill: the most reassuring state         #}
+{# available, handed out for silence, on the one column a reader scans to see   #}
+{# which scales are safe. `verdict_recorded` is set per scale by               #}
+{# adapters_monitoring.drift_report_to_svg and is tested FIRST. #}
+{% if s.verdict_recorded is defined and not s.verdict_recorded %}
+<rect x="586" y="{{ ry + 6 }}" width="72" height="20" rx="10" fill="#f1f5f9"/>
+<text x="622" y="{{ ry + 20 }}" text-anchor="middle" font-size="7.5" font-weight="600" fill="#64748b">NOT RECORDED</text>
+{% elif s.drift_detected %}
+<rect x="586" y="{{ ry + 6 }}" width="72" height="20" rx="10" fill="#fef2f2"/>
+<text x="622" y="{{ ry + 20 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#dc2626">DRIFT</text>
+{% else %}
+<rect x="586" y="{{ ry + 6 }}" width="72" height="20" rx="10" fill="#ecfdf5"/>
+<text x="622" y="{{ ry + 20 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#059669">STABLE</text>
+{% endif %}
+
+{# Row separator #}
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + table_row_h }}" x2="660" y2="{{ ry + table_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+{% endif %}{# end: not not_assessable #}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

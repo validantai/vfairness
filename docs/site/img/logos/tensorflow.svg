@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 40" height="40">
+  <g transform="translate(6,4)">
+    <path d="M16 0L16 32M16 0L28 7L28 18L16 11" fill="none" stroke="#FF6F00" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M16 11L4 18L4 7L16 0" fill="none" stroke="#FF6F00" stroke-width="2.5" stroke-linejoin="round" opacity="0.6"/>
+  </g>
+  <text x="42" y="26" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="600" fill="#FF6F00">TensorFlow</text>
+</svg>

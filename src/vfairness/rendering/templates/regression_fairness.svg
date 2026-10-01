@@ -1,0 +1,241 @@
+{# ── Regression Fairness Report SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set badge_h = 56 %}
+{% set table_header_h = 34 %}
+{% set table_row_h = 40 %}
+{% set table_h = table_header_h + groups|length * table_row_h + 10 %}
+{% set effect_row_h = 36 %}
+{% set effect_h = 34 + effects|length * effect_row_h + 10 %}
+{% set residual_h = 34 + groups|length * 30 + 10 %}
+{% set rec_h = 34 + recommendations|length * 18 + 10 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}
+{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 40 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{% set badge_y = header_h %}
+{% set table_y = badge_y + badge_h + 16 %}
+{% set effect_y = table_y + table_h + 16 %}
+{% set residual_y = effect_y + effect_h + 16 %}
+{% set rec_y = residual_y + residual_h + 16 %}
+{% set exp_y = rec_y + rec_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── EXAMPLE band ── #}
+{# The demo fixture is reachable only through example=True, and when it is used #}
+{# the canvas has to say so where a reader looks, not only in the <desc>. An    #}
+{# unlabelled demo is indistinguishable from a real regression assessment once  #}
+{# the file is exported. DO NOT REMOVE: the band and the watermark are the only #}
+{# things separating a sample from an audit artifact. #}
+{% if is_example %}
+<rect x="0" y="54" width="680" height="20" fill="#fef3c7"/>
+<text x="340" y="68" text-anchor="middle" font-size="9.5" font-weight="700" fill="#92400e" letter-spacing="0.8">EXAMPLE ONLY: SYNTHETIC DEMONSTRATION DATA, NOT A REAL EVALUATION</text>
+{% endif %}
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+
+{# ── Summary badge ── #}
+{# Three states, never two. `n_pass == n_total` is also true of 0 == 0, so a
+   report that measured NOTHING used to print a green EQUITABLE, and a metric
+   that could not be checked (None/NaN) left the denominator so the survivors
+   read as a clean sheet. The adapter decides could-not-check and sets
+   `not_assessable`; this branch is the only place the third state can be
+   shown, because the other two words are the only ones this badge had. #}
+<rect x="520" y="68" width="160" height="56" rx="10" fill="#ffffff"/>
+{% if not_assessable %}
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="#64748b"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">DISPARITY</text>
+<text x="536" y="106" font-size="13" font-weight="700" fill="#64748b">NOT ASSESSABLE</text>
+{% elif n_pass == n_total %}
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="#059669"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">DISPARITY</text>
+<text x="536" y="108" font-size="20" font-weight="700" fill="#059669">EQUITABLE</text>
+{% else %}
+<rect x="520" y="68" width="2.5" height="56" rx="1" fill="#dc2626"/>
+<text x="536" y="84" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">DISPARITY</text>
+<text x="536" y="108" font-size="20" font-weight="700" fill="#dc2626">BIASED</text>
+{% endif %}
+{# A rate over an EMPTY set is 0/0, which reads as a measurement. It is not one, #}
+{# and it sat directly under the NOT ASSESSABLE badge, which is the one place a #}
+{# reader looks for the number. Withheld, never zeroed.                         #}
+{# The test is n_total, NOT not_assessable: a page with one graded metric and   #}
+{# one unchecked one is also not-assessable, and there "0/1" and "1/2" are real #}
+{# measurements that must stay visible. Keeping the unmeasurable metric in the  #}
+{# DENOMINATOR is the whole point of the note at the top of adapters_regression, #}
+{# and hiding the fraction would undo it. Pinned by                             #}
+{# test_adapters_regression_verdicts.py::TestHeadlineVerdict. #}
+{% if n_total == 0 %}
+<text x="536" y="120" font-size="9" fill="#94a3b8">not measured</text>
+{% else %}
+<text x="536" y="120" font-size="9" fill="#94a3b8"><tspan font-weight="700">{{ n_pass }}/{{ n_total }}</tspan> metrics pass</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Disparity Badges Row                                             #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ badge_y }}" width="644" height="{{ badge_h }}" rx="10" fill="#ffffff"/>
+{% for b in badges %}
+{% set bx = 48 + loop.index0 * 158 %}
+<rect x="{{ bx }}" y="{{ badge_y + 8 }}" width="148" height="38" rx="8" fill="{{ b.bg }}"/>
+<rect x="{{ bx }}" y="{{ badge_y + 8 }}" width="2" height="38" rx="1" fill="{{ b.color }}"/>
+<text x="{{ bx + 14 }}" y="{{ badge_y + 24 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.3">{{ b.name|upper }}</text>
+<text x="{{ bx + 14 }}" y="{{ badge_y + 40 }}" font-size="12" font-weight="700" fill="{{ b.color }}">{{ b.value|f3 }}</text>
+<text x="{{ bx + 105 }}" y="{{ badge_y + 40 }}" font-size="9" font-weight="600" fill="{{ b.color }}">{{ b.label }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Per-Group Metrics Table                                          #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ table_y }}" width="644" height="{{ table_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">GROUP</text>
+<text x="160" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">N</text>
+<text x="220" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">MAE</text>
+<text x="290" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">RMSE</text>
+<text x="360" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">R²</text>
+<text x="430" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">MEAN RES.</text>
+<text x="530" y="{{ table_y + 22 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">STD RES.</text>
+<line x1="56" y1="{{ table_y + 30 }}" x2="660" y2="{{ table_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{# A cell whose value is None was NOT measured, and it is printed as N/A in the #}
+{# same slate as every other could-not-check state on this canvas, never as a   #}
+{# number. The adapter stopped defaulting these to 0 on 2026-08-27, when a      #}
+{# group carrying only its name was tabulated as six 0.000s in measurement      #}
+{# black under an honest NOT ASSESSABLE badge. DO NOT print `|f3` unguarded in  #}
+{# #475569: that colour is what tells the reader a figure was measured. #}
+{% set _na_fill = '#94a3b8' %}
+{% for g in groups %}
+{% set ry = table_y + table_header_h + loop.index0 * table_row_h %}
+<rect x="36" y="{{ ry }}" width="4" height="{{ table_row_h }}" fill="{{ g.color }}"/>
+<text x="56" y="{{ ry + 20 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ g.name }}</text>
+<text x="160" y="{{ ry + 20 }}" font-size="10" fill="{{ _na_fill if g.n is none else '#475569' }}">{% if g.n is none %}N/A{% else %}{{ g.n }}{% endif %}</text>
+<text x="220" y="{{ ry + 20 }}" font-size="10" fill="{{ _na_fill if g.mae is none else '#475569' }}">{{ g.mae|f3 }}</text>
+<text x="290" y="{{ ry + 20 }}" font-size="10" fill="{{ _na_fill if g.rmse is none else '#475569' }}">{{ g.rmse|f3 }}</text>
+<text x="360" y="{{ ry + 20 }}" font-size="10" fill="{{ _na_fill if g.r2 is none else '#475569' }}">{{ g.r2|f3 }}</text>
+{% if g.mean_residual is none %}
+<text x="430" y="{{ ry + 20 }}" font-size="10" font-weight="500" fill="{{ _na_fill }}">N/A</text>
+{% else %}
+<text x="430" y="{{ ry + 20 }}" font-size="10" font-weight="500" fill="{{ '#dc2626' if g.mean_residual|abs > 0.03 else '#475569' }}">{% if g.mean_residual >= 0 %}+{% endif %}{{ g.mean_residual|f4 }}</text>
+{% endif %}
+<text x="530" y="{{ ry + 20 }}" font-size="10" fill="{{ _na_fill if g.std_residual is none else '#475569' }}">{{ g.std_residual|f3 }}</text>
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + table_row_h }}" x2="660" y2="{{ ry + table_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Effect Sizes (Lollipop)                                          #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ effect_y }}" width="644" height="{{ effect_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ effect_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Effect Sizes (Cohen's d)</text>
+<line x1="56" y1="{{ effect_y + 30 }}" x2="660" y2="{{ effect_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{# Center axis #}
+<line x1="380" y1="{{ effect_y + 34 }}" x2="380" y2="{{ effect_y + 34 + effects|length * effect_row_h }}" stroke="#cbd5e1" stroke-width="0.5" stroke-dasharray="3,2"/>
+<text x="380" y="{{ effect_y + 34 + effects|length * effect_row_h + 12 }}" text-anchor="middle" font-size="7" fill="#94a3b8">0</text>
+
+{# A pair that reported no effect size gets NO MARK ON THIS AXIS. Every x here #}
+{# is a magnitude, and a dot sitting ON the zero line in the PASS green is the #}
+{# strongest thing this panel can say ("these two groups' predictions do not   #}
+{# differ at all"); the adapter used to produce exactly that from a `.get`     #}
+{# default of 0 for a pair nobody compared. The row keeps its place and says   #}
+{# what is true. DO NOT print `|f2` or plot `dot_x` unguarded: `None >= 0`     #}
+{# also raises out of the render. #}
+{% for e in effects %}
+{% set ey = effect_y + 34 + loop.index0 * effect_row_h %}
+<text x="170" y="{{ ey + 20 }}" text-anchor="end" font-size="9.5" font-weight="500" fill="#0f172a">{{ e.pair }}</text>
+{% if e.cohens_d is none %}
+<text x="392" y="{{ ey + 20 }}" font-size="9" fill="#94a3b8">no effect size reported, not compared</text>
+{% else %}
+{# Lollipop line from center #}
+<line x1="380" y1="{{ ey + 16 }}" x2="{{ e.dot_x }}" y2="{{ ey + 16 }}" stroke="{{ e.color }}" stroke-width="2"/>
+<circle cx="{{ e.dot_x }}" cy="{{ ey + 16 }}" r="5" fill="{{ e.color }}"/>
+{% if e.cohens_d >= 0 %}
+<text x="{{ e.dot_x + 10 }}" y="{{ ey + 20 }}" font-size="9" font-weight="600" fill="{{ e.color }}">{{ e.cohens_d|f2 }}</text>
+{% else %}
+<text x="{{ e.dot_x - 10 }}" y="{{ ey + 20 }}" text-anchor="end" font-size="9" font-weight="600" fill="{{ e.color }}">{{ e.cohens_d|f2 }}</text>
+{% endif %}
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Residual Bias Bars                                               #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ residual_y }}" width="644" height="{{ residual_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ residual_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Residual Bias</text>
+<line x1="56" y1="{{ residual_y + 30 }}" x2="660" y2="{{ residual_y + 30 }}" stroke="#475569" stroke-width="0.75"/>
+
+{# Center axis for residuals #}
+<line x1="400" y1="{{ residual_y + 34 }}" x2="400" y2="{{ residual_y + 34 + groups|length * 30 }}" stroke="#cbd5e1" stroke-width="0.5"/>
+<text x="400" y="{{ residual_y + 34 + groups|length * 30 + 12 }}" text-anchor="middle" font-size="7" fill="#94a3b8">0</text>
+
+{% for g in groups %}
+{% set ry = residual_y + 34 + loop.index0 * 30 %}
+<text x="56" y="{{ ry + 16 }}" font-size="9.5" font-weight="500" fill="#0f172a">{{ g.name }}</text>
+{# No residual measured means no mark on this axis. A bar of width 0 sitting on #}
+{# the zero line is a PLOTTED POINT, and it reads as "measured, and neutral";   #}
+{# so does the direction word beside it, which used to fall to "over-predict"   #}
+{# because a defaulted 0.0 satisfies `>= 0`. The row keeps its place and says   #}
+{# what is true: nothing was measured for this group. #}
+{% if g.mean_residual is none %}
+<text x="410" y="{{ ry + 16 }}" font-size="9" fill="#94a3b8">no residual reported</text>
+{% else %}
+{% if g.residual_dir == 'right' %}
+<rect x="400" y="{{ ry + 6 }}" width="{{ g.residual_bar_w }}" height="12" rx="3" fill="{{ g.color }}" opacity="0.6"/>
+{% else %}
+<rect x="{{ 400 - g.residual_bar_w }}" y="{{ ry + 6 }}" width="{{ g.residual_bar_w }}" height="12" rx="3" fill="{{ g.color }}" opacity="0.6"/>
+{% endif %}
+<text x="{{ 500 }}" y="{{ ry + 16 }}" font-size="9" fill="#64748b">{% if g.mean_residual >= 0 %}over-predict{% else %}under-predict{% endif %}</text>
+{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Recommendations                                                  #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ rec_y }}" width="644" height="{{ rec_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Recommendations</text>
+{% for r in recommendations %}
+<text x="56" y="{{ rec_y + 42 + loop.index0 * 18 }}" font-size="9.5" fill="#6b7280">{{ loop.index }}. {{ r }}</text>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── EXAMPLE watermark, painted last so it survives every panel above it ── #}
+{# Repeated down a tall canvas so a crop or a screenshot of one section cannot #}
+{# lose the only mark that separates a sample from a finding. #}
+{% if is_example %}
+{% for _p in ([22, 50, 78] if total_h > 1100 else [50]) %}
+{% set _wy = (total_h * _p / 100)|int %}
+<text x="340" y="{{ _wy }}" text-anchor="middle" font-size="76" font-weight="800" fill="#92400e" opacity="0.12" letter-spacing="6" transform="rotate(-24 340 {{ _wy }})">EXAMPLE</text>
+{% endfor %}
+{% endif %}
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a3a4f">
+    <meta name="description" content="vfairness Changelog - Version history and release notes for the vfairness library">
+    <title>Changelog | vfairness Documentation</title>
+
+    <link rel="icon" type="image/svg+xml" href="../img/favicon-v2.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script>/* theme before first paint: vf-theme = light | dark | system */(function(){var m='system';try{m=localStorage.getItem('vf-theme')||'system'}catch(e){}var d=m==='dark'||(m==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;r.setAttribute('data-theme',d?'dark':'light');r.setAttribute('data-theme-mode',m)})()</script>
+    <style>
+        .version-header {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-2) var(--spacing-4);
+            margin-bottom: var(--spacing-4);
+            min-width: 0;
+        }
+        .version-number {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-gray-900);
+            margin: 0;
+            min-width: 0;
+        }
+        .version-date {
+            color: var(--color-gray-500);
+            font-size: var(--font-size-sm);
+        }
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--spacing-1) var(--spacing-3);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            border-radius: var(--radius-full);
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .badge-latest {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-teal) 100%);
+            color: white;
+        }
+        .badge-stable {
+            background: var(--color-success);
+            color: white;
+        }
+        .badge-beta {
+            background: var(--color-warning);
+            color: var(--color-gray-900);
+        }
+        .version-section {
+            background: var(--color-white);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-8);
+            margin-bottom: var(--spacing-8);
+            transition: all var(--transition-fast);
+            overflow: hidden;
+            min-width: 0;
+        }
+        .version-section:hover {
+            border-color: var(--color-gray-300);
+            box-shadow: var(--shadow-lg);
+        }
+        .version-section.current {
+            border-color: var(--color-primary);
+            border-width: 2px;
+        }
+        .change-category {
+            margin-bottom: var(--spacing-6);
+        }
+        .change-category:last-child {
+            margin-bottom: 0;
+        }
+        .change-category-title {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--spacing-3);
+            padding: var(--spacing-1) var(--spacing-3);
+            border-radius: var(--radius-md);
+        }
+        .category-added {
+            background: #ecfdf5;
+            color: #059669;
+        }
+        .category-changed {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+        .category-fixed {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .category-deprecated {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        .category-security {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+        .category-performance {
+            background: #ecfeff;
+            color: #0891b2;
+        }
+        /* Legacy change-list styles removed — replaced by .change-entry cards */
+        .upgrade-note {
+            background: linear-gradient(135deg, rgba(44, 95, 124, 0.05) 0%, rgba(0, 150, 167, 0.05) 100%);
+            border: 1px solid var(--color-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-4);
+            margin-top: var(--spacing-4);
+        }
+        .upgrade-note-title {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-2);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+        .timeline-wrapper {
+            padding-left: 40px;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .timeline-line {
+            position: relative;
+        }
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--color-gray-200);
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -38px;
+            top: 12px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--color-white);
+            border: 3px solid var(--color-primary);
+        }
+        .timeline-dot.current {
+            background: var(--color-primary);
+        }
+        .intro-section {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-teal) 100%);
+            color: white;
+            padding: var(--spacing-12) var(--spacing-8);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--spacing-12);
+        }
+        .intro-section > * {
+            position: relative;
+            z-index: 2;
+        }
+        .intro-section::before {
+            content: '';
+            position: absolute;
+            inset: -4%;
+            background-image: url("../img/aas-pattern-overlay.svg");
+            background-repeat: no-repeat;
+            background-position: center 52%;
+            background-size: cover;
+            opacity: 0.52;
+            pointer-events: none;
+            z-index: 1;
+            mask-image: radial-gradient(
+                ellipse 56% 50% at 50% 46%,
+                rgba(0, 0, 0, 1) 55%,
+                rgba(0, 0, 0, 0.5) 72%,
+                rgba(0, 0, 0, 0.1) 86%,
+                transparent 96%
+            );
+            -webkit-mask-image: radial-gradient(
+                ellipse 56% 50% at 50% 46%,
+                rgba(0, 0, 0, 1) 55%,
+                rgba(0, 0, 0, 0.5) 72%,
+                rgba(0, 0, 0, 0.1) 86%,
+                transparent 96%
+            );
+        }
+        .intro-section h1 {
+            color: white;
+            margin-bottom: var(--spacing-4);
+        }
+        .quick-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-8);
+            margin-top: var(--spacing-6);
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: white;
+        }
+        .stat-label {
+            font-size: var(--font-size-sm);
+            opacity: 0.8;
+        }
+        .breaking-change {
+            background: #fef2f2;
+            border-left: 3px solid var(--color-error);
+            padding: var(--spacing-3) var(--spacing-4);
+            margin: var(--spacing-4) 0;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+        .breaking-change-title {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-error);
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--spacing-1);
+        }
+        .change-category {
+            min-width: 0;
+            overflow-wrap: break-word;
+        }
+        .upgrade-note {
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+        .upgrade-note p {
+            min-width: 0;
+        }
+
+        /* ── Change entry cards ── */
+        .change-entry {
+            background: var(--color-white);
+            border: 1px solid var(--color-gray-200);
+            border-left: 3px solid var(--color-gray-300);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-3) var(--spacing-4);
+            margin-bottom: var(--spacing-3);
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+            min-width: 0;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+        .change-entry:last-child {
+            margin-bottom: 0;
+        }
+        .change-entry:hover {
+            border-color: var(--color-gray-300);
+            box-shadow: 0 1px 4px rgb(0 0 0 / 0.06);
+        }
+        .category-added-entries .change-entry { border-left-color: #059669; }
+        .category-changed-entries .change-entry { border-left-color: #2563eb; }
+        .category-fixed-entries .change-entry { border-left-color: #d97706; }
+        .category-deprecated-entries .change-entry { border-left-color: #dc2626; }
+        .category-security-entries .change-entry { border-left-color: #7c3aed; }
+        .category-performance-entries .change-entry { border-left-color: #0891b2; }
+
+        .change-entry-title {
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-900);
+            line-height: 1.5;
+            margin-bottom: var(--spacing-1);
+        }
+        .change-entry-title code {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-gray-600);
+            background: var(--color-gray-100);
+            padding: 0.1em 0.4em;
+            border-radius: var(--radius-sm);
+            font-size: 0.85em;
+        }
+        .change-entry-desc {
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-600);
+            line-height: 1.6;
+        }
+        .change-entry-codes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-1) var(--spacing-2);
+            margin-top: var(--spacing-2);
+        }
+        .change-entry-codes code {
+            background: var(--color-gray-100);
+            padding: 0.15em 0.5em;
+            border-radius: var(--radius-sm);
+            font-size: 0.8em;
+            color: var(--color-gray-700);
+            white-space: nowrap;
+            border: 1px solid var(--color-gray-200);
+        }
+
+        /* ── Change count badge ── */
+        .change-count {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.75em;
+            font-weight: var(--font-weight-medium);
+            color: inherit;
+            opacity: 0.7;
+            background: rgb(255 255 255 / 0.5);
+            padding: 0.1em 0.5em;
+            border-radius: var(--radius-full);
+            margin-left: var(--spacing-1);
+        }
+
+        /* ── Collapsible version details ── */
+        .version-details {
+            width: 100%;
+        }
+        .version-details > summary {
+            list-style: none;
+            cursor: pointer;
+            user-select: none;
+        }
+        .version-details > summary::-webkit-details-marker {
+            display: none;
+        }
+        .version-details > summary::marker {
+            display: none;
+            content: '';
+        }
+        .version-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-1);
+            font-size: var(--font-size-xs);
+            color: var(--color-gray-400);
+            font-weight: var(--font-weight-medium);
+            margin-left: auto;
+            transition: color var(--transition-fast);
+            white-space: nowrap;
+        }
+        .version-toggle svg {
+            transition: transform 200ms ease;
+        }
+        .version-details[open] .version-toggle svg {
+            transform: rotate(180deg);
+        }
+        .version-details[open] .version-toggle {
+            color: var(--color-primary);
+        }
+        .version-content {
+            margin-top: var(--spacing-4);
+        }
+        .version-section.older {
+            padding: var(--spacing-6);
+        }
+
+        /* ── Changelog controls ── */
+        .changelog-controls {
+            display: flex;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-6);
+        }
+        .changelog-controls button {
+            background: var(--color-white);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-1) var(--spacing-3);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-gray-600);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .changelog-controls button:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 1024px) {
+            .timeline-wrapper {
+                padding-left: 28px;
+            }
+            .timeline-line::before {
+                left: -22px;
+            }
+            .timeline-dot {
+                left: -28px;
+                width: 12px;
+                height: 12px;
+            }
+        }
+        @media (max-width: 768px) {
+            .timeline-wrapper {
+                padding-left: 0;
+            }
+            .timeline-line::before,
+            .timeline-dot {
+                display: none;
+            }
+            .version-section {
+                padding: var(--spacing-4);
+            }
+            .version-section.older {
+                padding: var(--spacing-4);
+            }
+            .version-number {
+                font-size: var(--font-size-xl);
+            }
+            .intro-section {
+                padding: var(--spacing-8) var(--spacing-4);
+            }
+            .quick-stats {
+                gap: var(--spacing-4);
+            }
+            .change-entry {
+                padding: var(--spacing-2) var(--spacing-3);
+            }
+            .change-entry-codes {
+                gap: var(--spacing-1);
+            }
+            .change-entry-codes code {
+                font-size: 0.75em;
+            }
+            .changelog-controls {
+                margin-bottom: var(--spacing-4);
+            }
+        }
+    </style>
+    <script src="https://validant.ai/consent/v1/consent.js" defer></script>
+  </head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="../index.html">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
+                </a>
+                <span class="logo-divider"></span>
+                <span class="lib-name"><span>v</span>fairness</span>
+            </div>
+            <nav class="main-nav" aria-label="Main navigation">
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="../getting-started/index.html" class="nav-link">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../api-reference/index.html" class="nav-link">API Reference</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Learn
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Learn submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../test-objects/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Find a Test Object</span>
+                                        <span class="nav-dropdown__desc">Data, models and agents to test, by access depth</span>
+                                    </span>
+                                </a>
+                                <a href="../business-guide/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Business Guide</span>
+                                        <span class="nav-dropdown__desc">Fairness strategy for decision-makers</span>
+                                    </span>
+                                </a>
+                                <div class="nav-dropdown__group">
+                                    <div class="nav-dropdown__group-label">
+                                        <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></span>
+                                        <span class="nav-dropdown__text">
+                                            <span class="nav-dropdown__label">Sample Assessments</span>
+                                            <span class="nav-dropdown__desc">End-to-end audits with EU AI Act compliance</span>
+                                        </span>
+                                    </div>
+                                    <div class="nav-dropdown__group-items">
+                                        <a href="../sample-assessment/index.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Binary Classifier</span> <span class="sub-desc">— Credit scoring</span></a>
+                                        <a href="../sample-assessment/llm-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Foundation LLM</span> <span class="sub-desc">— Resume screening</span></a>
+                                        <a href="../sample-assessment/cv-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Computer Vision</span> <span class="sub-desc">— Medical imaging</span></a>
+                                        <a href="../sample-assessment/ranking-audit.html" role="menuitem"><span class="sub-bullet"></span><span class="sub-label">Ranking System</span> <span class="sub-desc">&mdash; Job platform</span></a>
+                                    </div>
+                                </div>
+                                <a href="../concepts/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Concepts</span>
+                                        <span class="nav-dropdown__desc">Fairness theory and metric foundations</span>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../our-offering/index.html" class="nav-link">Our Offering</a>
+                    </li>
+                    <li class="nav-item nav-item--has-dropdown">
+                        <button type="button" class="nav-link nav-link--trigger" aria-haspopup="true" aria-expanded="false">
+                            Explore
+                            <svg class="nav-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="nav-dropdown" role="menu" aria-label="Explore submenu">
+                            <div class="nav-dropdown__inner">
+                                <a href="../svg-gallery/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">SVG Gallery</span>
+                                        <span class="nav-dropdown__desc">Interactive visualization templates</span>
+                                    </span>
+                                </a>
+                                <a href="../workflow-integration/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Workflow Integration</span>
+                                        <span class="nav-dropdown__desc">MLOps, CI/CD, and experiment tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../usage-map/index.html" role="menuitem" class="nav-dropdown__item" data-um-injected="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Library Usage Map</span>
+                                        <span class="nav-dropdown__desc">Where the platform uses each vfairness symbol</span>
+                                    </span>
+                                </a>
+<a href="../llm-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">LLM Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Counterfactual testing, benchmarks, output analysis for LLMs</span>
+                                    </span>
+                                </a>
+                                <a href="../agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Agent Fairness Testing</span>
+                                        <span class="nav-dropdown__desc">Correspondence testing, tool bias, RAG bias, pipeline tracking</span>
+                                    </span>
+                                </a>
+                                <a href="../multi-agent-testing/index.html" role="menuitem" class="nav-dropdown__item" data-um-testing="1">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Multi-Agent Testing</span>
+                                        <span class="nav-dropdown__desc">Emergent bias, groupthink, non-compositionality</span>
+                                    </span>
+                                </a>
+                                <a href="../explainability-and-xai/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Explainability &amp; XAI</span>
+                                        <span class="nav-dropdown__desc">SHAP attributions, fairness decomposition, counterfactuals</span>
+                                    </span>
+                                </a>
+                                <a href="../training-time-interventions/index.html" role="menuitem" class="nav-dropdown__item">
+                                    <span class="nav-dropdown__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/></svg></span>
+                                    <span class="nav-dropdown__text">
+                                        <span class="nav-dropdown__label">Training-Time Interventions</span>
+                                        <span class="nav-dropdown__desc">Fairness-aware losses, constraints, calibration</span>
+                                    </span>
+                                </a>
+</div>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="nav-cta">
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="Search docs...">
+                    </div>
+                    <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+
+                <button type="button" class="mobile-nav-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-panel">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+<!-- Mobile Navigation -->
+<div class="mobile-nav-overlay" aria-hidden="true"></div>
+<nav class="mobile-nav-panel" id="mobile-nav-panel" aria-label="Mobile navigation" aria-hidden="true">
+    <div class="mobile-nav-header">
+        <span class="mobile-nav-title">Menu</span>
+        <button type="button" class="mobile-nav-close" aria-label="Close navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div class="mobile-nav-body">
+        <a href="../getting-started/index.html" class="mobile-nav-link">Getting Started</a>
+        <a href="../api-reference/index.html" class="mobile-nav-link">API Reference</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Learn
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../test-objects/index.html" class="mobile-nav-sublink">Find a Test Object</a>
+                <a href="../business-guide/index.html" class="mobile-nav-sublink">Business Guide</a>
+                <span class="mobile-nav-sublink" style="font-size:0.7rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;padding:0.5rem 0 0.15rem;">Sample Assessments</span>
+                <a href="../sample-assessment/index.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Binary Classifier</a>
+                <a href="../sample-assessment/llm-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Foundation LLM</a>
+                <a href="../sample-assessment/cv-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Computer Vision</a>
+                <a href="../sample-assessment/ranking-audit.html" class="mobile-nav-sublink" style="padding-left:0.75rem;">Ranking System</a>
+                <a href="../concepts/index.html" class="mobile-nav-sublink">Concepts</a>
+            </div></div>
+        </div>
+        <a href="../our-offering/index.html" class="mobile-nav-link">Our Offering</a>
+        <div class="mobile-nav-group">
+            <button type="button" class="mobile-nav-group__trigger" aria-expanded="false">
+                Explore
+                <svg class="mobile-nav-group__chevron" width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="mobile-nav-group__content"><div class="mobile-nav-group__items">
+                <a href="../svg-gallery/index.html" class="mobile-nav-sublink">SVG Gallery</a>
+                <a href="../workflow-integration/index.html" class="mobile-nav-sublink">Workflow Integration</a>
+                <a href="../usage-map/index.html" class="mobile-nav-sublink" data-um-injected="1">Library Usage Map</a>
+<a href="../llm-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">LLM Fairness Testing</a>
+                <a href="../agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Agent Fairness Testing</a>
+                <a href="../multi-agent-testing/index.html" class="mobile-nav-sublink" data-um-testing="1">Multi-Agent Testing</a>
+                <a href="../explainability-and-xai/index.html" class="mobile-nav-sublink">Explainability &amp; XAI</a>
+                <a href="../training-time-interventions/index.html" class="mobile-nav-sublink">Training-Time Interventions</a>
+</div></div>
+        </div>
+    </div>
+    <div class="mobile-nav-footer">
+        <a href="https://github.com/validantai/vfairness" class="btn btn-secondary" target="_blank">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            GitHub
+        </a>
+    </div>
+</nav>
+<script>/* Mobile nav bootstrap — works before main.js loads */
+(function(){
+var t=document.querySelector(".mobile-nav-toggle"),p=document.querySelector(".mobile-nav-panel"),o=document.querySelector(".mobile-nav-overlay"),c=document.querySelector(".mobile-nav-close");
+if(!t||!p)return;t.setAttribute("data-nav-init","1");
+function open(){t.setAttribute("aria-expanded","true");p.classList.add("is-open");p.setAttribute("aria-hidden","false");if(o)o.classList.add("is-open");document.body.style.overflow="hidden";}
+function close(){t.setAttribute("aria-expanded","false");p.classList.remove("is-open");p.setAttribute("aria-hidden","true");if(o)o.classList.remove("is-open");document.body.style.overflow="";}
+t.addEventListener("click",function(){t.getAttribute("aria-expanded")==="true"?close():open();});
+if(c)c.addEventListener("click",close);
+if(o)o.addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList.contains("is-open"))close();});
+})()
+</script>
+
+    <div class="page-wrapper docs-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Concepts</div>
+                <ul class="sidebar-nav">
+                    <li><a href="index.html#fairness-definitions">Fairness Definitions</a></li>
+                    <li><a href="index.html#impossibility">The Impossibility Theorem</a></li>
+                    <li><a href="index.html#statistical-validation">Statistical Validation</a></li>
+                    <li><a href="index.html#sample-size">Sample Size Guidelines</a></li>
+                </ul>
+            </div>
+
+            <!-- 1. DATA & PREPROCESSING -->
+            <div class="sidebar-section">
+                <div class="sidebar-title sidebar-title-primary" style="color: #f59e0b;">Data &amp; Preprocessing</div>
+                <ul class="sidebar-nav">
+                    <li><a href="index.html#bias-sources">Sources of Bias</a></li>
+                    <li><a href="index.html#intersectionality">Intersectionality</a></li>
+                </ul>
+            </div>
+
+            <!-- 2–5 Pipeline stages -->
+            <div class="sidebar-section">
+                <div class="sidebar-title sidebar-title-primary" style="color: #0aafe3;">Training-Time Interventions</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title sidebar-title-primary" style="color: #6366f1;">Prediction-Time Interventions</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title sidebar-title-primary" style="color: #2c5f7c;">Evaluation &amp; Measurement</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title sidebar-title-primary" style="color: #059669;">Operations &amp; Monitoring</div>
+                <ul class="sidebar-nav">
+                    <li><a href="index.html#monitoring-concepts">Monitoring & Drift</a></li>
+                    <li><a href="index.html#reporting-concepts">Reporting</a></li>
+                    <li><a href="index.html#experimentation-concepts">Experimentation</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Resources</div>
+                <ul class="sidebar-nav">
+                    <li><a href="references.html">Academic References</a></li>
+                    <li><a href="changelog.html" class="active">Changelog</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Releases</div>
+                <ul class="sidebar-nav">
+                    <li><a href="#unreleased">v0.1.0 (not yet released)</a></li>
+                    <li><a href="#v0.1.0">v0.1.0, earlier entries</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Development Versions</div>
+                <ul class="sidebar-nav">
+                    <li><a href="#v0.0.9">v0.0.9</a></li>
+                    <li><a href="#v0.0.8">v0.0.8</a></li>
+                    <li><a href="#v0.0.7">v0.0.7</a></li>
+                    <li><a href="#v0.0.5">v0.0.5</a></li>
+                    <li><a href="#v0.0.3">v0.0.3</a></li>
+                    <li><a href="#v0.0.1">v0.0.1 (Initial)</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Roadmap</div>
+                <ul class="sidebar-nav">
+                    <li><a href="#roadmap">Road to 1.0.0</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-container">
+                <!-- Introduction -->
+                <div class="intro-section">
+                    <p class="vf-eyebrow" data-dated>Learn &middot; Changelog</p>
+                    <h1>Development Changelog</h1>
+                    <p class="lead" style="color: rgba(255,255,255,0.95);">
+                        Development history for vfairness. Version 0.1.0 is the first public beta, published 2026-10-01 from the <code>v0.1.0</code> tag. The gate that decided whether it could be pushed passed: <code>scripts/release_gate.py</code> reports <strong>BETA READY</strong>, with all eight beta conditions met. The API is not frozen until the stable 1.0.0. We follow <a href="https://keepachangelog.com/" target="_blank" style="color: white; text-decoration: underline;">Keep a Changelog</a> and <a href="https://semver.org/" target="_blank" style="color: white; text-decoration: underline;">Semantic Versioning</a> conventions.
+                    </p>
+                    <div class="quick-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-version">0.1.0</div>
+                            <div class="stat-label">Version in preparation, not yet released</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-status">Beta</div>
+                            <div class="stat-label">Status</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-loc" title="140,912 code lines / 181,328 total / 227 files (v0.1.0)">~141k</div>
+                            <div class="stat-label">Lines of Code</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pre-release Notice -->
+                <div class="callout callout-warning" style="margin-bottom: var(--spacing-8);">
+                    <div class="callout-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                        Beta Software
+                    </div>
+                    <p>vfairness 0.1.0 is the first public beta, published 2026-10-01. Install it with <code>pip install vfairness</code>; the early <code>0.0.1</code> placeholder that held this name before the release has been yanked. The API is not frozen until the stable 1.0.0 release. We welcome feedback and contributions via <a href="https://github.com/validantai/vfairness">GitHub</a>.</p>
+                    <p style="margin-bottom: 0;">&ldquo;Beta&rdquo; here is the version number, not a verdict that the library is ready to rely on. Run again on 2026-10-01, <code>scripts/release_gate.py</code> reports <strong>BETA READY</strong>: all eight beta conditions are met and no known defect is open, while the full 1.0 gate still waits for a second examiner on part of the graded code. The earlier measurement is kept below as it was taken. Run on 2026-09-18, <code>scripts/release_gate.py</code> reports <strong>NOT BETA READY</strong> and <strong>NOT READY</strong>, four of five criteria failing in each. Two separate measurements sit behind that and are never added together: the 215-row capability census carries <strong>0 open defects</strong>, and of the 420 code units graded so far on the wider surface, <strong>95 are DEFECT OPEN</strong>. The standing figures and the criteria are on <a href="../quality-and-hardening/index.html">Quality &amp; Hardening</a>, and the release pipeline page records <a href="../quality-and-hardening/index.html#gate-status">where the gate stands</a>.</p>
+                </div>
+
+                <!-- Roadmap -->
+                <section id="roadmap" style="margin-bottom: var(--spacing-8);">
+                    <h2 style="margin-top: 0;">Roadmap to 1.0.0</h2>
+                    <p>The following features are planned for the stable 1.0.0 release:</p>
+                    <div class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                        <div class="card">
+                            <h4 style="margin-top: 0;">Stable API</h4>
+                            <p style="margin-bottom: 0;">Finalized, documented API with backward compatibility guarantees.</p>
+                        </div>
+                        <div class="card">
+                            <h4 style="margin-top: 0;">Complete Test Coverage</h4>
+                            <p style="margin-bottom: 0;">Comprehensive unit and integration tests with &gt;90% coverage. Measured at 81% line and branch combined as of 2026-09-11, commit <code>8559dda</code>; the CI floor is 55% and the per-pull-request diff floor is 80%.</p>
+                        </div>
+                        <div class="card">
+                            <h4 style="margin-top: 0;">Production Documentation</h4>
+                            <p style="margin-bottom: 0;">Full API reference, tutorials, and deployment guides.</p>
+                        </div>
+                        <div class="card">
+                            <h4 style="margin-top: 0;">PyPI Publication</h4>
+                            <p style="margin-bottom: 0;">Pending. Pushing the <code>v0.1.0</code> tag on the public repository triggers the publish to PyPI; that has not happened. 1.0.0 will be the first stable release under the backwards-compatibility contract.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="changelog-controls">
+                    <button type="button" id="expand-all-versions">Expand all</button>
+                    <button type="button" id="collapse-all-versions">Collapse all</button>
+                </div>
+
+                <div class="timeline-wrapper">
+                    <!-- Version 0.1.0 (Current, first public beta; mirrors the [0.1.0] block in CHANGELOG.md) -->
+                    <section id="unreleased" class="version-section current timeline-line">
+                        <div class="timeline-dot current"></div>
+                        <div class="version-header">
+                            <h2 class="version-number">v0.1.0</h2>
+                            <span class="version-badge badge-latest">Not yet released</span>
+                            <span class="version-date">2026-10-01</span>
+                        </div>
+
+                        <p style="color: var(--color-gray-600); margin-bottom: var(--spacing-6);">
+                            The most recent entries under <code>## [0.1.0] - 2026-10-01</code> in
+                            <code>CHANGELOG.md</code>, summarised (updated 1 Oct 2026; the file has every
+                            change in full). There is deliberately no separate
+                            <code>[Unreleased]</code> block: while 0.1.0 is itself unreleased, everything
+                            accumulates under it, so that no work can sit under one heading while
+                            shipping inside another. The earlier 0.1.0 entries are below.
+                        </p>
+
+                        <div class="change-category category-changed-entries">
+                            <div class="change-category-title category-changed">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                Changed <span class="change-count">2</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">The beta gate is met (1 Oct 2026)</div>
+                                <div class="change-entry-desc"><code>scripts/release_gate.py</code> reports BETA READY: all eight beta conditions met, including two new ones anyone can re-run. Every capability that an established library also computes gives the same answer (34 of 34), and no capability that measures invents a number on broken data (109 of 109). Second-examiner confirmation of every grade is now a condition of 1.0, not of the beta.</div>
+                                <div class="change-entry-codes">
+                                    <code>release_gate.py</code>
+                                    <code>B6</code>
+                                    <code>B7</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Return types and refusals that changed</div>
+                                <div class="change-entry-desc">No public symbol was removed or renamed. Some functions return richer types that still behave like the old ones (<code>FeasibleThresholds</code> is a <code>dict</code>, the proxy results are <code>list</code>s); some can now return <code>None</code>, meaning could not check, so test them with <code>is None</code>; some now raise instead of returning a misleading value. The full list is in <code>CHANGELOG.md</code>.</div>
+                                <div class="change-entry-codes">
+                                    <code>find_feasible_thresholds</code>
+                                    <code>identify_proxy_variables</code>
+                                    <code>find_proxy_chains</code>
+                                    <code>is_satisfied</code>
+                                    <code>require_checked</code>
+                                    <code>to_json</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="change-category category-fixed-entries">
+                            <div class="change-category-title category-fixed">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                                Fixed <span class="change-count">4</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Six defects found by the broken-data check (1 Oct)</div>
+                                <div class="change-entry-desc">Missing predictions read as a &ldquo;no&rdquo;; a group that never queried scored the maximum bias; a model with no decision explained as certain; a single row called significant; a genuine null refused; single-attribute comparisons silently dropped. Each now refuses or measures correctly, and each is pinned by a test shown to fail without the fix.</div>
+                                <div class="change-entry-codes">
+                                    <code>subgroup_robustness_audit</code>
+                                    <code>RAGBiasAnalyzer.full_analysis</code>
+                                    <code>AnchorsExplainer</code>
+                                    <code>EmergentBiasDetector</code>
+                                    <code>TextFairnessAnalyzer</code>
+                                    <code>intersectional_disparity_analysis</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Every remaining public unit examined (30 Sep)</div>
+                                <div class="change-entry-desc">Each unit nobody had graded was run on input where its quantity cannot exist. Fixes include age banding that rounded 17.6 into the 18-24 band, renderers that drew a full bar for <code>True</code> and a measured-looking bar for NaN, regularisers that accepted a negative strength, and a task envelope that read <code>"false"</code> as success.</div>
+                                <div class="change-entry-codes">
+                                    <code>prepare_protected_attributes</code>
+                                    <code>BaseRegularizer</code>
+                                    <code>TaskResult.from_envelope</code>
+                                    <code>compute_regression_effect_sizes</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Fixes found by the second examination of grades (29 Sep)</div>
+                                <div class="change-entry-desc">A near-constant residual turned Cohen's d into -6.9e15; a NaN group label silently shrank a 0.50 gap to 0.05; a health score read 96.2 GREEN while its breaching records had no readable timestamp. All now refuse or measure correctly.</div>
+                                <div class="change-entry-codes">
+                                    <code>cohens_d</code>
+                                    <code>permutation_test_equal_opportunity</code>
+                                    <code>MetricsStore.compute_health_score</code>
+                                    <code>MetricsStore.ingest_alert</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">The second-round audit and the core census (27 to 28 Sep)</div>
+                                <div class="change-entry-desc">193 further findings closed in one sweep, and every core capability examined: unmeasured values no longer appear as clean zeros, ticks or passes in charts, CI rows, dashboards and MCP tool output.</div>
+                                <div class="change-entry-codes">
+                                    <code>ModelFairnessGate</code>
+                                    <code>DecodingTrustRunner</code>
+                                    <code>FairnessDashboard</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="change-category category-added-entries">
+                            <div class="change-category-title category-added">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                                Added <span class="change-count">2</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">New result fields</div>
+                                <div class="change-entry-desc">Results now say what they left out: the groups a selection-rate headline excluded as too small to read, and the rows removed for a missing prediction.</div>
+                                <div class="change-entry-codes">
+                                    <code>headline_excluded_groups</code>
+                                    <code>n_rows_missing_prediction</code>
+                                    <code>uncovered_groups</code>
+                                    <code>groups_without_measured_calibration</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">New helpers</div>
+                                <div class="change-entry-desc">Shared answers to questions several modules asked separately: whether a model can predict right now, whether a value is a real finite number, and the current time in a store's own time zone.</div>
+                                <div class="change-entry-codes">
+                                    <code>prediction_fn_available</code>
+                                    <code>finite_or_nan</code>
+                                    <code>MetricsStore.window_now</code>
+                                    <code>BoundRole</code>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="v0.1.0" class="version-section timeline-line">
+                        <div class="timeline-dot"></div>
+                        <div class="version-header">
+                            <h2 class="version-number">v0.1.0, earlier entries</h2>
+                            <span class="version-badge badge-beta">Not yet released</span>
+                            <span class="version-date">2026-10-01</span>
+                        </div>
+
+                        <p style="color: var(--color-gray-600); margin-bottom: var(--spacing-6);">
+                            The first public beta: a plain SemVer 0.x release carrying the
+                            <code>Development Status :: 4 - Beta</code> classifier, installable with a normal
+                            <code>pip install vfairness</code> once it is published. This section is what 0.1.0 will
+                            contain when it is cut; pushing the
+                            <code>v0.1.0</code> tag triggers the
+                            <a href="../quality-and-hardening/index.html#how-a-release-happens">release pipeline</a>, which
+                            builds, verifies and smoke-tests the artifact and then publishes it to
+                            PyPI. There is no TestPyPI leg: it was removed on 2026-08-28. The API is
+                            not frozen until 1.0.0. This section highlights the
+                            <code>[0.1.0]</code> block of <code>CHANGELOG.md</code>.
+                        </p>
+
+                        <div class="change-category category-added-entries">
+                            <div class="change-category-title category-added">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                                Added <span class="change-count">6</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Output branding switch</div>
+                                <div class="change-entry-desc">New public <code>set_branding()</code> and <code>branding_enabled()</code> remove the validant.ai mark from generated SVGs and reports, honouring an explicit call, then the <code>VFAIRNESS_BRANDING</code> environment variable, then a branded default. A single chart can opt out with <code>render_svg(name, {"branding": False})</code>. An unbranded chart contains no occurrence of the brand string at all, and the switch is unconditional by design: nothing verifies a licence or calls home.</div>
+                                <div class="change-entry-codes">
+                                    <code>set_branding</code>
+                                    <code>branding_enabled</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">SSRF egress guard (<code>vfairness.net</code>)</div>
+                                <div class="change-entry-desc">A new cross-cutting infrastructure sub-package. Wired into the LLM api_proxy first; coverage of the remaining outbound call sites is follow-up work. <code>validate_endpoint</code> resolves and vets the target, <code>guarded_post</code> is a drop-in for <code>requests.post</code>, <code>PinnedIPAdapter</code> pins the vetted IP against DNS rebinding, and a refusal raises <code>SSRFError</code>. Wired into the LLM <code>api_proxy</code>, so assessment traffic cannot be pointed at loopback, private, link-local or cloud-metadata targets. A local model server needs the explicit <code>allow_loopback=True</code> opt-in, which unlocks loopback only.</div>
+                                <div class="change-entry-codes">
+                                    <code>vfairness.net</code>
+                                    <code>validate_endpoint</code>
+                                    <code>guarded_post</code>
+                                    <code>PinnedIPAdapter</code>
+                                    <code>SSRFError</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Groundedness axis (<code>vfairness.validity</code>)</div>
+                                <div class="change-entry-desc">A public sub-package for the validity / groundedness axis: the <code>VG_*</code> metric identifiers (faithfulness, groundedness, hallucination rate, citation accuracy, context precision and recall, answer correctness), a <code>GroundednessScorer</code>, a fail-closed judge ladder (<code>GroundednessJudge</code> / <code>LlmGroundednessJudge</code>) and <code>aggregate_validity</code>. Deliberately not registered in the capability manifest yet, so nothing can be sealed on it before its gold set lands.</div>
+                                <div class="change-entry-codes">
+                                    <code>vfairness.validity</code>
+                                    <code>GroundednessScorer</code>
+                                    <code>aggregate_validity</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Statistical-robustness layer for the sealed spec-v2 gates</div>
+                                <div class="change-entry-desc">A gate now passes on affirmative confidence-interval evidence (one-sided equivalence / TOST), never on a point estimate. New <code>*_with_ci</code> variants cover disparate impact, FPR parity, negative predictive value, conditional demographic disparity, pricing disparity, the integrated calibration index and multicalibration. Custom-shape statistics get an interval from a new <code>bootstrap_over_index</code> helper that resamples row indices stratified by group. The interval width feeds the three-state verdict.</div>
+                                <div class="change-entry-codes">
+                                    <code>bootstrap_over_index</code>
+                                    <code>disparate_impact_ratio_with_ci</code>
+                                    <code>multicalibration_with_ci</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Spec-v2 metric panel: independence, sufficiency, calibration, decision utility</div>
+                                <div class="change-entry-desc">New spine primaries and diagnostics: <code>disparate_impact_ratio</code> (the four-fifths selection-rate ratio), <code>conditional_demographic_disparity</code> (the CJEU objective-justification mirror), <code>negative_predictive_value_difference</code>, <code>auroc_parity</code> (a validity gate against levelling-down), grid-free <code>integrated_calibration_index</code> and <code>multicalibration</code>, the TRIPOD recalibration diagnostics <code>calibration_in_the_large</code> and <code>calibration_slope</code>, plus <code>pricing_disparity</code>, <code>net_benefit_parity</code> and <code>conditional_adverse_impact</code>. The error-rate metrics the catalogue referenced but the engine lacked (<code>fpr_parity_difference</code>, <code>fnr_parity_difference</code>, <code>accuracy_parity_difference</code>, <code>worst_group_accuracy</code>) also landed, closing the overclaims found in the knowledge-graph spine audit.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Blocking lint and type gates, mutation testing, governance</div>
+                                <div class="change-entry-desc"><code>ruff check src tests</code> and <code>mypy src</code> are both blocking on every library change, with the toolchain declared in the <code>dev</code> extra so CI, pre-commit and local runs agree. The type burndown reached zero errors and surfaced three real bugs (a dead subgroup-robustness audit in Pulse, a crash on list-valued <code>sample_weight</code> in <code>FairRegressor.fit</code>, and a no-op correlation proxy detector). Also added: mutation testing on the band logic, new property-based / determinism / deserialization-safety / reference-parity suites, an sdist allowlist, beta-programme materials, and the supply-chain governance files.</div>
+                            </div>
+                        </div>
+
+                        <div class="change-category category-changed-entries">
+                            <div class="change-category-title category-changed">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                Changed <span class="change-count">2</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Licence moved from MIT to Apache-2.0</div>
+                                <div class="change-entry-desc">The library ships under Apache-2.0 (copyright Glinz &amp; Company GmbH), with a <code>NOTICE</code> file alongside the <code>LICENSE</code>.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Python floor raised to 3.11</div>
+                                <div class="change-entry-desc"><code>requires-python</code> is now <code>&gt;=3.11</code>, following Scientific Python SPEC 0.</div>
+                            </div>
+                        </div>
+
+                        <div class="change-category category-fixed-entries">
+                            <div class="change-category-title category-fixed">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                                Fixed <span class="change-count">3</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">An undefined group rate is insufficient evidence, not 0.0 parity</div>
+                                <div class="change-entry-desc"><code>predictive_parity_difference</code>, <code>fpr_parity_difference</code>, <code>fnr_parity_difference</code> and <code>equalized_odds_difference</code> collapsed a NaN per-group rate (a group with no positive predictions, no negatives, or no positives) into a 0.0 &ldquo;perfect parity&rdquo; result, which read as PASS with a deceptively tight [0.0, 0.0] bootstrap CI. They now return NaN so the verdict routes to <code>insufficient_evidence</code>, mirroring the earlier NPV fix.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">False PASS on unmeasurable spec-v2 gates</div>
+                                <div class="change-entry-desc">Four of the new sealed metrics collapsed an unmeasurable result to the numeric &ldquo;perfectly fair&rdquo; 0.0 instead of NaN, bypassing both the report's not-assessable guard and the bootstrap NaN filter, so a no-evidence case could seal as fair. <code>multicalibration</code>, <code>negative_predictive_value_difference</code>, <code>auroc_parity</code> and <code>conditional_demographic_disparity</code> now return NaN when there is no evidence, and the last of those renormalises its stratum weights instead of biasing toward &ldquo;fair&rdquo; in proportion to the un-assessable population.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Verdicts derive from the interval, not the point estimate</div>
+                                <div class="change-entry-desc"><code>MetricResult</code> gains a three-state <code>verdict</code> (<code>fair</code> / <code>unfair</code> / <code>insufficient_evidence</code>), and <code>is_fair</code> becomes an alias for <code>verdict == 'fair'</code>. A wide small-sample interval is no longer reported as a pass or a fail. <code>predictive_parity_difference_with_ci</code> closes the last sufficiency metric that shipped as a bare point estimate.</div>
+                            </div>
+                        </div>
+
+                        <div class="change-category category-security-entries">
+                            <div class="change-category-title category-security">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Security <span class="change-count">2</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">No implicit deserialization of untrusted models</div>
+                                <div class="change-entry-desc">The XAI sidecar refuses to deserialize a model payload unless the caller opts in explicitly (<code>trust_input</code> / <code>VFAIRNESS_TRUST_MODEL_INPUT</code>), closing a remote-code-execution vector. An AST guard test also stops the metric core from swallowing computation errors silently.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Defence in depth on agent- and artifact-supplied paths</div>
+                                <div class="change-entry-desc">The MCP <code>load_dataframe</code> tool rejects remote <code>data_path</code> URLs, so an agent-supplied path cannot become network egress; the Pulse artifact download pins the scheme to <code>https</code> and caps the response size; and the deserialization-safety scan now resolves aliased imports and covers <code>marshal</code>, <code>pandas.read_pickle</code>, <code>jsonpickle</code> and <code>shelve</code>.</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Version 0.0.9 -->
+                    <section id="v0.0.9" class="version-section older timeline-line">
+                        <div class="timeline-dot"></div>
+                        <div class="version-header">
+                            <h2 class="version-number">v0.0.9</h2>
+                            <span class="version-badge badge-beta">Alpha</span>
+                            <span class="version-date">August 2026</span>
+                        </div>
+
+                        <p style="color: var(--color-gray-600); margin-bottom: var(--spacing-6);">
+                            A deep correctness-and-honesty hardening milestone. Five audit waves swept every
+                            subsystem for silently-wrong results, false fairness certificates and band
+                            inconsistencies; the rendering layer gained self-explaining, accessible SVGs and a
+                            single unified design language (Blanco); and the test/CI infrastructure was
+                            strengthened with golden-file value pins, render-smoke coverage across every
+                            template, and coverage measurement in CI. This was the last 0.0.x milestone
+                            before the 0.1.0 public beta.
+                        </p>
+
+                        <div class="change-category category-added-entries">
+                            <div class="change-category-title category-added">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                                Added <span class="change-count">5</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Self-explaining, accessible SVGs</div>
+                                <div class="change-entry-desc">Every rendered SVG now carries its own explanation automatically, wired at the <code>render_svg</code> choke point (so every adapter and <code>.to_svg()</code> inherits it): an auto-generated on-canvas explanation (concept &rarr; how to read it &rarr; the finding on this chart &rarr; recommended action) plus an accessible, machine-readable layer (<code>role="img"</code>, <code>&lt;title&gt;</code>, a one-line <code>&lt;desc&gt;</code>, and a <code>&lt;metadata&gt;</code> JSON block). Severity is derived from the same data the badge uses, so the explanation can never contradict the badge. Curated content covers every template.</div>
+                                <div class="change-entry-codes">
+                                    <code>vfairness.rendering.explain</code>
+                                    <code>CHART_META</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Blanco &mdash; the one SVG design language</div>
+                                <div class="change-entry-desc"><code>render_svg</code> applies Blanco (&ldquo;The Silent Gallery&rdquo;) by default: a single post-render transform giving sharp corners, editorial type (Plus Jakarta Sans / JetBrains Mono), desaturated graphite chrome, and colour reserved for the four semantic tones. It never touches the templates or adapters themselves.</div>
+                                <div class="change-entry-codes">
+                                    <code>apply_skin</code>
+                                    <code>list_skins</code>
+                                    <code>SKINS</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Golden-file regression tests</div>
+                                <div class="change-entry-desc">Exact-value pins for the core classification, regression and ranking metrics and the <code>FairnessAnalyzer</code> report, so a numeric regression fails loudly instead of drifting silently.</div>
+                                <div class="change-entry-codes">
+                                    <code>tests/test_golden_metrics.py</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Render-smoke coverage for every template</div>
+                                <div class="change-entry-desc">Drives <code>render_svg</code> for every registered SVG template and asserts well-formed XML with no unrendered Jinja tokens.</div>
+                                <div class="change-entry-codes">
+                                    <code>tests/test_rendering.py</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Task result envelope &amp; coverage-in-CI</div>
+                                <div class="change-entry-desc">New <code>TaskResult</code> dataclass formalises the task-handler result envelope (<code>schema_version</code>, <code>task_type</code>, <code>success</code>, <code>data</code>/<code>error</code>, optional <code>warnings</code>) with a backward-compatible <code>to_dict()</code>. Coverage is now measured in CI (<code>--cov=vfairness</code>) behind a ratcheting <code>--cov-fail-under</code> gate.</div>
+                                <div class="change-entry-codes">
+                                    <code>vfairness.result.TaskResult</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="change-category category-changed-entries">
+                            <div class="change-category-title category-changed">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                Changed <span class="change-count">3</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">SVG gallery is all-Blanco</div>
+                                <div class="change-entry-desc">The gallery renders every example in Blanco; the Original/Blanco skin switch and the parallel mirror were removed, along with the coloured category-icon boxes and the unused design-proposal SVGs.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">CI runs the full test suite</div>
+                                <div class="change-entry-desc">The <code>-m fairness</code> marker matched zero tests (so CI silently ran nothing); the filter was removed from both GitHub and GitLab pipelines, and both now install the extras the suite exercises.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Task handlers use the result envelope</div>
+                                <div class="change-entry-desc">The CI/CD and Pulse handlers build their result via <code>TaskResult.to_dict()</code>. The <code>success</code>/<code>data</code>/<code>error</code> semantics are unchanged; the envelope gains additive <code>schema_version</code> and <code>task_type</code> keys.</div>
+                            </div>
+                        </div>
+
+                        <div class="change-category category-fixed-entries">
+                            <div class="change-category-title category-fixed">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                                Fixed &mdash; deep-audit Waves 1&ndash;5 <span class="change-count">7</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Undefined metrics are not failures</div>
+                                <div class="change-entry-desc">A metric that returns NaN (undefined, e.g. an error-rate metric when a group has no positive labels, or R&sup2; when a group has constant <code>y_true</code>) is now surfaced in <code>assessment.not_assessable_metrics</code> and excluded from the fairness score, instead of being mis-scored as a FAIL. The classification report gains a <code>not_assessable_metrics</code> field.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Evaluation metrics &amp; statistical honesty</div>
+                                <div class="change-entry-desc">Effect sizes now measure the gap the metric actually reports; equal opportunity returns NaN with a warning (not a silent &ldquo;fair&rdquo; 0.0) when a group has no positives; dropped small groups are named; <code>fisher_exact_test</code> uses the real exact test (no silent chi-square degrade); Bayesian credible intervals delegate to <code>scipy</code> (the homegrown Beta&nbsp;PPF had collapsed &ldquo;95%&rdquo; intervals to ~55% coverage); Wilson score intervals replace NaN bounds for large groups; multiple-testing correction runs real two-proportion z-tests instead of inverted pseudo p-values.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">No more false fairness certificates</div>
+                                <div class="change-entry-desc">Degenerate data (0 samples or a single group) is marked <code>NOT ASSESSABLE</code> instead of certifying <code>fairness_score 1.0</code>; critical findings floor the overall risk band (1+ &rarr; MEDIUM, 3+ &rarr; HIGH) so three critical issues can no longer average out to a green badge; constant-probability ECE/MCE report the true error instead of a &ldquo;perfect&rdquo; 0.0.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Band consistency &amp; explainer coherence</div>
+                                <div class="change-entry-desc">A single canonical <code>vfairness._bands</code> module drives every severity/threshold decision, so the badge, radar chart, detailed report and explanation text can no longer give contradictory verdicts for the same input; the divergent 0.2/0.4/0.6/0.8 risk scale was eliminated everywhere; NaN scores render a neutral N/A badge rather than a green MINIMAL.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">In-, post- and pre-processing correctness</div>
+                                <div class="change-entry-desc">Threshold optimization and three of five reweighters crashed on every fit &mdash; both fixed; <code>BetaCalibrator</code> is now real Kull et&nbsp;al. 2017 beta calibration; <code>GridSearch</code> predicts with the classifier it reports; <code>FairRegressor</code> raises instead of silently fitting an unconstrained model for unsupported objectives; the adversarial debiasing loss trains its adversary in the correct direction; the outcome column is no longer scanned as its own proxy.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Rendering, XAI, Pulse &amp; ops robustness</div>
+                                <div class="change-entry-desc">Hostile inputs (empty modules, None nests, stringified numbers, Infinity) render or raise a clear error naming the template instead of leaking ZeroDivision/Overflow; falsy-zero bugs (score 0, zero-tolerance thresholds) read at the correct severity; deep-model XAI routing selects Integrated Gradients (Phase-2 <code>DeepExplainer</code> had made every deep job fail); SHAP attributions, base value and prediction now come from one class; causal identification and refuter-crash disclosure fixed; monitoring/drift windows and health-score trends corrected.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Packaging, frozen API surface &amp; test hardening</div>
+                                <div class="change-entry-desc"><code>requirements.txt</code> now includes the hard runtime deps <code>requests</code> and <code>scikit-learn</code> (a minimal install previously could not even import vfairness); the <code>mcp</code> extra is gated to Python&nbsp;&ge;&nbsp;3.10 so the project locks again; frozen-surface exports (<code>calibration_difference</code>, <code>r2_parity_difference</code>, <code>residual_bias</code>) restored; ~800 new regression tests across <code>tests/test_audit_wave1&ndash;5</code> pin every fix. Documentation examples corrected against the real APIs.</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Version 0.0.8 -->
+                    <section id="v0.0.8" class="version-section older timeline-line">
+                        <div class="timeline-dot"></div>
+                        <div class="version-header">
+                            <h2 class="version-number">v0.0.8</h2>
+                            <span class="version-badge badge-beta">Alpha</span>
+                            <span class="version-date">March 2026</span>
+                        </div>
+
+                        <p style="color: var(--color-gray-600); margin-bottom: var(--spacing-6);">
+                            Release consolidating all v0.0.x development work into a stable alpha milestone.
+                            Includes 43 historical discrimination patterns across US, EU, EU AI Act &amp; Swiss jurisdictions,
+                            finalized APIs for the full pipeline, expanded test coverage,
+                            and polished documentation across all modules.
+                        </p>
+
+                        <div class="change-category category-added-entries">
+                            <div class="change-category-title category-added">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                                Added (May 2026) <span class="change-count">6</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">DisparateImpactRemover (pre-processing transformer)</div>
+                                <div class="change-entry-desc">Feldman et al. (2015) geometric repair: aligns each numeric feature's distribution across protected groups toward a shared per-quantile-median target, removing disparate impact while preserving within-group ranking. Tunable <code>repair_level</code> (0 = no change, 1 = full repair) with a tie-robust empirical-CDF mapping. Registered under dispatch key <code>disparate_impact_removal</code> and wired into the platform's pre-processing step (with a configurable repair-strength control).</div>
+                                <div class="change-entry-codes">
+                                    <code>DisparateImpactRemover</code>
+                                    <code>disparate_impact_removal</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">LabelMassager (pre-processing transformer)</div>
+                                <div class="change-entry-desc">Kamiran &amp; Calders (2012) &ldquo;massaging&rdquo;: a logistic ranker scores each instance by proximity to the decision boundary, then the minimal set of borderline labels is flipped (promote deprived-group negatives, demote favored-group positives) to equalize group positive rates. Row-preserving; changes only the target. Exposes the additive <code>get_massaged_labels()</code> hook and a <code>max_flip_fraction</code> safety cap. Wired into the platform's pre-processing step.</div>
+                                <div class="change-entry-codes">
+                                    <code>LabelMassager</code>
+                                    <code>label_massaging</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Resampler (pre-processing transformer)</div>
+                                <div class="change-entry-desc">Kamiran &amp; Calders (2012) sampling: balances protected-group (and group&nbsp;&times;&nbsp;label) representation by random over-sampling with replacement up to the largest cell, or under-sampling down to the smallest. Exposes the additive <code>get_resampled_data()</code> hook with configurable <code>strategy</code> and <code>balance_by</code>. The platform rebalances the training split only, leaving the held-out test split intact for honest evaluation.</div>
+                                <div class="change-entry-codes">
+                                    <code>Resampler</code>
+                                    <code>resampling</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Fairness Regularization (in-processing, platform wiring)</div>
+                                <div class="change-entry-desc">The Navigator's &ldquo;Fairness Regularization&rdquo; tile now runs a torch training loop that minimizes <code>BCE + &lambda; &middot; GroupFairnessRegularizer</code>. The fairness metric (demographic parity, equalized odds, equal opportunity, or FPR parity) is selected from the chosen fairness definition, and the penalty strength gives continuous control over the accuracy-fairness trade-off. Registered under dispatch key <code>fairness_regularization</code>; falls back to reweighting if torch is unavailable.</div>
+                                <div class="change-entry-codes">
+                                    <code>GroupFairnessRegularizer</code>
+                                    <code>fairness_regularization</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">FairRepresentationTransformer (pre-processing transformer)</div>
+                                <div class="change-entry-desc">Adversarial fair-representation learning (Zemel et al. 2013 LFR; Louizos et al. 2016 VFAE; Madras et al. 2018 LAFTR): an autoencoder encodes the numeric features into a latent code trained with reconstruction loss plus a gradient-reversal adversary that cannot recover the protected group, yielding a group-invariant representation. <code>transform</code> returns the latent columns (<code>rep_0..</code>). Tunable <code>representation_dim</code> and <code>lambda_fairness</code>; multiple attributes handled via their intersection. Registered as <code>fair_representation</code> and wired into the pre-processing step + Pareto sweep. Requires torch.</div>
+                                <div class="change-entry-codes">
+                                    <code>FairRepresentationTransformer</code>
+                                    <code>fair_representation</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Intervention hardening: intersectional, secondary constraints, guardrails</div>
+                                <div class="change-entry-desc">Across the intervention suite: (1) <code>DisparateImpactRemover</code>, <code>LabelMassager</code>, <code>Resampler</code>, <code>FairRepresentationTransformer</code> and the fairness-regularization training loop now operate on the <em>intersection</em> of all protected attributes rather than only the first (e.g. they repair / rebalance / penalize race&nbsp;x&nbsp;gender jointly); (2) the regularizer accepts secondary fairness constraints (penalized jointly); (3) a degenerate-collapse guard detects and softens penalties that drive the model to a single class; (4) a training-row cap keeps the torch sweep responsive on large datasets; (5) pre-processing techniques (Disparate Impact Removal, Label Massaging, Resampling, Fair Representation) gained Pareto strength sweeps; and (6) results surface proxy-survival notes and small-sample / confidence warnings so a near-unchanged metric is explained rather than mistaken for a no-op.</div>
+                                <div class="change-entry-codes">
+                                    <code>get_massaged_labels</code>
+                                    <code>get_resampled_data</code>
+                                    <code>secondary_constraints</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="change-category category-added-entries">
+                            <div class="change-category-title category-added">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                                Planned (all shipped in this release) <span class="change-count">9</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Historical discrimination patterns</div>
+                                <div class="change-entry-desc">43 patterns (up from 12) with multi-jurisdiction coverage across US, EU, and Swiss contexts.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Attribute &times; domain historical-pattern cross-walk</div>
+                                <div class="change-entry-desc">New <code>attribute_historical_pattern(attribute, domain)</code> helper resolves 24 documented (attribute class &times; regulated domain) precedents -- race / gender / age / national-origin / religion / disability / geographic proxy across hiring, lending, healthcare, justice, insurance and education. Pulse attaches the citation-backed envelope onto bias findings so the &ldquo;Historical pattern&rdquo; channel keys off a structured flag instead of regex-matching evidence text.</div>
+                                <div class="change-entry-codes">
+                                    <code>attribute_historical_pattern</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">EU AI Act patterns</div>
+                                <div class="change-entry-desc">11 patterns: 4 prohibited practices (Art. 5) and 7 high-risk systems (Annex III).</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">European discrimination patterns</div>
+                                <div class="change-entry-desc">12 patterns covering employment, housing, welfare, policing, and education.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Swiss-specific patterns</div>
+                                <div class="change-entry-desc">8 patterns including Ausweis-based discrimination, naturalisation bias, and cantonal disparities.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">EU AI Act compliance detection</div>
+                                <div class="change-entry-desc">Automated risk classification with penalty exposure alerts for prohibited and high-risk AI systems.</div>
+                                <div class="change-entry-codes">
+                                    <code>CRITICAL</code>
+                                    <code>HIGH</code>
+                                    <code>MEDIUM</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Penalty exposure alerts</div>
+                                <div class="change-entry-desc">Prohibited practices (€35M / 7% turnover) and high-risk systems (€15M / 3% turnover).</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Expanded synthetic demo dataset</div>
+                                <div class="change-entry-desc">19 columns including EU, AI Act, and Swiss-specific features.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Stabilised API surface</div>
+                                <div class="change-entry-desc">Consistent interface across all 6 sub-packages (as of this release; the taxonomy is 15 top-level sub-packages as of 0.1.0).</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Comprehensive documentation</div>
+                                <div class="change-entry-desc">Curated academic references for each jurisdiction.</div>
+                            </div>
+                        </div>
+
+                        <div class="change-category category-added-entries">
+                            <div class="change-category-title category-added">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                                Added (March 2026) <span class="change-count">6</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Statistical validation module <code>_statistics.py</code></div>
+                                <div class="change-entry-desc">Comprehensive uncertainty quantification: bootstrap CIs (percentile, BCa, basic), stratified bootstrap for fairness metrics, Bayesian credible intervals (proportion, difference, mean), multiple testing corrections (Bonferroni, Benjamini-Hochberg FDR), effect sizes (Cohen's d, risk ratio, odds ratio), and auto method selection based on sample size. Zero scipy dependency. <em>(Superseded in v0.0.9: the homegrown scipy-free Beta PPF was found to collapse "95%" credible intervals to about 55% coverage, so it now delegates to scipy, which is a hard runtime dependency.)</em></div>
+                                <div class="change-entry-codes">
+                                    <code>bootstrap_ci</code>
+                                    <code>stratified_bootstrap_ci</code>
+                                    <code>bayesian_proportion_ci</code>
+                                    <code>bayesian_difference_ci</code>
+                                    <code>compute_metric_with_ci</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Proportion tests and power analysis</div>
+                                <div class="change-entry-desc">Two-proportion z-test, Fisher's exact test (exact for n&le;200, chi-squared fallback), Cohen's h effect size for binary outcomes, minimum detectable effect computation, and human-readable power warnings for small subgroups.</div>
+                                <div class="change-entry-codes">
+                                    <code>proportion_z_test</code>
+                                    <code>fisher_exact_test</code>
+                                    <code>cohens_h</code>
+                                    <code>minimum_detectable_effect</code>
+                                    <code>power_warning</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Intersectional disparity SVG template</div>
+                                <div class="change-entry-desc">New ranked-bar chart SVG template (<code>intersectional_disparity.svg</code>) with ground truth overlay, severity-colored bars, prediction delta indicators, most/least advantaged comparison cards, and insight cards. 44th SVG template in the rendering module.</div>
+                                <div class="change-entry-codes">
+                                    <code>intersectional_disparity_to_svg()</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Dual-lens intersectional analysis</div>
+                                <div class="change-entry-desc"><code>identify_privileged_groups()</code> and <code>intersectional_disparity_analysis()</code> now compute ground truth rates, false positive rates, and prediction deltas per subgroup. New <code>outcome_polarity</code> parameter supports both favorable (loan approval) and unfavorable (recidivism) outcome directions.</div>
+                                <div class="change-entry-codes">
+                                    <code>ground_truth_rate</code>
+                                    <code>false_positive_rate</code>
+                                    <code>prediction_delta</code>
+                                    <code>outcome_polarity</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Confidence intervals in structured findings</div>
+                                <div class="change-entry-desc">Intersectional structured findings now include Bayesian credible intervals for small subgroups, enriching compliance reporting with uncertainty quantification.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Improved SVG chart rendering</div>
+                                <div class="change-entry-desc">Enhanced Pareto frontier visuals, improved disparity heatmap layout, and refined calibration adapters for cleaner publication-ready output.</div>
+                            </div>
+                        </div>
+
+                        <div class="change-category category-fixed-entries">
+                            <div class="change-category-title category-fixed">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                                Fixed (March 2026) <span class="change-count">2</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Validation SVG: raw dict/list strings no longer leak into rendered text</div>
+                                <div class="change-entry-desc"><code>data_validation_to_svg()</code> now safely handles nested dicts and lists, truncates overly long string representations, and only includes scalar values in metric cards. Previously, raw Python repr output (e.g., <code>{'count': 5}</code>) could appear in the SVG text.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Polarity-aware ratio in intersectional insights</div>
+                                <div class="change-entry-desc">Fixed the insight generation to correctly compute advantage ratios when <code>outcome_polarity='positive_unfavorable'</code>. Previously, the ratio calculation was inverted for unfavorable outcomes, making insights misleading.</div>
+                            </div>
+                        </div>
+
+                    </section>
+
+                    <!-- Version 0.0.7 -->
+                    <section id="v0.0.7" class="version-section older timeline-line">
+                        <div class="timeline-dot"></div>
+                        <details class="version-details">
+                            <summary>
+                                <div class="version-header">
+                                    <h2 class="version-number">v0.0.7</h2>
+                                    <span class="version-badge badge-beta">Alpha</span>
+                                    <span class="version-date">February 2026</span>
+                                    <span class="version-toggle">
+                                        <span>Show details</span>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </span>
+                                </div>
+                                <p style="color: var(--color-gray-600); margin-bottom: 0;">Documentation quality overhaul and major feature release. Complete site redesign with gradient theme system, plus new Reporting &amp; Dashboards, Experimentation &amp; A/B Testing, and Workflow Integration modules. 43 SVG templates across 15 adapter modules, 114 gallery illustrations.</p>
+                            </summary>
+                            <div class="version-content">
+
+                        <div class="change-category category-added-entries">
+                            <div class="change-category-title category-added">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                                Added <span class="change-count">18</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Reporting module <code>vfairness.operations.reporting</code></div>
+                                <div class="change-entry-desc">Privacy-preserving queries, Plotly progressive-disclosure views, multi-format NLG output, and interactive Dash/HTML dashboards.</div>
+                                <div class="change-entry-codes">
+                                    <code>MetricsStore</code>
+                                    <code>FairnessDashboard</code>
+                                    <code>ReportGenerator</code>
+                                    <code>InteractiveDashboard</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Experimentation module <code>vfairness.operations.experimentation</code></div>
+                                <div class="change-entry-desc">A/B testing with intersectional analysis, SPRT early stopping, Pareto frontier and causal decomposition.</div>
+                                <div class="change-entry-codes">
+                                    <code>FairnessExperiment</code>
+                                    <code>FairnessPowerAnalyzer</code>
+                                    <code>ExperimentAnalysis</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Monitoring expansion</div>
+                                <div class="change-entry-desc">Wavelet + KS multi-scale drift detection, adaptive thresholds, and alert prioritisation.</div>
+                                <div class="change-entry-codes">
+                                    <code>FairnessDriftDetector</code>
+                                    <code>AdaptiveThresholdManager</code>
+                                    <code>FairnessAlertPrioritizer</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Monitoring SVG templates</div>
+                                <div class="change-entry-desc">4 new templates for production monitoring visualisation.</div>
+                                <div class="change-entry-codes">
+                                    <code>monitoring_dashboard</code>
+                                    <code>drift_report</code>
+                                    <code>alert_timeline</code>
+                                    <code>temporal_analysis</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">SVG template redesign</div>
+                                <div class="change-entry-desc">All 32 core templates redesigned with consistent card-based layout system and explanation overlays.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">SVG gallery page update</div>
+                                <div class="change-entry-desc">Reporting &amp; Experimentation sections, new filter categories, and expanded code examples.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Workflow integration <code>vfairness.operations.cicd</code></div>
+                                <div class="change-entry-desc">Three-level intersectional gate evaluation, PR-ready markdown reports, and under-powered group detection.</div>
+                                <div class="change-entry-codes">
+                                    <code>HierarchicalGateConfig</code>
+                                    <code>FairnessReportCard</code>
+                                    <code>SmallSampleWarning</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">W&amp;B integration <code>log_fairness_to_wandb()</code></div>
+                                <div class="change-entry-desc">Weights &amp; Biases experiment tracking, mirroring the existing MLflow integration.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Auto-logging decorator <code>@auto_log_fairness</code></div>
+                                <div class="change-entry-desc">Automatic fairness logging during model training with MLflow and W&amp;B backend support.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Pre-commit hooks</div>
+                                <div class="change-entry-desc">Early validation of fairness documentation before commits.</div>
+                                <div class="change-entry-codes">
+                                    <code>vfairness-check-config</code>
+                                    <code>vfairness-check-model-card</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Formal pytest plugin</div>
+                                <div class="change-entry-desc">Registered via <code>pytest11</code> entry point with marker, fixture, and terminal summary.</div>
+                                <div class="change-entry-codes">
+                                    <code>@pytest.mark.fairness</code>
+                                    <code>fairness_gate</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">CI/CD configurations</div>
+                                <div class="change-entry-desc">GitHub Actions workflow, GitLab CI config, and PR template with fairness checklist.</div>
+                                <div class="change-entry-codes">
+                                    <code>fairness-checks.yml</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Workflow SVG templates</div>
+                                <div class="change-entry-desc">3 new templates for workflow visualisation.</div>
+                                <div class="change-entry-codes">
+                                    <code>workflow_overview</code>
+                                    <code>hierarchical_gate</code>
+                                    <code>report_card</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Getting Started guide expansion</div>
+                                <div class="change-entry-desc">Reporting, Experimentation, and Workflow Integration quick-start sections.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Notebooks</div>
+                                <div class="change-entry-desc">Interactive tutorials for new modules.</div>
+                                <div class="change-entry-codes">
+                                    <code>reporting_units_3.ipynb</code>
+                                    <code>experimentation_unit_4.ipynb</code>
+                                    <code>vfairness_8_workflow_integration.ipynb</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">8 new SVG templates (35 &rarr; 43)</div>
+                                <div class="change-entry-desc">General correlation matrix with mixed methods, causal decomposition, robustness testing, ranking fairness, data validation, auto discovery, regression fairness, and multi-tier reporting dashboard.</div>
+                                <div class="change-entry-codes">
+                                    <code>correlation_matrix</code>
+                                    <code>causal_decomposition</code>
+                                    <code>robustness_testing</code>
+                                    <code>ranking_fairness</code>
+                                    <code>data_validation</code>
+                                    <code>auto_discovery</code>
+                                    <code>regression_fairness</code>
+                                    <code>reporting_dashboard</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">6 new rendering adapter modules</div>
+                                <div class="change-entry-desc">Dedicated adapter files for robustness, ranking, validation, discovery, regression, and reporting SVG templates.</div>
+                                <div class="change-entry-codes">
+                                    <code>adapters_robustness.py</code>
+                                    <code>adapters_ranking.py</code>
+                                    <code>adapters_validation.py</code>
+                                    <code>adapters_discovery.py</code>
+                                    <code>adapters_regression.py</code>
+                                    <code>adapters_reporting.py</code>
+                                </div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Full notebook coverage for all 43 SVG templates</div>
+                                <div class="change-entry-desc">Every SVG adapter function is now exercised in at least one notebook. SVG rendering demo notebook expanded from 35 to 43 templates with new Advanced Modules category.</div>
+                            </div>
+                        </div>
+
+                        <div class="change-category category-changed-entries">
+                            <div class="change-category-title category-changed">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                Changed <span class="change-count">7</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Public API expansion</div>
+                                <div class="change-entry-desc">200+ exports across all pipeline stages with backward-compatible <code>sys.modules</code> aliasing.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Rendering adapters</div>
+                                <div class="change-entry-desc">All adapters updated for consistent explanation parameter and template context.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Project dependencies <code>pyproject.toml</code></div>
+                                <div class="change-entry-desc">New module dependencies with Plotly and Dash as optional extras.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">SVG gallery</div>
+                                <div class="change-entry-desc">Expanded to 43 templates with 114 gallery illustrations including advanced modules for robustness, ranking, validation, discovery, regression, and reporting.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Documentation overhaul</div>
+                                <div class="change-entry-desc">New Workflow Integration nav link, expanded Business Guide with CI/CD gates and MLOps tracking sections, API Reference with 6 new component pages.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Hero stats updated</div>
+                                <div class="change-entry-desc">Getting Started page statistics refreshed: 60K+ lines of code, 1,211 functions, 217 classes, 43 SVG templates, 114 illustrations. <em>(Counts as of v0.0.7, measured as raw definitions. What the Getting Started tiles count has changed since: they now report the whole callable surface, 463 functions, 392 classes and 691 methods across 204 modules, alongside 215 capability-registry rows naming 222 of those same objects, and 44 SVG templates, measured 2026-09-18. Those tiles are filled from <code>data/library-stats.json</code> at page load rather than typed in, so read them there rather than here.)</em></div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Business Guide glossary repositioned</div>
+                                <div class="change-entry-desc">Glossary section moved to its correct location before Appendices for better document flow.</div>
+                            </div>
+                        </div>
+
+                        <div class="change-category category-fixed-entries">
+                            <div class="change-category-title category-fixed">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                Fixed <span class="change-count">3</span>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Column label readability in correlation SVG templates</div>
+                                <div class="change-entry-desc">Rotated column labels in <code>correlation_heatmap</code> and <code>correlation_matrix</code> templates were painted over by grid cells. Fixed <code>text-anchor</code> from <code>end</code> to <code>start</code>, increased font size to 12px, and added 100px panel headroom.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">Cohen's d lollipop chart alignment in regression fairness SVG</div>
+                                <div class="change-entry-desc">Effect size dots were displaced &sim;200px left of the center axis due to mismatched coordinate origins. Recentered <code>dot_x</code> computation around the axis position and added smart label placement for negative values.</div>
+                            </div>
+                            <div class="change-entry">
+                                <div class="change-entry-title">SVG template count references</div>
+                                <div class="change-entry-desc">Outdated template counts (30+, 35) across Getting Started, API Reference, and main index pages updated to 43.</div>
+                            </div>
+                        </div>
+
+                        <div class="upgrade-note">
+                            <div class="upgrade-note-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                                Feature Release
+                            </div>
+                            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--color-gray-600);">
+                                Major feature and documentation release. New modules require optional dependencies: <code>pip install vfairness[reporting]</code>, <code>pip install vfairness[experimentation]</code>, or <code>pip install vfairness[mlops]</code>.
+                            </p>
+                        </div>
+                            </div>
+                        </details>
+                    </section>
+
+
+                    <!-- Version 0.0.5 -->
+                    <section id="v0.0.5" class="version-section older timeline-line">
+                        <div class="timeline-dot"></div>
+                        <details class="version-details">
+                            <summary>
+                                <div class="version-header">
+                                    <h2 class="version-number">v0.0.5-dev</h2>
+                                    <span class="version-badge badge-beta">Alpha</span>
+                                    <span class="version-date">February 2026</span>
+                                    <span class="version-toggle">
+                                        <span>Show details</span>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </span>
+                                </div>
+                                <p style="color: var(--color-gray-600); margin-bottom: 0;">Post-processing expansion and SVG rendering engine. Added threshold optimisation, prediction reweighting, operations/monitoring modules for production deployment, and 28 purpose-built SVG templates for server-side report generation.</p>
+                            </summary>
+                            <div class="version-content">
+                            <div class="change-category category-added-entries">
+                                <div class="change-category-title category-added">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                                    Added <span class="change-count">10</span>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Threshold optimisation</div>
+                                    <div class="change-entry-desc">Multi-objective threshold tuning for group-aware decisions.</div>
+                                    <div class="change-entry-codes">
+                                        <code>ThresholdOptimizer</code>
+                                        <code>GroupThresholdOptimizer</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Prediction reweighting</div>
+                                    <div class="change-entry-desc">Prediction adjustment techniques for fairer outcomes.</div>
+                                    <div class="change-entry-codes">
+                                        <code>PredictionReweighter</code>
+                                        <code>RejectionOptionClassifier</code>
+                                        <code>CalibratedEqualizer</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Operations module</div>
+                                    <div class="change-entry-desc">Production deployment tools for bias validation, gating, and monitoring.</div>
+                                    <div class="change-entry-codes">
+                                        <code>DataBiasValidator</code>
+                                        <code>ModelFairnessGate</code>
+                                        <code>BiasMonitor</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Drift detection &amp; constraint specification</div>
+                                    <div class="change-entry-desc">Alert system for fairness metric drift and declarative constraint types.</div>
+                                    <div class="change-entry-codes">
+                                        <code>DriftAlert</code>
+                                        <code>FairnessConstraintType</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Testing utilities</div>
+                                    <div class="change-entry-desc">pytest integration for fairness assertions.</div>
+                                    <div class="change-entry-codes">
+                                        <code>FairnessTestSuite</code>
+                                        <code>@fairness_test</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Rendering sub-package</div>
+                                    <div class="change-entry-desc">Core SVG engine, adapters, and 28 purpose-built templates for server-side report generation.</div>
+                                    <div class="change-entry-codes">
+                                        <code>vfairness.rendering</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Fairness report SVG adapters</div>
+                                    <div class="change-entry-desc">Adapters for classification, regression, and ranking results.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Calibration SVG adapters</div>
+                                    <div class="change-entry-desc">Reliability diagrams and disparity plots.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Feature engineering SVG adapters</div>
+                                    <div class="change-entry-desc">Correlation matrices and proxy chain visualisation.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Training analysis SVG adapters</div>
+                                    <div class="change-entry-desc">Loss curves and constraint satisfaction tracking.</div>
+                                </div>
+                            </div>
+                            <div class="change-category category-changed-entries">
+                                <div class="change-category-title category-changed">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                    Changed <span class="change-count">4</span>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Post-processing restructuring</div>
+                                    <div class="change-entry-desc">Reorganised into calibration, threshold_optimization, and reweighting sub-modules.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">CI/CD module relocation</div>
+                                    <div class="change-entry-desc">Moved from <code>evaluation.integrations</code> to dedicated <code>operations.cicd</code> module.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">CalibrationAnalyzer enhancement</div>
+                                    <div class="change-entry-desc">Pareto frontier and impossibility theorem diagnostics.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Rendering / visualisation separation</div>
+                                    <div class="change-entry-desc">Plotly/Matplotlib for interactive use, SVG engine for static reports.</div>
+                                </div>
+                            </div>
+                            </div>
+                        </details>
+                    </section>
+
+                    <!-- Version 0.0.3 -->
+                    <section id="v0.0.3" class="version-section older timeline-line">
+                        <div class="timeline-dot"></div>
+                        <details class="version-details">
+                            <summary>
+                                <div class="version-header">
+                                    <h2 class="version-number">v0.0.3-dev</h2>
+                                    <span class="version-badge badge-beta">Alpha</span>
+                                    <span class="version-date">January &ndash; February 2026</span>
+                                    <span class="version-toggle">
+                                        <span>Show details</span>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </span>
+                                </div>
+                                <p style="color: var(--color-gray-600); margin-bottom: 0;">Full pipeline expansion. Post-processing calibration, feature engineering, in-processing training interventions, and enhanced visualisation. Expanded vfairness from detection-only to a full-pipeline fairness toolkit.</p>
+                            </summary>
+                            <div class="version-content">
+                            <div class="change-category category-added-entries">
+                                <div class="change-category-title category-added">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                                    Added <span class="change-count">14</span>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">FairExplAIner module</div>
+                                    <div class="change-entry-desc">Human-readable explanations for all fairness metrics.</div>
+                                    <div class="change-entry-codes">
+                                        <code>FairExplAIner</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Calibration module</div>
+                                    <div class="change-entry-desc">Group-aware probability calibration with 5 methods, intersectional calibration, and Pareto trade-off analysis.</div>
+                                    <div class="change-entry-codes">
+                                        <code>GroupCalibrator</code>
+                                        <code>IntersectionalCalibrator</code>
+                                        <code>CalibrationAnalyzer</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Feature engineering sub-package</div>
+                                    <div class="change-entry-desc">Fairness-aware data transformation, 5 transformers, and proxy chain detection via mutual information.</div>
+                                    <div class="change-entry-codes">
+                                        <code>vfairness.preprocessing.feature_engineering</code>
+                                        <code>FeatureEngineeringAnalyzer</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">In-processing module</div>
+                                    <div class="change-entry-desc">Complete training-time intervention toolkit with 12 loss functions, 5 constraint types, and 5 regularizers.</div>
+                                    <div class="change-entry-codes">
+                                        <code>vfairness.in_processing</code>
+                                        <code>ExponentiatedGradient</code>
+                                        <code>FairClassifier</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Trainable group calibrators</div>
+                                    <div class="change-entry-desc">5 calibration methods for per-group adjustment during training.</div>
+                                    <div class="change-entry-codes">
+                                        <code>TemperatureScaling</code>
+                                        <code>PlattScaling</code>
+                                        <code>TrainableGroupCalibrator</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Enhanced visualisation suite</div>
+                                    <div class="change-entry-desc">Interactive Plotly charts, publication-ready matplotlib outputs, reliability diagrams, and disparity dashboards.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Bayesian confidence intervals</div>
+                                    <div class="change-entry-desc">Conjugate priors for small sample sizes (n &lt; 30).</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Auto-discovery of protected attributes</div>
+                                    <div class="change-entry-desc">Automatic detection from dataset column names and metadata.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Geographic bias detection</div>
+                                    <div class="change-entry-desc">Location-based disparity analysis.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Quick analysis function</div>
+                                    <div class="change-entry-desc">Convenience function for rapid fairness analysis.</div>
+                                    <div class="change-entry-codes">
+                                        <code>classification_fairness_report()</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Multi-class classification support</div>
+                                    <div class="change-entry-desc">Fairness metrics extended to multi-class settings.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Training analyser</div>
+                                    <div class="change-entry-desc">Monitoring fairness metrics during model training.</div>
+                                    <div class="change-entry-codes">
+                                        <code>FairnessTrainingAnalyzer</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Documentation site</div>
+                                    <div class="change-entry-desc">Comprehensive API reference, tutorials, and 6 Jupyter demo notebooks.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">scikit-learn wrappers</div>
+                                    <div class="change-entry-desc">Drop-in compatible classifiers and regressors.</div>
+                                    <div class="change-entry-codes">
+                                        <code>FairClassifier</code>
+                                        <code>FairRegressor</code>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="change-category category-changed-entries">
+                                <div class="change-category-title category-changed">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                    Changed <span class="change-count">5</span>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Package reorganisation</div>
+                                    <div class="change-entry-desc">6 top-level sub-packages: preprocessing, in_processing, post_processing, evaluation, operations, rendering.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Library scope expansion</div>
+                                    <div class="change-entry-desc">From detection/measurement to full-pipeline fairness: detect, mitigate, calibrate, monitor.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Bootstrap confidence intervals</div>
+                                    <div class="change-entry-desc">Bias-corrected and accelerated (BCa) method for improved accuracy.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">MLflow integration</div>
+                                    <div class="change-entry-desc">Automatic artifact logging and metric tracking.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">FairnessAnalyzer refactoring</div>
+                                    <div class="change-entry-desc">Better memory efficiency with large datasets.</div>
+                                </div>
+                            </div>
+                            <div class="change-category category-performance-entries">
+                                <div class="change-category-title category-performance">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                    Performance <span class="change-count">3</span>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Bootstrap computation</div>
+                                    <div class="change-entry-desc">40% faster through vectorized operations.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Intersectional analysis</div>
+                                    <div class="change-entry-desc">60% reduced memory footprint.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Permutation tests</div>
+                                    <div class="change-entry-desc">Parallel processing support.</div>
+                                </div>
+                            </div>
+                            <div class="change-category category-fixed-entries">
+                                <div class="change-category-title category-fixed">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    Fixed <span class="change-count">3</span>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Demographic parity edge case</div>
+                                    <div class="change-entry-desc">Fixed calculation when one group has zero positive predictions.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Calibration numerical stability</div>
+                                    <div class="change-entry-desc">Resolved issues with very small probabilities.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">pytest assertion messages</div>
+                                    <div class="change-entry-desc">Clearer failure diagnostics.</div>
+                                </div>
+                            </div>
+
+                            <div class="upgrade-note">
+                                <div class="upgrade-note-title">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                                    Scope Change
+                                </div>
+                                <p style="margin: 0; font-size: var(--font-size-sm); color: var(--color-gray-600);">
+                                    vfairness is no longer detection-only. With in-processing and post-processing modules, it now covers the full ML fairness pipeline.
+                                </p>
+                            </div>
+                            </div>
+                        </details>
+                    </section>
+
+                    <!-- Version 0.0.1 -->
+                    <section id="v0.0.1" class="version-section older timeline-line">
+                        <div class="timeline-dot"></div>
+                        <details class="version-details">
+                            <summary>
+                                <div class="version-header">
+                                    <h2 class="version-number">v0.0.1-alpha</h2>
+                                    <span class="version-badge badge-beta">Alpha</span>
+                                    <span class="version-date">December 2025</span>
+                                    <span class="version-toggle">
+                                        <span>Show details</span>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </span>
+                                </div>
+                                <p style="color: var(--color-gray-600); margin-bottom: 0;">Initial development release. Core fairness metrics, statistical validation, bias detection module, and MLOps integration foundations.</p>
+                            </summary>
+                            <div class="version-content">
+                            <div class="change-category category-added-entries">
+                                <div class="change-category-title category-added">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                                    Added <span class="change-count">16</span>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Core fairness analyser</div>
+                                    <div class="change-entry-desc">Classification fairness analysis with demographic parity, equal opportunity, and equalized odds.</div>
+                                    <div class="change-entry-codes">
+                                        <code>FairnessAnalyzer</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Calibration &amp; disparate impact metrics</div>
+                                    <div class="change-entry-desc">Calibration difference, predictive parity, and 80% rule calculation.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Intersectional analysis</div>
+                                    <div class="change-entry-desc">Multi-attribute fairness evaluation with automatic subgroup discovery.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Regression fairness metrics</div>
+                                    <div class="change-entry-desc">Error rate disparity and prediction gap analysis.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Statistical validation</div>
+                                    <div class="change-entry-desc">Bootstrap confidence intervals, permutation testing, and multiple testing corrections (Bonferroni, Benjamini-Hochberg).</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Effect size calculations</div>
+                                    <div class="change-entry-desc">Cohen's d, risk ratio, and odds ratio.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Bias detection module</div>
+                                    <div class="change-entry-desc">Comprehensive data-level bias analysis with historical pattern detection and representation bias.</div>
+                                    <div class="change-entry-codes">
+                                        <code>BiasDetector</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Proxy variable identification</div>
+                                    <div class="change-entry-desc">Correlation and mutual information-based detection.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">MLflow integration</div>
+                                    <div class="change-entry-desc">Native fairness logging for experiment tracking.</div>
+                                    <div class="change-entry-codes">
+                                        <code>log_fairness_to_mlflow()</code>
+                                    </div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">pytest plugin</div>
+                                    <div class="change-entry-desc">Fairness assertions in CI/CD pipelines.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Ranking fairness metrics</div>
+                                    <div class="change-entry-desc">NDKL, skew, and exposure disparity.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Training callbacks</div>
+                                    <div class="change-entry-desc">Framework-specific monitoring hooks for Keras, PyTorch, and scikit-learn.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Basic visualisation</div>
+                                    <div class="change-entry-desc">Matplotlib bar charts and heatmaps.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Report export</div>
+                                    <div class="change-entry-desc">JSON, dictionary, and structured output formats.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Sample size warnings</div>
+                                    <div class="change-entry-desc">Recommendations for adequate statistical power.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Unified API</div>
+                                    <div class="change-entry-desc">Consistent interface across classification, regression, and ranking analysers.</div>
+                                </div>
+                            </div>
+                            <div class="change-category category-fixed-entries">
+                                <div class="change-category-title category-fixed">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    Fixed <span class="change-count">3</span>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">NaN handling</div>
+                                    <div class="change-entry-desc">Fixed incorrect handling of NaN values in sensitive attribute columns.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Memory leak fix</div>
+                                    <div class="change-entry-desc">Resolved leak in iterative confidence interval computation.</div>
+                                </div>
+                                <div class="change-entry">
+                                    <div class="change-entry-title">Effect size calculations</div>
+                                    <div class="change-entry-desc">Corrected calculations for imbalanced groups.</div>
+                                </div>
+                            </div>
+
+                            <div class="upgrade-note">
+                                <div class="upgrade-note-title">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                                    Initial Development Release
+                                </div>
+                                <p style="margin: 0; font-size: var(--font-size-sm); color: var(--color-gray-600);">
+                                    First public development release. Not recommended for production use. Install from source or GitHub.
+                                </p>
+                            </div>
+                            </div>
+                        </details>
+                    </section>
+
+                                        <!-- Future Plans Section -->
+                    <section class="mt-12 py-8" style="border-top: 1px solid var(--color-gray-200);">
+                        <h2>What's Next</h2>
+                        <p>Some of the most interesting parts of vfairness are already in the code and maturing toward a full documentation page and a frozen API; others are planned. Here is where the work is heading.</p>
+
+                        <div class="cards-grid mt-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="3"/>
+                                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                                        </svg>
+                                    </div>
+                                    <h3>In progress (already in the code)</h3>
+                                </div>
+                                <ul style="font-size: var(--font-size-sm); color: var(--color-gray-600); padding-left: var(--spacing-4); margin: 0;">
+                                    <li><strong>Explainability &amp; XAI:</strong> the SHAP family, the Lundberg fairness decomposition and DiCE counterfactuals (shipping in the code today; full documentation page landing this release)</li>
+                                    <li><strong>Validity / groundedness axis:</strong> the VG-* metric family with a fail-closed LLM judge (interim, live)</li>
+                                    <li><strong>Vision representation fairness:</strong> Skew / NDKL / bias-amplification math shipped, plus an optional FairFace demographic sidecar</li>
+                                    <li>Causal fairness graphs and fairness-aware model selection</li>
+                                </ul>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                        </svg>
+                                    </div>
+                                    <h3>Planned</h3>
+                                </div>
+                                <ul style="font-size: var(--font-size-sm); color: var(--color-gray-600); padding-left: var(--spacing-4); margin: 0;">
+                                    <li>A per-symbol API reference for every top-level export</li>
+                                    <li>An owned groundedness detector to succeed the interim LLM judge</li>
+                                    <li>Continuous monitoring dashboard</li>
+                                    <li>Enterprise compliance reports</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Contributing Section -->
+                    <section class="mt-8">
+                        <div class="callout callout-info">
+                            <div class="callout-title">Contributing</div>
+                            <p>
+                                Found a bug or have a feature request? Please open an issue on
+                                <a href="https://github.com/validantai/vfairness/issues" target="_blank">GitHub</a>.
+                                We welcome contributions from the community.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- Navigation -->
+                    <div class="flex justify-between mt-12 py-8" style="border-top: 1px solid var(--color-gray-200);">
+                        <a href="references.html" class="btn btn-secondary">
+                            &larr; Academic References
+                        </a>
+                        <a href="../index.html" class="btn btn-primary">
+                            Home &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="brand-logo">
+                    <p>Systems for Trust & Agency. Building tools for responsible AI development.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Documentation</h4>
+                        <ul>
+                            <li><a href="../getting-started/index.html">Getting Started</a></li>
+                            <li><a href="../business-guide/index.html">Business Guide</a></li>
+                            <li><a href="../api-reference/index.html">API Reference</a></li>
+                            <li><a href="index.html">Concepts</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="references.html">Academic References</a></li>
+                            <li><a href="changelog.html">Changelog</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="https://validant.ai" target="_blank">validant.ai</a></li>
+                            <li><a href="https://validant.ai/imprint#publisher" target="_blank">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 validant.ai. vfairness is licensed under the Apache License 2.0.</p>
+                <div class="footer-legal">
+                    <a href="../legal/index.html">Legal</a>
+                    <span class="footer-dot">·</span>
+                    <a href="../legal/index.html#ai-usage" title="AI-Assisted Development Disclosure">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -1px; margin-right: 3px;"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/></svg>AI-Assisted
+                    </a>
+                </div>
+            </div>
+            <div class="footer-github-mobile">
+                <a href="https://github.com/validantai/vfairness" class="btn" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; vertical-align: -2px;"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="../js/main.js"></script>
+    <script>
+    /* Live library stats — reads the true, current figures generated from the
+       package manifest (scripts/refresh-manifest.sh -> data/library-stats.json)
+       so the version / status / lines-of-code stat box can never go stale. The
+       hardcoded values above are the build-time fallback if the fetch fails. */
+    (function () {
+        function fmtLoc(loc) {
+            if (!loc || typeof loc.code !== 'number') return null;
+            var k = Math.round(loc.code / 1000);
+            return { text: '~' + k + 'k', title: loc.code.toLocaleString() + ' code lines / '
+                + loc.total.toLocaleString() + ' total / ' + loc.files + ' files' };
+        }
+        function set(id, value, title) {
+            var el = document.getElementById(id);
+            if (el && value != null) { el.textContent = value; if (title) el.title = title; }
+        }
+        fetch('../data/library-stats.json', { cache: 'no-cache' })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function (s) {
+                set('stat-version', s.version);
+                set('stat-status', s.status);
+                var loc = fmtLoc(s.lines_of_code);
+                if (loc) {
+                    set('stat-loc', loc.text, loc.title + (s.version ? ' (v' + s.version + ')' : ''));
+                }
+            })
+            .catch(function () { /* keep the build-time fallback values */ });
+    })();
+    </script>
+</body>
+</html>

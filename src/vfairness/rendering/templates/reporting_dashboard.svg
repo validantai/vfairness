@@ -1,0 +1,555 @@
+{# ── Multi-Tier Event-Driven Reporting Dashboard SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# HEIGHT COMPUTATION                                                #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% set header_h = 140 %}
+{% set health_h = 100 %}
+{% set kpi_h = 56 %}
+{% set tier_h = 36 %}
+{% set metrics_header_h = 40 %}
+{% set metrics_row_h = 30 %}
+{% set metrics_h = metrics_header_h + metrics|length * metrics_row_h + 10 %}
+{% set breaches_header_h = 40 %}
+{% set breaches_row_h = 38 %}
+{% set breaches_h = (breaches_header_h + breaches|length * breaches_row_h + 10) if breaches else 0 %}
+{% set alerts_header_h = 36 %}
+{% set alerts_row_h = 26 %}
+{% set alerts_h = (alerts_header_h + min(alerts|length, 5) * alerts_row_h + 10) if alerts else 0 %}
+{% set nlg_h = 0 %}
+{% if narrative %}
+{% set _nlg = narrative|wordwrap(100) %}{% set _nlg_lines = _nlg.split('\n') %}
+{% set nlg_h = 52 + _nlg_lines|length * 16 %}
+{% endif %}
+{% set rec_header_h = 36 %}
+{% set rec_row_h = 26 %}
+{% set rec_h = (rec_header_h + recommendations|length * rec_row_h + 10) if recommendations else 0 %}
+{% set exp_h = 0 %}
+{% if explanation %}
+{% set _exp_pre = explanation|wordwrap(105) %}{% set _exp_lines_pre = _exp_pre.split('\n') %}
+{% set exp_h = 44 + _exp_lines_pre|length * 16 + 24 %}
+{% endif %}
+
+{# Y-offsets (sequential stacking) #}
+{% set health_y = header_h %}
+{% set kpi_y = health_y + health_h + 16 %}
+{% set tier_y = kpi_y + kpi_h + 12 %}
+{% set metrics_y = tier_y + tier_h + 16 %}
+{% set breaches_y = metrics_y + metrics_h + 16 %}
+{% set alerts_y = breaches_y + (breaches_h + 16 if breaches else 0) %}
+{% set nlg_y = alerts_y + (alerts_h + 16 if alerts else 0) %}
+{% set rec_y = nlg_y + (nlg_h + 16 if nlg_h else 0) %}
+{% set exp_y = rec_y + (rec_h + 16 if rec_h else 0) %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# COULD NOT CHECK                                                   #}
+{# CRITICAL: three states, never two. A dashboard handed no report must not  #}
+{# print a health score, a status colour or a KPI. Until 2026-08-27          #}
+{# reporting_dashboard_to_svg(None) fell back to a module-level demo fixture #}
+{# and rendered a complete YELLOW operational analysis of credit_risk_v3,    #}
+{# breach rows and all, for a model nobody had measured. The demo now needs  #}
+{# example=True and is watermarked. This branch collapses the whole verdict   #}
+{# stack (health, KPIs, tier, metric grid) to one panel that states the      #}
+{# absence; the breach and alert panels already self-suppress on empty lists. #}
+{% if not_assessable %}
+{# N-07. The panel used to hard-code "No report was supplied", but the adapter
+   raises this branch for TWO different absences and passes the right sentence
+   in `not_assessable_reason`. On the second one, a report that WAS supplied but
+   carried no health score, the canvas contradicted itself four lines apart: the
+   subtitle said "No health score was reported: the scorecard is withheld, not
+   zero" and the panel underneath said "No report was supplied". A reader
+   resolving that contradiction has to guess which half to believe, on a surface
+   whose entire job is to say what was and was not measured.
+   The reason is 122 characters in one case and 208 in the other, so the panel
+   is sized from the WRAPPED text rather than fixed. Two lines still compute to
+   the historic 96, so a canvas that fitted before is unchanged. #}
+{% set _na_reason = not_assessable_reason|default('', true) %}
+{% set _na_lines = (_na_reason|wordwrap(88)).split('\n') if _na_reason else ['No report was supplied, so no metric was evaluated and no threshold was applied.'] %}
+{% set notice_h = 60 + _na_lines|length * 18 %}
+{% set health_y = header_h %}
+{# N-08. breaches_y and alerts_y were the two offsets this branch forgot to
+   recompute, while health_y, nlg_y, rec_y, exp_y and total_h were all rebased
+   onto the notice panel. It was latent only because the adapter passes both
+   lists empty and the panels self-suppress: any caller that raised
+   not_assessable WITH a breach or alert row would have drawn it at an offset
+   derived from the collapsed metric grid, on top of the notice. Recomputed in
+   the same sequential order as the main stack, so the latency is gone rather
+   than merely undisturbed. #}
+{% set breaches_y = header_h + notice_h + 16 %}
+{% set alerts_y = breaches_y + (breaches_h + 16 if breaches else 0) %}
+{% set nlg_y = alerts_y + (alerts_h + 16 if alerts else 0) %}
+{% set rec_y = nlg_y + (nlg_h + 16 if nlg_h else 0) %}
+{% set exp_y = rec_y + (rec_h + 16 if rec_h else 0) %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# HEADER BAR                                                       #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+<text x="644" y="32" text-anchor="end" font-size="9" fill="#b0b8c4">{{ timestamp }}</text>
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── EXAMPLE band ── #}
+{# The demo tiers are reachable only through example=True, and when one is used #}
+{# the canvas has to say so where a reader looks, not only in the <desc>. DO    #}
+{# NOT REMOVE: the band and the watermark are the only things separating a      #}
+{# sample from an audit artifact once the SVG is exported. #}
+{% if is_example %}
+<rect x="0" y="54" width="680" height="20" fill="#fef3c7"/>
+<text x="340" y="68" text-anchor="middle" font-size="9.5" font-weight="700" fill="#92400e" letter-spacing="0.8">EXAMPLE ONLY: SYNTHETIC DEMONSTRATION DATA, NOT A REAL EVALUATION</text>
+{% endif %}
+
+{# ── Title + Subtitle ── #}
+<text x="36" y="92" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="114" font-size="10" fill="#64748b">{{ subtitle }}</text>
+{% if model_name %}
+<text x="36" y="130" font-size="9" fill="#94a3b8">Model: {{ model_name }}{% if model_version %} · v{{ model_version }}{% endif %}</text>
+{% endif %}
+
+{# ── Ungraded count, in the HEADLINE BAND ──
+   The headline of this dashboard is a health score and a status colour, and
+   both are computed over the GRADED rows only. A row nobody compared to a
+   threshold was named far below, in the narrative panel, while the number a
+   reader takes away sat up here with nothing beside it. Counted off the SAME
+   `could_not_check` flag the metric rows below branch on, so the chip and the
+   rows cannot drift apart, and absent for a fully graded run so a healthy
+   canvas is unchanged. #}
+{% set _nc = (metrics or []) | selectattr('could_not_check', 'defined') | selectattr('could_not_check') | list | length %}
+{% if _nc %}
+<rect x="424" y="102" width="256" height="24" rx="12" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+<text x="440" y="118" font-size="9.5" font-weight="700" fill="#64748b">COULD NOT CHECK: {{ _nc }} metric(s) not graded</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# NOTHING WAS ASSESSED PANEL  (see the CRITICAL note above)         #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if not_assessable %}
+<rect x="36" y="{{ health_y }}" width="644" height="{{ notice_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ health_y }}" width="2.5" height="{{ notice_h }}" rx="1" fill="#64748b"/>
+<rect x="520" y="{{ health_y + 20 }}" width="140" height="28" rx="14" fill="#f1f5f9"/>
+<text x="590" y="{{ health_y + 39 }}" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b">NOT CHECKED</text>
+<text x="56" y="{{ health_y + 32 }}" font-size="15" font-weight="700" fill="#64748b">Nothing was assessed</text>
+{% for _na_line in _na_lines %}
+<text x="56" y="{{ health_y + 56 + loop.index0 * 18 }}" font-size="10.5" fill="#64748b">{{ _na_line }}</text>
+{% endfor %}
+{% else %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# HEALTH SCORE PANEL                                               #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ health_y }}" width="644" height="{{ health_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ health_y }}" width="2.5" height="{{ health_h }}" rx="1" fill="{{ status_color }}"/>
+
+{# Health score gauge (large number) #}
+<text x="56" y="{{ health_y + 20 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">FAIRNESS HEALTH SCORE</text>
+<text x="56" y="{{ health_y + 64 }}" font-size="38" font-weight="800" fill="{{ status_color }}">{{ health_score }}</text>
+<text x="{{ 56 + (health_score|string|length) * 24 + 8 }}" y="{{ health_y + 64 }}" font-size="16" font-weight="400" fill="#94a3b8">/100</text>
+
+{# Status badge #}
+<rect x="240" y="{{ health_y + 30 }}" width="100" height="30" rx="15" fill="{{ status_bg }}"/>
+<text x="290" y="{{ health_y + 50 }}" text-anchor="middle" font-size="12" font-weight="700" fill="{{ status_color }}">{{ status_label }}</text>
+
+{# Trend indicator #}
+<text x="360" y="{{ health_y + 22 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">TREND</text>
+{% if trend == 'improving' %}
+<text x="360" y="{{ health_y + 48 }}" font-size="20" font-weight="700" fill="#059669">+</text>
+<text x="380" y="{{ health_y + 48 }}" font-size="12" font-weight="600" fill="#059669">Improving</text>
+{% elif trend == 'degrading' %}
+<text x="360" y="{{ health_y + 48 }}" font-size="20" font-weight="700" fill="#dc2626">-</text>
+<text x="380" y="{{ health_y + 48 }}" font-size="12" font-weight="600" fill="#dc2626">Degrading</text>
+{% else %}
+<text x="360" y="{{ health_y + 48 }}" font-size="20" font-weight="700" fill="#3b82f6">=</text>
+<text x="380" y="{{ health_y + 48 }}" font-size="12" font-weight="600" fill="#3b82f6">Stable</text>
+{% endif %}
+{% if trend_slope is defined %}
+<text x="360" y="{{ health_y + 66 }}" font-size="9" fill="#94a3b8">slope: {{ trend_slope }}/day</text>
+{% endif %}
+
+{# Event trigger #}
+<rect x="500" y="{{ health_y + 14 }}" width="170" height="72" rx="8" fill="#f8fafc"/>
+<text x="516" y="{{ health_y + 32 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.5">EVENT TRIGGER</text>
+<text x="516" y="{{ health_y + 50 }}" font-size="10" font-weight="600" fill="#0f172a">{{ event_trigger }}</text>
+<text x="516" y="{{ health_y + 66 }}" font-size="8.5" fill="#6b7280">{{ event_detail }}</text>
+{% if time_window %}
+<text x="516" y="{{ health_y + 80 }}" font-size="8" fill="#94a3b8">Window: {{ time_window }}</text>
+{% endif %}
+
+{# Health bar visualization #}
+<rect x="56" y="{{ health_y + 80 }}" width="170" height="8" rx="4" fill="#f1f5f9"/>
+<rect x="56" y="{{ health_y + 80 }}" width="{{ (health_score_raw * 1.7)|int }}" height="8" rx="4" fill="{{ status_color }}" opacity="0.8"/>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# KPI CARDS ROW                                                    #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# CRITICAL: three states per KPI card, never three colour BANDS and nothing
+   else. A health record carrying no ``components`` used to send 0 for a
+   sub-score that was never computed, and `{% if kpi_compliance >= 70 %}` then
+   painted a FAILING 0/100 in #dc2626. That is a fabricated BREACH, which is not
+   the safer error: it sends someone after a compliance problem nobody measured.
+   The card states the absence instead, keyed on a per-card flag.
+
+   BOTH HALVES OF THIS FIX MUST STAY TOGETHER, 2026-08-28. The flag arm landed
+   here first while the adapter still sent `int(... or 0)` and never sent the
+   flag at all, so `default(true)` took the measured arm every time and all
+   three cards went on painting a red 0/100 for sub-scores nobody computed. The
+   template read a flag no one set: a half fix that renders exactly like no fix.
+   `adapters_reporting._from_report` now sends `kpi_<card>` as None and
+   `kpi_<card>_measured` as False for an absent component. `default(true)` is
+   kept ONLY for the `_demo_*` fixtures, which send real integers and no flag;
+   it is not a licence to leave the flag unset from a real report. #}
+{# Card 1: Metric Compliance #}
+<rect x="36" y="{{ kpi_y }}" width="152" height="{{ kpi_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ kpi_y + 18 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">METRIC COMPLIANCE</text>
+{% if kpi_compliance_measured|default(true) and kpi_compliance is not none %}
+<text x="56" y="{{ kpi_y + 42 }}" font-size="16" font-weight="700" fill="{% if kpi_compliance >= 70 %}#059669{% elif kpi_compliance >= 40 %}#f59e0b{% else %}#dc2626{% endif %}">{{ kpi_compliance }}</text>
+<text x="{{ 56 + (kpi_compliance|string|length) * 10 + 2 }}" y="{{ kpi_y + 42 }}" font-size="9" fill="#94a3b8">/100</text>
+{% else %}
+<text x="56" y="{{ kpi_y + 42 }}" font-size="10" font-weight="700" fill="#64748b">not measured</text>
+{% endif %}
+
+{# Card 2: Alert Frequency #}
+<rect x="200" y="{{ kpi_y }}" width="152" height="{{ kpi_h }}" rx="10" fill="#ffffff"/>
+<text x="220" y="{{ kpi_y + 18 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">ALERT SCORE</text>
+{% if kpi_alert_measured|default(true) and kpi_alert is not none %}
+<text x="220" y="{{ kpi_y + 42 }}" font-size="16" font-weight="700" fill="{% if kpi_alert >= 70 %}#059669{% elif kpi_alert >= 40 %}#f59e0b{% else %}#dc2626{% endif %}">{{ kpi_alert }}</text>
+<text x="{{ 220 + (kpi_alert|string|length) * 10 + 2 }}" y="{{ kpi_y + 42 }}" font-size="9" fill="#94a3b8">/100</text>
+{% else %}
+<text x="220" y="{{ kpi_y + 42 }}" font-size="10" font-weight="700" fill="#64748b">not measured</text>
+{% endif %}
+
+{# Card 3: Drift Stability #}
+<rect x="364" y="{{ kpi_y }}" width="152" height="{{ kpi_h }}" rx="10" fill="#ffffff"/>
+<text x="384" y="{{ kpi_y + 18 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">DRIFT STABILITY</text>
+{% if kpi_drift_measured|default(true) and kpi_drift is not none %}
+<text x="384" y="{{ kpi_y + 42 }}" font-size="16" font-weight="700" fill="{% if kpi_drift >= 70 %}#059669{% elif kpi_drift >= 40 %}#f59e0b{% else %}#dc2626{% endif %}">{{ kpi_drift }}</text>
+<text x="{{ 384 + (kpi_drift|string|length) * 10 + 2 }}" y="{{ kpi_y + 42 }}" font-size="9" fill="#94a3b8">/100</text>
+{% else %}
+<text x="384" y="{{ kpi_y + 42 }}" font-size="10" font-weight="700" fill="#64748b">not measured</text>
+{% endif %}
+
+{# Card 4: Alerts Count #}
+<rect x="528" y="{{ kpi_y }}" width="152" height="{{ kpi_h }}" rx="10" fill="#ffffff"/>
+<text x="548" y="{{ kpi_y + 18 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">ACTIVE ALERTS</text>
+<text x="548" y="{{ kpi_y + 42 }}" font-size="16" font-weight="700" fill="{% if n_active_alerts == 0 %}#059669{% elif n_active_alerts <= 2 %}#f59e0b{% else %}#dc2626{% endif %}">{{ n_active_alerts }}</text>
+{% if n_critical_alerts > 0 %}
+<rect x="590" y="{{ kpi_y + 28 }}" width="68" height="18" rx="9" fill="#fef2f2"/>
+<text x="624" y="{{ kpi_y + 41 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#dc2626">{{ n_critical_alerts }} CRITICAL</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# REPORT TIER INDICATOR                                            #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ tier_y }}" width="644" height="{{ tier_h }}" rx="6" fill="#ffffff"/>
+
+{# Three tier boxes #}
+{% if report_tier == 'EXECUTIVE' %}
+{% set t1_fill = '#059669' %}{% set t1_text = '#ffffff' %}{% set t1_bg = '#059669' %}
+{% set t2_fill = '#f1f5f9' %}{% set t2_text = '#94a3b8' %}{% set t3_fill = '#f1f5f9' %}{% set t3_text = '#94a3b8' %}
+{% elif report_tier == 'OPERATIONAL' %}
+{% set t1_fill = '#f1f5f9' %}{% set t1_text = '#94a3b8' %}
+{% set t2_fill = '#3b82f6' %}{% set t2_text = '#ffffff' %}{% set t2_bg = '#3b82f6' %}
+{% set t3_fill = '#f1f5f9' %}{% set t3_text = '#94a3b8' %}
+{% else %}
+{% set t1_fill = '#f1f5f9' %}{% set t1_text = '#94a3b8' %}
+{% set t2_fill = '#f1f5f9' %}{% set t2_text = '#94a3b8' %}
+{% set t3_fill = '#8b5cf6' %}{% set t3_text = '#ffffff' %}{% set t3_bg = '#8b5cf6' %}
+{% endif %}
+
+<text x="56" y="{{ tier_y + 23 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.5">REPORT TIER</text>
+
+<rect x="160" y="{{ tier_y + 6 }}" width="100" height="24" rx="12" fill="{{ t1_fill }}"/>
+<text x="210" y="{{ tier_y + 22 }}" text-anchor="middle" font-size="8" font-weight="700" fill="{{ t1_text }}">EXECUTIVE</text>
+
+<rect x="270" y="{{ tier_y + 6 }}" width="110" height="24" rx="12" fill="{{ t2_fill }}"/>
+<text x="325" y="{{ tier_y + 22 }}" text-anchor="middle" font-size="8" font-weight="700" fill="{{ t2_text }}">OPERATIONAL</text>
+
+<rect x="390" y="{{ tier_y + 6 }}" width="100" height="24" rx="12" fill="{{ t3_fill }}"/>
+<text x="440" y="{{ tier_y + 22 }}" text-anchor="middle" font-size="8" font-weight="700" fill="{{ t3_text }}">TECHNICAL</text>
+
+{# N metrics / N groups summary #}
+<text x="520" y="{{ tier_y + 23 }}" font-size="9" fill="#6b7280">{{ n_metrics }} metrics · {{ n_groups }} groups · {{ n_records }} records</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# FAIRNESS METRICS TABLE                                           #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ metrics_y }}" width="644" height="{{ metrics_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">METRIC</text>
+<text x="260" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">VALUE</text>
+<text x="340" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">THRESHOLD</text>
+<text x="430" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">BREACH</text>
+<text x="530" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">GROUPS</text>
+<text x="610" y="{{ metrics_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">STATUS</text>
+<line x1="56" y1="{{ metrics_y + 32 }}" x2="660" y2="{{ metrics_y + 32 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for m in metrics %}
+{% set ry = metrics_y + metrics_header_h + loop.index0 * metrics_row_h %}
+
+{# Row background for breached metrics #}
+{# CRITICAL: three states per row, never two. `could_not_check` is set by
+   adapters_reporting for a row whose value or threshold was missing, so the
+   comparison never ran. It has to be tested FIRST everywhere on this row: the
+   adapter is forced to send `warning=True` for such a row precisely because the
+   two-state tests below would otherwise fall through to the green PASS badge,
+   and its own comment records that it can do nothing more from its side. A row
+   nobody compared is neither a breach nor a warning nor a pass. #}
+{% if m.could_not_check %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ metrics_row_h }}" fill="#f1f5f9" opacity="0.5"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ metrics_row_h }}" fill="#64748b"/>
+{% elif m.breached %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ metrics_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ metrics_row_h }}" fill="#dc2626"/>
+{% elif m.warning %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ metrics_row_h }}" fill="#fffbeb" opacity="0.3"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ metrics_row_h }}" fill="#f59e0b"/>
+{% endif %}
+
+{# Metric name #}
+<text x="56" y="{{ ry + 19 }}" font-size="10" font-weight="500" fill="#0f172a">{{ m.name|truncate_text(28) }}</text>
+
+{# Value #}
+<text x="260" y="{{ ry + 19 }}" font-size="11" font-weight="700" fill="{{ m.color }}">{{ m.display_value }}</text>
+
+{# Threshold #}
+<text x="340" y="{{ ry + 19 }}" font-size="10" fill="#6b7280">{{ m.display_threshold }}</text>
+
+{# Breach magnitude #}
+{% if m.could_not_check %}
+<text x="430" y="{{ ry + 19 }}" font-size="10" fill="#64748b">not measured</text>
+{% elif m.breached %}
+<text x="430" y="{{ ry + 19 }}" font-size="10" font-weight="600" fill="#dc2626">+{{ m.breach_pct }}%</text>
+{% elif m.warning %}
+<text x="430" y="{{ ry + 19 }}" font-size="10" fill="#f59e0b">{{ m.margin_pct }}% margin</text>
+{% else %}
+<text x="430" y="{{ ry + 19 }}" font-size="10" fill="#94a3b8">n/a</text>
+{% endif %}
+
+{# Affected groups count #}
+{# This cell was the fabricated all-clear adapters_reporting recorded as
+   template-blocked RESIDUE: a two-state test on a bare number, so a row that
+   never counted its affected groups printed "all pass" beside the [UNCHECKED]
+   name and the NOT CHECKED threshold in the same row. No value the adapter can
+   send suppresses that (a string breaks the comparison, every number picks one
+   of the two verdicts), so the third branch has to be here. #}
+{% if m.could_not_check %}
+<text x="530" y="{{ ry + 19 }}" font-size="10" fill="#64748b">not counted</text>
+{# The FOURTH branch, and the other half of the same defect. A GRADED row whose
+   producer never counted its affected groups also printed "all pass", which is
+   a group-level all-clear nobody measured: the row's own threshold verdict says
+   nothing about how many groups the metric moved. A reported 0 still reads
+   "all pass", because that one IS a measurement. `is none` has to come before
+   the `> 0` test: Jinja raises TypeError comparing None to an int, so an
+   unreported count would take the whole render down. #}
+{% elif m.n_affected_groups is none %}
+<text x="530" y="{{ ry + 19 }}" font-size="10" fill="#64748b">not reported</text>
+{% elif m.n_affected_groups > 0 %}
+<text x="530" y="{{ ry + 19 }}" font-size="10" font-weight="600" fill="{{ m.color }}">{{ m.n_affected_groups }} affected</text>
+{% else %}
+<text x="530" y="{{ ry + 19 }}" font-size="10" fill="#94a3b8">all pass</text>
+{% endif %}
+
+{# Status badge.
+
+   CRITICAL, keep all four arms on ONE markup convention:
+   `text-anchor="middle" font-size="8" font-weight="600"`. That string is how a
+   reader SCANS the verdict column, on the canvas and in the tests, and the
+   could-not-check arm shipped at font-size 7 instead. The badge was on the
+   page and legible, but every scanner keyed on the convention read the column
+   as EMPTY for exactly the row whose verdict matters most, which is
+   indistinguishable from "no row was drawn at all". A third state that the
+   verifier cannot see is not a third state. Do not restyle one arm alone; if
+   the size must change, change all four together. #}
+{% if m.could_not_check %}
+<rect x="596" y="{{ ry + 5 }}" width="64" height="18" rx="9" fill="#f1f5f9"/>
+<text x="628" y="{{ ry + 18 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#64748b">NOT CHECKED</text>
+{% elif m.breached %}
+<rect x="600" y="{{ ry + 5 }}" width="56" height="18" rx="9" fill="#fef2f2"/>
+<text x="628" y="{{ ry + 18 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#dc2626">BREACH</text>
+{% elif m.warning %}
+<rect x="600" y="{{ ry + 5 }}" width="56" height="18" rx="9" fill="#fffbeb"/>
+<text x="628" y="{{ ry + 18 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#f59e0b">WARN</text>
+{% else %}
+<rect x="600" y="{{ ry + 5 }}" width="56" height="18" rx="9" fill="#ecfdf5"/>
+<text x="628" y="{{ ry + 18 }}" text-anchor="middle" font-size="8" font-weight="600" fill="#059669">PASS</text>
+{% endif %}
+
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + metrics_row_h }}" x2="660" y2="{{ ry + metrics_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+{% endif %}{# end of the verdict stack; see COULD NOT CHECK above #}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# THRESHOLD BREACH REPORT                                          #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if breaches %}
+<rect x="36" y="{{ breaches_y }}" width="644" height="{{ breaches_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ breaches_y }}" width="644" height="1.5" fill="#dc2626"/>
+
+<text x="56" y="{{ breaches_y + 24 }}" font-size="7.5" fill="#dc2626" letter-spacing="0.8" font-weight="600">THRESHOLD BREACH REPORT</text>
+<text x="260" y="{{ breaches_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">CURRENT</text>
+<text x="340" y="{{ breaches_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">THRESHOLD</text>
+<text x="420" y="{{ breaches_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">MAGNITUDE</text>
+<text x="520" y="{{ breaches_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">SEVERITY</text>
+<line x1="56" y1="{{ breaches_y + 32 }}" x2="660" y2="{{ breaches_y + 32 }}" stroke="#dc2626" stroke-width="0.5" opacity="0.3"/>
+
+{% for b in breaches %}
+{% set by = breaches_y + breaches_header_h + loop.index0 * breaches_row_h %}
+
+{# Severity color strip #}
+{% if b.severity == 'critical' %}
+<rect x="36" y="{{ by }}" width="2.5" height="{{ breaches_row_h }}" fill="#dc2626"/>
+<rect x="36" y="{{ by }}" width="644" height="{{ breaches_row_h }}" fill="#fef2f2" opacity="0.2"/>
+{% elif b.severity == 'high' %}
+<rect x="36" y="{{ by }}" width="2.5" height="{{ breaches_row_h }}" fill="#f97316"/>
+{% else %}
+<rect x="36" y="{{ by }}" width="2.5" height="{{ breaches_row_h }}" fill="#f59e0b"/>
+{% endif %}
+
+{# Metric name + affected group #}
+<text x="56" y="{{ by + 16 }}" font-size="10" font-weight="600" fill="#0f172a">{{ b.metric_name|truncate_text(28) }}</text>
+<text x="56" y="{{ by + 30 }}" font-size="8.5" fill="#6b7280">{{ b.affected_groups }}</text>
+
+{# Current value #}
+<text x="260" y="{{ by + 20 }}" font-size="11" font-weight="700" fill="#dc2626">{{ b.display_value }}</text>
+
+{# Threshold #}
+<text x="340" y="{{ by + 20 }}" font-size="10" fill="#6b7280">{{ b.display_threshold }}</text>
+
+{# Breach magnitude bar #}
+<rect x="420" y="{{ by + 10 }}" width="80" height="10" rx="3" fill="#fef2f2"/>
+<rect x="420" y="{{ by + 10 }}" width="{{ min(80, b.bar_w) }}" height="10" rx="3" fill="#dc2626" opacity="0.7"/>
+<text x="506" y="{{ by + 20 }}" font-size="9" font-weight="600" fill="#dc2626">+{{ b.breach_pct }}%</text>
+
+{# Severity badge #}
+{% if b.severity == 'critical' %}
+<rect x="520" y="{{ by + 6 }}" width="70" height="20" rx="10" fill="#fef2f2"/>
+<text x="555" y="{{ by + 20 }}" text-anchor="middle" font-size="8" font-weight="700" fill="#dc2626">CRITICAL</text>
+{% elif b.severity == 'high' %}
+<rect x="520" y="{{ by + 6 }}" width="70" height="20" rx="10" fill="#fff7ed"/>
+<text x="555" y="{{ by + 20 }}" text-anchor="middle" font-size="8" font-weight="700" fill="#f97316">HIGH</text>
+{% else %}
+<rect x="520" y="{{ by + 6 }}" width="70" height="20" rx="10" fill="#fffbeb"/>
+<text x="555" y="{{ by + 20 }}" text-anchor="middle" font-size="8" font-weight="700" fill="#f59e0b">MEDIUM</text>
+{% endif %}
+
+{# NLG insight per breach #}
+{% if b.insight %}
+<text x="600" y="{{ by + 20 }}" font-size="8" fill="#6b7280" font-style="italic">{{ b.insight|truncate_text(12) }}</text>
+{% endif %}
+
+{% if not loop.last %}
+<line x1="56" y1="{{ by + breaches_row_h }}" x2="660" y2="{{ by + breaches_row_h }}" stroke="#fecaca" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# ALERT SUMMARY                                                    #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if alerts %}
+<rect x="36" y="{{ alerts_y }}" width="644" height="{{ alerts_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ alerts_y + 22 }}" font-size="11" font-weight="700" fill="#0f172a">Recent Alerts</text>
+<text x="250" y="{{ alerts_y + 22 }}" font-size="9" fill="#94a3b8">{{ alerts|length }} total in window</text>
+<line x1="56" y1="{{ alerts_y + 30 }}" x2="660" y2="{{ alerts_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+
+{% for a in alerts[:5] %}
+{% set ay = alerts_y + alerts_header_h + loop.index0 * alerts_row_h %}
+
+{# Severity dot #}
+{% if a.severity == 'CRITICAL' %}
+<circle cx="62" cy="{{ ay + 10 }}" r="4" fill="#dc2626"/>
+{% elif a.severity == 'WARNING' %}
+<circle cx="62" cy="{{ ay + 10 }}" r="4" fill="#f59e0b"/>
+{% else %}
+<circle cx="62" cy="{{ ay + 10 }}" r="4" fill="#3b82f6"/>
+{% endif %}
+
+{# Alert info #}
+<text x="74" y="{{ ay + 14 }}" font-size="9" font-weight="600" fill="#0f172a">[{{ a.severity }}]</text>
+<text x="140" y="{{ ay + 14 }}" font-size="9" fill="#475569">{{ a.metric_name|truncate_text(25) }}</text>
+<text x="380" y="{{ ay + 14 }}" font-size="8.5" fill="#6b7280">{{ a.message|truncate_text(30) }}</text>
+<text x="620" y="{{ ay + 14 }}" font-size="8" fill="#94a3b8" text-anchor="end">{{ a.time_ago }}</text>
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# NLG NARRATIVE PANEL                                              #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if narrative %}
+{% set _nlg = narrative|wordwrap(100) %}{% set _nlg_lines = _nlg.split('\n') %}
+<rect x="36" y="{{ nlg_y }}" width="644" height="{{ nlg_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ nlg_y }}" width="2.5" height="{{ nlg_h }}" rx="1" fill="{{ status_color }}"/>
+
+<text x="56" y="{{ nlg_y + 22 }}" font-size="8" font-weight="600" fill="{{ status_color }}" letter-spacing="0.5">AUTOMATED NARRATIVE (NLG)</text>
+{% if report_tier %}
+<text x="260" y="{{ nlg_y + 22 }}" font-size="8" fill="#94a3b8">{{ report_tier }} tier, audience-adapted</text>
+{% endif %}
+<line x1="56" y1="{{ nlg_y + 32 }}" x2="660" y2="{{ nlg_y + 32 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+
+{% for line in _nlg_lines %}
+<text x="56" y="{{ nlg_y + 50 + loop.index0 * 16 }}" font-size="10" fill="#334155">{{ line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# RECOMMENDATIONS                                                  #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if recommendations %}
+<rect x="36" y="{{ rec_y }}" width="644" height="{{ rec_h }}" rx="10" fill="#ffffff"/>
+<text x="56" y="{{ rec_y + 22 }}" font-size="7.5" font-weight="600" fill="#94a3b8" letter-spacing="0.8">RECOMMENDATIONS</text>
+<line x1="56" y1="{{ rec_y + 30 }}" x2="660" y2="{{ rec_y + 30 }}" stroke="#f1f5f9" stroke-width="0.5"/>
+
+{% for rec in recommendations %}
+{% set ry = rec_y + rec_header_h + loop.index0 * rec_row_h %}
+{# Priority indicator #}
+{% if rec.priority == 'critical' %}
+<rect x="48" y="{{ ry + 2 }}" width="16" height="16" rx="8" fill="#fef2f2"/>
+<text x="56" y="{{ ry + 14 }}" text-anchor="middle" font-size="8" font-weight="700" fill="#dc2626">!</text>
+{% elif rec.priority == 'high' %}
+<rect x="48" y="{{ ry + 2 }}" width="16" height="16" rx="8" fill="#fff7ed"/>
+<text x="56" y="{{ ry + 14 }}" text-anchor="middle" font-size="8" font-weight="700" fill="#f97316">!</text>
+{% else %}
+<rect x="48" y="{{ ry + 2 }}" width="16" height="16" rx="8" fill="#f1f5f9"/>
+<text x="56" y="{{ ry + 14 }}" text-anchor="middle" font-size="7" font-weight="700" fill="#64748b">{{ loop.index }}</text>
+{% endif %}
+<text x="72" y="{{ ry + 14 }}" font-size="9.5" fill="#0f172a">{{ rec.text|truncate_text(95) }}</text>
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# EXPLANATION PANEL                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── EXAMPLE watermark, painted last so it survives every panel above it ── #}
+{# Repeated down a tall canvas so a crop or a screenshot of one section cannot #}
+{# lose the only mark that separates a sample from a finding. #}
+{% if is_example %}
+{% for _p in ([22, 50, 78] if total_h > 1100 else [50]) %}
+{% set _wy = (total_h * _p / 100)|int %}
+<text x="340" y="{{ _wy }}" text-anchor="middle" font-size="76" font-weight="800" fill="#92400e" opacity="0.12" letter-spacing="6" transform="rotate(-24 340 {{ _wy }})">EXAMPLE</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

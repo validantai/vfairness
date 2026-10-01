@@ -1,0 +1,90 @@
+name: Security
+
+# Static analysis and dependency auditing for vfairness (VB-SEC-4, VB-SEC-8),
+# plus CodeQL. Runs on every push and pull request, and weekly so a
+# vulnerability disclosed after a merge is still found.
+#
+# ROOT-RELATIVE BY DESIGN. This file lives in the vfairness/ subtree of the
+# private development monorepo and becomes active only in the PUBLIC repo
+# (validantai/vfairness), where that subtree IS the repo root: pyproject.toml
+# and src/ sit at the top level. So there is no `vfairness/` path prefix and no
+# `defaults.run.working-directory` here, unlike the monorepo's own copy of this
+# gate. release.yml carries the same transformation.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-analysis:
+    name: Bandit + pip-audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install bandit pip-audit
+      - name: Bandit (source security scan)
+        # -ll: report medium and high severity; the metrics core must not
+        # swallow errors or use unsafe deserialization (VB-SEC-4, VB-SEC-6).
+        run: bandit -r src -ll
+      - name: pip-audit (known-vulnerability scan)
+        # Audit the resolved DEPENDENCY set, not the environment. An environment
+        # audit makes --strict abort on the editable project itself with
+        # "Dependency not found on PyPI and could not be audited".
+        # --skip-editable does NOT help: --strict counts a skipped distribution
+        # as a collection failure too ("distribution marked as editable").
+        # Freezing without the editable project leaves exactly the third-party
+        # tree, still under --strict, so a genuinely unauditable dependency
+        # keeps failing the build.
+        run: |
+          python -m pip install -e .
+          python -m pip freeze --exclude-editable > /tmp/audit-requirements.txt
+          pip-audit --strict --desc -r /tmp/audit-requirements.txt
+
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    # Two self-arming guards. Neither is a convention to be tidied away.
+    #
+    # 1. THE REPOSITORY MUST BE PUBLIC. Code scanning is free on a public repo,
+    #    but on a private repo without GitHub Advanced Security the SARIF upload
+    #    can only ever 403. This condition is what lets the same file sit in the
+    #    private monorepo's subtree, where it skips, and run for real here.
+    #
+    # 2. A PULL REQUEST MUST COME FROM THIS REPOSITORY, NOT A FORK. A fork PR
+    #    gets a read-only GITHUB_TOKEN, so `security-events: write` is not
+    #    actually granted and the upload cannot succeed. Skipping is honest;
+    #    red-crossing every outside contribution is not. A fork's code is still
+    #    analysed by the push and schedule runs once it lands on main.
+    #
+    # Verified 2026-08-28 that this repo has NO code-scanning "default setup"
+    # configured (GET /repos/validantai/vfairness/code-scanning/default-setup ->
+    # {"state":"not-configured"}), so this advanced configuration does not
+    # conflict with one. If someone enables default setup later, this job starts
+    # failing with "analyses from advanced configurations cannot be processed
+    # when the default setup is enabled" — pick one, do not run both.
+    if: >-
+      github.event.repository.private == false &&
+      (github.event_name != 'pull_request' ||
+       github.event.pull_request.head.repo.full_name == github.repository)
+    permissions:
+      # Job-level permissions REPLACE the workflow-level block, so contents:read
+      # must be repeated here or actions/checkout cannot clone the repo
+      # ("remote: Repository not found") if it is ever made private.
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: github/codeql-action/init@c4dd10e44af883a891fe31ced449bcb4a6728b9b  # v3
+        with:
+          languages: python
+      - uses: github/codeql-action/analyze@c4dd10e44af883a891fe31ced449bcb4a6728b9b  # v3

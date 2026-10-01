@@ -1,0 +1,234 @@
+{# ── CalibrationAnalyzer · Report SVG Template ── #}
+{# ── vfairness Design System v4 · 680-width layout ── #}
+
+{# ── Height computation ── #}
+{% set header_h = 140 %}
+{% set scores_h = 70 %}
+{% set table_header_h = 40 %}
+{% set table_row_h = 40 %}
+{% set table_h = table_header_h + groups|length * table_row_h + 10 %}
+{# A table with no rows still needs room for the sentence that says so. #}
+{% if not groups %}{% set table_h = table_header_h + 34 %}{% endif %}
+{# The could-not-check panel grows the same third line the disparity verdict #}
+{# uses, so it must not be sized as if it were the terse all-clear. #}
+{% set disparity_h = 60 if (disparity_assessable and not has_disparity) else 80 %}
+{% set recs_h = 60 + recommendations|length * 22 if recommendations else 0 %}
+{% if explanation %}{% set _pre_exp = explanation|wordwrap(105) %}{% set exp_h = 44 + _pre_exp.split('\n')|length * 16 %}{% else %}{% set exp_h = 0 %}{% endif %}
+
+{% set table_y = header_h + scores_h %}
+{% set disparity_y = table_y + table_h + 16 %}
+{% set recs_y = disparity_y + disparity_h + 16 %}
+{% set exp_y = recs_y + recs_h + 16 if recommendations else disparity_y + disparity_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+<svg xmlns="http://www.w3.org/2000/svg" font-family="'Inter','Segoe UI',system-ui,sans-serif" viewBox="0 0 680 {{ total_h }}">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header bar ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}
+<text x="644" y="32" text-anchor="end" font-size="9" fill="#b0b8c4">{{ timestamp }}</text>
+{% endif %}
+<rect x="36" y="52" width="644" height="1.5" fill="url(#accent)"/>
+
+{# ── COULD NOT CHECK band ── #}
+{# DO NOT REMOVE, and do not move this into the <desc>. An SVG is an export: it #}
+{# is attached to a ticket, pasted into a report and read months later by       #}
+{# someone who never saw the run. Until 2026-08-27 an empty CalibrationReport   #}
+{# rendered ECE/MCE/BRIER 0.000, a red MISCALIBRATED badge and a green NO       #}
+{# DISPARITY panel reading "All groups are similarly well-calibrated" on ONE    #}
+{# canvas, across zero groups. This band is where a reader learns that nothing  #}
+{# behind those numbers was measured. It is NOT a rejection: could-not-check is #}
+{# neither a pass nor a fail, and the wording must never imply either.          #}
+{% if not_assessable %}
+<rect x="0" y="54" width="680" height="20" fill="{{ unknown_bg|default('#f1f5f9') }}"/>
+<text x="340" y="68" text-anchor="middle" font-size="9" font-weight="600" fill="{{ unknown_color|default('#64748b') }}">{{ not_assessable_text|default('NOT ASSESSABLE') }}: {{ overall_reason|default('nothing on this canvas was measured.')|truncate_text(118) }}</text>
+{% endif %}
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a" letter-spacing="-0.3">{{ title }}</text>
+<text x="36" y="122" font-size="10" fill="#64748b">{{ n_groups }} group{{ 's' if n_groups != 1 else '' }} analysed{% if protected_attribute %} by {{ protected_attribute }}{% endif %}{% if not_assessable %} · this report certifies neither calibration nor its absence{% endif %}</text>
+
+{# ── Score badges ── #}
+{# Three states, never two. The slate is neither the pass green nor the fail    #}
+{# red: a run that measured no ECE has not been found miscalibrated.            #}
+{# `is_well_calibrated is none` is the WITHHELD verdict, and it is tested here  #}
+{# rather than relying on falsiness: CalibrationReport.is_well_calibrated is    #}
+{# Optional[bool] and the analyzer sets None on purpose, `bool(None)` is False, #}
+{# and without this branch a withheld verdict fell to the else below and        #}
+{# painted the red MISCALIBRATED badge, a breach nobody measured. A data dict   #}
+{# that OMITS the key is the same state and gets the same branch, which is why  #}
+{# there is no |default here: an absent verdict is not a negative one.          #}
+{% if not overall_assessable or is_well_calibrated is none %}
+{% set cal_color = unknown_color|default('#64748b') %}
+{% set cal_bg = unknown_bg|default('#f1f5f9') %}
+{% set cal_label = not_assessable_text|default('NOT ASSESSABLE') %}
+{% elif is_well_calibrated %}
+{% set cal_color = '#059669' %}
+{% set cal_bg = '#ecfdf5' %}
+{% set cal_label = 'WELL CALIBRATED' %}
+{% else %}
+{% set cal_color = '#dc2626' %}
+{% set cal_bg = '#fef2f2' %}
+{% set cal_label = 'MISCALIBRATED' %}
+{% endif %}
+
+{# ECE / MCE / Brier row #}
+<rect x="36" y="{{ header_h }}" width="200" height="56" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ header_h }}" width="2.5" height="56" rx="1" fill="{{ cal_color }}"/>
+<text x="56" y="{{ header_h + 16 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">ECE</text>
+<text x="56" y="{{ header_h + 40 }}" font-size="20" font-weight="700" fill="{{ cal_color }}">{{ ece|f3 }}</text>
+<text x="120" y="{{ header_h + 16 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">MCE</text>
+<text x="120" y="{{ header_h + 40 }}" font-size="20" font-weight="700" fill="#475569">{{ mce|f3 }}</text>
+<text x="180" y="{{ header_h + 16 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">BRIER</text>
+<text x="180" y="{{ header_h + 40 }}" font-size="20" font-weight="700" fill="#475569">{{ brier|f3 }}</text>
+
+{# Calibration status badge #}
+<rect x="520" y="{{ header_h }}" width="160" height="56" rx="10" fill="#ffffff"/>
+<rect x="520" y="{{ header_h }}" width="2.5" height="56" rx="1" fill="{{ cal_color }}"/>
+<text x="536" y="{{ header_h + 16 }}" font-size="8" font-weight="600" fill="#94a3b8" letter-spacing="0.5">CALIBRATION</text>
+<rect x="536" y="{{ header_h + 24 }}" width="120" height="22" rx="11" fill="{{ cal_bg }}"/>
+<text x="596" y="{{ header_h + 39 }}" text-anchor="middle" font-size="10" font-weight="600" fill="{{ cal_color }}">{{ cal_label }}</text>
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Group Calibration Table                                           #}
+{# ══════════════════════════════════════════════════════════════════ #}
+<rect x="36" y="{{ table_y }}" width="644" height="{{ table_h }}" rx="10" fill="#ffffff"/>
+
+{# Column headers #}
+<text x="56" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">GROUP</text>
+<text x="260" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">ECE</text>
+<text x="370" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">MCE</text>
+<text x="480" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">BRIER</text>
+<text x="580" y="{{ table_y + 24 }}" font-size="7.5" fill="#94a3b8" letter-spacing="0.8" font-weight="600">CALIBRATION</text>
+<line x1="56" y1="{{ table_y + 32 }}" x2="660" y2="{{ table_y + 32 }}" stroke="#475569" stroke-width="0.75"/>
+
+{% for g in groups %}
+{% set ry = table_y + table_header_h + loop.index0 * table_row_h %}
+
+{# Highlight worst group #}
+{% if has_disparity and g.group == worst_group %}
+<rect x="36" y="{{ ry }}" width="644" height="{{ table_row_h }}" fill="#fef2f2" opacity="0.3"/>
+<rect x="36" y="{{ ry }}" width="2.5" height="{{ table_row_h }}" fill="#dc2626"/>
+{% endif %}
+
+<text x="56" y="{{ ry + 16 }}" font-size="10.5" font-weight="500" fill="#0f172a">{{ g.group }}</text>
+{% if has_disparity and g.group == best_group %}
+<text x="56" y="{{ ry + 28 }}" font-size="8.5" fill="#059669">Best calibrated</text>
+{% elif has_disparity and g.group == worst_group %}
+<text x="56" y="{{ ry + 28 }}" font-size="8.5" fill="#dc2626">Most miscalibrated</text>
+{% endif %}
+
+{# ECE with inline bar. A group whose ECE was never supplied has an empty      #}
+{# track and prints N/A: the old `metrics.get("ece", 0)` default drew a 4px    #}
+{# bar, printed 0.000 and lit the green GOOD pill for a measurement that does  #}
+{# not exist. #}
+<rect x="260" y="{{ ry + 4 }}" width="80" height="8" rx="3" fill="#e2e8f0"/>
+{% if g.ece is not none %}
+{% set ece_bw = min(80, max(4, (g.ece * 800)|int)) %}
+<rect x="260" y="{{ ry + 4 }}" width="{{ ece_bw }}" height="8" rx="3" fill="{{ g.color }}"/>
+{% endif %}
+<text x="260" y="{{ ry + 26 }}" font-size="13" font-weight="700" fill="{{ g.color if g.ece is not none else unknown_color|default('#64748b') }}">{{ g.ece|f3 }}</text>
+
+{# MCE #}
+<text x="370" y="{{ ry + 20 }}" font-size="13" font-weight="700" fill="#475569">{{ g.mce|f3 }}</text>
+
+{# Brier #}
+<text x="480" y="{{ ry + 20 }}" font-size="13" font-weight="700" fill="#475569">{{ g.brier|f3 }}</text>
+
+{# Calibration quality indicator #}
+{% if g.ece is none %}
+<rect x="572" y="{{ ry + 6 }}" width="68" height="20" rx="10" fill="{{ unknown_bg|default('#f1f5f9') }}"/>
+<text x="606" y="{{ ry + 20 }}" text-anchor="middle" font-size="7.5" font-weight="600" fill="{{ unknown_color|default('#64748b') }}">NOT MEASURED</text>
+{% elif g.ece < 0.05 %}
+<rect x="572" y="{{ ry + 6 }}" width="68" height="20" rx="10" fill="#ecfdf5"/>
+<text x="606" y="{{ ry + 20 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#059669">GOOD</text>
+{% elif g.ece < 0.1 %}
+<rect x="572" y="{{ ry + 6 }}" width="68" height="20" rx="10" fill="#fef3c7"/>
+<text x="606" y="{{ ry + 20 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#f59e0b">FAIR</text>
+{% else %}
+<rect x="572" y="{{ ry + 6 }}" width="68" height="20" rx="10" fill="#fef2f2"/>
+<text x="606" y="{{ ry + 20 }}" text-anchor="middle" font-size="9" font-weight="600" fill="#dc2626">POOR</text>
+{% endif %}
+
+{% if not loop.last %}
+<line x1="56" y1="{{ ry + table_row_h }}" x2="660" y2="{{ ry + table_row_h }}" stroke="#cbd5e1" stroke-width="0.5"/>
+{% endif %}
+{% endfor %}
+{# An empty grid is silent, and silence under a header row reads as agreement. #}
+{% if not groups %}
+<text x="56" y="{{ table_y + table_header_h + 16 }}" font-size="10" fill="#64748b">No group's calibration was measured on this run, so no row here is well calibrated and none is miscalibrated.</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Disparity Finding Panel                                          #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Three states, never two. A spread between groups does not exist until TWO   #}
+{# groups have been measured, so with fewer than two this panel withholds the  #}
+{# number and says so. NEVER collapse the first branch into the green else:    #}
+{# "All groups are similarly well-calibrated" printed across zero groups is a  #}
+{# fabricated all-clear, and it used to sit on the same canvas as a fabricated #}
+{# MISCALIBRATED badge. #}
+{% if not disparity_assessable %}
+{% set disp_color = unknown_color|default('#64748b') %}
+{% set disp_bg = unknown_bg|default('#f1f5f9') %}
+{% set disp_label = not_assessable_text|default('NOT ASSESSABLE') %}
+{% elif has_disparity %}
+{% set disp_color = '#dc2626' %}
+{% set disp_bg = '#fef2f2' %}
+{% set disp_label = 'DISPARITY DETECTED' %}
+{% else %}
+{% set disp_color = '#059669' %}
+{% set disp_bg = '#ecfdf5' %}
+{% set disp_label = 'NO DISPARITY' %}
+{% endif %}
+<rect x="36" y="{{ disparity_y }}" width="644" height="{{ disparity_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ disparity_y }}" width="2.5" height="{{ disparity_h }}" rx="1" fill="{{ disp_color }}"/>
+<text x="56" y="{{ disparity_y + 20 }}" font-size="8" font-weight="600" fill="{{ disp_color }}" letter-spacing="0.5">{{ disp_label }}</text>
+<text x="220" y="{{ disparity_y + 20 }}" font-size="10.5" font-weight="600" fill="#0f172a">Calibration Disparity Assessment</text>
+<line x1="56" y1="{{ disparity_y + 30 }}" x2="660" y2="{{ disparity_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+<text x="56" y="{{ disparity_y + 48 }}" font-size="9.5" fill="#6b7280">ECE disparity: </text>
+<text x="140" y="{{ disparity_y + 48 }}" font-size="11" font-weight="700" fill="{{ disp_color }}">{{ ece_disparity|f3 }}</text>
+{% if not disparity_assessable %}
+<text x="56" y="{{ disparity_y + 66 }}" font-size="9.5" fill="#6b7280">Not compared: {{ disparity_reason|default('no two groups were measured.') }} This panel neither clears nor faults the model.</text>
+{% elif has_disparity %}
+<text x="56" y="{{ disparity_y + 66 }}" font-size="9.5" fill="#6b7280">Most miscalibrated: {{ worst_group }} · best calibrated: {{ best_group }}</text>
+{% else %}
+<text x="56" y="{{ disparity_y + 66 }}" font-size="9.5" fill="#6b7280">All groups are similarly well-calibrated.</text>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Recommendations Panel                                             #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if recommendations %}
+<rect x="36" y="{{ recs_y }}" width="644" height="{{ recs_h }}" rx="10" fill="#ffffff"/>
+<rect x="36" y="{{ recs_y }}" width="2.5" height="{{ recs_h }}" rx="1" fill="#3b82f6"/>
+<text x="56" y="{{ recs_y + 20 }}" font-size="8" font-weight="600" fill="#3b82f6" letter-spacing="0.5">RECOMMENDED</text>
+<text x="160" y="{{ recs_y + 20 }}" font-size="10.5" font-weight="600" fill="#0f172a">{{ recommendation_strategy }}</text>
+<line x1="56" y1="{{ recs_y + 30 }}" x2="660" y2="{{ recs_y + 30 }}" stroke="#e2e8f0" stroke-width="0.5"/>
+{% for rec in recommendations %}
+<text x="66" y="{{ recs_y + 48 + loop.index0 * 22 }}" font-size="9.5" fill="#6b7280">{{ loop.index }}. {{ rec|truncate_text(105) }}</text>
+{% endfor %}
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════════════ #}
+{# Explanation Panel                                                 #}
+{# ══════════════════════════════════════════════════════════════════ #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}
+{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}
+<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>
+{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

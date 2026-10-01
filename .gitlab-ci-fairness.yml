@@ -1,0 +1,75 @@
+# GitLab CI/CD Fairness Checks
+# Include in your .gitlab-ci.yml:
+#   include:
+#     - local: '.gitlab-ci-fairness.yml'
+
+stages:
+  - fairness
+
+fairness-tests:
+  stage: fairness
+  image: python:3.11-slim
+  script:
+    # CPU-only torch first: the default Linux wheel pulls the CUDA runtime
+    # (~2.5 GB) onto a runner with no GPU. The extras install then sees the
+    # requirement satisfied.
+    - pip install --index-url https://download.pytorch.org/whl/cpu torch
+    # Every extra the suite exercises. DO NOT TRIM: until 2026-08-27 this read
+    # "[dev,rendering,viz,monitoring]" under a comment claiming the full suite
+    # ran, while 60 tests (xai, torch fairness losses, fairlearn/aif360 parity)
+    # importorskip'd silently and the job still reported green.
+    - pip install -e ".[dev,rendering,viz,monitoring,xai,training,parity]"
+    # Run the WHOLE suite (dropped '-m fairness': that marker matches zero
+    # tests). --cov-fail-under is set just under the measured baseline so
+    # coverage can only ratchet up. VFAIRNESS_REQUIRE_BACKENDS=1 turns a
+    # missing optional backend into a named failure; -rs shows every skip.
+    # Re-baselined 30 -> 55 on 2026-08-27, matching the GitHub gate: coverage
+    # measured 66.88% once the extras above actually install and a coverage wave
+    # added 226 behavioural tests. A gate nothing can trip is not a gate.
+    - VFAIRNESS_REQUIRE_BACKENDS=1 python -m pytest --tb=short -rs --junitxml=fairness-results.xml
+      --cov=vfairness --cov-report=term-missing --cov-report=xml
+      --cov-fail-under=55
+  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+  artifacts:
+    when: always
+    reports:
+      junit: fairness-results.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+fairness-gate:
+  stage: fairness
+  image: python:3.11-slim
+  script:
+    - pip install -e ".[dev]"
+    - |
+      python -c "
+      from vfairness import ModelFairnessGate, FairnessReportCard
+      import numpy as np, sys
+
+      # Customize: load your test data and model predictions
+      np.random.seed(42)
+      n = 1000
+      y_true = np.random.randint(0, 2, n)
+      y_pred = np.random.randint(0, 2, n)
+      protected = np.random.choice(['A', 'B'], n)
+
+      gate = ModelFairnessGate(
+          metrics=['demographic_parity_difference', 'equalized_odds_difference'],
+          thresholds={
+              'demographic_parity_difference': 0.1,
+              'equalized_odds_difference': 0.1,
+          },
+      )
+      decision = gate.evaluate(y_true, y_pred, protected)
+      card = FairnessReportCard(decision, model_name='MR Model')
+      print(card.to_markdown())
+
+      if not decision.approved:
+          sys.exit(1)
+      "
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"

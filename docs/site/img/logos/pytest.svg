@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 95 40" height="40">
+  <g transform="translate(6,6)">
+    <rect x="0" y="0" width="28" height="28" rx="4" fill="none" stroke="#009FE3" stroke-width="2"/>
+    <path d="M7 14L12 20L22 8" fill="none" stroke="#009FE3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="40" y="26" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="600" fill="#009FE3">pytest</text>
+</svg>

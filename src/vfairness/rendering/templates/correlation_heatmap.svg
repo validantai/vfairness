@@ -1,0 +1,128 @@
+{# ── Feature Engineering · Correlation Heatmap SVG Template ── #}
+{% set col_w = min(80, (480 / max(1, n_cols))|int) %}
+{% set row_h = min(32, (280 / max(1, n_rows))|int) %}
+{% set col_start = 180 %}
+{% set row_start = 296 %}
+{% set grid_h = n_rows * row_h %}
+{% set scale_y = row_start + grid_h + 20 %}
+{% set risk_y = scale_y + 60 %}
+{% set exp_y = risk_y + 60 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% else %}
+{% set exp_h = 0 %}
+{% endif %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   The badges, the grid, the scale and the risk-summary pill all go. The pill's
+   else-branch prints "No high correlations detected" in emerald, which is a
+   proxy-risk all-clear, and on an empty matrix it certifies a scan that
+   computed no correlation at all. #}
+{% if not_assessable %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = 134 %}
+{% set exp_y = na_y + na_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 {{ total_h }}" font-family="'Inter','Segoe UI',system-ui,-apple-system,sans-serif">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a">{{ title }}</text>
+{% if not_assessable %}
+<text x="36" y="122" font-size="10" fill="#64748b">No feature-attribute correlation was computed</text>
+{% else %}
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+{% endif %}
+
+{% if not_assessable %}
+{% include '_could_not_check.svg' %}
+{% else %}
+
+{# ── Stats Badges ── #}
+{% set badge_y = 134 %}
+<rect x="36" y="{{ badge_y }}" width="120" height="38" rx="8" fill="#ffffff"/>
+<text x="56" y="{{ badge_y + 14 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.5">FEATURES</text>
+<text x="56" y="{{ badge_y + 30 }}" font-size="13" font-weight="700" fill="#0f172a">{{ n_features }}</text>
+
+<rect x="168" y="{{ badge_y }}" width="160" height="38" rx="8" fill="#ffffff"/>
+<text x="188" y="{{ badge_y + 14 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.5">HIGH CORRELATIONS</text>
+<text x="188" y="{{ badge_y + 30 }}" font-size="13" font-weight="700" fill="{{ risk_color }}">{{ n_high_corr }}</text>
+
+<rect x="340" y="{{ badge_y }}" width="140" height="38" rx="8" fill="#ffffff"/>
+<text x="360" y="{{ badge_y + 14 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.5">THRESHOLD</text>
+<text x="360" y="{{ badge_y + 30 }}" font-size="13" font-weight="700" fill="#0f172a">|r| >= {{ threshold|f2 }}</text>
+
+{# ── Heatmap Panel ── #}
+<rect x="36" y="{{ row_start - 100 }}" width="644" height="{{ grid_h + 112 }}" rx="10" fill="#ffffff"/>
+
+{# Column labels (rotated on top) #}
+{% for attr in col_labels %}
+{% set mx = col_start + loop.index0 * col_w + col_w // 2 %}
+<text x="{{ mx }}" y="{{ row_start - 14 }}" text-anchor="start" font-size="12" font-weight="700" fill="#0f172a" transform="rotate(-55,{{ mx }},{{ row_start - 14 }})">{{ attr }}</text>
+{% endfor %}
+
+{# Rows: label on left, colored cells #}
+{% for row in rows %}
+{% set ry = row_start + loop.index0 * row_h %}
+
+{# Row label #}
+<text x="170" y="{{ ry + row_h // 2 + 4 }}" text-anchor="end" font-size="10.5" fill="#0f172a" font-weight="600">{{ row.label }}</text>
+
+{# Cells #}
+{% for cell in row.cells %}
+{% set cell_x = col_start + loop.index0 * col_w %}
+<rect x="{{ cell_x + 1 }}" y="{{ ry + 1 }}" width="{{ col_w - 2 }}" height="{{ row_h - 2 }}" rx="4" fill="{{ cell.bg }}"/>
+<text x="{{ cell_x + col_w // 2 }}" y="{{ ry + row_h // 2 + 4 }}" text-anchor="middle" font-size="9.5" font-weight="600" fill="{{ cell.text_color }}">{{ cell.value|f2 }}</text>
+{% endfor %}
+{% endfor %}
+
+{# ── Colour Scale ── #}
+<text x="180" y="{{ scale_y + 12 }}" text-anchor="end" font-size="9" fill="#6b7280">-1.0</text>
+{% set scale_colors = ['#1d4ed8', '#3b82f6', '#93c5fd', '#dbeafe', '#f8fafc', '#fef9c3', '#fde68a', '#f59e0b', '#dc2626'] %}
+{% for sc in scale_colors %}
+{% set sx = 190 + loop.index0 * 32 %}
+<rect x="{{ sx }}" y="{{ scale_y }}" width="32" height="14" rx="2" fill="{{ sc }}"/>
+{% endfor %}
+<text x="{{ 190 + 9 * 32 + 8 }}" y="{{ scale_y + 12 }}" font-size="9" fill="#6b7280">+1.0</text>
+
+{# Threshold legend #}
+<line x1="190" y1="{{ scale_y + 28 }}" x2="210" y2="{{ scale_y + 28 }}" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3,2"/>
+<text x="216" y="{{ scale_y + 32 }}" font-size="9" fill="#94a3b8">Proxy threshold (|r| >= {{ threshold|f2 }})</text>
+
+{# ── Risk Summary Panel ── #}
+<rect x="36" y="{{ risk_y }}" width="644" height="44" rx="10" fill="#ffffff"/>
+{% if n_high_corr > 0 %}
+<rect x="56" y="{{ risk_y + 10 }}" width="{{ min(240, n_high_corr * 40 + 120) }}" height="24" rx="12" fill="#fee2e2"/>
+<text x="{{ 56 + min(240, n_high_corr * 40 + 120) // 2 }}" y="{{ risk_y + 26 }}" text-anchor="middle" font-size="9.5" font-weight="600" fill="#dc2626">{{ n_high_corr }} potential proxy variable{{ 's' if n_high_corr != 1 }} detected</text>
+{% else %}
+<rect x="56" y="{{ risk_y + 10 }}" width="220" height="24" rx="12" fill="#d1fae5"/>
+<text x="166" y="{{ risk_y + 26 }}" text-anchor="middle" font-size="9.5" font-weight="600" fill="#059669">No high correlations detected</text>
+{% endif %}
+{% endif %}{# end: not not_assessable #}
+
+{# ── Explanation Panel ── #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

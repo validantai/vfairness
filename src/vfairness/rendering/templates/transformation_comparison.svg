@@ -1,0 +1,170 @@
+{# ── Feature Engineering · Transformation Comparison SVG Template ── #}
+{% set max_feats = 6 %}
+{% set row_h = min(40, (240 / max(1, features|length))|int) %}
+{% set bar_x = 240 %}
+{% set bar_w = 360 %}
+{% set table_y = 178 %}
+{% set table_h = 34 + features[:max_feats]|length * row_h + 30 %}
+{% set exp_y = table_y + table_h + 20 %}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+{% set exp_h = 44 + _exp_lines|length * 16 %}
+{% else %}
+{% set exp_h = 0 %}
+{% endif %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+
+{# ── COULD NOT CHECK (see the CRITICAL note in _could_not_check.svg) ──
+   With no feature compared, the badge row and the before/after chart all go.
+   AVG REDUCTION 0%, FEATURES IMPROVED 0 / 0 and the verdict word "Minimal" are
+   the same canvas a transformation that genuinely failed would produce, and
+   nothing was transformed here. #}
+{% if not_assessable %}
+{% set _na_lines = (not_assessable_reason|default('', true)|wordwrap(88)).split('\n') %}
+{% set na_h = 76 + _na_lines|length * 18 %}
+{% set na_y = 134 %}
+{% set exp_y = na_y + na_h + 16 %}
+{% set total_h = (exp_y + exp_h + 30) if explanation else (exp_y + 14) %}
+{% endif %}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 {{ total_h }}" font-family="'Inter','Segoe UI',system-ui,-apple-system,sans-serif">
+{% include '_shared_defs.svg' %}
+
+{# ── Background ── #}
+<rect width="680" height="{{ total_h }}" fill="#f8f9fb"/>
+
+{# ── Header ── #}
+<rect width="680" height="52" fill="#ffffff"/>
+<use href="#validant-logo" x="36" y="15" width="110" height="30"/>
+{% if timestamp %}<text x="644" y="32" text-anchor="end" font-size="9" fill="#94a3b8">{{ timestamp }}</text>{% endif %}
+<rect x="36" y="52" width="644" height="1.5" rx="0.75" fill="url(#accent)"/>
+
+{# ── Title ── #}
+<text x="36" y="96" font-size="18" font-weight="700" fill="#0f172a">{{ title }}</text>
+{% if not_assessable %}
+<text x="36" y="122" font-size="10" fill="#64748b">No before/after correlation pair was compared</text>
+{% else %}
+<text x="36" y="122" font-size="10" fill="#64748b">{{ subtitle }}</text>
+{% endif %}
+
+{% if not_assessable %}
+{% include '_could_not_check.svg' %}
+{% else %}
+
+{# ── Summary Badge Row ── #}
+{% set badge_y = 134 %}
+<rect x="36" y="{{ badge_y }}" width="160" height="30" rx="8" fill="#ffffff"/>
+<text x="56" y="{{ badge_y + 12 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.5">AVG REDUCTION</text>
+<text x="56" y="{{ badge_y + 24 }}" font-size="13" font-weight="700" fill="{{ avg_color }}">{{ (avg_reduction * 100)|int }}%</text>
+
+<rect x="208" y="{{ badge_y }}" width="150" height="30" rx="8" fill="#ffffff"/>
+<text x="228" y="{{ badge_y + 12 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.5">FEATURES IMPROVED</text>
+<text x="228" y="{{ badge_y + 24 }}" font-size="13" font-weight="700" fill="#059669">{{ n_improved }} / {{ n_total }}</text>
+
+<rect x="370" y="{{ badge_y }}" width="120" height="30" rx="8" fill="{{ summary_bg }}"/>
+<text x="430" y="{{ badge_y + 19 }}" text-anchor="middle" font-size="10" font-weight="600" fill="{{ summary_color }}">{{ summary_icon }} {{ summary_text }}</text>
+
+{# The ungraded count sits in the headline row, beside the band it is NOT part
+   of. AVG REDUCTION, FEATURES IMPROVED and the band are all over the graded
+   subset; without this pill the reader has no way to tell the subset from the
+   whole, and "3 / 3 improved" beside "Effective" reads as an all-clear over
+   every feature on the table. #}
+{# n_ratio_ungraded joins it: a feature that started at |r| = 0 has both halves of
+   its pair and still no proportional reduction, so it is out of AVG REDUCTION
+   and out of the n_total denominator for a second, different reason. Both
+   silences are ungraded, and the reader is owed both. #}
+{% set n_ungraded = (n_unmeasured|default(0, true)) + (n_ratio_ungraded|default(0, true)) %}
+{% if n_ungraded %}
+<rect x="502" y="{{ badge_y }}" width="178" height="30" rx="8" fill="#f1f5f9"/>
+<text x="522" y="{{ badge_y + 12 }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.5">NOT MEASURED</text>
+<text x="522" y="{{ badge_y + 24 }}" font-size="11" font-weight="700" fill="#64748b">{{ n_ungraded }} feature(s), not graded</text>
+{% endif %}
+
+{# ── Comparison Table Panel ── #}
+<rect x="36" y="{{ table_y }}" width="644" height="{{ table_h }}" rx="10" fill="#ffffff"/>
+
+{# Table Header #}
+{% set hdr_y = table_y + 18 %}
+<text x="56" y="{{ hdr_y }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.5">FEATURE</text>
+<text x="{{ bar_x }}" y="{{ hdr_y }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.5">BEFORE / AFTER</text>
+<text x="620" y="{{ hdr_y }}" font-size="7.5" font-weight="700" fill="#94a3b8" letter-spacing="0.5">REDUCTION</text>
+<line x1="56" y1="{{ hdr_y + 6 }}" x2="660" y2="{{ hdr_y + 6 }}" stroke="#cbd5e1" stroke-width="0.5"/>
+
+{# Grid lines for chart area #}
+{% for i in range(5) %}
+{% set gx = bar_x + i * (bar_w // 4) %}
+<line x1="{{ gx }}" y1="{{ hdr_y + 8 }}" x2="{{ gx }}" y2="{{ hdr_y + 8 + features[:max_feats]|length * row_h }}" stroke="#f1f5f9" stroke-width="1"/>
+<text x="{{ gx }}" y="{{ hdr_y + 12 + features[:max_feats]|length * row_h }}" text-anchor="middle" font-size="7.5" fill="#94a3b8">{{ (i * 0.25)|f2 }}</text>
+{% endfor %}
+
+{# Threshold line #}
+{% set thresh_x = bar_x + (threshold * bar_w)|int %}
+<line x1="{{ thresh_x }}" y1="{{ hdr_y + 8 }}" x2="{{ thresh_x }}" y2="{{ hdr_y + 8 + features[:max_feats]|length * row_h }}" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+{# Feature Rows #}
+{% for feat in features[:max_feats] %}
+{% set fy = table_y + 30 + loop.index0 * row_h %}
+
+{# Separator #}
+{% if not loop.first %}
+<line x1="56" y1="{{ fy }}" x2="660" y2="{{ fy }}" stroke="#cbd5e1" stroke-width="0.3"/>
+{% endif %}
+
+{# Feature label #}
+<text x="56" y="{{ fy + row_h // 2 + 2 }}" font-size="10" fill="#0f172a" font-weight="500">{{ feat.name|truncate_text(22) }}</text>
+
+{# A feature missing either half of its pair draws NO BAR and NO PERCENTAGE.
+   A zero-length after-bar and a "100%" in the reduction column are what the
+   best possible transformation looks like, and this row measured nothing. #}
+{% if feat.measured %}
+{# Before bar (top half, red) #}
+{% set before_w = min(bar_w, max(4, (feat.before * bar_w)|int)) %}
+<rect x="{{ bar_x }}" y="{{ fy + 4 }}" width="{{ before_w }}" height="{{ row_h // 2 - 3 }}" rx="3" fill="#dc2626" opacity="0.55"/>
+
+{# After bar (bottom half, green) #}
+{% set after_w = min(bar_w, max(4, (feat.after * bar_w)|int)) %}
+<rect x="{{ bar_x }}" y="{{ fy + row_h // 2 + 1 }}" width="{{ after_w }}" height="{{ row_h // 2 - 3 }}" rx="3" fill="#059669" opacity="0.55"/>
+
+{# Reduction percentage #}
+{# A feature that started at |r| = 0 has no proportional reduction: the ratio  #}
+{# is undefined, not 0%. The adapter used to write that undefined ratio in as  #}
+{# a measured 0 and feed it to the mean behind the summary band, dragging the  #}
+{# verdict towards the red "Minimal". Both endpoints WERE measured, so the     #}
+{# bars stay; only the percentage is withheld. `None > 0` also raises. #}
+{% if feat.reduction is none %}
+<text x="620" y="{{ fy + row_h // 2 + 4 }}" font-size="11" font-weight="700" fill="#94a3b8">n/a</text>
+{% elif feat.reduction > 0 %}
+<text x="620" y="{{ fy + row_h // 2 + 4 }}" font-size="13" font-weight="700" fill="#059669">{{ (feat.reduction * 100)|int }}%</text>
+{% elif feat.reduction < 0 %}
+<text x="620" y="{{ fy + row_h // 2 + 4 }}" font-size="13" font-weight="700" fill="#dc2626">+{{ (feat.reduction * -100)|int }}%</text>
+{% else %}
+<text x="620" y="{{ fy + row_h // 2 + 4 }}" font-size="13" font-weight="700" fill="#94a3b8">0%</text>
+{% endif %}
+{% else %}
+<text x="{{ bar_x }}" y="{{ fy + row_h // 2 + 4 }}" font-size="9.5" fill="#94a3b8">no before/after pair, not compared</text>
+<text x="620" y="{{ fy + row_h // 2 + 4 }}" font-size="11" font-weight="700" fill="#94a3b8">n/a</text>
+{% endif %}
+{% endfor %}
+
+{# Legend row #}
+{% set leg_y = table_y + 30 + features[:max_feats]|length * row_h + 6 %}
+<rect x="{{ bar_x }}" y="{{ leg_y }}" width="10" height="10" rx="2" fill="#dc2626" opacity="0.55"/>
+<text x="{{ bar_x + 14 }}" y="{{ leg_y + 9 }}" font-size="8.5" fill="#6b7280">Before</text>
+<rect x="{{ bar_x + 60 }}" y="{{ leg_y }}" width="10" height="10" rx="2" fill="#059669" opacity="0.55"/>
+<text x="{{ bar_x + 74 }}" y="{{ leg_y + 9 }}" font-size="8.5" fill="#6b7280">After</text>
+<line x1="{{ bar_x + 120 }}" y1="{{ leg_y + 5 }}" x2="{{ bar_x + 140 }}" y2="{{ leg_y + 5 }}" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"/>
+<text x="{{ bar_x + 146 }}" y="{{ leg_y + 9 }}" font-size="8.5" fill="#94a3b8">Proxy threshold ({{ threshold|f2 }})</text>
+{% endif %}{# end: not not_assessable #}
+
+{# ── Explanation Panel ── #}
+{% if explanation %}
+{% set _exp = explanation|wordwrap(105) %}{% set _exp_lines = _exp.split('\n') %}
+<rect x="36" y="{{ exp_y }}" width="644" height="{{ 44 + _exp_lines|length * 16 }}" rx="10" fill="#ffffff"/>
+<rect x="56" y="{{ exp_y }}" width="604" height="0.5" fill="#475569"/>
+<text x="56" y="{{ exp_y + 26 }}" font-size="11" font-weight="700" fill="#0f172a">Explanation</text>
+{% for _line in _exp_lines %}<text x="56" y="{{ exp_y + 50 + loop.index0 * 16 }}" font-size="9.5" fill="#6b7280">{{ _line }}</text>{% endfor %}
+{% endif %}
+
+{# ── Bottom accent + icon ── #}
+<rect x="36" y="{{ total_h - 14 }}" width="618" height="1.5" rx="0.75" fill="url(#accent)"/>
+<use href="#validant-icon" x="658" y="{{ total_h - 25 }}" width="22" height="22" opacity="0.55"/>
+</svg>

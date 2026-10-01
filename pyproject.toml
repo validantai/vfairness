@@ -1,0 +1,502 @@
+[build-system]
+# THE FLOOR IS A CORRECTNESS FLOOR, NOT A REPRODUCIBILITY ONE. This comment used
+# to read "Pin a floor so the build backend is reproducible across environments
+# (an unpinned backend can silently change the emitted Metadata-Version)". A
+# floor is not a pin, and the claim is measurably false. Built from THIS
+# pyproject on 2026-09-10, same source, same interpreter:
+#     hatchling 1.26.3  ->  Metadata-Version: 2.3
+#     hatchling 1.27.0  ->  Metadata-Version: 2.4
+#     hatchling 1.32.0  ->  Metadata-Version: 2.5
+# The permitted range emits three different metadata versions and always did, so
+# the sentence asserted a property nothing established.
+#
+# What >= 1.27 DOES buy is PEP 639, and losing it is silent. Measured on the same
+# day: at 1.26.3 the `license = "Apache-2.0"` below degrades to the legacy
+# free-text `License:` header, and `license-files` is dropped ENTIRELY. The 1.26.3
+# wheel carried no License-File header at all, so LICENSE and NOTICE were simply
+# not recorded in the distribution metadata, with no warning and no build error.
+# 1.27.0 emits `License-Expression: Apache-2.0` plus `License-File: LICENSE` and
+# `License-File: NOTICE`. tests/test_readiness_pypi.py holds the floor at that
+# boundary, and holds it together with the two fields it exists to enable, so it
+# cannot be lowered back across it while they stay declared.
+#
+# The metadata version that comes out is CHECKED rather than assumed: the build
+# job in .github/workflows/release.yml installs a current twine and runs
+# `python -m twine check dist/*` before any job can publish. Measured 2026-09-10:
+# twine 6.2.0 in strict mode passes on the 2.5 artifact, and PyPI itself serves
+# hatchling-1.32.0-py3-none-any.whl with `Metadata-Version: 2.5`, so the index
+# accepts that level today.
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vfairness"
+dynamic = ["version"]
+# This is the one-line Summary on the PyPI project page. It read "A clean,
+# minimal fairness metrics library for machine learning", which stopped being
+# true several subsystems ago: the package ships bias detection, in-processing
+# mitigation, calibration and threshold optimisation, drift monitoring, CI/CD
+# gates, explainability and LLM/agent fairness testing.
+description = "End-to-end ML fairness: bias detection, mitigation, metrics, monitoring and CI/CD gates"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+# Python support window follows Scientific Python SPEC 0 (drop versions
+# roughly 3 years after release), so 3.9 and 3.10 are out of support.
+requires-python = ">=3.11"
+authors = [
+    { name = "Glinz & Company GmbH (validant.ai)" }
+]
+keywords = [
+    "fairness",
+    "machine-learning",
+    "bias",
+    "ethics",
+    "ai-fairness",
+    "classification",
+    "regression"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    # The wheel ships src/vfairness/py.typed, so the package is type-marked and
+    # should say so where a consumer's tooling looks.
+    "Typing :: Typed",
+]
+# DEPENDENCY FLOORS ARE TESTED, NOT GUESSED. The `dependency-floor` job in
+# .github/workflows/fairness-checks.yml resolves this list with
+# `uv pip install --resolution lowest-direct` and runs the whole suite against it,
+# so every floor below is a version the suite has actually passed on. Do not lower
+# one without re-running that job; do not raise one without checking the floor job
+# still resolves.
+#
+# numpy/scipy: the previous floors (1.21.0 / 1.7.0) predated the first release of
+# each with a cp311 wheel, and requires-python is >= 3.11, so no resolver could
+# ever install them. They documented a support claim that was never true. These
+# are the oldest releases that exist for Python 3.11.
+#
+# pandas: the previous floor was >= 1.3.0, also unreachable on 3.11, and the
+# reachable floor was not good enough either. Measured 2026-08-27 with numpy
+# 1.23.2 / scipy 1.9.2 / scikit-learn 1.4.0 held constant, running the agent
+# memory-contamination screen (tests/test_pulse_deferred_tail.py::
+# test_memory_screen_flags_planted_reliance_disparity and
+# ::test_memory_term_screen_flags_cross_group_descriptors):
+#     pandas 1.5.0 / 1.5.3 / 2.0.3 / 2.1.4  FAIL
+#     pandas 2.2.0 / 2.2.1                  PASS
+# Below 2.2.0, `(s == g).to_numpy()` on a column holding missing values yields an
+# object-dtype array, so agent_probe._memory_section raises
+# "IndexError: arrays used as indices must be of integer (or boolean) type" and the
+# whole screen degrades to "could not be computed". It fails closed rather than
+# reporting a false clean, but the screen is silently gone.
+#
+# The floor is 2.2.1 rather than 2.2.0 for a second, independent reason: pandas
+# 2.2.0 emits a DeprecationWarning at import when pyarrow is absent, which trips
+# the library's own pin that importing vfairness survives `python -W error`
+# (tests/test_audit_wave4_llm.py::TestPlaceholderWarningsLazy::
+# test_import_survives_error_warnings). Verified 2026-08-27: 2.2.1, 2.2.2 and
+# 2.2.3 import clean under -W error, 2.2.0 does not.
+#
+# scikit-learn: the previous floor was >= 1.0, a version the project has never
+# passed on. Measured 2026-08-27 on Python 3.11 with numpy 1.23.2 / scipy 1.9.2 /
+# pandas 1.5.0 held constant, running
+# tests/test_audit_wave6_reductions.py::TestExponentiatedGradientEnforces::
+# test_eg_dp_satisfies_constraint_on_separable_bias:
+#     sklearn 1.1.3  FAIL  violation 0.0516 > tolerance 0.05
+#     sklearn 1.2.2  FAIL  violation 0.0516 > tolerance 0.05
+#     sklearn 1.3.2  FAIL  violation 0.0516 > tolerance 0.05
+#     sklearn 1.4.0  PASS
+# Below 1.4.0 the ExponentiatedGradient mitigation reports its own
+# demographic-parity constraint as enforced when it is not, which is exactly the
+# guarantee this library exists to make. 1.4.0 is therefore a correctness floor,
+# not a convenience one.
+dependencies = [
+    "numpy>=1.23.2",
+    "pandas>=2.2.1",
+    "scipy>=1.9.2",
+    # Loaded at package-import time (llm.api_proxy imports requests; the
+    # in-processing wrappers and pulse scoring pull sklearn), so these are
+    # hard runtime dependencies, not extras. Declared to close the
+    # packaging debt the pulse-contract CI worked around with an explicit
+    # install.
+    "requests>=2.25.0",
+    "scikit-learn>=1.4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    # Property-based tests (tests/test_property_invariants.py, VB-TEST-2); without
+    # this in an installed extra they silently importorskip in CI.
+    "hypothesis>=6.0",
+    # Lint + type gate (see .github/workflows/quality.yml; VB-LINT-1, VB-TYPE-1).
+    # Declared so CI, pre-commit, and local runs share one toolchain; the gate
+    # pins exact versions so findings are reproducible.
+    "ruff>=0.16",
+    "mypy>=1.11",
+    # tests/test_notebooks_still_run.py executes every notebook; they display
+    # SVGs through IPython, which is not a runtime dependency of the library.
+    "ipython>=8.0",
+]
+# matplotlib: the floor was >=3.5.0, the same unreachable-floor defect the
+# numpy/scipy/pandas note above records, just in an extra where no test looks.
+# Queried against the PyPI JSON API on 2026-08-28: 3.5.0, 3.5.1, 3.5.2 and 3.5.3
+# publish ZERO cp311 wheels; 3.6.0 is the first release that does (8 of them,
+# e.g. matplotlib-3.6.0-cp311-cp311-macosx_10_12_universal2.whl). With
+# requires-python >= 3.11 the old floor could only ever have been satisfied by
+# compiling the sdist, so it documented a support claim no resolver could reach.
+viz = [
+    "matplotlib>=3.6.0",
+    "seaborn>=0.12.0",
+]
+rendering = [
+    "jinja2>=3.0",
+]
+dashboard = [
+    "plotly>=5.0",
+]
+interactive = [
+    "plotly>=5.0",
+    "dash>=2.0",
+]
+monitoring = [
+    # The module imports as `pywt`, but the PyPI distribution is PyWavelets.
+    "PyWavelets>=1.4.0",
+]
+# torch: the floor was >=1.9.0 in all three extras that declare it (training,
+# llm-transformers, xai) and was the WORST case of the unreachable-floor class,
+# because torch publishes no sdist at all, so there was no fallback to compile.
+# Queried against the PyPI JSON API on 2026-08-28:
+#     torch 1.9.0 .. 1.12.1  0 cp311 wheels, 0 sdists  -> nothing installable
+#     torch 1.13.0           first cp311 wheel, but ONLY
+#                            torch-1.13.0-cp311-cp311-manylinux1_x86_64.whl
+#     torch 2.0.0            first cp311 wheel for macOS arm64
+#                            (torch-2.0.0-cp311-none-macosx_11_0_arm64.whl)
+# The floor is 2.0.0, not 1.13.0, because [tool.uv].environments below declares
+# darwin AND linux on 3.11-3.13 as the supported surface: at 1.13.0 the extra is
+# still uninstallable on half of it. 2.0.0 is the oldest release that resolves on
+# every environment this project claims to support.
+training = [
+    "torch>=2.0.0",
+]
+mlops = [
+    "mlflow>=2.0",
+    "wandb>=0.15",
+]
+embeddings = [
+    "sentence-transformers>=2.2.0",
+]
+llm = [
+    "requests>=2.28.0",
+    "vaderSentiment>=3.3.2",
+    "alt-profanity-check>=1.4.0",
+]
+# Transformer-backed rungs of the LLM scorer ladder in vfairness/llm/scorers.py
+# (Flair sentiment C-01, Detoxify toxicity C-02, HuggingFace regard C-04).
+# These backends were advertised by scorers.py but not installable via any
+# extra before. Deliberately NOT part of `all`: the torch + transformer
+# downloads are multi-GB and the keyword/VADER ladder rungs remain the
+# supported default without them.
+llm-transformers = [
+    "transformers>=4.30",
+    "flair>=0.13",
+    "detoxify>=0.5",
+    # See the torch note above `training`: below 2.0.0 there is no cp311 artifact
+    # for every supported platform, and torch ships no sdist to fall back to.
+    "torch>=2.0.0",
+]
+# Explainability subsystem (vfairness.xai). All MIT / BSD-3, so no licence
+# risk; optional install only. Resolves backlog decision D-01 (option a:
+# all five at once). Alibi is deliberately excluded (BSL relicence, 2024);
+# Integrated Gradients via captum + Anchors via anchor-exp replace it.
+xai = [
+    "shap>=0.44",
+    "lime>=0.2",
+    "dice-ml>=0.11",
+    "captum>=0.7",
+    # See the torch note above `training`: below 2.0.0 there is no cp311 artifact
+    # for every supported platform, and torch ships no sdist to fall back to.
+    "torch>=2.0.0",
+    "anchor-exp>=0.0.2.0",
+    "sage-importance>=0.0.5",
+]
+# Reference implementations the parity battery measures vfairness against
+# (tests/test_cross_library_parity.py, test_reference_parity.py,
+# test_spine_metric_robustness.py). These were never declared in any extra, so
+# 19 parity tests importorskip'd in every environment and the audit could only
+# record them as "could-not-verify (fairlearn/aif360 not installed)". Declared
+# here so the comparison is an installable, gated contract rather than an
+# accident of whatever happens to be on the machine.
+parity = [
+    "fairlearn>=0.10",
+    "aif360>=0.6",
+]
+# Causal estimation (vfairness.operations.causal): identification, mediation
+# (NDE/NIE), refutation, GCM counterfactuals, distribution-change attribution.
+causal = [
+    "dowhy>=0.11",
+    "networkx>=3.0",
+]
+# Local-first Model Context Protocol server (vfairness.mcp). Exposes the
+# fairness battery as MCP tools/resources/prompts for any MCP client. See
+# docs/reference/mcp-tools-redesign.md (Track 2).
+mcp = [
+    # The mcp SDK needs Python >=3.10. requires-python is already >=3.11, so this
+    # marker is redundant today; it is kept to stay in lockstep with uv.lock and
+    # to remain correct if the Python floor is ever lowered again.
+    #
+    # CRITICAL, DO NOT REMOVE THE <2 CAP. mcp 2.0.0 deleted the
+    # `mcp.server.fastmcp` module, which is the single import
+    # vfairness/mcp/server.py makes. Uncapped, every fresh resolver picked
+    # 2.x and the shipped `vfairness-mcp` console script died on import.
+    # Verified 2026-08-27: mcp 2.0.0 -> ModuleNotFoundError on
+    # mcp.server.fastmcp; mcp 1.29.1 imports it fine. Lift the cap only
+    # after server.py has been ported to the 2.x server API.
+    "mcp>=1.2.0,<2; python_version >= '3.10'",
+]
+# CI/CD hooks (operations.cicd.precommit, the shipped `vfairness-precommit`
+# console script). PyYAML is what `check-config` parses .yml/.yaml fairness gate
+# configs with. It was previously declared nowhere, `all` included, and the hook
+# reacted to its absence by printing a warning and exiting 0, so on a clean
+# install every YAML gate config passed unchecked. The hook now fails closed
+# (precommit.py), and this extra is how a user makes it able to check at all.
+cicd = [
+    "PyYAML>=6.0",
+]
+# Pulse consumer (operations.pulse): decrypts the ZK-encrypted dataset artifact
+# (AES-256-GCM via cryptography) and fetches it over a certifi-pinned TLS context.
+pulse = [
+    "cryptography>=3.4",
+    "certifi>=2020.6.20",
+]
+# XAI async worker + storage (xai.worker / xai.storage): persists explainability
+# jobs to Supabase (Postgres).
+worker = [
+    "supabase>=2.0",
+]
+all = [
+    "vfairness[dev,viz,rendering,dashboard,interactive,monitoring,training,mlops,embeddings,llm,xai,causal,mcp,pulse,worker,parity,cicd]",
+]
+
+[project.scripts]
+vfairness-precommit = "vfairness.operations.cicd.precommit:main"
+vfairness-mcp = "vfairness.mcp.server:main"
+
+[project.entry-points."pytest11"]
+# CRITICAL, THIS MUST STAY A TOP-LEVEL MODULE (no dots). pytest imports every
+# pytest11 entry point unconditionally at startup. While this pointed at
+# `vfairness.operations.cicd.pytest_plugin`, reaching it forced Python to execute
+# vfairness/__init__.py, which imports numpy/pandas/scipy/sklearn and ~1500 more
+# modules into EVERY pytest session of EVERY project that merely has vfairness
+# installed. Measured on a one-assert throwaway project, 2026-08-27:
+#   pytest -q                  ->  3.24 / 3.21 / 3.33 s
+#   pytest -q -p no:vfairness  ->  0.36 / 0.34 / 0.36 s
+# src/_vfairness_pytest_plugin.py imports nothing but pytest at module scope and
+# defers the vfairness imports into the fixture bodies. Guarded by
+# tests/test_packaging_hygiene.py.
+vfairness = "_vfairness_pytest_plugin"
+
+[project.urls]
+Homepage = "https://validant.ai"
+Documentation = "https://vfairness.validant.ai"
+Repository = "https://github.com/validantai/vfairness"
+Issues = "https://github.com/validantai/vfairness/issues"
+Changelog = "https://vfairness.validant.ai/concepts/changelog.html"
+Funding = "https://github.com/sponsors/validantai"
+
+# Single source of version truth: read __version__ from the package itself
+# so there is exactly one place to bump on release.
+[tool.hatch.version]
+path = "src/vfairness/__init__.py"
+
+# EVERY-TARGET exclude. Internal design / deploy notes that live beside the code
+# for maintainers but are noise in a distributed package (nothing loads them at
+# runtime). Keep py.typed, the SVG templates, LICENSE and NOTICE, which the
+# library and its licence do need.
+#
+# THIS MUST STAY GLOBAL, NOT PER-TARGET. It was declared only under
+# [tool.hatch.build.targets.wheel], so the wheel dropped these files while the
+# sdist, whose include list ships "/src" wholesale, carried all five of them
+# anyway. An sdist is published to PyPI beside the wheel and is fully readable,
+# so "excluded from the wheel" bought nothing: one of these notes named a
+# developer's home-directory path to the private task-consumer checkout, and it
+# was one `twine upload` away from being public. Hatchling resolves `exclude`
+# per target with a fallback to this table, so declaring it once here covers the
+# wheel, the sdist, and any target added later, which is the point: a new target
+# cannot silently reintroduce the leak by forgetting to repeat the list.
+[tool.hatch.build]
+exclude = [
+    "**/CONSUMER_REGISTRATION.md",
+    "**/TRACE_CONTRACT.md",
+    "**/SVG_DESIGN_SYSTEM.md",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vfairness"]
+# The auto-loaded pytest plugin is a TOP-LEVEL module on purpose, so pytest can
+# import it without executing vfairness/__init__.py (see the pytest11 entry point
+# above). `packages` only ships the package directory, so the module is mapped in
+# explicitly here; without this line the entry point would be dead in the wheel.
+force-include = { "src/_vfairness_pytest_plugin.py" = "_vfairness_pytest_plugin.py" }
+# NOTE: no `exclude` key here on purpose. Setting one at this level OVERRIDES the
+# [tool.hatch.build] list above rather than merging with it, which would restore
+# the exact split that let the sdist leak. Add new internal-note patterns there.
+
+# Explicit allowlist for the source distribution. Ships only what a source
+# install needs; keeps docs, notebooks, datasets, media, the uv lock and the
+# virtualenvs out so the sdist stays a few MB instead of hundreds.
+[tool.hatch.build.targets.sdist]
+# Leading "/" anchors each pattern at the project root, so a bare "README.md"
+# does not also glob in docs/site/img/README.md and reintroduce the docs tree.
+include = [
+    "/src",
+    "/README.md",
+    "/LICENSE",
+    "/NOTICE",
+    "/pyproject.toml",
+    "/CHANGELOG.md",
+    "/requirements.txt",
+    # Ships because the library DIVERGES from papers it cites, and a user who
+    # reads a docstring citation deserves the full record, not a pointer to a
+    # file that exists only in the private monorepo. The docstrings now carry
+    # the divergence inline (conditional_demographic_disparity names precisely
+    # what differs from Wachter, Mittelstadt and Russell), and this is the
+    # long form. Checked publication-safe: no hosts, paths or credentials.
+    "/docs/DIVERGENCES.md",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-v --tb=short"
+# Registered markers. `slow` gates the VB-PERF-1 scale/stress tests so a fast
+# run can skip them with `pytest -m "not slow"`.
+markers = [
+    "slow: marks tests as slow (large-scale performance/stress; deselect with '-m \"not slow\"')",
+]
+
+# N-22, structural half, applied 2026-09-07. A NON-strict xfail over a test that
+# has started passing is inert in BOTH directions: it does not fail now that the
+# defect is gone, and it will not fail if the defect comes back. Three such
+# markers outlived their defects here (register entries N-02, N-03, N-04) and
+# were only found by reinstating a defect and watching the file that claimed to
+# record it stay green. This makes an unexpected pass a FAILURE, so the next
+# marker cannot rot the same way; a marker that genuinely needs the lenient
+# behaviour can still say `strict=False` explicitly.
+xfail_strict = true
+
+# Coverage is invoked explicitly in CI (see .github/workflows/fairness-checks.yml
+# and .gitlab-ci-fairness.yml) with --cov=vfairness. It is intentionally NOT in
+# the default addopts so a plain local `pytest` stays fast and ungated.
+[tool.coverage.run]
+source = ["vfairness"]
+# Branch coverage is on: the gate counts untaken branches, not just unexecuted
+# lines, so a half-tested if/else no longer reads as fully covered.
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+# The CI gate measures branch-inclusive coverage and keeps --cov-fail-under under
+# the current baseline so coverage can only ratchet up. Re-measured over the full
+# suite on 2026-08-27: 52.38% line+branch, and 51.67% recomputed with the causal
+# subsystem's covered lines removed. The gate in
+# .github/workflows/fairness-checks.yml moved 40 -> 48 on that measurement (at 40
+# it ratcheted nothing: a third of the tested surface could have disappeared
+# unnoticed). tests/test_packaging_hygiene.py pins the gate value so it cannot
+# quietly drift back down.
+#
+# NOTE: the monorepo also runs .github/workflows/vfairness-tests.yml, at the repo
+# root and outside this package tree. It has since been re-baselined and its gate
+# is --cov-fail-under=55 (read from that workflow on 2026-08-28; this comment
+# claimed 43 long after it moved). It sits higher than the 48 here because it
+# installs a DIFFERENT extras set, not a narrower one: it adds `causal`, a large
+# subsystem whose covered lines lift the figure, and omits `cicd`. Two gates over
+# two extras sets are expected to differ, so keep each just under its OWN measured
+# figure rather than making the numbers match.
+#
+# The 80% target needs new tests for the operations/{cicd,monitoring,reporting,
+# experimentation} subsystems and is tracked as follow-up (VB-TST-6).
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.ruff]
+line-length = 100
+# Matches requires-python (Scientific Python SPEC 0 support window).
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
+# E501 is handled by the formatter. N803/N806/N812 stay allowed because
+# ML and fairness code names matrices and tensors in uppercase by convention
+# (X, X_train, A for the protected attribute, IG for integrated gradients);
+# lowercasing them would obscure, not clarify.
+ignore = ["E501", "N803", "N806", "N812"]
+
+[tool.ruff.lint.per-file-ignores]
+# __init__ modules deliberately re-export the public API, so an import that
+# looks unused is intentional surface, not dead code.
+"__init__.py" = ["F401", "F403"]
+# Test modules legitimately place imports after module-level statements:
+# `pytest.importorskip(...)` guards for optional extras, and imports grouped
+# next to the tests that exercise them. E402 there is intentional, not a bug.
+"tests/**" = ["E402"]
+
+# Formatter (VB-LINT-2). The whole tree is ruff-formatted and `ruff format
+# --check` is enforced in CI. The one-time reformat commit is listed in
+# .git-blame-ignore-revs so `git blame` skips it.
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.uv]
+# The core library supports 3.14 (the task consumer runs it), but several heavy
+# native extras (torch, shap, pywt) do not yet ship 3.14 or Windows wheels, so a
+# universal lock across all of requires-python is unsolvable. The lock therefore
+# targets the real deploy surface: macOS and Linux on Python 3.11 through 3.13
+# (lower bound matches requires-python and Scientific Python SPEC 0).
+environments = [
+    "python_version >= '3.11' and python_version < '3.14' and sys_platform == 'darwin'",
+    "python_version >= '3.11' and python_version < '3.14' and sys_platform == 'linux'",
+]
+
+# Starting-point static type config. Strictness can ratchet up over time.
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+
+# Strict typing island (VB-TYPE-2): foundational public modules and core helpers
+# held to mypy --strict via this per-module override, while the rest of the tree
+# stays at the base config. `mypy src` enforces it. The island expands outward as
+# modules are cleaned: make a module pass `mypy --strict <module>` first, then
+# add it here.
+[[tool.mypy.overrides]]
+module = [
+    "vfairness._bands",
+    "vfairness._deprecation",
+    "vfairness._manifest",
+    "vfairness._methodology",
+    "vfairness.exceptions",
+    "vfairness.result",
+    "vfairness.streaming",
+    "vfairness.evaluation.vfairness_metrics._grouping",
+    "vfairness.evaluation.vfairness_metrics._validation",
+]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_return_any = true
+strict_equality = true
+warn_unused_ignores = true
