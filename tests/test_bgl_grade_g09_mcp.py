@@ -29,9 +29,14 @@ import warnings
 import numpy as np
 import pytest
 
+# importorskip only skips a ModuleNotFoundError, but the server deliberately
+# re-raises a missing 'mcp' as an ImportError carrying the install hint. Without
+# the extra installed (the public CI), that turned a skip into a collection
+# error that stopped the whole suite.
 mcp_server = pytest.importorskip(
     "vfairness.mcp.server",
     reason="the MCP server needs the optional 'mcp' extra (mcp>=1.2.0,<2)",
+    exc_type=ImportError,
 )
 
 server = mcp_server

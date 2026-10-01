@@ -34,6 +34,7 @@
         initNavigation();
         initMobileMenu();
         initMobileSearch();
+        initApiPackageView();
         initTouchWording();
 
         // ── Deferred — heavy / non-essential, won't block the main thread ──
@@ -514,6 +515,7 @@
             ticking = false;
             var line = window.scrollY + 140, best = null, bestTop = -Infinity;
             for (var i = 0; i < pairs.length; i++) {
+                if (pairs[i].el.closest('[hidden]')) continue;   // in a closed API package
                 var top = pairs[i].el.getBoundingClientRect().top + window.scrollY;
                 if (top <= line && top > bestTop) { best = pairs[i]; bestTop = top; }
             }
@@ -672,6 +674,166 @@
         };
         window.addEventListener('hashchange', openTarget);
         openTarget();
+    }
+
+    // ============================================================
+    // API Reference, one package at a time. The page holds 14 packages
+    // (Overview, the 11 numbered sections, Rendering, Infrastructure) in one
+    // file, which several generators and tests read by path, so the file stays
+    // whole and the READER sees one package at a time: a switcher under the
+    // title, a URL per package (?pkg=...), and "All on one page". Hidden
+    // packages use hidden="until-found", so find-in-page still finds text in
+    // them and opens the right package; links to any anchor do the same.
+    // ============================================================
+
+    var API_PACKAGES = [
+        { k: 'overview', n: '', t: 'Overview', start: null },
+        { k: 'preprocessing', n: '1', t: 'Data & Preprocessing', start: '#preprocessing-overview' },
+        { k: 'training', n: '2', t: 'Training-Time Interventions', start: '#in-processing-overview' },
+        { k: 'prediction', n: '3', t: 'Prediction-Time Interventions', start: '#post-processing-overview' },
+        { k: 'evaluation', n: '4', t: 'Evaluation & Measurement', start: '#evaluation-overview' },
+        { k: 'operations', n: '5', t: 'Operations & Monitoring', start: '#operations-overview' },
+        { k: 'reporting', n: '6', t: 'Reporting & Dashboards', start: '#reporting-overview' },
+        { k: 'experimentation', n: '7', t: 'Experimentation', start: '#experimentation-overview' },
+        { k: 'cicd', n: '8', t: 'CI/CD Integration', start: '#cicd-overview' },
+        { k: 'llm', n: '9', t: 'LLM Fairness Testing', start: '#llm-overview' },
+        { k: 'agents', n: '10', t: 'Agent Fairness Testing', start: '#agent-overview' },
+        { k: 'multi-agent', n: '11', t: 'Multi-Agent Fairness Testing', start: '#multi-agent-overview' },
+        { k: 'rendering', n: '', t: 'Rendering Adapters', start: '#rendering-overview' },
+        { k: 'infrastructure', n: '', t: 'Infrastructure', start: '#net-overview' }
+    ];
+
+    function initApiPackageView() {
+        if (!/api-reference/.test(location.pathname)) return;
+        var box = document.querySelector('.main-content .content-container');
+        var intro = document.getElementById('introduction');
+        if (!box || !intro) return;
+        // 1. Tag every top-level block with its package.
+        var starts = {};
+        API_PACKAGES.forEach(function (pk) {
+            if (!pk.start) return;
+            var el = box.querySelector(pk.start);
+            if (!el || el.parentElement !== box) return;
+            var prev = el.previousElementSibling;
+            if (prev && prev.classList.contains('category-divider')) el = prev;
+            starts[pk.k] = el;
+        });
+        if (Object.keys(starts).length < 10) return;   // structure changed: leave the page whole
+        var current = 'overview';
+        var blocks = [];
+        Array.prototype.forEach.call(box.children, function (el) {
+            for (var k in starts) { if (starts[k] === el) current = k; }
+            el.setAttribute('data-pkg', current);
+            blocks.push(el);
+        });
+        // The title stays visible in every package: everything else in the
+        // introduction belongs to the Overview package.
+        var keep = [];
+        var h1 = intro.querySelector('h1');
+        if (h1) {
+            var e = h1.previousElementSibling; if (e) keep.push(e);
+            keep.push(h1);
+            var lead = h1.nextElementSibling; if (lead && lead.tagName === 'P') keep.push(lead);
+        }
+        var introKids = Array.prototype.filter.call(intro.children, function (c) { return keep.indexOf(c) < 0; });
+        // 2. The switcher, right under the title.
+        var nav = document.createElement('nav');
+        nav.className = 'pkg-switch';
+        nav.setAttribute('aria-label', 'API packages');
+        nav.innerHTML = API_PACKAGES.map(function (pk) {
+            return '<a href="?pkg=' + pk.k + '" data-k="' + pk.k + '">' + (pk.n ? '<span class="sec-num">' + pk.n + '</span>' : '') + pk.t + '</a>';
+        }).join('') + '<a href="?pkg=all" data-k="all" class="pkg-switch__all">All on one page</a>';
+        var anchor = keep[keep.length - 1] || h1;
+        anchor.parentNode.insertBefore(nav, anchor.nextSibling);
+        // 3. Next / previous package at the end of each package.
+        var pager = document.createElement('nav');
+        pager.className = 'page-pager pkg-pager';
+        pager.setAttribute('aria-label', 'Previous and next package');
+        var foot = box.querySelector('.page-foot');
+        box.insertBefore(pager, foot || null);
+
+        var visible = null;
+        function show(k, opts) {
+            opts = opts || {};
+            if (k !== 'all' && !API_PACKAGES.some(function (p) { return p.k === k; })) k = 'overview';
+            visible = k;
+            blocks.forEach(function (el) {
+                var on = k === 'all' || el.getAttribute('data-pkg') === k || el === intro;
+                if (on) el.removeAttribute('hidden'); else el.setAttribute('hidden', 'until-found');
+            });
+            introKids.forEach(function (el) {
+                if (k === 'all' || k === 'overview') el.removeAttribute('hidden'); else el.setAttribute('hidden', 'until-found');
+            });
+            nav.querySelectorAll('a').forEach(function (a) { a.classList.toggle('is-active', a.getAttribute('data-k') === k); a.setAttribute('aria-current', a.getAttribute('data-k') === k ? 'page' : 'false'); });
+            var i = API_PACKAGES.map(function (p) { return p.k; }).indexOf(k);
+            var prev = i > 0 ? API_PACKAGES[i - 1] : null, next = i >= 0 && i < API_PACKAGES.length - 1 ? API_PACKAGES[i + 1] : null;
+            pager.hidden = k === 'all';
+            pager.innerHTML = (prev ? '<a class="page-pager__prev" href="?pkg=' + prev.k + '"><span>Previous package</span>' + (prev.n ? prev.n + '. ' : '') + prev.t + '</a>' : '<span></span>') +
+                (next ? '<a class="page-pager__next" href="?pkg=' + next.k + '"><span>Next package</span>' + (next.n ? next.n + '. ' : '') + next.t + '</a>' : '<span></span>');
+            if (typeof mermaid !== 'undefined') {
+                var todo = Array.prototype.filter.call(document.querySelectorAll('.mermaid:not([data-processed])'), function (n) { return !n.closest('[hidden]'); });
+                if (todo.length) mermaid.run({ nodes: todo }).catch(function () {});
+            }
+            if (opts.push) {
+                var url = location.pathname + (k === 'overview' ? '' : '?pkg=' + k) + (opts.hash || '');
+                try { history.pushState({ pkg: k }, '', url); } catch (e) {}
+            }
+            if (opts.top) { var r = nav.getBoundingClientRect(); window.scrollTo(0, Math.max(0, window.scrollY + r.top - 120)); }
+            window.dispatchEvent(new Event('scroll'));
+        }
+        function pkgOf(el) {
+            for (var q = el; q && q !== box; q = q.parentElement) { if (q.parentElement === box) return q.getAttribute('data-pkg'); }
+            if (intro.contains(el)) return 'overview';
+            return null;
+        }
+        function revealHash(push) {
+            var id = decodeURIComponent(location.hash.slice(1));
+            var el = id && document.getElementById(id);
+            if (!el) return false;
+            var k = pkgOf(el);
+            if (k && visible !== 'all' && k !== visible) show(k, { push: push, hash: location.hash });
+            el.scrollIntoView();
+            return true;
+        }
+        // Initial state: an anchor wins, then ?pkg=, then Overview.
+        var params = new URLSearchParams(location.search);
+        show(params.get('pkg') || 'overview');
+        if (location.hash) revealHash(false);
+        nav.addEventListener('click', function (e) {
+            var a = e.target.closest('a[data-k]'); if (!a) return;
+            e.preventDefault(); show(a.getAttribute('data-k'), { push: true, top: true });
+        });
+        pager.addEventListener('click', function (e) {
+            var a = e.target.closest('a'); if (!a) return;
+            e.preventDefault(); show(new URLSearchParams(a.getAttribute('href').slice(1)).get('pkg'), { push: true, top: true });
+        });
+        // In-page links (sidebar, overview cards, search results on this page).
+        document.addEventListener('click', function (e) {
+            var a = e.target.closest('a[href*="#"]'); if (!a || e.defaultPrevented) return;
+            var href = a.getAttribute('href');
+            if (href.charAt(0) !== '#' && !/api-reference\/(index\.html)?#/.test(href)) return;
+            var id = decodeURIComponent(href.split('#')[1] || '');
+            var el = id && document.getElementById(id);
+            if (!el) return;
+            var k = pkgOf(el);
+            if (k && visible !== 'all' && k !== visible) {
+                e.preventDefault();
+                show(k, { push: true, hash: '#' + id });
+                el.scrollIntoView();
+            }
+        }, true);
+        window.addEventListener('hashchange', function () { revealHash(false); });
+        window.addEventListener('popstate', function () {
+            show(new URLSearchParams(location.search).get('pkg') || 'overview');
+            if (location.hash) revealHash(false);
+        });
+        // Find-in-page reached text in a hidden package: open that package.
+        blocks.concat(introKids).forEach(function (el) {
+            el.addEventListener('beforematch', function () {
+                var k = el === intro || introKids.indexOf(el) >= 0 ? 'overview' : el.getAttribute('data-pkg');
+                show(k, { push: true });
+            });
+        });
     }
 
     // ============================================================
@@ -1501,7 +1663,10 @@
         });
 
         // Render all .mermaid elements that haven't been processed yet
-        var nodes = document.querySelectorAll('.mermaid:not([data-processed])');
+        // Diagrams inside a hidden API package are rendered when the package is
+        // opened (initApiPackageView): a diagram laid out while hidden has no
+        // size, so Mermaid would draw it at zero width.
+        var nodes = Array.prototype.filter.call(document.querySelectorAll('.mermaid:not([data-processed])'), function (n) { return !n.closest('[hidden]'); });
         if (nodes.length) {
             mermaid.run({ nodes: nodes }).catch(function(err) {
                 console.warn('Mermaid render error:', err);

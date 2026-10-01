@@ -4897,6 +4897,49 @@ pre .hljs-class { color: #f0d58a; }
 pre .hljs-params { color: #c5ced7; }
 .code-copy.copied { color: #7fd36a !important; border-color: rgba(127, 211, 106, 0.6) !important; }
 
+/* API Reference package view */
+.pkg-switch { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 3.5rem; padding: 1rem 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.pkg-switch a {
+    display: inline-flex; align-items: center; padding: 0.45rem 0.8rem; font-size: 0.85rem; font-weight: 600;
+    color: var(--color-gray-700); border: 1px solid var(--rule); background: var(--surface-veil); text-decoration: none !important;
+    transition: border-color 120ms ease, color 120ms ease;
+}
+.pkg-switch a .sec-num { margin-right: 0.45em; font-size: 0.72em; }
+.pkg-switch a:hover { border-color: var(--color-gray-800); color: var(--color-gray-900); }
+.pkg-switch a.is-active { border-color: var(--color-primary); color: var(--color-gray-900); box-shadow: inset 0 -2px 0 var(--color-primary); }
+.pkg-switch a.is-active .sec-num { border-color: var(--color-primary); }
+.pkg-switch__all { font-family: var(--font-mono); font-size: 0.68rem !important; font-weight: 500 !important; letter-spacing: 0.1em; text-transform: uppercase; }
+/* A closed package takes no space: hidden="until-found" keeps the box, so its
+   margins and divider rules would otherwise leave large gaps. */
+.content-container > [data-pkg][hidden], #introduction > [hidden] { margin: 0 !important; padding: 0 !important; border: 0 !important; }
+.content-container > [data-pkg][hidden]::before { display: none !important; }
+.pkg-pager { margin-top: 5rem; }
+
+/* Changelog and References: their dark gradient intro becomes the standard
+   title area (light ground, ink), and the changelog numbers a quiet stat row. */
+.main-content .intro-section {
+    background: none !important; color: inherit !important; padding: 0 !important; margin: 0 0 3.5rem !important;
+    border: 0 !important; border-radius: 0 !important; box-shadow: none !important; overflow: visible !important;
+}
+.main-content .intro-section::before, .main-content .intro-section::after { display: none !important; }
+.main-content .intro-section > * { position: static !important; }
+.main-content .intro-section h1 { color: var(--color-gray-900) !important; }
+.main-content .intro-section .lead, .main-content .intro-section p { color: var(--color-gray-500) !important; }
+.main-content .intro-section .lead strong { color: var(--color-gray-800) !important; }
+.main-content .intro-section a { color: var(--color-primary) !important; }
+.main-content .intro-section code { background: var(--surface-sunk) !important; color: var(--color-gray-900) !important; }
+.main-content .intro-section .quick-stats {
+    display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 !important; margin: 0 !important;
+    border-top: 1px solid var(--rule-strong); border-left: 1px solid var(--rule); background: none !important;
+}
+.main-content .intro-section .stat-item {
+    background: var(--surface-veil) !important; padding: 1.25rem 1.25rem 1.1rem !important; text-align: left !important;
+    border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); border-radius: 0 !important;
+}
+.main-content .intro-section .stat-value { color: var(--color-gray-900) !important; font-size: 2.25rem !important; font-weight: 300 !important; letter-spacing: -0.03em; line-height: 1.1; font-variant-numeric: tabular-nums; background: none !important; -webkit-text-fill-color: currentColor !important; }
+.main-content .intro-section .stat-label { margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.66rem !important; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray-500) !important; opacity: 1 !important; }
+@media (max-width: 560px) { .main-content .intro-section .quick-stats { grid-template-columns: minmax(0, 1fr); } }
+
 /* Stat tiles on Getting Started: a solid sheet, so the dot field behind
    them never runs through the numbers. */
 .hero-stats .hero-stat { background: rgba(255, 255, 255, 0.94) !important; }
