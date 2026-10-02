@@ -35,6 +35,7 @@ from __future__ import annotations
 import collections
 import pathlib
 import re
+from html.parser import HTMLParser
 
 import pytest
 
@@ -102,12 +103,60 @@ def _reader_text() -> str:
         start, end = f"<!-- {name}:start -->", f"<!-- {name}:end -->"
         if start in s and end in s:
             s = s[: s.index(start)] + s[s.index(end) + len(end) :]
-    s = re.sub(r"<script\b.*?</script\s*>", " ", s, flags=re.S | re.I)
-    s = re.sub(r"<style\b.*?</style\s*>", " ", s, flags=re.S | re.I)
-    s = re.sub(r"<!--.*?-->", " ", s, flags=re.S)
-    # Any ELEMENT carrying a kpi- class, contents included: those are filled on load.
-    s = re.sub(r'<(\w+)\b[^>]*class="[^"]*\bkpi-[\w-]+[^"]*"[^>]*>.*?</\1>', " ", s, flags=re.S)
-    return re.sub(r"<[^>]+>", " ", s)
+    # A real HTML parser, not regular expressions: it drops script and style
+    # bodies, comments, and any element carrying a kpi- class with its contents
+    # (those are filled on load), however the closing tags are spelled
+    # (CodeQL py/bad-tag-filter).
+    return _ReaderText.of(s)
+
+
+class _ReaderText(HTMLParser):
+    _SKIP = {"script", "style"}
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self._parts: list = []
+        self._skip_stack: list = []
+
+    @classmethod
+    def of(cls, html: str) -> str:
+        parser = cls()
+        parser.feed(html)
+        parser.close()
+        return " ".join(parser._parts)
+
+    def handle_starttag(self, tag, attrs):
+        if tag in _VOID:
+            return
+        classes = (dict(attrs).get("class") or "").split()
+        hidden = tag in self._SKIP or any(c.startswith("kpi-") for c in classes)
+        if self._skip_stack or hidden:
+            self._skip_stack.append(tag)
+
+    def handle_endtag(self, tag):
+        if self._skip_stack and self._skip_stack[-1] == tag:
+            self._skip_stack.pop()
+
+    def handle_data(self, data):
+        if not self._skip_stack:
+            self._parts.append(data)
+
+
+_VOID = {
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "source",
+    "track",
+    "wbr",
+}
 
 
 def _typed() -> collections.Counter:

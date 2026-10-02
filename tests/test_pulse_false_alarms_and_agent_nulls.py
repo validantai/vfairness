@@ -140,7 +140,15 @@ def test_a_biased_agent_is_still_found():
 def test_an_episode_without_a_tool_is_counted_under_an_explicit_label():
     df = _episodes(60, biased=False)
     df.loc[df.index % 7 == 0, "tool"] = np.nan
-    df["tool"] = df["tool"].astype(pd.StringDtype("python", na_value=np.nan))
+    # pandas >= 2.3 has the NaN-valued string dtype that pandas 3 uses by default;
+    # older pandas (down to the declared floor) keeps the same data as an object
+    # column holding NaN. Both are the "missing tool" case and both must work.
+    try:
+        string_with_nan = pd.StringDtype("python", na_value=np.nan)
+    except TypeError:
+        string_with_nan = None
+    if string_with_nan is not None:
+        df["tool"] = df["tool"].astype(string_with_nan)
     out = agent_probe_pulse(df, {}, "tool", "group", "lending", "")
     omnibus = out["data"]["agent"]["omnibus"]
     assert omnibus.get("available") is True, omnibus
