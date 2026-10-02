@@ -39,7 +39,7 @@ from __future__ import annotations
 import decimal
 import math
 import numbers
-from typing import Any, Dict, Hashable, Iterable, List, Mapping, Tuple
+from typing import Any, Dict, Hashable, Iterable, List, Mapping, Tuple, TypeVar
 
 import numpy as np
 
@@ -137,9 +137,17 @@ def is_measured(value: Any) -> bool:
         return False
 
 
+# The key type of a partition is the caller's key type. Generic so a
+# ``Dict[str, float]`` comes back keyed by ``str``: ``Mapping`` is invariant in
+# its key, so the old ``Mapping[Hashable, Any]`` refused a ``Dict[str, float]``
+# under mypy and handed back ``Hashable`` keys a caller could not index with.
+# Typing only; the runtime behaviour is unchanged.
+_K = TypeVar("_K", bound=Hashable)
+
+
 def partition_measured(
-    values: Mapping[Hashable, Any],
-) -> Tuple[Dict[Hashable, float], List[Hashable]]:
+    values: Mapping[_K, Any],
+) -> Tuple[Dict[_K, float], List[_K]]:
     """Split a name -> value mapping into what was measured and what was not.
 
     Returns ``(measured, unmeasured)`` where ``measured`` maps each name to a
@@ -153,8 +161,8 @@ def partition_measured(
     >>> partition_measured({"a": 0.1, "b": float("nan"), "c": None})
     ({'a': 0.1}, ['b', 'c'])
     """
-    measured: Dict[Hashable, float] = {}
-    unmeasured: List[Hashable] = []
+    measured: Dict[_K, float] = {}
+    unmeasured: List[_K] = []
     for name, value in values.items():
         if is_measured(value):
             measured[name] = float(value)

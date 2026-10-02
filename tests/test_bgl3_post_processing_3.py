@@ -34,11 +34,21 @@ import math
 import warnings
 from typing import Any, Callable, List, Tuple
 
-import matplotlib
 import numpy as np
 import pytest
 
-matplotlib.use("Agg")
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 from vfairness.post_processing.calibration.methods import (  # noqa: E402
     IsotonicCalibrator,
@@ -581,6 +591,7 @@ class TestDashboardNamesAPartialDisparity:
         calibrated = np.clip(y_prob * 0.9 + 0.05, 0, 1)
         return y_true, y_prob, attr, calibrated
 
+    @needs_matplotlib
     def test_a_disparity_measured_over_two_of_three_groups_says_so_on_the_chart(self):
         """Measured BEFORE the fix on 135 rows with groups m=60, f=60, x=15:
 
@@ -611,6 +622,7 @@ class TestDashboardNamesAPartialDisparity:
         )
         assert any("excluded from the expected calibration error" in m for m in caught)
 
+    @needs_matplotlib
     def test_an_unmeasurable_disparity_is_still_marked_not_measured(self):
         """The neighbouring state, one group only: max_group_disparity is NaN and
         a NaN bar draws exactly what a measured 0.0 draws. Measured: both bars
@@ -624,6 +636,7 @@ class TestDashboardNamesAPartialDisparity:
         assert "before: not measured" in notes, notes
         assert "after: not measured" in notes, notes
 
+    @needs_matplotlib
     def test_control_a_complete_comparison_carries_no_caveat(self):
         """CONTROL. Two groups of 60, both above every floor: the disparity bar is
         a finite measured number and the chart must say nothing about exclusions

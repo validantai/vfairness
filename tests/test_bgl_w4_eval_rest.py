@@ -22,16 +22,31 @@ wave fixed the door the judgement named:
 """
 
 import hashlib
+import importlib.util
 import io
 import warnings
 
-import matplotlib
-
-matplotlib.use("Agg")
-
-import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pytest  # noqa: E402
+
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+    plt = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+    import matplotlib.pyplot as plt
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
+needs_plotly = pytest.mark.skipif(
+    importlib.util.find_spec("plotly") is None,
+    reason="needs the optional [dashboard] extra (plotly)",
+)
 
 from vfairness.evaluation.vfairness_metrics import visualization as viz  # noqa: E402
 
@@ -79,6 +94,7 @@ def _png_sha(entry, threshold=0.1):
         plt.close(fig)
 
 
+@needs_matplotlib
 def test_ci_chart_draws_no_acceptable_region_for_an_absent_point_estimate():
     """An ABSENT point estimate must not be shaded green as compliant.
 
@@ -100,6 +116,7 @@ def test_ci_chart_draws_no_acceptable_region_for_an_absent_point_estimate():
     ],
     ids=["absent", "none", "nan"],
 )
+@needs_matplotlib
 def test_ci_chart_refuses_every_spelling_of_an_absent_point_estimate(entry):
     """Absence has more than one spelling and two of the three were already shut."""
     bands, texts, _ = _draw_ci(entry)
@@ -107,6 +124,7 @@ def test_ci_chart_refuses_every_spelling_of_an_absent_point_estimate(entry):
     assert any("the value was not measured" in t for t in texts), texts
 
 
+@needs_matplotlib
 def test_ci_chart_does_not_raise_on_a_tuple_shaped_interval():
     """``compute_metric_with_ci`` returns a tuple, and a caller passes it straight through.
 
@@ -119,6 +137,7 @@ def test_ci_chart_does_not_raise_on_a_tuple_shaped_interval():
     assert any(viz.NOT_MEASURED_TICK in t for t in texts), texts
 
 
+@needs_matplotlib
 def test_ci_chart_does_not_invent_a_zero_width_interval_from_a_lone_point_estimate():
     """An absent BOUND defaulted to the point estimate, printing "[0.420, 0.420]"."""
     _bands, texts, _ = _draw_ci({"point_estimate": 0.42})
@@ -127,6 +146,7 @@ def test_ci_chart_does_not_invent_a_zero_width_interval_from_a_lone_point_estima
     assert label[0] == f"0.420\n[{viz.NOT_MEASURED_TICK}, {viz.NOT_MEASURED_TICK}]", label
 
 
+@needs_matplotlib
 def test_control_ci_chart_still_renders_the_real_numbers_and_the_real_region():
     """The healthy case keeps its band and its three real numbers."""
     bands, texts, messages = _draw_ci(
@@ -137,6 +157,7 @@ def test_control_ci_chart_still_renders_the_real_numbers_and_the_real_region():
     assert messages == [], messages
 
 
+@needs_matplotlib
 def test_control_three_ci_states_render_three_different_images():
     """The RENDERED artifact must differ, not only the returned data.
 
@@ -169,6 +190,7 @@ def _ci_panel(entry):
     return fig, messages
 
 
+@needs_plotly
 def test_ci_dashboard_panel_places_no_marker_for_an_absent_point_estimate():
     """The twin put a diamond at x = 0, which on a disparity axis is perfect parity.
 
@@ -182,6 +204,7 @@ def test_ci_dashboard_panel_places_no_marker_for_an_absent_point_estimate():
     assert any("not a value at zero" in m for m in messages), messages
 
 
+@needs_plotly
 def test_control_ci_dashboard_panel_still_draws_the_real_point_and_interval():
     fig, messages = _ci_panel({"point_estimate": 0.42, "lower_bound": 0.31, "upper_bound": 0.53})
     assert len(fig.data) == 1

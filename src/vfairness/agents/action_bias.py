@@ -18,6 +18,7 @@ import numpy as np
 from scipy import stats
 
 from vfairness.evaluation.vfairness_metrics._statistics import (
+    _mannwhitney_two_sided_p,
     detectability,
     min_attainable_p_fisher,
 )
@@ -144,8 +145,9 @@ class ActionBiasAnalyzer:
 
         MIN_RECOMMENDED_SAMPLES = 30
         if len(actions_a) < MIN_RECOMMENDED_SAMPLES or len(actions_b) < MIN_RECOMMENDED_SAMPLES:
-            import warnings
-
+            # No local `import warnings` here: it made `warnings` a LOCAL name
+            # for the whole method, so any later warnings.warn raised
+            # UnboundLocalError whenever both groups held 30 or more records.
             logger.warning(
                 "Sample size (%d, %d) below recommended minimum of %d",
                 len(actions_a),
@@ -195,7 +197,24 @@ class ActionBiasAnalyzer:
             # Genuinely identical samples: a real p of 1.0, not a stand-in.
             p_value = 1.0
         else:
-            _, p_value = stats.mannwhitneyu(values_a, values_b, alternative="two-sided")
+            # The shared helper, not a bare mannwhitneyu: on scipy 1.18 a fully
+            # tied pair of DIFFERENT lengths (array_equal is False) came back
+            # p=nan and read as could-not-check with no warning; its exact p is
+            # 1.0. Any other nan p is still could-not-check, and now says so.
+            measured = _mannwhitney_two_sided_p(values_a, values_b)
+            if measured is None:
+                warnings.warn(
+                    f"ActionBiasAnalyzer: the Mann-Whitney test on {outcome_field!r} "
+                    f"returned no p-value (a non-finite outcome, or a degenerate input "
+                    f"scipy answers with nan), so significance was NOT tested. "
+                    f"Reporting p_value=nan and is_significant=None (could not check), "
+                    f"not a 'not significant' reading.",
+                    UserWarning,
+                    stacklevel=2,
+                )
+                p_value = float("nan")
+            else:
+                p_value = measured
 
         # Determine action type from the most common action.
         action_counts = Counter(a.get("action", "unknown") for a in actions_a + actions_b)

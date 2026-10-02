@@ -29,14 +29,24 @@ import hashlib
 import io
 import warnings
 
-import matplotlib
-
-matplotlib.use("Agg")  # no display in CI; must precede pyplot
-
-import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import pytest  # noqa: E402
+
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+    plt = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+    import matplotlib.pyplot as plt
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 from vfairness.post_processing.calibration.group_calibrator import (  # noqa: E402
     GroupCalibrator,
@@ -65,7 +75,8 @@ from vfairness.xai.decomposition import (  # noqa: E402
 @pytest.fixture(autouse=True)
 def _close_figures():
     yield
-    plt.close("all")
+    if plt is not None:
+        plt.close("all")
 
 
 def _png(plot_fn, **kwargs) -> str:
@@ -349,12 +360,15 @@ class TestPointColorReachesThePoints:
     byte-identical PNGs, because the non-frontier scatter was hardcoded to
     'gray'."""
 
+    @needs_matplotlib
     def test_two_colours_render_differently(self):
         assert _pareto(point_color="#00ff00") != _pareto(point_color="magenta")
 
+    @needs_matplotlib
     def test_the_default_is_the_colour_the_signature_documents(self):
         assert _pareto() == _pareto(point_color="#1f77b4")
 
+    @needs_matplotlib
     def test_the_old_hardcoded_colour_is_still_reachable(self):
         """The default picture changed with this fix (gray -> #1f77b4), so the
         old look must remain available by name rather than be lost."""
@@ -362,14 +376,17 @@ class TestPointColorReachesThePoints:
 
 
 class TestControlTheParetoHarnessIsNotVacuous:
+    @needs_matplotlib
     def test_the_same_call_twice_hashes_the_same(self):
         assert _pareto() == _pareto()
 
+    @needs_matplotlib
     def test_a_parameter_that_was_already_wired_changes_the_bytes(self):
         """If this fails, the harness cannot see ANY colour change and the
         pins above prove nothing."""
         assert _pareto(frontier_color="#00ff00") != _pareto(frontier_color="#d62728")
 
+    @needs_matplotlib
     def test_the_frontier_itself_is_untouched(self):
         """point_color must colour the dominated points ONLY."""
         assert _pareto(point_color="magenta") != _pareto(
@@ -446,11 +463,13 @@ class TestThresholdMarkersAreDrawn:
     outlines are pinned by coordinate and by PAINTED PIXELS as well.
     """
 
+    @needs_matplotlib
     def test_turning_them_off_changes_the_picture(self, correlations):
         assert _heatmap(correlations, threshold_lines=True) != _heatmap(
             correlations, threshold_lines=False
         )
 
+    @needs_matplotlib
     def test_the_outlines_are_painted_not_merely_attached(self, correlations):
         """~1400 pixels of the marker colour with the markers on, ~14 without.
         Not zero without: text antialiasing lands on that colour a few times,
@@ -459,9 +478,11 @@ class TestThresholdMarkersAreDrawn:
         off = _marker_pixels(correlations, threshold_lines=False)
         assert on > 20 * max(off, 1), f"markers on={on} off={off}"
 
+    @needs_matplotlib
     def test_the_default_is_on_as_documented(self, correlations):
         assert _heatmap(correlations) == _heatmap(correlations, threshold_lines=True)
 
+    @needs_matplotlib
     def test_exactly_the_pairs_get_high_correlations_reports_are_marked(self, correlations):
         """The picture and the number must not be able to disagree: same
         threshold, same set. (income, race), (zipcode, race), (age, gender)
@@ -472,9 +493,11 @@ class TestThresholdMarkersAreDrawn:
         # seaborn/pcolormesh: cell (row i, col j) has its corner at (j, i).
         assert marked == [(0.0, 0.0), (0.0, 1.0), (1.0, 2.0)]
 
+    @needs_matplotlib
     def test_nothing_is_marked_when_they_are_off(self, correlations):
         assert _outlines(correlations, threshold_lines=False) == []
 
+    @needs_matplotlib
     def test_the_matplotlib_only_branch_marks_the_same_cells(self, correlations, monkeypatch):
         """The two branches use different cell geometry (imshow centres cells on
         integer coordinates, pcolormesh does not), so an offset that is right in
@@ -491,12 +514,15 @@ class TestThresholdMarkersAreDrawn:
 
 
 class TestControlTheHeatmapHarnessIsNotVacuous:
+    @needs_matplotlib
     def test_the_same_call_twice_hashes_the_same(self, correlations):
         assert _heatmap(correlations) == _heatmap(correlations)
 
+    @needs_matplotlib
     def test_a_parameter_that_was_already_wired_changes_the_bytes(self, correlations):
         assert _heatmap(correlations, annotate=True) != _heatmap(correlations, annotate=False)
 
+    @needs_matplotlib
     def test_the_markers_do_not_move_the_axes(self, correlations):
         """Adding patches must not rescale the heatmap under the reader."""
         limits = []

@@ -246,6 +246,16 @@ class GroupManager:
             }
         )
         n_rows = int(len(frame.index))
+        # Only claim a split when there IS more than one spelling. pandas 3
+        # stores a text column as `str`, which folds pd.NA and None into one
+        # `nan` at construction, so the same input can mint one name or several.
+        split_note = (
+            "Note that the spellings above are the SAME missing state and mint "
+            "DIFFERENT group names, so one absent category can be split across several "
+            "groups. "
+            if len(spellings) > 1
+            else ""
+        )
         warnings.warn(
             f"{rows_with_missing} of {n_rows} rows have a MISSING value in at least "
             f"one of the intersectional attributes. The combined group label is built "
@@ -253,9 +263,8 @@ class GroupManager:
             f"after the absence ({', '.join(spellings)}): they are not dropped and not "
             f"merged, but any metric computed over such a group describes rows whose "
             f"protected class is unknown, which is not a measured result for any real "
-            f"group. Note that the spellings above are the SAME missing state and mint "
-            f"DIFFERENT group names, so one absent category can be split across several "
-            f"groups. Drop these rows, or impute them, if that is not what you want.",
+            f"group. {split_note}Drop these rows, or impute them, if that is not what "
+            f"you want.",
             UserWarning,
             # Attribute it to the line that BUILT the GroupManager (here to
             # _create_intersectional_groups to __init__ to the caller), for the

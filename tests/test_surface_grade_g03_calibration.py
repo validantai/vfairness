@@ -75,14 +75,24 @@ import io
 import math
 import warnings
 
-import matplotlib
-
-matplotlib.use("Agg")  # no display in CI; must precede pyplot
-
-import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import pytest  # noqa: E402
+
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+    plt = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+    import matplotlib.pyplot as plt
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 from vfairness._not_assessed import (  # noqa: E402
     MIN_ROWS_PER_GROUP_FOR_CALIBRATION as MIN_GROUP_CURVE,
@@ -119,7 +129,8 @@ from vfairness.post_processing.calibration.tradeoffs import (  # noqa: E402
 @pytest.fixture(autouse=True)
 def _close_figures():
     yield
-    plt.close("all")
+    if plt is not None:
+        plt.close("all")
 
 
 def _messages(caught) -> list[str]:
@@ -614,6 +625,7 @@ def _frontier_offsets(cal, fair):
 
 
 class TestTheParetoChartRanksOnlyWhatItCanCompare:
+    @needs_matplotlib
     def test_an_unrankable_point_is_not_drawn_as_pareto_optimal(self):
         """MEASURED BEFORE THE FIX, with the fifth fairness violation set to NaN:
         the "Pareto Optimal" collection was built INCLUDING (0.15, nan), and the
@@ -634,6 +646,7 @@ class TestTheParetoChartRanksOnlyWhatItCanCompare:
         assert any("Not ranked (1 of 7)" in t for t in texts), texts
         assert any("no dominance comparison" in m for m in messages), messages
 
+    @needs_matplotlib
     def test_every_point_unrankable_does_not_die_inside_matplotlib(self):
         """The 2026-09-27 input class: one group with no negative labels, so the
         whole fairness axis is NaN. Before the fix every point came back on the
@@ -644,6 +657,7 @@ class TestTheParetoChartRanksOnlyWhatItCanCompare:
         assert any("No trade-off point could be ranked" in t for t in texts), texts
         assert any("NOTHING could be ranked" in m for m in messages), messages
 
+    @needs_matplotlib
     def test_control_the_real_frontier_is_unchanged(self):
         """OVER-CORRECTION CONTROL, on fully measured points: the frontier must
         be exactly the non-dominated set, and the other three points must be
@@ -657,6 +671,7 @@ class TestTheParetoChartRanksOnlyWhatItCanCompare:
         assert not any("Not ranked" in t for t in texts), texts
         assert messages == [], messages
 
+    @needs_matplotlib
     def test_three_states_render_three_different_images(self):
         """A drawing is only pinned by its own bytes. Three DISTINCT states:
         fully measured, one point unrankable, nothing rankable.
@@ -672,6 +687,7 @@ class TestTheParetoChartRanksOnlyWhatItCanCompare:
             none_at_all[:12],
         )
 
+    @needs_matplotlib
     def test_control_the_raster_harness_is_not_vacuous(self):
         """If the same call twice differed, or a wired parameter did not change
         the bytes, the hash pin above would prove nothing.
@@ -692,6 +708,7 @@ def _scores_and_labels(n: int = 200):
 
 
 class TestTheGroupChartCountsAMissingLevelHonestly:
+    @needs_matplotlib
     def test_a_missing_level_states_its_real_row_count(self):
         """MEASURED BEFORE THE FIX, on 100 zeros beside 100 NaNs in a float
         attribute: the chart read "Not measured (n<10): nan (n=0)" and the
@@ -712,6 +729,7 @@ class TestTheGroupChartCountsAMissingLevelHonestly:
         # the measured level still gets its curve
         assert any("0.0 (ECE=" in t for t in texts), texts
 
+    @needs_matplotlib
     def test_an_object_dtype_attribute_with_one_missing_cell_does_not_crash(self):
         """Before the fix ``np.unique`` sorted a float NaN against strings and
         raised ``TypeError: '<' not supported between instances of 'float' and
@@ -728,6 +746,7 @@ class TestTheGroupChartCountsAMissingLevelHonestly:
         assert any("ARE a missing value" in m for m in _messages(caught))
 
     @pytest.mark.parametrize("blank", ["", "None", "nan", "<NA>"])
+    @needs_matplotlib
     def test_the_string_spellings_of_absence_are_not_demographic_groups(self, blank):
         """``str(x)`` on an absent value MINTS content, and a CSV read is where
         these spellings come from. ``pd.NA`` once minted a group named '<NA>'
@@ -741,6 +760,7 @@ class TestTheGroupChartCountsAMissingLevelHonestly:
         assert any("Missing attribute" in t for t in _figure_texts(axes)), _figure_texts(axes)
         assert any("ARE a missing value" in m for m in _messages(caught))
 
+    @needs_matplotlib
     def test_control_two_real_groups_are_drawn_and_nothing_warns(self):
         """OVER-CORRECTION CONTROL: a chart that cries "missing" for data it
         measured is worse than one that says nothing, and a reader who sees the
@@ -756,6 +776,7 @@ class TestTheGroupChartCountsAMissingLevelHonestly:
         assert not any("Missing attribute" in t or "Not measured" in t for t in texts), texts
         assert _messages(caught) == [], _messages(caught)
 
+    @needs_matplotlib
     def test_control_a_genuinely_small_group_is_still_called_small(self):
         """The two disclosures must stay distinguishable: one needs more rows,
         the other needs a value in the column."""
@@ -776,6 +797,7 @@ class TestTheGroupChartCountsAMissingLevelHonestly:
 
 
 class TestTheReliabilityDiagramCaption:
+    @needs_matplotlib
     def test_zero_rows_is_not_captioned_as_perfect_calibration(self):
         y, p = np.array([]), np.array([])
         with warnings.catch_warnings(record=True) as caught:
@@ -786,6 +808,7 @@ class TestTheReliabilityDiagramCaption:
         assert "nan" in caption[0].lower(), caption
         assert any("would read as perfect calibration" in m for m in _messages(caught))
 
+    @needs_matplotlib
     def test_control_a_measurable_ece_is_still_a_number(self):
         """DERIVED, not quoted: the caption must be the ECE the metric computes
         on this data, whatever that number turns out to be."""

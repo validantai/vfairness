@@ -18,7 +18,10 @@ from typing import List, Optional, Tuple
 import numpy as np
 from scipy import stats
 
-from vfairness.evaluation.vfairness_metrics._statistics import detectability
+from vfairness.evaluation.vfairness_metrics._statistics import (
+    _mannwhitney_two_sided_p,
+    detectability,
+)
 from vfairness.llm._base import RunMetadata, SerializableMixin
 
 logger = logging.getLogger(__name__)
@@ -346,7 +349,12 @@ class CorrespondenceTester:
             if np.array_equal(arr_a, arr_b):
                 p_value = 1.0
             else:
-                _, p_value = stats.mannwhitneyu(arr_a, arr_b, alternative="two-sided")
+                # The shared helper: a fully tied pair of different lengths is the
+                # exact p of 1.0, where scipy 1.18 answers nan. Any other missing
+                # p stays nan, which the three-state block below reports as
+                # could-not-check with its own warning.
+                measured = _mannwhitney_two_sided_p(arr_a, arr_b)
+                p_value = float("nan") if measured is None else measured
 
         sample_size = min(len(arr_a), len(arr_b))
 

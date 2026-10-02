@@ -41,6 +41,7 @@ drift on a series that never moved):
    this file pins the DIAGNOSIS only that branch produces.
 """
 
+import inspect
 import math
 import warnings
 
@@ -571,8 +572,10 @@ class TestEmergentNeedsExactlyTwoGroups:
         with pytest.raises(ValueError, match="exactly 2 unique values"):
             EmergentBiasDetector().analyze(components, system, groups)
         # The seam is stated where a caller reads it, not only here.
+        # inspect.getdoc, not __doc__: Python 3.13 dedents docstrings at
+        # compile time and 3.12 does not, so the raw text differs by version.
         assert "raises\nValueError for a third label" in (
-            MultiAgentRunHarness.as_emergent_inputs.__doc__ or ""
+            inspect.getdoc(MultiAgentRunHarness.as_emergent_inputs) or ""
         )
 
     def test_emergent_system_bias_refusal_says_the_system_outputs_are_the_cause(self):

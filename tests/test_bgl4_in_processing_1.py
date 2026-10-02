@@ -27,15 +27,29 @@ tried.
 
 from __future__ import annotations
 
+import importlib.util
 import math
 import re
 import warnings
 
 import numpy as np
 import pytest
-import torch
-import torch.nn as nn
 from sklearn.linear_model import LinearRegression, LogisticRegression
+
+# torch is an optional extra ([training]), so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that build tensors are marked needs_torch and skip; the rest still run.
+try:
+    import torch
+    import torch.nn as nn
+except ModuleNotFoundError:
+    torch = None
+    nn = None
+needs_torch = pytest.mark.skipif(torch is None, reason="needs the optional torch extra")
+needs_jinja2 = pytest.mark.skipif(
+    importlib.util.find_spec("jinja2") is None,
+    reason="needs the optional [rendering] extra (jinja2)",
+)
 
 from vfairness.in_processing.analyzer import FairnessTrainingAnalyzer
 from vfairness.in_processing.calibrators.group_calibrators import (
@@ -105,6 +119,7 @@ class TestG07AnUnreadableTargetIsNotAMeasuredAccuracy:
             "accuracy came back " + repr(result.accuracy) + " with accuracy_measured True"
         )
 
+    @needs_jinja2
     def test_the_undefined_r2_is_not_drawn_as_a_number_a_reader_can_read(self):
         """BEFORE (BGL4 audit): the NaN the fix reports does not survive to
         either renderer. full_analysis copies three fields out of the baseline
@@ -212,6 +227,7 @@ class TestG06APartiallyFailedComparisonLeavesNoRecord:
 
 
 class TestG14TheRefusalIsReachableOnEveryInputItsDocstringNames:
+    @needs_torch
     def test_min_group_size_zero_does_not_score_a_diverged_batch_as_perfect(self):
         """BEFORE (BGL4 audit): the refusal is ``int(mask.sum()) < min_group_size``
         and 0 usable rows is not < 0, so min_group_size=0 makes the NaN refusal
@@ -232,6 +248,7 @@ class TestG14TheRefusalIsReachableOnEveryInputItsDocstringNames:
             value = float(calibrator.calibration_loss(logits, y, groups, min_group_size=0))
         assert math.isnan(value), "returned " + repr(value) + " for a batch with no usable row"
 
+    @needs_torch
     def test_an_empty_batch_is_refused_and_not_a_traceback(self):
         """BEFORE (BGL4 audit): the docstring names 'an empty batch' as a case the
         NaN refusal covers. The BGL3 fix's own _finite_rows reshapes (0, 1) to
@@ -252,6 +269,7 @@ class TestG14TheRefusalIsReachableOnEveryInputItsDocstringNames:
             )
         assert math.isnan(value)
 
+    @needs_torch
     def test_the_trainer_surfaces_refuse_an_empty_batch_too(self):
         """BEFORE (BGL4 audit), same root cause one layer up: train_step and
         fine_tune_calibration promise NaN when the calibrator could not measure,
@@ -288,10 +306,14 @@ class _Dummy(BaseFairnessLoss):
         return torch.tensor(0.25)
 
 
+# Built only when torch is present; without it the class is skipped, and the
+# placeholders keep the parameter ids so collection still succeeds.
+_ZERO_WEIGHTS = [torch.zeros(1), torch.tensor(0.0)] if torch is not None else [None, None]
+
+
+@needs_torch
 class TestG21AScalarZeroWeightIsNotAMeasuredTaskLoss:
-    @pytest.mark.parametrize(
-        "weight", [torch.zeros(1), torch.tensor(0.0)], ids=["numel-1", "0-dim"]
-    )
+    @pytest.mark.parametrize("weight", _ZERO_WEIGHTS, ids=["numel-1", "0-dim"])
     def test_a_broadcast_zero_weight_is_not_a_perfect_fit(self, weight):
         """BEFORE (BGL4 audit): a broadcast scalar sample_weight of 0.0 leaves
         task_rows_used at the full row count, so task_loss 0.0 is reported with

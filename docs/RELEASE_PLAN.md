@@ -159,7 +159,7 @@ self-contained check and the expensive part is the agent's start-up context.
 That single change is the difference between this plan being affordable and not.
 
 <!-- BGL:remaining:start -->
-_Generated 2026-10-01 from `scripts/release_gate.py`._
+_Generated 2026-10-02 from `scripts/release_gate.py`._
 
 **0** of the **1580** public code units carry no grade.
 1580 do: 222 from the capability census and 1374 from the wider-surface waves.

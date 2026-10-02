@@ -49,7 +49,8 @@ def _import_gcm():
     except ImportError as exc:
         raise ImportError(
             "vfairness.operations.causal.counterfactual needs dowhy's gcm module "
-            "(plus networkx). gcm requires dowhy>=0.11, which currently supports "
+            "(plus networkx). It needs dowhy>=0.13 (older releases call a networkx "
+            "function networkx has removed), which currently supports "
             "Python <=3.13 only; on Python 3.14 the available dowhy (0.8) has a gcm "
             "that is incompatible with numpy>=1.25. Run this op on a Python 3.13 "
             "worker, or use the graph-based CausalFairnessGraph / counterfactual_fairness() "

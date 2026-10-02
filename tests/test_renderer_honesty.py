@@ -34,16 +34,31 @@ values accused four renderers of plotting zeros when they had plotted nothing.
 
 from __future__ import annotations
 
+import importlib.util
 import re
 import warnings
 
-import matplotlib
-
-matplotlib.use("Agg")
-
-import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pytest  # noqa: E402
+
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+    plt = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+    import matplotlib.pyplot as plt
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
+needs_jinja2 = pytest.mark.skipif(
+    importlib.util.find_spec("jinja2") is None,
+    reason="needs the optional [rendering] extra (jinja2)",
+)
 
 from vfairness._not_assessed import MIN_ROWS_PER_GROUP_FOR_CALIBRATION  # noqa: E402
 
@@ -99,12 +114,14 @@ G_BOTH_FINE = np.array(["A"] * 30 + ["B"] * 30)
 @pytest.fixture(autouse=True)
 def _close_figures():
     yield
-    plt.close("all")
+    if plt is not None:
+        plt.close("all")
 
 
 # ---------------------------------------------------------------- unmeasurable in
 
 
+@needs_jinja2
 def test_svg_group_calibration_names_the_group_it_could_not_measure():
     from vfairness.rendering.adapters_calibration import group_calibration_to_svg
 
@@ -134,6 +151,7 @@ def test_svg_group_calibration_names_the_group_it_could_not_measure():
     )
 
 
+@needs_matplotlib
 def test_chart_group_calibration_names_the_group_it_could_not_measure():
     from vfairness.post_processing.calibration.visualization import plot_group_calibration
 
@@ -147,6 +165,7 @@ def test_chart_group_calibration_names_the_group_it_could_not_measure():
     )
 
 
+@needs_matplotlib
 def test_transformation_comparison_does_not_present_an_empty_frame_as_success():
     from vfairness.preprocessing.feature_engineering.visualization import (
         plot_transformation_comparison,
@@ -204,6 +223,7 @@ def test_transformation_comparison_does_not_present_an_empty_frame_as_success():
         ("vfairness.rendering.adapters", "cicd_pipeline_to_svg", ()),
     ],
 )
+@needs_jinja2
 def test_a_renderer_given_nothing_says_so_on_the_canvas(module, name, args):
     """Each of these accepts the empty input its own signature advertises."""
     mod = __import__(module, fromlist=[name])
@@ -226,6 +246,7 @@ def test_a_renderer_given_nothing_says_so_on_the_canvas(module, name, args):
 # everything above. The disclosure has to be a function of the data.
 
 
+@needs_jinja2
 def test_svg_group_calibration_stays_quiet_when_both_groups_are_measurable():
     from vfairness.rendering.adapters_calibration import group_calibration_to_svg
 
@@ -239,6 +260,7 @@ def test_svg_group_calibration_stays_quiet_when_both_groups_are_measurable():
     )
 
 
+@needs_matplotlib
 def test_chart_group_calibration_stays_quiet_when_both_groups_are_measurable():
     from vfairness.post_processing.calibration.visualization import plot_group_calibration
 
@@ -252,6 +274,7 @@ def test_chart_group_calibration_stays_quiet_when_both_groups_are_measurable():
     assert not [w for w in caught if "no calibration curve was drawn" in str(w.message)]
 
 
+@needs_matplotlib
 def test_transformation_comparison_stays_quiet_on_real_correlations():
     from vfairness.preprocessing.feature_engineering.visualization import (
         plot_transformation_comparison,
@@ -266,6 +289,7 @@ def test_transformation_comparison_stays_quiet_on_real_correlations():
     assert not caught, f"nothing should warn here: {[str(w.message) for w in caught]}"
 
 
+@needs_matplotlib
 def test_reliability_diagram_prints_a_refusal_not_a_zero_for_an_unmeasurable_ece():
     """ECE is the one number this chart writes directly onto the canvas."""
     from vfairness.post_processing.calibration.visualization import plot_reliability_diagram
@@ -322,6 +346,7 @@ def test_the_two_group_calibration_surfaces_use_the_same_threshold():
     "n_small,both_measured",
     [(MIN_ROWS_PER_GROUP_FOR_CALIBRATION - 1, False), (MIN_ROWS_PER_GROUP_FOR_CALIBRATION, True)],
 )
+@needs_jinja2
 def test_both_surfaces_agree_at_the_threshold_boundary(n_small, both_measured):
     """One row below the line, and exactly on it. Both surfaces, same answer.
 

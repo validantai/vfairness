@@ -36,7 +36,7 @@ the same honest way, never as a silent pass.
 
 > ### First beta
 >
-> `0.1.0` is the first public beta, released 2026-10-01 and installable with
+> `0.1.0` is the first public beta, released 2026-10-02 and installable with
 > `pip install vfairness`. It is a `0.x` release: the frozen public surface is
 > stable and changes only through a deprecation cycle, while experimental
 > surface may still move before `1.0.0`. See
@@ -259,7 +259,7 @@ explanation, and the assurance handled for you.
 ## Beta and API stability
 
 vfairness follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-`0.1.0` is the first beta, published to PyPI on 2026-10-01 from the `v0.1.0`
+`0.1.0` is the first beta, published to PyPI on 2026-10-02 from the `v0.1.0`
 tag on `validantai/vfairness`. The API is
 not frozen until `1.0.0`, so a `0.x` minor release may still change experimental
 surface. The frozen public surface

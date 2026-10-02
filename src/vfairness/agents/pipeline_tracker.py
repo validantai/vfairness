@@ -14,8 +14,8 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 import numpy as np
-from scipy import stats
 
+from vfairness.evaluation.vfairness_metrics._statistics import _mannwhitney_two_sided_p
 from vfairness.llm._base import RunMetadata, SerializableMixin
 
 logger = logging.getLogger(__name__)
@@ -140,6 +140,7 @@ class PipelineTracker:
         cumulative = 0.0
         previous_bias = 0.0
         untestable: List[str] = []
+        no_p_value: List[str] = []
         unmeasurable: List[str] = []
         unmeasurable_contribution: List[str] = []
 
@@ -199,11 +200,19 @@ class PipelineTracker:
                 if np.array_equal(data["outcomes_a"], data["outcomes_b"]):
                     p_value = 1.0
                 else:
-                    _, p_value = stats.mannwhitneyu(
-                        data["outcomes_a"],
-                        data["outcomes_b"],
-                        alternative="two-sided",
-                    )
+                    # The shared helper, for the case the shortcut above cannot
+                    # see: every value tied but the arms of DIFFERENT lengths, so
+                    # array_equal is False. scipy 1.18 returned nan there and the
+                    # stage left the ranking with no warning naming it; the exact
+                    # p is 1.0. Any other missing p stays NaN and is named below.
+                    measured = _mannwhitney_two_sided_p(data["outcomes_a"], data["outcomes_b"])
+                    if measured is None:
+                        p_value = float("nan")
+                        # Non-finite outcomes are already named by `unmeasurable`.
+                        if n_a_bad == 0 and n_b_bad == 0:
+                            no_p_value.append(stage)
+                    else:
+                        p_value = measured
             else:
                 p_value = float("nan")
                 untestable.append(f"{stage} (n_a={n_a}, n_b={n_b})")
@@ -290,6 +299,15 @@ class PipelineTracker:
                 f"including any ranking by identify_bias_source, covers only the "
                 f"{len(results)} recorded stage(s). The absent stages were not "
                 f"measured, which is not a finding that they carry no bias.",
+                UserWarning,
+                stacklevel=2,
+            )
+        if no_p_value:
+            warnings.warn(
+                f"compute_cumulative: the Mann-Whitney test returned no p-value for "
+                f"{len(no_p_value)} stage(s), so their p_value is NaN and they are "
+                f"excluded from identify_bias_source: {', '.join(no_p_value)}. That is "
+                f"a test that did not run, not evidence of an absence of difference.",
                 UserWarning,
                 stacklevel=2,
             )

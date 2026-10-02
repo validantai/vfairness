@@ -58,7 +58,7 @@ def _check_plotly():
     if not _PLOTLY_AVAILABLE:
         raise ImportError(
             "Plotly is required for FairnessDashboard.\n"
-            "Install it with: pip install plotly>=5.0  "
+            "Install it with: pip install plotly>=5.8.0  "
             "or: pip install vfairness[dashboard]"
         )
 

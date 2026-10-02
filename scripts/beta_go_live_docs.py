@@ -23,13 +23,26 @@ import json
 import os
 import sys
 import tempfile
-from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src"
 
 BATCH_ORDER = ("BGL-A", "BGL-B", "BGL-C", "BGL-D")
+
+
+def _stamp_date() -> str:
+    """The date the gate checks last ran, never the clock of a --check run.
+
+    The "_Generated <date>_" lines were date.today(), and --check compares the
+    whole page, so three pages read as stale the day after they were generated
+    with not one figure changed. One source for every generated date:
+    library_kpis.gate_measured_on().
+    """
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import library_kpis  # noqa: PLC0415
+
+    return library_kpis.gate_measured_on()
 
 
 def _load():
@@ -457,7 +470,7 @@ def remaining_block() -> str:
     )
     return "\n".join(
         [
-            f"_Generated {date.today().isoformat()} from `scripts/release_gate.py`._",
+            f"_Generated {_stamp_date()} from `scripts/release_gate.py`._",
             "",
             f"**{total - graded}** of the **{total}** public code units carry no grade.",
             f"{graded} do: {surf['graded']} from the capability census and "
@@ -494,7 +507,7 @@ def gate_block() -> str:
     import release_gate
 
     beta, full = release_gate._beta_criteria(), release_gate._criteria()
-    lines = [f"_Generated {date.today().isoformat()} by `scripts/release_gate.py`._", ""]
+    lines = [f"_Generated {_stamp_date()} by `scripts/release_gate.py`._", ""]
     for name, crit in (("Beta bar", beta), ("Full release bar", full)):
         passed = sum(1 for c in crit if c["passes"])
         verdict = "READY" if passed == len(crit) else "NOT READY"
@@ -598,7 +611,7 @@ def readiness_block() -> str:
     verdict = "READY TO CUT A BETA" if not failed else "NOT READY"
     lines = [
         f"**{verdict}.** {len(passed)} of {len(beta)} beta criteria pass; "
-        f"{len(failed)} block it. _Generated {date.today().isoformat()} from "
+        f"{len(failed)} block it. _Generated {_stamp_date()} from "
         "`scripts/release_gate.py`._",
         "",
         "| | Criterion | Measured now | Closes when |",

@@ -37,15 +37,25 @@ from __future__ import annotations
 
 import warnings
 
-import matplotlib
-
-matplotlib.use("Agg")  # no display in CI; must precede pyplot
-
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
+
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+    plt = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+    import matplotlib.pyplot as plt
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 from vfairness.preprocessing.bias_detection.geographic_data import (
     assess_geographic_feature_risk,
@@ -71,7 +81,8 @@ UNRESOLVED_ZIP = "99999"  # not in the table
 @pytest.fixture(autouse=True)
 def _close_figures():
     yield
-    plt.close("all")
+    if plt is not None:
+        plt.close("all")
 
 
 def _eta_sq(feature: np.ndarray, groups: np.ndarray) -> float:
@@ -109,6 +120,7 @@ def _messages(records) -> list[str]:
 
 
 class TestR3PlotterNeverDrawsAnUnmeasuredZero:
+    @needs_matplotlib
     def test_absent_after_value_draws_no_bar_and_warns(self):
         """The exact reproduction: before={'race': 0.8}, after={} used to render
         heights [0.8, 0] annotated '0.800' / '0.000' with no warning."""
@@ -125,6 +137,7 @@ class TestR3PlotterNeverDrawsAnUnmeasuredZero:
         assert "not measured" in texts
         assert "0.000" not in texts, "a 0.000 annotation is the fabricated measurement"
 
+    @needs_matplotlib
     def test_mixed_attributes_keep_measured_values_and_blank_the_rest(self):
         with pytest.warns(UserWarning, match=r"\['gender'\]"):
             ax = viz.plot_transformation_comparison({"race": 0.8, "gender": 0.4}, {"race": 0.1})
@@ -135,6 +148,7 @@ class TestR3PlotterNeverDrawsAnUnmeasuredZero:
         assert texts == ["0.800", "0.400", "0.100", "not measured"]
         assert ax.get_ylim()[1] == pytest.approx(0.8 * 1.2)  # NaN excluded from the axis range
 
+    @needs_matplotlib
     def test_a_measured_zero_is_still_a_bar_with_no_warning(self):
         """Over-correction control: a genuinely measured 0.0 keeps its bar."""
         with warnings.catch_warnings(record=True) as w:
@@ -145,6 +159,7 @@ class TestR3PlotterNeverDrawsAnUnmeasuredZero:
         assert heights == pytest.approx([0.8, 0.0])
         assert [t.get_text() for t in ax.texts] == ["0.800", "0.000"]
 
+    @needs_matplotlib
     def test_effect_figure_labels_a_missing_after_panel(self):
         result = TransformationResult(
             method="m",
@@ -158,6 +173,7 @@ class TestR3PlotterNeverDrawsAnUnmeasuredZero:
         assert not panel.patches, "no bars may be drawn when nothing was measured after"
         assert any("not measured" in t.get_text() for t in panel.texts)
 
+    @needs_matplotlib
     def test_effect_figure_still_draws_bars_when_after_exists(self):
         result = TransformationResult(
             method="m",

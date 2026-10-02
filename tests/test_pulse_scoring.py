@@ -233,3 +233,41 @@ def test_notes_and_degradations_are_json_safe():
         for d in degr
     )
     json.dumps({"featureColumns": cols, "notes": notes, "degradations": degr})
+
+
+# ── the factory's own string never reaches a log line or a note ─────────────
+
+
+class SecretLabelPredict(RowMeanPredict):
+    """A factory that returns a credential-bearing string as its 'source'."""
+
+    SECRET = "https://user:tok-SECRET-123@scorer.example/predict?key=sk-SECRET-456"
+
+    def __call__(self, scoring_payload, model_cols):
+        predict, _ = super().__call__(scoring_payload, model_cols)
+        return predict, self.SECRET
+
+
+def test_the_factory_source_string_is_never_printed(caplog):
+    """CodeQL py/clear-text-logging-sensitive-data: the injected factory also
+    receives the endpoint and auth token, so its returned string must not be
+    logged or written into a report note verbatim. Only fixed labels are."""
+    caplog.set_level("DEBUG")
+    stub = SecretLabelPredict()
+    _out, _cols, notes, _degr = score_model_over_frame(
+        _frame(), _inputs(), {"endpoint_url": "https://scorer.example/predict"}, stub
+    )
+    printed = " ".join(notes) + " " + caplog.text
+    assert "SECRET" not in printed, printed
+    assert "Scored injected model" in " ".join(notes), notes
+
+
+@pytest.mark.parametrize("source, label", [("endpoint", "endpoint"), ("upload", "uploaded")])
+def test_the_consumer_labels_still_read_plainly(source, label):
+    class Labelled(RowMeanPredict):
+        def __call__(self, scoring_payload, model_cols):
+            predict, _ = super().__call__(scoring_payload, model_cols)
+            return predict, source
+
+    _out, _cols, notes, _degr = score_model_over_frame(_frame(), _inputs(), _payload(), Labelled())
+    assert f"Scored {label} model" in " ".join(notes), notes

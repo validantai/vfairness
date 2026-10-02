@@ -22,7 +22,6 @@ from dataclasses import dataclass, field, replace
 from typing import List, Optional
 
 import numpy as np
-from scipy import stats
 
 from ._base import RunMetadata, SerializableMixin
 from .scorers import (
@@ -1758,7 +1757,16 @@ class OutputAnalyzer:
                 p_value_source = "identical_samples_short_circuit"
             else:
                 try:
-                    _, p_value = stats.mannwhitneyu(scores_a, scores_b, alternative="two-sided")
+                    # The shared helper: a fully tied pair of DIFFERENT lengths
+                    # (array_equal is False) is the exact p of 1.0, a real test,
+                    # where scipy 1.18 answers nan. Its None is the non-finite
+                    # case the backstop below already refuses, so it maps to nan.
+                    from vfairness.evaluation.vfairness_metrics._statistics import (
+                        _mannwhitney_two_sided_p,
+                    )
+
+                    measured = _mannwhitney_two_sided_p(scores_a, scores_b)
+                    p_value = float("nan") if measured is None else measured
                     p_value_source = "mannwhitneyu"
                 except ValueError as exc:
                     # BGL3, 2026-09-27. This was `p_value = 1.0`: the test

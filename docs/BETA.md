@@ -30,7 +30,7 @@ B1 passed, B2 went to zero and back up on an audit, B4 passed 500 and came back
 down. Reproduce it with `python scripts/release_gate.py`, which is the authority.
 
 <!-- BGL:gate:start -->
-_Generated 2026-10-01 by `scripts/release_gate.py`._
+_Generated 2026-10-02 by `scripts/release_gate.py`._
 
 **Beta bar: READY.** 8 of 8 criteria pass.
 

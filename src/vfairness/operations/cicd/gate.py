@@ -396,7 +396,7 @@ def _unsized_rate_scope_sentence() -> str:
     )
 
 
-def _vacuous_min_group_size(min_group_size: int) -> Optional[int]:
+def _vacuous_min_group_size(min_group_size: int) -> Optional[Union[int, float]]:
     """The configured minimum, when NO group count can fall below it, else None.
 
     THE SAME RULE AS _vacuous_bound_message, ON THE GATE'S FOURTH BOUND (W3,
@@ -720,7 +720,7 @@ def _absent_baseline_message(metric_name: str, value: float) -> str:
     )
 
 
-def _vacuous_minimum_sentence(minimum: int) -> str:
+def _vacuous_minimum_sentence(minimum: Union[int, float]) -> str:
     """The NOT RUN sentence for a group-size bound no count can fall below.
 
     One wording, used by the flat report, the hierarchical report and the card, so
@@ -1048,8 +1048,10 @@ class GateDecision:
     small_sample_check_ran: Optional[bool] = None
     # The configured minimum when no group count can fall below it, else None.
     # It is the CAUSE of a False above, and the sentence has to name the number:
-    # see _vacuous_min_group_size for the five measured rows.
-    small_sample_vacuous_minimum: Optional[int] = None
+    # see _vacuous_min_group_size for the five measured rows. Union[int, float]
+    # because a NaN minimum is carried as float("nan") (W4), which the old
+    # Optional[int] annotation did not admit although the value always arrived.
+    small_sample_vacuous_minimum: Optional[Union[int, float]] = None
     # What the answer above does NOT cover (W4, 2026-09-30). The flat twin of the
     # hierarchical field: a True means every count the gate KNOWS about was
     # compared, and the numbers from a caller-supplied compute_metrics_fn rest on
@@ -1347,8 +1349,9 @@ class IntersectionalGateDecision:
     # the ATTRIBUTES, this answers for every group set the data defines.
     small_sample_unsized: List[str] = field(default_factory=list)
     # The hierarchy's own copy of the flat field, because hconfig.min_group_size
-    # is the bound ITS scan applies and it can be just as unbreachable.
-    small_sample_vacuous_minimum: Optional[int] = None
+    # is the bound ITS scan applies and it can be just as unbreachable. A NaN
+    # minimum is carried as float("nan"), hence Union[int, float] (W4).
+    small_sample_vacuous_minimum: Optional[Union[int, float]] = None
 
     @property
     def summary(self) -> str:
@@ -3568,13 +3571,15 @@ class FairnessReportCard:
                 "- RAN, and every group was at or above the minimum. This is a "
                 "measurement, not an absence of one."
             )
-        elif getattr(self.decision, "small_sample_vacuous_minimum", None) is not None:
+        elif (
+            vacuous_minimum := getattr(self.decision, "small_sample_vacuous_minimum", None)
+        ) is not None:
             # THE BOUND-SHAPED CAUSE, ahead of both type-shaped ones (W3,
             # 2026-09-30). A minimum of 1 or less was compared to every group and
             # could not fire, so neither "no group sizes attached" nor
             # "check_single_attributes is off" is true of this decision: the sizes
             # were there and the scan ran. Same sentence as both reports.
-            lines.append(_vacuous_minimum_sentence(self.decision.small_sample_vacuous_minimum))
+            lines.append(_vacuous_minimum_sentence(vacuous_minimum))
         elif ran is False:
             # The CAUSE differs by decision type and the sentence has to be true of
             # the decision in hand: a flat one was handed numbers with no sample

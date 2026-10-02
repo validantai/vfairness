@@ -346,7 +346,10 @@ def test_shap_decomposition_two_groups_stays_silent():
 def test_removal_curve_auc_without_np_trapezoid(monkeypatch):
     import vfairness.xai.diagnostics.faithfulness as faithfulness
 
-    trapezoid = np.trapezoid  # keep a reference before hiding the name
+    # keep a reference before hiding the name. numpy before 2.0 has no
+    # np.trapezoid at all (only np.trapz), which is the very case the fallback
+    # serves, so take whichever this numpy ships.
+    trapezoid = getattr(np, "trapezoid", None) or np.trapz
     monkeypatch.delattr(np, "trapezoid", raising=False)
     monkeypatch.setattr(np, "trapz", trapezoid, raising=False)
     try:

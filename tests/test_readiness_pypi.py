@@ -264,7 +264,9 @@ def test_the_extractor_sees_the_urls_a_markdown_only_scan_misses() -> None:
         f"a markdown-only scan misses {len(missed)} of the page's references, "
         f"expected at least 5 (the hero image and four badges): {sorted(missed)}"
     )
-    assert all("img.shields.io" in u or u == hero for u in missed), (
+    from urllib.parse import urlparse
+
+    assert all(urlparse(u).hostname == "img.shields.io" or u == hero for u in missed), (
         f"the non-markdown references are no longer only badges and the hero: "
         f"{sorted(missed)}. Confirm each one is checked before widening this."
     )
@@ -413,7 +415,7 @@ def test_the_page_names_only_public_hosts() -> None:
         f"{unexpected}. Confirm each is public and reachable from outside, then "
         "add it to PUBLIC_HOSTS deliberately."
     )
-    assert "raw.githubusercontent.com" in hosts and "vfairness.validant.ai" in hosts, (
+    assert {"raw.githubusercontent.com", "vfairness.validant.ai"} <= hosts, (
         f"the host scan found {sorted(hosts)}, which does not include the two "
         "hosts the page cannot work without; the extractor is broken"
     )

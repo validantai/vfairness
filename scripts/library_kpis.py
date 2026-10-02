@@ -59,6 +59,81 @@ LATER_WAVES = sorted(
 
 STAMP = "Beta Go-Live proof status"
 
+GATE_CHECKS = ROOT / "docs" / "gate-checks.json"
+
+
+def gate_measured_on() -> str:
+    """The ONE date every generated page prints as "measured" or "generated".
+
+    It is the date the two beta-gate checks were last EXECUTED, read from
+    docs/gate-checks.json, and never the clock of whoever runs a --check.
+
+    WHY. Every generator stamped date.today() into what it publishes, and every
+    --check compared the whole published block, the stamp included. So a tree
+    regenerated on 2026-10-01 read as STALE on 2026-10-02 with not one figure
+    changed: the public CI job "Published documents match the repo" reported
+    library-stats, the register and three markdown pages stale for no reason
+    but the calendar. A check that fails on a timer teaches its reader to ignore
+    it, which is worse than no check. Every figure is still compared; only the
+    date stops being a function of the wall clock.
+
+    It is also the TRUER date. ./scripts/refresh-docs.sh executes the gate checks
+    first and writes that day into gate-checks.json, so this is the day the
+    published figures were measured. A --check run later does not re-measure the
+    gate, it recomputes the figures and proves they still match, which is not a
+    new measurement date.
+
+    Falls back to today only when the file is absent or unreadable, which is a
+    tree where the gate checks never ran and release_gate.py already reports
+    them as could not check.
+    """
+    try:
+        with GATE_CHECKS.open(encoding="utf-8") as fh:
+            stamped = json.load(fh).get("date")
+        return date.fromisoformat(stamped).isoformat()
+    except (OSError, ValueError, TypeError, AttributeError):
+        return date.today().isoformat()
+
+
+# THE EXTRAS THAT CHANGE THE SURFACE, and what each one is probed by. Each probe
+# names a module the extra in pyproject.toml actually installs. `dashboard` was
+# probed by `streamlit`, which no extra declares and no vfairness module imports,
+# so the published record said whether a developer happened to have streamlit on
+# the machine: true on the workstation that generated the ledger, false on every
+# CI runner that installs the declared extras, and the library-stats check could
+# never pass there. The dashboard extra declares plotly.
+SURFACE_EXTRAS = (
+    ("mcp", "mcp"),
+    ("viz", "matplotlib"),
+    ("xai", "shap"),
+    ("training", "torch"),
+    ("causal", "dowhy"),
+    ("dashboard", "plotly"),
+)
+
+
+def missing_extras(published: dict | None) -> list[str]:
+    """Extras the PUBLISHED measurement had importable and this environment lacks.
+
+    The surface walk depends on them: without `mcp` the twelve functions of
+    vfairness.mcp.server cannot be imported, and without torch the eight
+    adversarial-training units in in_processing.loss_functions.adversarial are not
+    defined while three placeholder stubs are. Measured 2026-10-02 on the public
+    tree with only the dev, rendering, viz, monitoring and causal extras: 1,563
+    units (1,560 checked, 3 not checked) against the 1,580 the full install
+    measures. That is not a stale ledger, it is a different package being
+    measured, and reporting it as STALE invites a regeneration that would publish
+    a partial install's count as the library's. A check that cannot see what was
+    published is a could-not-check, never a pass and never a staleness verdict.
+    """
+    import importlib.util as _ilu
+
+    published = published or {}
+    return sorted(
+        name for name, mod in SURFACE_EXTRAS if published.get(name) and _ilu.find_spec(mod) is None
+    )
+
+
 # qualified name -> (short name, object), filled by _walk_public_surface.
 _OBJECTS: dict[str, tuple[str, object]] = {}
 
@@ -202,17 +277,7 @@ def _walk_public_surface() -> dict:
     # compared, and every figure downstream inherits that.
     import importlib.util as _ilu
 
-    extras = {
-        name: _ilu.find_spec(mod) is not None
-        for name, mod in (
-            ("mcp", "mcp"),
-            ("viz", "matplotlib"),
-            ("xai", "shap"),
-            ("training", "torch"),
-            ("causal", "dowhy"),
-            ("dashboard", "streamlit"),
-        )
-    }
+    extras = {name: _ilu.find_spec(mod) is not None for name, mod in SURFACE_EXTRAS}
 
     f, c, m = bucket(funcs), bucket(classes), bucket(methods)
     total = f["total"] + c["total"] + m["total"]
@@ -694,7 +759,8 @@ def _gate() -> dict:
         # beside numbers that refresh themselves on every page load. The figures
         # were current and the date was eight days old, which is the worse way round:
         # it invites a reader to discount a measurement that is in fact live.
-        "measured_on": date.today().isoformat(),
+        # From gate-checks.json, not the clock: see gate_measured_on().
+        "measured_on": gate_measured_on(),
         "verdict": "READY" if all(c["passes"] for c in crit) else "NOT READY",
         "criteria": crit,
         "beta_verdict": "BETA READY" if all(c["passes"] for c in beta) else "NOT BETA READY",
@@ -936,6 +1002,16 @@ def main() -> int:
         return 0
     site = ROOT / "docs" / "site" / "data" / "library-stats.json"
     published = (json.loads(site.read_text(encoding="utf-8")) or {}).get("kpis")
+    absent = missing_extras(((published or {}).get("surface") or {}).get("optional_extras_present"))
+    if absent:
+        print(
+            "COULD NOT CHECK: docs/site/data/library-stats.json was measured with the "
+            f"optional extras {absent} importable and this environment lacks them, so "
+            "it cannot measure the surface that was published. Install the extras the "
+            "published-docs CI job installs and run the check again.",
+            file=sys.stderr,
+        )
+        return 2
     if published != kpis:
         print("STALE: docs/site/data/library-stats.json kpis block", file=sys.stderr)
         print("  run ./scripts/refresh-manifest.sh", file=sys.stderr)

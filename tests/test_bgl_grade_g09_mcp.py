@@ -35,7 +35,7 @@ import pytest
 # error that stopped the whole suite.
 mcp_server = pytest.importorskip(
     "vfairness.mcp.server",
-    reason="the MCP server needs the optional 'mcp' extra (mcp>=1.2.0,<2)",
+    reason="the MCP server needs the optional 'mcp' extra (mcp>=1.14.0,<2)",
     exc_type=ImportError,
 )
 

@@ -4853,22 +4853,49 @@ html[data-theme="dark"] .to .to-warn { border-color: rgba(232, 178, 79, 0.35) !i
 @media (min-width: 1025px) { .mobile-sections { display: none; } }
 
 /* Page foot: date, report a problem, previous / next */
-.page-foot { margin: 6rem 0 0; padding-top: 1.5rem; border-top: 1px solid var(--rule); }
-.page-foot__meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-gray-500); }
-.page-foot__meta a { color: var(--color-gray-700); }
-.page-foot__meta a:hover { color: var(--color-primary); }
-.page-pager { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 2rem; }
-.page-pager a {
-    display: flex; flex-direction: column; gap: 0.35rem; padding: 1.1rem 1.25rem; text-decoration: none !important;
-    border: 1px solid var(--rule); background: var(--surface-veil); color: var(--color-gray-900); font-weight: 600; font-size: 1.05rem;
-    transition: border-color 120ms ease;
+/* Page foot: one calm panel, no rules or boxes (Daniel, 2026-10-01). Big
+   previous / next titles on the content column, then one quiet line with
+   the date and the report link. On full-width pages it is held to the same
+   column as the content instead of running edge to edge. */
+.page-foot {
+    margin: 7rem 0 0; padding: 3rem clamp(1.25rem, 3vw, 2.5rem) 2rem;
+    background: var(--surface-sunk); display: flex; flex-direction: column; gap: 2.25rem;
 }
-.page-pager a:hover { border-color: var(--color-gray-800); }
-.page-pager a span { font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-gray-500); }
-.page-pager__prev span::before { content: "\2190  "; }
+main.page-wrapper > .page-foot { max-width: 1120px; margin: 7rem auto 5rem; width: calc(100% - 2.5rem); }
+.page-pager { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; margin: 0; }
+.page-pager a {
+    display: flex; flex-direction: column; gap: 0.6rem; padding: 0; border: 0; background: none;
+    color: var(--color-gray-900); text-decoration: none !important;
+}
+.page-pager a span {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-gray-500);
+}
+.page-pager a strong {
+    font-size: clamp(1.35rem, 1rem + 1.2vw, 1.9rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+    color: var(--color-gray-900); transition: color 160ms ease;
+}
+.page-pager a span i { font-style: normal; display: inline-block; transition: transform 200ms var(--ease-smooth); color: var(--color-primary); font-size: 0.9rem; letter-spacing: 0; }
+.page-pager a:hover strong { color: var(--color-primary); }
+.page-pager__prev:hover span i { transform: translateX(-5px); }
+.page-pager__next:hover span i { transform: translateX(5px); }
 .page-pager__next { text-align: right; align-items: flex-end; }
-.page-pager__next span::after { content: "  \2192"; }
-@media (max-width: 560px) { .page-pager { grid-template-columns: minmax(0, 1fr); } }
+.page-pager a:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 6px; }
+.page-foot__meta {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.4rem 0.9rem;
+    font-size: 0.85rem; color: var(--color-gray-500); text-align: center;
+}
+.page-foot__meta > * + *::before { content: "\00B7"; margin-right: 0.9rem; color: var(--color-gray-400); }
+.page-foot__meta a { color: var(--color-gray-700); text-decoration: underline; text-decoration-color: var(--rule-strong); text-underline-offset: 3px; }
+.page-foot__meta a:hover { color: var(--color-primary); text-decoration-color: currentColor; }
+.page-foot__date[hidden] + a::before { content: none; }
+.pkg-pager { margin-top: 5rem; padding: 2.5rem clamp(1.25rem, 3vw, 2.5rem); background: var(--surface-sunk); }
+@media (max-width: 560px) {
+    .page-pager { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+    .page-pager__next { text-align: left; align-items: flex-start; }
+    .page-foot__meta { flex-direction: column; gap: 0.35rem; }
+    .page-foot__meta > * + *::before { content: none; }
+}
 
 /* Long guides: overview list and folded sections */
 .guide-overview { margin: 0 0 4rem; padding: 1.5rem 1.75rem; border: 1px solid var(--rule); border-left: 2px solid var(--color-primary); background: var(--surface-veil); }
@@ -4939,6 +4966,14 @@ pre .hljs-params { color: #c5ced7; }
 .main-content .intro-section .stat-value { color: var(--color-gray-900) !important; font-size: 2.25rem !important; font-weight: 300 !important; letter-spacing: -0.03em; line-height: 1.1; font-variant-numeric: tabular-nums; background: none !important; -webkit-text-fill-color: currentColor !important; }
 .main-content .intro-section .stat-label { margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.66rem !important; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gray-500) !important; opacity: 1 !important; }
 @media (max-width: 560px) { .main-content .intro-section .quick-stats { grid-template-columns: minmax(0, 1fr); } }
+
+/* Test Objects explorer (.tx): the weak column's coral darkened so the white
+   tick labels on it pass AA, and the summary list may wrap on phones (its
+   download link ran 57px past a 390px screen). */
+.to .tx { --coral: #b8432c !important; }
+.to .tx-foot { grid-template-columns: max-content minmax(0, 1fr) !important; }
+.to .tx-foot dd, .to .tx-foot a, .to .tx-foot .to-dl { min-width: 0; overflow-wrap: anywhere; word-break: break-word; white-space: normal !important; }
+@media (max-width: 560px) { .to .tx-foot { grid-template-columns: minmax(0, 1fr) !important; } }
 
 /* Stat tiles on Getting Started: a solid sheet, so the dot field behind
    them never runs through the numbers. */

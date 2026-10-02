@@ -2421,9 +2421,11 @@ def subgroup_robustness_audit(
     # nothing. Rows without a prediction (or without a label, when the metric
     # needs one) are removed and counted before anything is measured, so a
     # subgroup left with no rows falls into the existing too-small path.
+    # Not `|=`: under pandas 3 copy-on-write, `.to_numpy()` hands back a
+    # read-only view, and an in-place OR raised "output array is read-only".
     missing = pd.isna(pd.Series(y_pred, dtype=object)).to_numpy()
     if y_true is not None and metric in ("tpr", "fpr", "error_rate"):
-        missing |= pd.isna(pd.Series(np.asarray(y_true), dtype=object)).to_numpy()
+        missing = missing | pd.isna(pd.Series(np.asarray(y_true), dtype=object)).to_numpy()
     n_rows_missing = int(missing.sum())
     if n_rows_missing:
         keep = ~missing

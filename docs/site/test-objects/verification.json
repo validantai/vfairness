@@ -29,12 +29,20 @@
     {
      "attribute": "sex",
      "assessable": true,
-     "tone": "critical"
+     "tone": "critical",
+     "significant": true,
+     "pValueAdjusted": 0.001998001998001998,
+     "gap": 0.17866665933833903,
+     "fourFifthsRatio": 0.3125026195274454
     },
     {
      "attribute": "race",
      "assessable": true,
-     "tone": "critical"
+     "tone": "critical",
+     "significant": true,
+     "pValueAdjusted": 0.001998001998001998,
+     "gap": 0.12570464624093802,
+     "fourFifthsRatio": 0.3178331735378715
     }
    ],
    "calibration": true,
@@ -94,12 +102,20 @@
     {
      "attribute": "sex",
      "assessable": true,
-     "tone": "critical"
+     "tone": "critical",
+     "significant": true,
+     "pValueAdjusted": 0.001998001998001998,
+     "gap": 0.17866665933833903,
+     "fourFifthsRatio": 0.3125026195274454
     },
     {
      "attribute": "race",
      "assessable": true,
-     "tone": "critical"
+     "tone": "critical",
+     "significant": true,
+     "pValueAdjusted": 0.001998001998001998,
+     "gap": 0.12570464624093802,
+     "fourFifthsRatio": 0.3178331735378715
     }
    ],
    "calibration": false,
@@ -156,12 +172,20 @@
     {
      "attribute": "gender",
      "assessable": true,
-     "tone": "pass"
+     "tone": "pass",
+     "significant": true,
+     "pValueAdjusted": 0.011988011988011988,
+     "gap": 0.09150641025641026,
+     "fourFifthsRatio": 0.8176883780332056
     },
     {
      "attribute": "race",
      "assessable": true,
-     "tone": "pass"
+     "tone": "pass",
+     "significant": false,
+     "pValueAdjusted": 1.0,
+     "gap": 0.06,
+     "fourFifthsRatio": 0.875
     }
    ],
    "calibration": true,
@@ -199,12 +223,20 @@
     {
      "attribute": "gender",
      "assessable": true,
-     "tone": "pass"
+     "tone": "pass",
+     "significant": false,
+     "pValueAdjusted": 1.0,
+     "gap": 0.02022727272727276,
+     "fourFifthsRatio": 0.972394540942928
     },
     {
      "attribute": "ethnicity",
      "assessable": true,
-     "tone": "pass"
+     "tone": "pass",
+     "significant": false,
+     "pValueAdjusted": 1.0,
+     "gap": 0.07280701754385965,
+     "fourFifthsRatio": 0.8948545861297539
     }
    ],
    "calibration": true,
@@ -249,12 +281,20 @@
     {
      "attribute": "sex",
      "assessable": true,
-     "tone": "pass"
+     "tone": "pass",
+     "significant": false,
+     "pValueAdjusted": 1.0,
+     "gap": 0.018000000000000016,
+     "fourFifthsRatio": 0.979020979020979
     },
     {
      "attribute": "race",
      "assessable": true,
-     "tone": "pass"
+     "tone": "pass",
+     "significant": true,
+     "pValueAdjusted": 0.023976023976023976,
+     "gap": 0.08684210526315783,
+     "fourFifthsRatio": 0.8750000000000001
     }
    ],
    "calibration": true,
@@ -290,30 +330,46 @@
     "pathway": "tabular"
    },
    "verdict": {
-    "tone": "critical",
-    "headline": "Not fit to deploy as-is: material disparity for \"Cognitive/Neurodivergent\"."
+    "tone": "warn",
+    "headline": "Deployable only with monitoring: watch-level gap for \"Cognitive/Neurodivergent\"."
    },
    "assurance": "Adverse",
    "perVariable": [
     {
      "attribute": "gender",
      "assessable": true,
-     "tone": "warn"
+     "tone": "warn",
+     "significant": false,
+     "pValueAdjusted": 1.0,
+     "gap": 0.016433099766433104,
+     "fourFifthsRatio": 0.6525573192239859
     },
     {
      "attribute": "race_ethnicity",
      "assessable": true,
-     "tone": "critical"
+     "tone": "warn",
+     "significant": false,
+     "pValueAdjusted": 1.0,
+     "gap": 0.04390243902439024,
+     "fourFifthsRatio": 0.0
     },
     {
      "attribute": "age",
      "assessable": true,
-     "tone": "critical"
+     "tone": "warn",
+     "significant": false,
+     "pValueAdjusted": 1.0,
+     "gap": 0.023529411764705882,
+     "fourFifthsRatio": 0.0
     },
     {
      "attribute": "disability_status",
      "assessable": true,
-     "tone": "critical"
+     "tone": "warn",
+     "significant": false,
+     "pValueAdjusted": 1.0,
+     "gap": 0.05992063492063492,
+     "fourFifthsRatio": 0.22959183673469385
     }
    ],
    "calibration": false,
@@ -505,12 +561,20 @@
     {
      "attribute": "gender",
      "assessable": true,
-     "tone": "pass"
+     "tone": "pass",
+     "significant": true,
+     "pValueAdjusted": 0.007992007992007992,
+     "gap": 0.04814814814814816,
+     "fourFifthsRatio": 0.9445037353255069
     },
     {
      "attribute": "race",
      "assessable": true,
-     "tone": "pass"
+     "tone": "pass",
+     "significant": false,
+     "pValueAdjusted": 1.0,
+     "gap": 0.03703703703703698,
+     "fourFifthsRatio": 0.9575221238938054
     }
    ],
    "calibration": false,
@@ -634,10 +698,10 @@
     "pathway": "agent_traces"
    },
    "verdict": {
-    "tone": "disclaimer",
-    "headline": "Insufficient assessable data to issue a fairness opinion. Provide grouped protected attributes and, ideally, outcome labels."
+    "tone": "pass",
+    "headline": "Unqualified opinion: no material fairness defect found on the assessed attributes. Keep monitoring."
    },
-   "assurance": "Disclaimer",
+   "assurance": "Unqualified",
    "perVariable": [],
    "calibration": false,
    "proxies": [],
@@ -666,10 +730,10 @@
     "pathway": "agent_traces"
    },
    "verdict": {
-    "tone": "disclaimer",
-    "headline": "Insufficient assessable data to issue a fairness opinion. Provide grouped protected attributes and, ideally, outcome labels."
+    "tone": "pass",
+    "headline": "Unqualified opinion: no material fairness defect found on the assessed attributes. Keep monitoring."
    },
-   "assurance": "Disclaimer",
+   "assurance": "Unqualified",
    "perVariable": [],
    "calibration": false,
    "proxies": [],
@@ -688,14 +752,8 @@
    "file": "synthetic/clean.csv",
    "planted": "nothing",
    "planted_found": null,
-   "flagged": [
-    "age",
-    "national_origin"
-   ],
-   "spurious": [
-    "age",
-    "national_origin"
-   ],
+   "flagged": [],
+   "spurious": [],
    "proxies_named": [
     "applicant_id",
     "applicant_id",
@@ -793,8 +851,8 @@
     "model_score"
    ],
    "verdict": {
-    "tone": "critical",
-    "headline": "Not fit to deploy as-is: material disparity for \"18-24\"."
+    "tone": "warn",
+    "headline": "Deployable only with monitoring: watch-level gap for \"18-24\"."
    },
    "toned_warn_or_critical": [
     "race_ethnicity",
@@ -908,8 +966,8 @@
     "model_score"
    ],
    "verdict": {
-    "tone": "critical",
-    "headline": "Not fit to deploy as-is: material disparity for \"Hispanic\"."
+    "tone": "warn",
+    "headline": "Deployable only with monitoring: watch-level gap for \"Spanish\"."
    },
    "toned_warn_or_critical": [
     "race_ethnicity",
@@ -1281,7 +1339,7 @@
      "race_ethnicity"
     ]
    },
-   "planted_found": true,
+   "planted_found": false,
    "flagged": [],
    "spurious": [],
    "proxies_named": [
@@ -1378,8 +1436,8 @@
     "years_experience"
    ],
    "verdict": {
-    "tone": "critical",
-    "headline": "Not fit to deploy as-is: material disparity for \"Mandarin\"."
+    "tone": "warn",
+    "headline": "Deployable only with monitoring: watch-level gap for \"Single\"."
    },
    "toned_warn_or_critical": [
     "race_ethnicity",
@@ -1481,8 +1539,8 @@
     "photo_attractiveness_score"
    ],
    "verdict": {
-    "tone": "critical",
-    "headline": "Not fit to deploy as-is: material disparity for \"18-24\"."
+    "tone": "warn",
+    "headline": "Deployable only with monitoring: watch-level gap for \"Single\"."
    },
    "toned_warn_or_critical": [
     "age",
@@ -1505,12 +1563,10 @@
    "planted_found": true,
    "flagged": [
     "race_ethnicity",
-    "national_origin",
-    "primary_language"
+    "national_origin"
    ],
    "spurious": [
-    "national_origin",
-    "primary_language"
+    "national_origin"
    ],
    "proxies_named": [
     "applicant_id",

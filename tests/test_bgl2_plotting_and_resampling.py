@@ -27,13 +27,24 @@ from __future__ import annotations
 
 import warnings
 
-import matplotlib
 import numpy as np
 import pandas as pd
 import pytest
 
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+    plt = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+    import matplotlib.pyplot as plt
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 import vfairness  # noqa: E402
 from vfairness.post_processing.calibration import visualization as calibration_plots  # noqa: E402
@@ -55,7 +66,8 @@ N = 400
 @pytest.fixture(autouse=True)
 def _close_figures():
     yield
-    plt.close("all")
+    if plt is not None:
+        plt.close("all")
 
 
 def _rng():
@@ -79,6 +91,7 @@ def _frame(constant: bool = False) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 
+@needs_matplotlib
 def test_a_feature_that_could_not_be_measured_is_a_hole_in_the_heatmap():
     """Not a zero. A zero is painted as "no relationship" and read as a finding."""
     columns = ["const", "age", "inc"]
@@ -103,6 +116,7 @@ def test_a_feature_that_could_not_be_measured_is_a_hole_in_the_heatmap():
     )
 
 
+@needs_matplotlib
 def test_control_a_frame_without_constants_has_no_holes():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -113,6 +127,7 @@ def test_control_a_frame_without_constants_has_no_holes():
     assert np.ma.count_masked(grid) == 0
 
 
+@needs_matplotlib
 def test_the_correlation_bars_chart_draws_one_bar_per_feature():
     frame = _frame()
     with warnings.catch_warnings():
@@ -126,6 +141,7 @@ def test_the_correlation_bars_chart_draws_one_bar_per_feature():
     assert len(axes.patches) >= 2, "a feature in the matrix got no bar"
 
 
+@needs_matplotlib
 def test_no_proxy_chains_draws_no_chart_and_says_so():
     """An empty bar chart titled "Indirect Proxy Chains" would read as a clean
     result. The function declines to draw one and warns instead."""
@@ -133,6 +149,7 @@ def test_no_proxy_chains_draws_no_chart_and_says_so():
         assert correlation_plots.plot_proxy_chains([]) is None
 
 
+@needs_matplotlib
 def test_proxy_chains_are_drawn_when_there_are_some():
     chains = [
         {"chain": ["zip", "income", "race"], "indirect_correlation": 0.41},
@@ -163,6 +180,7 @@ def _analyzer():
     return CalibrationAnalyzer(y_true, y_prob, groups)
 
 
+@needs_matplotlib
 def test_the_disparity_chart_renders_from_a_real_disparity_result():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -171,6 +189,7 @@ def test_the_disparity_chart_renders_from_a_real_disparity_result():
     assert figure.axes, "the figure carries no axes"
 
 
+@needs_matplotlib
 def test_the_tradeoff_chart_renders_from_a_real_tradeoff_result():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -178,6 +197,7 @@ def test_the_tradeoff_chart_renders_from_a_real_tradeoff_result():
     assert axes is not None
 
 
+@needs_matplotlib
 def test_the_comparison_chart_draws_a_curve_per_named_method():
     y_true, y_prob, _groups = _calibration_inputs()
     rng = np.random.default_rng(2)
@@ -194,6 +214,7 @@ def test_the_comparison_chart_draws_a_curve_per_named_method():
     assert len(axes.get_lines()) >= len(results)
 
 
+@needs_matplotlib
 def test_the_group_calibration_chart_renders():
     y_true, y_prob, groups = _calibration_inputs()
     with warnings.catch_warnings():
@@ -201,6 +222,7 @@ def test_the_group_calibration_chart_renders():
         assert calibration_plots.plot_group_calibration(y_true, y_prob, groups) is not None
 
 
+@needs_matplotlib
 def test_the_dashboard_renders_a_multi_panel_figure():
     y_true, y_prob, groups = _calibration_inputs()
     with warnings.catch_warnings():
@@ -244,6 +266,7 @@ def test_the_top_level_wrapper_forwards_every_argument_untouched(
     assert seen == [((1, 2), {"n_bins": 7, "title": "t"})]
 
 
+@needs_matplotlib
 def test_the_top_level_wrappers_reach_the_real_charts():
     """Control for the test above: with nothing patched, the wrappers must actually
     produce charts. A recorder proves forwarding, not that the target works."""

@@ -73,7 +73,16 @@ jobs:
           # configs with. Without it the two positive-path tests in
           # tests/test_packaging_hygiene.py importorskip, so the only thing CI
           # would prove about that hook is that it refuses to run.
-          pip install -e ".[dev,rendering,viz,monitoring,xai,training,parity,cicd]"
+          #
+          # dashboard, causal and mcp added 2026-10-02, matching tests.yml and the
+          # monorepo's vfairness-tests.yml. Run 36929555066 failed 106 tests here,
+          # most of them because plotly was absent (the dashboard, documented-plot
+          # and operations batteries), and without mcp the surface walk saw 1,568
+          # units instead of the 1,580 the published ledger was measured on, so
+          # the ledger, register and readiness tests failed on the environment
+          # rather than on the documents. causal (dowhy) is added so this job runs
+          # the causal battery instead of skipping it.
+          pip install -e ".[dev,rendering,viz,dashboard,monitoring,causal,xai,training,parity,cicd,mcp]"
 
       - name: Run test suite with coverage
         env:
@@ -190,11 +199,22 @@ jobs:
   # cannot ship again. Verified on this exact resolution 2026-08-27: no test fails
   # at the floor that does not also fail at the latest resolution.
   #
-  # Only the core dependency set is floored. The optional extras are deliberately
-  # NOT installed here: several of their own floors (matplotlib 3.5, torch 1.9)
-  # predate cp311 wheels, so a lowest-direct resolution of them would fail to
-  # build rather than tell us anything. Tests that need those backends
-  # importorskip, and -rs prints each one.
+  # THE EXTRAS ARE FLOORED TOO (2026-10-02). This job used to install only the
+  # core set, on the grounds that some extra floors (matplotlib 3.5, torch 1.9)
+  # predated cp311 wheels. Those floors have since been raised to installable
+  # ones, and leaving the extras out meant the floor of every optional backend
+  # was again an assertion nobody ran. The first run with them installed found
+  # floors that were simply false: plotly 5.0 rejects properties every heatmap
+  # sets, fairlearn 0.10 lacks a metric the parity battery calls, mcp below
+  # 1.14 crashes registering the tools, and torch 2.0 has no float16 CPU clamp.
+  # It also found six library paths that only worked on newer versions (numpy
+  # matrix_rank on an empty matrix, scipy pearsonr on inf, scipy
+  # chi2_contingency(...).pvalue, sklearn 1.4 on bool dummies, shap 0.44 on zero
+  # rows, and an eager matplotlib import that broke `python -W error -c "import
+  # vfairness"`); those were fixed in the library. Every extra the main test
+  # job installs is installed here at its declared floor. The tests that need
+  # an extra still skip cleanly without it (needs_matplotlib, needs_torch,
+  # ...), so a no-extras install also collects.
   dependency-floor:
     name: Lowest declared dependency versions
     runs-on: ubuntu-latest
@@ -214,26 +234,50 @@ jobs:
 
       - name: Install at the lowest declared direct versions
         run: |
-          uv pip install --system --resolution lowest-direct -e .
-          # Test tooling is not part of the contract under test, so it resolves
-          # normally. Neither pytest nor networkx depends on the scientific stack,
-          # so this cannot lift the floors installed above.
+          set -euo pipefail
+          # Every extra the main test job (tests.yml) installs, plus mcp, at
+          # its lowest declared version.
           #
-          # networkx is here because tests/unit/test_causal_graph.py imports the
-          # causal graph directly instead of guarding on importorskip, so without
-          # it those 7 tests fail for a reason that has nothing to do with
-          # dependency floors. The main job above gets networkx transitively via
-          # torch; this job installs no torch, so it has to ask.
-          uv pip install --system pytest networkx
+          # CPU torch, for the reason tests.yml gives: the default PyPI wheel
+          # carries the CUDA runtime (about 2.5 GB) and has run this runner out
+          # of disk. tests.yml pre-installs the CPU wheel and relies on pip
+          # keeping it; that does NOT work here, because the lowest-direct
+          # resolution replaces a pre-installed torch with the PyPI build.
+          # --torch-backend cpu routes torch to the CPU index inside the same
+          # resolution instead. Checked 2026-10-02 with `uv pip compile
+          # --python-platform x86_64-manylinux_2_28 --torch-backend cpu
+          # --resolution lowest-direct`: torch==2.1.0+cpu, no CUDA torch wheels.
+          uv pip install --system --torch-backend cpu --resolution lowest-direct \
+            -e ".[rendering,viz,dashboard,monitoring,causal,xai,training,parity,cicd,mcp]"
+          # Test tooling is not part of the contract under test, so it resolves
+          # normally. None of these depends on the scientific stack, so this
+          # cannot lift the floors installed above. hypothesis and ipython come
+          # from the dev extra (property tests, notebook tests). networkx is no
+          # longer listed: the causal extra above now brings it at its floor.
+          uv pip install --system pytest hypothesis ipython
           python - <<'PY'
-          import numpy, pandas, scipy, sklearn, requests
-          print("resolved floor:",
-                "numpy", numpy.__version__,
-                "pandas", pandas.__version__,
-                "scipy", scipy.__version__,
-                "scikit-learn", sklearn.__version__,
-                "requests", requests.__version__)
+          from importlib.metadata import version
+          names = ["numpy", "pandas", "scipy", "scikit-learn", "requests", "jinja2",
+                   "matplotlib", "seaborn", "plotly", "PyWavelets", "torch", "shap",
+                   "lime", "dice-ml", "captum", "anchor-exp", "sage-importance",
+                   "fairlearn", "aif360", "dowhy", "networkx", "PyYAML", "mcp"]
+          print("resolved floor:", ", ".join(f"{n} {version(n)}" for n in names))
           PY
+
+      - name: Install gitleaks (pinned + checksum-verified)
+        # Same pin and checksum as tests.yml and secret-scan.yml: two tests prove the secret-scan gate by RUNNING it
+        # and fail closed (could-not-check) when the scanner is absent.
+        env:
+          GITLEAKS_VERSION: "8.30.1"
+          GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+        run: |
+          set -euo pipefail
+          url="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sfL "$url" -o /tmp/gitleaks.tar.gz
+          echo "${GITLEAKS_SHA256}  /tmp/gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/gitleaks.tar.gz -C /tmp gitleaks
+          sudo install -m 0755 /tmp/gitleaks /usr/local/bin/gitleaks
+          gitleaks version
 
       - name: Run test suite at the dependency floor
         run: python -m pytest --tb=short -rs -q

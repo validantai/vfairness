@@ -1034,7 +1034,14 @@ class BetaCalibrator(BaseCalibrator):
 
         def _design_rank(model_type: str) -> int:
             """Rank of the design over the rows that actually carry weight."""
-            return int(np.linalg.matrix_rank(_design(model_type)[positive_weight]))
+            weighted = _design(model_type)[positive_weight]
+            # No weighted row means rank 0. numpy before 2.0 raises "zero-size
+            # array to reduction operation maximum" from matrix_rank on a
+            # (0, k) matrix instead of answering 0, which turned the all-zero
+            # weight refusal into a crash at the declared numpy floor.
+            if weighted.shape[0] == 0:
+                return 0
+            return int(np.linalg.matrix_rank(weighted))
 
         def _is_identified(model_type: str) -> bool:
             return _design_rank(model_type) >= _design(model_type).shape[1]

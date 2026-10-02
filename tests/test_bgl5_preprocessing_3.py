@@ -20,12 +20,22 @@ from __future__ import annotations
 
 import warnings
 
-import matplotlib
 import numpy as np
 import pandas as pd
 import pytest
 
-matplotlib.use("Agg")
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 from vfairness.preprocessing.bias_detection.historical import (  # noqa: E402
     attribute_historical_pattern,
@@ -570,6 +580,7 @@ class TestCorrelationBarsDoesNotDeleteWhatItCouldNotMeasure:
     a chart titled "Feature Correlations with <attribute>" showed a feature
     simply missing, which reads as that feature carrying no proxy risk."""
 
+    @needs_matplotlib
     def test_an_unmeasured_feature_keeps_a_row_and_gets_no_bar(self):
         """Measured on 300 rows: income eta 0.999166, age constant so NaN.
 
@@ -592,6 +603,7 @@ class TestCorrelationBarsDoesNotDeleteWhatItCouldNotMeasure:
         assert _said(messages, "could not be measured on this data and have NO bar")
         matplotlib.pyplot.close("all")
 
+    @needs_matplotlib
     def test_a_column_with_nothing_measured_draws_no_chart_at_all(self):
         """Measured on a 5-row frame (below MIN_SAMPLE_SIZE=10) whose whole
         gender column is NaN. Before: an axes with 0 bars, 0 texts, no warning
@@ -616,6 +628,7 @@ class TestCorrelationBarsDoesNotDeleteWhatItCouldNotMeasure:
 
     # ── over-correction control ──
 
+    @needs_matplotlib
     def test_control_a_measurable_frame_still_draws_every_bar_silently(self):
         rng = np.random.default_rng(4)
         n = 400
@@ -648,6 +661,7 @@ class TestIntersectionalHeatmapReadsItsOwnCoverageRecord:
     """The function read neither ``coverage`` nor ``groups_not_assessed`` from a
     result carrying both, and no test in the repository executed it at all."""
 
+    @needs_matplotlib
     def test_an_unexamined_cell_keeps_a_slot_and_gets_no_bar(self):
         """Measured with one intersectional cell shrunk to 3 rows against
         min_group_size 30: the result says coverage 'partial' and names 'f_b'.
@@ -674,6 +688,7 @@ class TestIntersectionalHeatmapReadsItsOwnCoverageRecord:
         assert _said(messages, "never examined and have NO bar")
         matplotlib.pyplot.close("all")
 
+    @needs_matplotlib
     def test_no_group_examined_says_so_instead_of_blaming_the_feature_name(self):
         """Before: it returned None warning "Feature 'score' not found in
         intersectional results", which sends the caller to fix a naming problem
@@ -693,6 +708,7 @@ class TestIntersectionalHeatmapReadsItsOwnCoverageRecord:
         assert not _said(messages, "not found in intersectional results")
         matplotlib.pyplot.close("all")
 
+    @needs_matplotlib
     def test_a_feature_that_really_is_absent_still_says_not_found(self):
         """The other direction: with every group examined, a feature name that
         is not in the results IS a naming problem, and the message stays."""
@@ -708,6 +724,7 @@ class TestIntersectionalHeatmapReadsItsOwnCoverageRecord:
 
     # ── over-correction control ──
 
+    @needs_matplotlib
     def test_control_complete_coverage_draws_every_cell_silently(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -737,6 +754,7 @@ class TestDashboardDoesNotPublishTheGraderFallThroughBand:
     it dropped is the one that turned an unmeasurable pair into a NEGLIGIBLE risk
     slice and a Top Concerns entry."""
 
+    @needs_matplotlib
     def test_an_unmeasured_pair_is_named_not_graded(self):
         """Measured on 300 rows: income determines gender, age is constant.
 
@@ -767,6 +785,7 @@ class TestDashboardDoesNotPublishTheGraderFallThroughBand:
         assert "NOT MEASURED: 1 of 2" in text
         matplotlib.pyplot.close("all")
 
+    @needs_matplotlib
     def test_a_frame_with_no_feature_pair_does_not_read_as_clean(self):
         """A frame whose only column is the protected attribute: 0 of 0 cells.
         Before: 'Features analyzed: 0 of 0' beside the unqualified 'none found'.
@@ -783,6 +802,7 @@ class TestDashboardDoesNotPublishTheGraderFallThroughBand:
 
     # ── over-correction control ──
 
+    @needs_matplotlib
     def test_control_a_measured_dashboard_still_grades_its_finding(self):
         rng = np.random.default_rng(0)
         n = 300

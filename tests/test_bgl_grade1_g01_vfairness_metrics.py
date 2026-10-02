@@ -308,11 +308,15 @@ class TestMaxRatioRefusesWhatItCouldNotDivide:
 
 
 def _frame_with_absent_race():
+    # dtype=object keeps pd.NA and None as two distinct spellings. Without it,
+    # pandas 3 infers the `str` dtype and folds both into one `nan` at
+    # construction, so the premise below (two spellings) would not exist.
     return pd.DataFrame(
         {
             "sex": ["F"] * 20 + ["M"] * 20,
             "race": ["white"] * 10 + [pd.NA] * 10 + ["black"] * 10 + [None] * 10,
-        }
+        },
+        dtype=object,
     )
 
 
@@ -336,6 +340,7 @@ class TestGroupManagerDisclosesAMintedIntersection:
         # The distinct SPELLINGS matter: they split one absent category across
         # several groups, each one able to fall under the size floor alone.
         assert _warned(caught, "<NA>") and _warned(caught, "None")
+        assert _warned(caught, "mint DIFFERENT group names")
 
     @pytest.mark.parametrize(
         "absent", [pd.NA, None, np.nan, float("nan"), pd.NaT], ids=lambda v: type(v).__name__
@@ -346,6 +351,8 @@ class TestGroupManagerDisclosesAMintedIntersection:
             warnings.simplefilter("always")
             GroupManager(frame, min_group_size=2)
         assert _warned(caught, "MISSING value in at least one")
+        # One spelling cannot split a category, so the split must not be claimed.
+        assert not _warned(caught, "mint DIFFERENT group names")
 
     def test_the_2d_numpy_path_discloses_it_too(self):
         attr = np.array([[1.0, 2.0]] * 10 + [[np.nan, 2.0]] * 10)

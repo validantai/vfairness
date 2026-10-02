@@ -361,6 +361,13 @@ class TreeShapExplainer(Explainer):
     ) -> list[Explanation]:
         import shap
 
+        # One Explanation per row, so zero rows in is zero out. Answered here
+        # rather than by shap: the declared shap floor runs its additivity
+        # check on the empty output and raises "zero-size array to reduction
+        # operation maximum" from np.max, where newer shap returns no rows.
+        if np.asarray(X).shape[0] == 0:
+            return []
+
         explainer = shap.TreeExplainer(model)
         shap_values = explainer.shap_values(X)
         # Class-consistent selection (see _class_consistent).

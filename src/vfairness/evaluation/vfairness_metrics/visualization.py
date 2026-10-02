@@ -2473,7 +2473,11 @@ def plot_effect_sizes(
         return None
 
     pairs = list(effect_sizes.keys())
-    cohens_d = []
+    # Any, not Optional[float]: these are raw report values (a float, NaN, the
+    # None a strict JSON encoder writes, or something else entirely). Every
+    # float() below is reached only behind `_is_measured`, which is what makes
+    # it safe; the annotation records that the guard, not the type, decides.
+    cohens_d: List[Any] = []
     interpretations = []
 
     for pair in pairs:

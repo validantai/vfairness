@@ -162,8 +162,9 @@ problematic = analyzer.identify_unfair_paths(threshold=0.1)
 - [x] Documentation with examples (API_REFERENCE.md, LIBRARY_OVERVIEW.md)
 
 #### Dependencies
-- `networkx>=2.6` (graph operations)
-- Optional: `dowhy>=0.8` (advanced causal inference)
+- `networkx>=3.0` (graph operations)
+- Optional: `dowhy>=0.13` (advanced causal inference; the `causal` extra's floor,
+  because dowhy 0.11 and 0.12 call a networkx function networkx has removed)
 
 ---
 

@@ -556,7 +556,10 @@ class TestMcpExtraIsCapped:
 
     def test_extra_keeps_its_working_floor(self):
         mcp_req = next(r for r in _mcp_requirements() if r.split(";")[0].strip().startswith("mcp"))
-        assert ">=1.2.0" in mcp_req
+        # 1.14.0 since 2026-10-02: the dependency-floor job measured 1.2.0 .. 1.9
+        # returning no structured tool content and 1.10.0 .. 1.13.1 crashing at
+        # tool registration (see the note on the extra in pyproject.toml).
+        assert ">=1.14.0" in mcp_req
 
     def test_uv_lock_does_not_pin_the_incompatible_major(self):
         # uv.lock is what `uv sync --extra mcp` actually installs. A capped
@@ -1876,8 +1879,16 @@ class TestTheFullSuiteWorkflowCanActuallyRunThisFile:
                 if "run" not in step:
                     continue
                 script = str(step["run"])
+                # ANY position in the list, not only first or last. This handled
+                # `[cicd,` and `,cicd]` alone, so when `mcp` was appended after
+                # `cicd` on 2026-10-02 the sabotage silently left `,cicd,` in place
+                # and the pin reported that it could not fail.
                 for extra in wanted:
-                    script = script.replace(f",{extra}]", "]").replace(f"[{extra},", "[")
+                    script = (
+                        script.replace(f",{extra},", ",")
+                        .replace(f",{extra}]", "]")
+                        .replace(f"[{extra},", "[")
+                    )
                 step["run"] = script
         assert _installed_extras(workflow), "the sabotage removed the install line itself"
         problems = _yaml_extra_problems(workflow)

@@ -14,28 +14,12 @@ Key Visualizations:
 All visualizations support both static (matplotlib) and interactive modes.
 """
 
+import importlib.util
 import warnings
 from typing import Any, Dict, List, Optional, Tuple, cast
 
 import numpy as np
 import pandas as pd
-
-try:
-    import matplotlib.patches as mpatches
-    import matplotlib.pyplot as plt
-    from matplotlib import colormaps
-    from matplotlib.colors import LinearSegmentedColormap
-
-    HAS_MATPLOTLIB = True
-except ImportError:
-    HAS_MATPLOTLIB = False
-
-try:
-    import seaborn as sns
-
-    HAS_SEABORN = True
-except ImportError:
-    HAS_SEABORN = False
 
 from ..._not_assessed import NOT_ASSESSED, warn_not_assessed
 from .correlation import (
@@ -46,6 +30,52 @@ from .correlation import (
 )
 from .transformers import TransformationResult
 from .transformers import finite_or_nan as _finite_or_nan  # noqa: F401 -- public under this name
+
+# matplotlib and seaborn are the optional [viz] extra and are imported LAZILY,
+# on the first chart call (see _load_backends), never at `import vfairness`.
+# This module used to import pyplot and seaborn at module level, and the package
+# imports this module, so `import vfairness` paid for the whole plotting stack
+# and inherited its import-time warnings. Measured at the declared matplotlib
+# floor (3.6.0) with pyparsing 3.3: matplotlib calls the deprecated
+# setParseAction while importing, so `python -W error -c "import vfairness"`
+# aborted (tests/test_audit_wave4_llm.py::TestPlaceholderWarningsLazy).
+# matplotlib 3.6.0, 3.6.3, 3.7.0, 3.7.1, 3.8.0, 3.9.0 and 3.10.0 all did the
+# same and 3.10.7 did not, so the alternative was a floor near 3.10.7 for a
+# library that draws nothing on import.
+HAS_MATPLOTLIB = importlib.util.find_spec("matplotlib") is not None
+HAS_SEABORN = importlib.util.find_spec("seaborn") is not None
+
+mpatches: Any = None
+plt: Any = None
+colormaps: Any = None
+LinearSegmentedColormap: Any = None
+sns: Any = None
+
+
+def _load_backends() -> None:
+    """Import the plotting stack into this module's globals, once."""
+    global mpatches, plt, colormaps, LinearSegmentedColormap, sns
+    if plt is not None:
+        return
+    try:
+        import matplotlib.patches as _mpatches
+        import matplotlib.pyplot as _plt
+        from matplotlib import colormaps as _colormaps
+        from matplotlib import colors as _mcolors
+    except ImportError as exc:
+        raise ImportError(
+            "matplotlib is required for visualization. Install it with: pip install matplotlib"
+        ) from exc
+    mpatches, plt, colormaps = _mpatches, _plt, _colormaps
+    LinearSegmentedColormap = _mcolors.LinearSegmentedColormap
+    if HAS_SEABORN:
+        try:
+            import seaborn as _sns
+
+            sns = _sns
+        except ImportError:
+            sns = None
+
 
 # COLOR SCHEMES
 
@@ -73,21 +103,45 @@ FAIRNESS_CMAP_COLORS = [
 
 
 def _check_matplotlib():
-    """Check if matplotlib is available."""
+    """Check that matplotlib is available, and import it on first use."""
     if not HAS_MATPLOTLIB:
         raise ImportError(
             "matplotlib is required for visualization. Install it with: pip install matplotlib"
         )
+    _load_backends()
 
 
 def _create_fairness_cmap():
     """Create a colormap for fairness visualizations."""
+    _check_matplotlib()
     colors = ["#4CAF50", "#8BC34A", "#CDDC39", "#FFC107", "#FF9800", "#F44336"]
     return LinearSegmentedColormap.from_list("fairness", colors)
 
 
 #: Outline colour for heatmap cells at or above the proxy threshold (R6-5).
 THRESHOLD_MARKER_COLOR = "#212121"
+
+
+def _recentered_at_zero(cmap: Any) -> Any:
+    """The colormap ``sns.heatmap(center=0, vmin=0, vmax=1)`` used to build.
+
+    seaborn 0.13 recenters with ``Colormap.set_bad``, which matplotlib 3.11
+    flags with a PendingDeprecationWarning on every heatmap. The same colours
+    are built here with ``with_extremes`` (matplotlib >= 3.4), and seaborn is
+    called with ``center=None`` so it does not recenter again. Centred at 0 over
+    [0, 1], seaborn keeps the upper half of the map: 256 samples from 0.5 to 1.
+    """
+    from matplotlib.colors import Colormap, ListedColormap
+
+    base = cmap if isinstance(cmap, Colormap) else colormaps[cmap]
+    bad = base(np.ma.masked_invalid([np.nan]))[0]
+    extremes: Dict[str, Any] = {"bad": bad}
+    under, over = base(-np.inf), base(np.inf)
+    if np.any(under != base(0)):
+        extremes["under"] = under
+    if np.any(over != base(base.N - 1)):
+        extremes["over"] = over
+    return ListedColormap(base(np.linspace(0.5, 1.0, 256))).with_extremes(**extremes)
 
 
 def _mark_cells_over_threshold(ax, corr_df, threshold: float, origin: float) -> int:
@@ -112,6 +166,7 @@ def _mark_cells_over_threshold(ax, corr_df, threshold: float, origin: float) -> 
     Returns the number of cells marked, so a caller (and the pin) can compare it
     against ``get_high_correlations``.
     """
+    _check_matplotlib()
     values = np.abs(corr_df.values)
     marked = 0
     for i in range(values.shape[0]):
@@ -189,8 +244,8 @@ def plot_correlation_heatmap(
             corr_df.abs(),
             annot=annotate,
             fmt=".2f",
-            cmap=cmap,
-            center=0,
+            cmap=_recentered_at_zero(cmap),
+            center=None,
             vmin=0,
             vmax=1,
             ax=ax,

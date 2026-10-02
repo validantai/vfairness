@@ -767,7 +767,10 @@ def test_intersectional_coverage_is_not_complete_when_nothing_was_measurable():
     assert result["coverage"] == "not_assessed", result["coverage"]
     assert result["between_group_differences"] == {}
     assert [e["feature"] for e in result["features_not_numeric"]] == ["city"]
-    assert "object" in result["features_not_numeric"][0]["dtype"]
+    # The reported dtype is the column's real one: `object` on pandas 2, `str`
+    # on pandas 3 (its default text dtype). Pin it to the frame, not a spelling.
+    assert result["features_not_numeric"][0]["dtype"] == str(frame["city"].dtype)
+    assert not pd.api.types.is_numeric_dtype(frame["city"])
     assert any(
         "none of the 1 requested feature column(s) is numeric" in str(c.message) for c in caught
     ), [str(c.message) for c in caught]

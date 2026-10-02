@@ -584,15 +584,16 @@
             encodeURIComponent('Docs: ' + title.trim()) + '&body=' + encodeURIComponent('Page: ' + location.href.replace(/#.*$/, '') + '\n\nWhat is wrong or unclear:\n');
         var foot = document.createElement('footer');
         foot.className = 'page-foot';
-        var html = '<div class="page-foot__meta"><span class="page-foot__date" hidden></span>' +
-            '<a href="' + issue + '" target="_blank" rel="noopener">Report a problem with this page</a></div>';
+        var html = '';
         if (idx >= 0) {
             var prev = DOC_ORDER[idx - 1], next = DOC_ORDER[idx + 1];
             html += '<nav class="page-pager" aria-label="Previous and next page">' +
-                (prev ? '<a class="page-pager__prev" href="' + root + prev.u + '"><span>Previous</span>' + prev.t + '</a>' : '<span></span>') +
-                (next ? '<a class="page-pager__next" href="' + root + next.u + '"><span>Next</span>' + next.t + '</a>' : '<span></span>') +
+                (prev ? '<a class="page-pager__prev" href="' + root + prev.u + '"><span><i aria-hidden="true">\u2190</i>Previous</span><strong>' + prev.t + '</strong></a>' : '<span></span>') +
+                (next ? '<a class="page-pager__next" href="' + root + next.u + '"><span>Next<i aria-hidden="true">\u2192</i></span><strong>' + next.t + '</strong></a>' : '<span></span>') +
                 '</nav>';
         }
+        html += '<div class="page-foot__meta"><span class="page-foot__date" hidden></span>' +
+            '<a href="' + issue + '" target="_blank" rel="noopener">Report a problem with this page</a></div>';
         foot.innerHTML = html;
         main.appendChild(foot);
         fetch(root + 'data/page-dates.json', { cache: 'no-cache' })
@@ -768,8 +769,8 @@
             var i = API_PACKAGES.map(function (p) { return p.k; }).indexOf(k);
             var prev = i > 0 ? API_PACKAGES[i - 1] : null, next = i >= 0 && i < API_PACKAGES.length - 1 ? API_PACKAGES[i + 1] : null;
             pager.hidden = k === 'all';
-            pager.innerHTML = (prev ? '<a class="page-pager__prev" href="?pkg=' + prev.k + '"><span>Previous package</span>' + (prev.n ? prev.n + '. ' : '') + prev.t + '</a>' : '<span></span>') +
-                (next ? '<a class="page-pager__next" href="?pkg=' + next.k + '"><span>Next package</span>' + (next.n ? next.n + '. ' : '') + next.t + '</a>' : '<span></span>');
+            pager.innerHTML = (prev ? '<a class="page-pager__prev" href="?pkg=' + prev.k + '"><span><i aria-hidden="true">\u2190</i>Previous package</span><strong>' + (prev.n ? prev.n + '. ' : '') + prev.t + '</strong></a>' : '<span></span>') +
+                (next ? '<a class="page-pager__next" href="?pkg=' + next.k + '"><span>Next package<i aria-hidden="true">\u2192</i></span><strong>' + (next.n ? next.n + '. ' : '') + next.t + '</strong></a>' : '<span></span>');
             if (typeof mermaid !== 'undefined') {
                 var todo = Array.prototype.filter.call(document.querySelectorAll('.mermaid:not([data-processed])'), function (n) { return !n.closest('[hidden]'); });
                 if (todo.length) mermaid.run({ nodes: todo }).catch(function () {});
@@ -1919,8 +1920,45 @@
     // ============================================================
 
     function initChangelogCollapse() {
+        // Every version is collapsible (2026-10-01). Only the four oldest were
+        // written as <details>; the newest ones were plain sections, so
+        // "Expand all" / "Collapse all" visibly did nothing at the top of the
+        // page. Wrap each plain version in the same <details> structure: the
+        // newest stays open, older ones start closed.
+        var plain = document.querySelectorAll('.version-section');
+        Array.prototype.forEach.call(plain, function (sec, i) {
+            if (sec.querySelector(':scope > .version-details')) return;
+            var header = sec.querySelector(':scope > .version-header');
+            if (!header) return;
+            var det = document.createElement('details');
+            det.className = 'version-details';
+            if (i === 0) det.open = true;
+            var sum = document.createElement('summary');
+            var toggle = document.createElement('span');
+            toggle.className = 'version-toggle';
+            toggle.innerHTML = '<span>' + (det.open ? 'Hide details' : 'Show details') + '</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
+            header.appendChild(toggle);
+            var body = document.createElement('div');
+            body.className = 'version-body';
+            var n = header.nextSibling;
+            while (n) { var next = n.nextSibling; body.appendChild(n); n = next; }
+            sec.insertBefore(det, header);
+            sum.appendChild(header);
+            det.appendChild(sum);
+            det.appendChild(body);
+            // A link to an entry inside a closed version opens it.
+        });
+        var openFromHash = function () {
+            var id = decodeURIComponent(location.hash.slice(1));
+            var el = id && document.getElementById(id);
+            var d = el && (el.closest('.version-details') || el.querySelector(':scope > .version-details'));
+            if (d && !d.open) { d.open = true; el.scrollIntoView(); }
+        };
+        window.addEventListener('hashchange', openFromHash);
+
         var allDetails = document.querySelectorAll('.version-details');
         if (!allDetails.length) return;
+        openFromHash();
 
         // Update toggle text on open/close
         allDetails.forEach(function(details) {

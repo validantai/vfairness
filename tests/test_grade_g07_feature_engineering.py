@@ -57,14 +57,24 @@ import json
 import math
 import warnings
 
-import matplotlib
-
-matplotlib.use("Agg")  # no display; must precede pyplot
-
-import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import pytest  # noqa: E402
+
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+    plt = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+    import matplotlib.pyplot as plt
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 from vfairness._not_assessed import NOT_ASSESSED  # noqa: E402
 from vfairness.preprocessing.feature_engineering import visualization as viz  # noqa: E402
@@ -96,7 +106,8 @@ from vfairness.preprocessing.feature_engineering.transformers import (  # noqa: 
 @pytest.fixture(autouse=True)
 def _close_figures():
     yield
-    plt.close("all")
+    if plt is not None:
+        plt.close("all")
 
 
 def _proxy(feature, correlation, level, *, attr="race", evidence=None):
@@ -132,6 +143,7 @@ THREE = [
 ]
 
 
+@needs_matplotlib
 def test_the_risk_chart_draws_no_bar_for_an_unmeasured_proxy_and_labels_it():
     """DEFECT CASE. The bar was already absent; nothing said why."""
     rows = [_proxy(*r) for r in THREE]
@@ -148,6 +160,7 @@ def test_the_risk_chart_draws_no_bar_for_an_unmeasured_proxy_and_labels_it():
         assert feature in _text(ax)
 
 
+@needs_matplotlib
 def test_the_unmeasured_row_is_never_ranked_among_the_measured_ones():
     """A NaN sort key is not an ordering; the measured ones keep theirs."""
     rows = [_proxy(*r) for r in THREE]
@@ -161,6 +174,7 @@ def test_the_unmeasured_row_is_never_ranked_among_the_measured_ones():
     assert labels[len(expected) :] == ["zipcode"]
 
 
+@needs_matplotlib
 def test_a_chart_where_nothing_was_measured_says_so_on_every_row():
     """The whole-screen case: the old figure showed every feature at zero."""
     rows = [_proxy("income", float("nan"), ProxyRiskLevel.NEGLIGIBLE)] + [
@@ -172,6 +186,7 @@ def test_a_chart_where_nothing_was_measured_says_so_on_every_row():
     assert [t.get_text() for t in ax.texts] == ["not measured", "not measured"]
 
 
+@needs_matplotlib
 def test_the_risk_distribution_gives_the_unmeasured_rows_their_own_wedge():
     """DEFECT CASE. They were counted into the NEGLIGIBLE band."""
     rows = [_proxy(*r) for r in THREE]
@@ -187,6 +202,7 @@ def test_the_risk_distribution_gives_the_unmeasured_rows_their_own_wedge():
 
 
 @pytest.mark.parametrize("plot", ["plot_proxy_risk_chart", "plot_risk_distribution"])
+@needs_matplotlib
 def test_the_producers_explicit_not_assessed_status_is_honoured(plot):
     """The second door: a FINITE float beside a status saying it was not assessed.
 
@@ -210,6 +226,7 @@ def test_the_producers_explicit_not_assessed_status_is_honoured(plot):
         assert NOT_ASSESSED.upper() in _text(ax)
 
 
+@needs_matplotlib
 def test_a_fully_measured_run_of_both_charts_says_nothing():
     """OVER-CORRECTION CONTROL, with the real numbers.
 
@@ -245,6 +262,7 @@ def _matrix(values, features, attrs):
     )
 
 
+@needs_matplotlib
 def test_the_heatmap_counts_the_cells_it_could_not_measure():
     """DEFECT CASE, and the picture must agree with get_high_correlations."""
     m = _matrix([[0.85, np.nan], [np.nan, 0.10]], ["income", "zipcode"], ["race", "gender"])
@@ -262,6 +280,7 @@ def test_the_heatmap_counts_the_cells_it_could_not_measure():
     assert "never a zero" in ax.get_xlabel()
 
 
+@needs_matplotlib
 def test_a_heatmap_over_a_matrix_measured_nowhere_does_not_read_as_an_all_clear():
     m = _matrix([[np.nan], [np.nan]], ["income", "zipcode"], ["race"])
     with pytest.warns(UserWarning, match="only 0 of 2"):
@@ -269,6 +288,7 @@ def test_a_heatmap_over_a_matrix_measured_nowhere_does_not_read_as_an_all_clear(
     assert "2 of 2 cell(s) NOT MEASURED" in ax.get_xlabel()
 
 
+@needs_matplotlib
 def test_a_fully_measured_heatmap_carries_no_coverage_line():
     """OVER-CORRECTION CONTROL. The cells and the threshold outlines are intact."""
     m = _matrix([[0.85, 0.20], [0.40, 0.10]], ["income", "zipcode"], ["race", "gender"])
@@ -310,6 +330,7 @@ def test_the_headline_predicate_agrees_with_finite_or_nan(value, measured):
     )
 
 
+@needs_matplotlib
 def test_a_boolean_correlation_is_not_drawn_as_a_perfect_proxy():
     """DEFECT CASE. This drew a bar of width 1 annotated '1.00'."""
     with pytest.warns(UserWarning, match="only 0 of 1"):
@@ -318,6 +339,7 @@ def test_a_boolean_correlation_is_not_drawn_as_a_perfect_proxy():
     assert [t.get_text() for t in ax.texts] == ["not measured"]
 
 
+@needs_matplotlib
 def test_a_numeric_string_correlation_is_still_drawn():
     """OVER-CORRECTION CONTROL. This used to raise TypeError on abs('0.85')."""
     with warnings.catch_warnings():
@@ -470,6 +492,7 @@ def test_total_loss_is_still_refused_and_the_frame_comes_back_unchanged():
 # === 6. the transformation charts: standing controls ======================
 
 
+@needs_matplotlib
 def test_an_unmeasured_after_correlation_is_labelled_not_a_zero_bar():
     with pytest.warns(UserWarning, match="no after-transformation correlation"):
         ax = viz.plot_transformation_comparison({"race": 0.8}, {})
@@ -478,18 +501,21 @@ def test_an_unmeasured_after_correlation_is_labelled_not_a_zero_bar():
     assert "not measured" in _text(ax)
 
 
+@needs_matplotlib
 def test_no_attribute_at_all_is_not_a_removed_correlation():
     with pytest.warns(UserWarning, match="no attribute was compared"):
         ax = viz.plot_transformation_comparison({}, {})
     assert "No attribute was compared" in _text(ax)
 
 
+@needs_matplotlib
 def test_the_transformation_effect_panel_says_when_there_is_nothing_to_compare():
     fig = viz.plot_feature_transformation_effect(_result({}, {}))
     rendered = " ".join(t.get_text() for a in fig.axes for t in a.texts)
     assert "not measured" in rendered
 
 
+@needs_matplotlib
 def test_the_transformation_effect_panel_prints_the_real_reduction():
     """OVER-CORRECTION CONTROL: the percentage is derived, not quoted."""
     before, after = 0.8, 0.2

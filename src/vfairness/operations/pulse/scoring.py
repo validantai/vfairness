@@ -677,6 +677,16 @@ def score_model_over_frame(
         "response_mapping_key": inputs.get("response_mapping_key", "predictions"),
     }
     predict, source = build_predict(scoring_payload, model_cols)
+    # The factory is injected and also receives the endpoint and auth token, so
+    # whatever string it returns must never reach a log line or a report note
+    # verbatim. Only fixed labels are printed (CodeQL
+    # py/clear-text-logging-sensitive-data, 2026-10-01).
+    if source == "endpoint":
+        source_label = "endpoint"
+    elif source == "upload":
+        source_label = "uploaded"
+    else:
+        source_label = "injected"
     scores = np.asarray(predict(X), dtype=float).ravel()
     if len(scores) != len(df):
         raise ValueError("model returned {0} scores for {1} rows".format(len(scores), len(df)))
@@ -686,7 +696,7 @@ def score_model_over_frame(
     notes.append(
         "Scored {0} model over {1} rows on {2} feature column(s) "
         "({3} model input(s) after encoding).".format(
-            source, int(len(out)), len(feature_columns), int(X.shape[1])
+            source_label, int(len(out)), len(feature_columns), int(X.shape[1])
         )
     )
     log.info("[pulse-scoring] %s", notes[-1])

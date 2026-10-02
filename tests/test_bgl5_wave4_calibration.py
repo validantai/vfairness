@@ -67,11 +67,21 @@ import hashlib
 import io
 import warnings
 
-import matplotlib
 import numpy as np
 import pytest
 
-matplotlib.use("Agg")
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 from vfairness.post_processing.calibration import visualization as calibration_plots
 from vfairness.post_processing.calibration.metrics import (  # noqa: E402
@@ -181,6 +191,7 @@ class TestTheDisparityChartMarksTheGroupItCouldNotMeasure:
     SIZE gate removed. A group inside the gate whose calibration error is NaN
     left no trace, and its fabricated MCE of 0.0 was drawn as a real bar."""
 
+    @needs_matplotlib
     def test_an_unmeasurable_group_is_marked_on_every_panel(self):
         """MEASURED BEFORE THE FIX, on this exact input:
 
@@ -223,6 +234,7 @@ class TestTheDisparityChartMarksTheGroupItCouldNotMeasure:
         assert "plot_calibration_disparity" in messages, messages
         assert "NO calibration error could be computed" in messages, messages
 
+    @needs_matplotlib
     def test_the_disclosure_reaches_the_pixels_a_reader_looks_at(self):
         """THE RASTER PIN: the marks must be INK, not just text artists.
 
@@ -267,6 +279,7 @@ class TestTheDisparityChartMarksTheGroupItCouldNotMeasure:
             "looks at carries no disclosure"
         )
 
+    @needs_matplotlib
     def test_control_a_fully_measured_chart_carries_no_caveat(self):
         """THE OVER-CORRECTION CONTROL, with the healthy case's REAL numbers.
 

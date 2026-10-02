@@ -102,8 +102,8 @@ def _reader_text() -> str:
         start, end = f"<!-- {name}:start -->", f"<!-- {name}:end -->"
         if start in s and end in s:
             s = s[: s.index(start)] + s[s.index(end) + len(end) :]
-    s = re.sub(r"<script\b.*?</script>", " ", s, flags=re.S)
-    s = re.sub(r"<style\b.*?</style>", " ", s, flags=re.S)
+    s = re.sub(r"<script\b.*?</script\s*>", " ", s, flags=re.S | re.I)
+    s = re.sub(r"<style\b.*?</style\s*>", " ", s, flags=re.S | re.I)
     s = re.sub(r"<!--.*?-->", " ", s, flags=re.S)
     # Any ELEMENT carrying a kpi- class, contents included: those are filled on load.
     s = re.sub(r'<(\w+)\b[^>]*class="[^"]*\bkpi-[\w-]+[^"]*"[^>]*>.*?</\1>', " ", s, flags=re.S)

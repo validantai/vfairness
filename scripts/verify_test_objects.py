@@ -294,10 +294,14 @@ def main() -> None:
         s = _summary(run_pulse(df, inputs))
         flagged = _flagged(s)
         planted_attr, planted_proxy = expect.get("attr"), expect.get("proxy")
+        # A planted PROXY counts as found only when the gap it causes is
+        # confirmed. Being named in the proxy battery is not detection: that
+        # list names zip, photo score and surname for the clean control too
+        # (measured 2026-10-01).
         found = (
             (planted_attr in flagged)
             if planted_attr
-            else (planted_proxy in s.get("proxies", []))
+            else any(a in flagged for a in expect.get("also", []))
             if planted_proxy
             else None
         )

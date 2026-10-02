@@ -68,6 +68,11 @@ from vfairness.evaluation.vfairness_metrics._statistics import detectability
 
 ALPHA = 0.05
 SAMPLE_FLOOR = 20  # minimum episodes per group to be assessable
+
+#: The tool name recorded for an episode whose trace shows no tool call. Stated
+#: as text so it is counted, compared and printed like any other action, and so
+#: it reads the same on every pandas version.
+NO_ACTION_LABEL = "(no tool call)"
 # Minimum cross-group-descriptor-matched episodes before the term-level
 # memory screen fires (a lone word-boundary hit is not contamination).
 _MEM_TERM_MIN_EPISODES = 3
@@ -1481,7 +1486,12 @@ def _temporal_section(
             },
             [],
         )
-    sub_tools = df.loc[mask, action_col].astype(str).to_numpy()
+    # Same explicit missing-action label as the main tool lists (pandas 3
+    # keeps NaN a float through astype(str); see NO_ACTION_LABEL).
+    _sub = df.loc[mask, action_col]
+    sub_tools = (
+        _sub.astype(object).where(_sub.notna().to_numpy(), NO_ACTION_LABEL).astype(str).to_numpy()
+    )
     sub_groups = s[mask].to_numpy()
     sub_t = t[mask].to_numpy(dtype=float)
     order = np.argsort(sub_t, kind="stable")
@@ -2160,7 +2170,17 @@ def _probe(
         "chiSquare": None,
         "dof": None,
     }
-    tool_lists = {g: df.loc[(s == g).to_numpy(), action_col].astype(str).tolist() for g in adequate}
+    # A missing action (an episode that invoked no tool) is made EXPLICIT before
+    # the lists are built. `.astype(str)` used to do it by accident and only on
+    # pandas 2, where a missing value becomes the text "nan". On pandas 3 the
+    # column is StringDtype(na_value=nan), astype(str) leaves NaN a float, and
+    # the sorted() over tool names below raised TypeError, which _safe turned
+    # into "The agent-trace probe could not analyze these traces". Reproduced
+    # 2026-10-01 with pandas 3.0.6 on an OTel export where some episodes call
+    # no tool: every such export was reported as unassessable.
+    _acts = df[action_col]
+    _act_text = _acts.astype(object).where(_acts.notna().to_numpy(), NO_ACTION_LABEL).astype(str)
+    tool_lists = {g: _act_text[(s == g).to_numpy()].tolist() for g in adequate}
 
     # G-20: raw trace rows behind each comparison, keyed by comparison
     # identity; family_size feeds the auditTrail.probe envelope.
@@ -2496,10 +2516,56 @@ def _probe(
     if assessable:
         from vfairness.operations.reporting import build_assurance_verdict
 
+        # The verdict has to know WHAT was assessed. With per_variable=[] the
+        # BGL-3 guard in build_assurance_verdict (correctly) reads "nothing was
+        # assessed" and returns a Disclaimer, so an adequately sampled agent
+        # whose tool choice showed NO bias was reported as "Insufficient
+        # assessable data": a measured null shown as a could-not-check.
+        # Measured 2026-10-01: 6 groups x 120 episodes, omnibus p 0.996,
+        # headline "Insufficient assessable data". The group attribute is now
+        # passed as assessed, with its measured gap (the largest difference in
+        # any one tool's invocation rate between adequate groups) and the
+        # omnibus decision as its significance.
+        def _largest_tool_rate_gap() -> Optional[float]:
+            tools = sorted({t for g in adequate for t in tool_lists[g]})
+            gaps = []
+            for t in tools:
+                rates = [
+                    tool_lists[g].count(t) / len(tool_lists[g]) for g in adequate if tool_lists[g]
+                ]
+                if len(rates) >= 2:
+                    gaps.append(max(rates) - min(rates))
+            return float(max(gaps)) if gaps else None
+
+        # Declared only when the omnibus test actually RAN: a frame where every
+        # episode used one tool cannot be tested, and that stays a
+        # could-not-check (Disclaimer). The entry carries scope only:
+        # findingsFromBias tells the verdict that this attribute's findings are
+        # the probe's own omnibus-gated, corrected ones in `bias`, so the raw
+        # gap is shown but never turned into a second, uncorrected finding.
+        agent_per_variable = (
+            [
+                {
+                    "attribute": str(group_col),
+                    "assessable": True,
+                    "gap": _safe(_largest_tool_rate_gap, None),
+                    "significant": omnibus.get("significant") is True,
+                    "fourFifthsRatio": None,
+                    "measure": "largest per-tool invocation-rate gap between groups",
+                    "findingsFromBias": True,
+                }
+            ]
+            # dof > 0: with one tool (or one group) the table has no degrees of
+            # freedom, the "test" cannot disagree, and the probe itself notes that
+            # no selection disparity is definable.
+            if omnibus.get("available") is True and (omnibus.get("dof") or 0) > 0
+            else []
+        )
+
         assurance = _safe(
             lambda: build_assurance_verdict(
                 schema={"pii_leakage": [], "mismatches": [], "refuse": False},
-                per_variable=[],
+                per_variable=agent_per_variable,
                 metrics=[],
                 bias=findings,
                 proxies={},

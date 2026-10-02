@@ -19,15 +19,29 @@ The six rows:
 
 from __future__ import annotations
 
+import importlib.util
 import math
 import re
 import warnings
 
 import numpy as np
 import pytest
-import torch
-import torch.nn as nn
 from sklearn.linear_model import LinearRegression, LogisticRegression
+
+# torch is an optional extra ([training]), so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that build tensors are marked needs_torch and skip; the rest still run.
+try:
+    import torch
+    import torch.nn as nn
+except ModuleNotFoundError:
+    torch = None
+    nn = None
+needs_torch = pytest.mark.skipif(torch is None, reason="needs the optional torch extra")
+needs_jinja2 = pytest.mark.skipif(
+    importlib.util.find_spec("jinja2") is None,
+    reason="needs the optional [rendering] extra (jinja2)",
+)
 
 from vfairness.in_processing.analyzer import (
     FairnessTrainingAnalyzer,
@@ -83,6 +97,7 @@ def _calibration_batch():
 
 
 class TestG14TheRefusalIsReachableOnEveryInputItsDocstringNames:
+    @needs_torch
     def test_an_empty_batch_is_refused_and_not_a_traceback(self):
         """The docstring names "an empty batch" as a case the NaN refusal covers.
 
@@ -106,6 +121,7 @@ class TestG14TheRefusalIsReachableOnEveryInputItsDocstringNames:
                 )
             assert math.isnan(value), "returned " + repr(value) + " for an empty batch"
 
+    @needs_torch
     def test_min_group_size_zero_does_not_score_a_diverged_batch_as_perfect(self):
         """min_group_size is public and documented, and 0 disabled the refusal.
 
@@ -133,6 +149,7 @@ class TestG14TheRefusalIsReachableOnEveryInputItsDocstringNames:
             )
             assert len(caught) == 2, [str(w.message)[:60] for w in caught]
 
+    @needs_torch
     def test_rows_in_no_group_are_disclosed_as_uncovered(self):
         """A row whose group id is out of range entered no bin and no warning.
 
@@ -163,6 +180,7 @@ class TestG14TheRefusalIsReachableOnEveryInputItsDocstringNames:
             "the warning is the whole fix: the number covers half the batch"
         )
 
+    @needs_torch
     def test_the_trainer_surfaces_refuse_an_empty_batch_too(self):
         """Same root cause one layer up: both promise NaN, both raised.
 
@@ -187,6 +205,7 @@ class TestG14TheRefusalIsReachableOnEveryInputItsDocstringNames:
             assert math.isnan(out["calibration_loss"]), out
             assert math.isnan(trainer.fine_tune_calibration([empty], optimizer))
 
+    @needs_torch
     def test_control_a_healthy_batch_still_measures_and_stays_silent(self):
         """OVER-CORRECTION CONTROL, by value.
 
@@ -206,6 +225,7 @@ class TestG14TheRefusalIsReachableOnEveryInputItsDocstringNames:
             assert not [str(w.message) for w in caught]
             assert value.requires_grad, "the loss must still carry a gradient"
 
+    @needs_torch
     def test_control_the_trainer_still_trains_on_a_usable_loader(self):
         """OVER-CORRECTION CONTROL for the two trainer surfaces, by value.
 
@@ -264,10 +284,32 @@ def _four_rows():
     )
 
 
+# Built only when torch is present; without it the class is skipped, and the
+# placeholders keep the parameter ids so collection still succeeds.
+_DEAD_WEIGHTS = (
+    [torch.zeros(1), torch.tensor(0.0), torch.tensor([float("nan")])]
+    if torch is not None
+    else [None, None, None]
+)
+
+_LIVE_WEIGHTS = (
+    [
+        (None, 0.16425204277038574, 4),
+        (torch.ones(4), 0.16425204277038574, 4),
+        (torch.ones(1), 0.16425204277038574, 4),
+        (torch.tensor(2.0), 0.3285040855407715, 4),
+        (torch.tensor([1.0, 0.0, 1.0, 1.0]), 0.10846614837646484, 3),
+    ]
+    if torch is not None
+    else [(None, None, None)] * 5
+)
+
+
+@needs_torch
 class TestG21AScalarZeroWeightIsNotAMeasuredTaskLoss:
     @pytest.mark.parametrize(
         "weight",
-        [torch.zeros(1), torch.tensor(0.0), torch.tensor([float("nan")])],
+        _DEAD_WEIGHTS,
         ids=["numel-1-zero", "0-dim-zero", "numel-1-nan"],
     )
     def test_a_broadcast_dead_weight_is_not_a_perfect_fit(self, weight):
@@ -348,13 +390,7 @@ class TestG21AScalarZeroWeightIsNotAMeasuredTaskLoss:
 
     @pytest.mark.parametrize(
         "weight,expected,rows_used",
-        [
-            (None, 0.16425204277038574, 4),
-            (torch.ones(4), 0.16425204277038574, 4),
-            (torch.ones(1), 0.16425204277038574, 4),
-            (torch.tensor(2.0), 0.3285040855407715, 4),
-            (torch.tensor([1.0, 0.0, 1.0, 1.0]), 0.10846614837646484, 3),
-        ],
+        _LIVE_WEIGHTS,
         ids=["none", "ones-4", "ones-1-broadcast", "scalar-2", "one-row-weighted-out"],
     )
     def test_control_a_live_weight_still_measures_its_real_number(
@@ -440,6 +476,7 @@ class TestG07AnUnreadableTargetIsNotAMeasuredAccuracy:
         )
         assert math.isnan(result.accuracy)
 
+    @needs_jinja2
     def test_the_undefined_r2_is_not_drawn_as_a_number_a_reader_can_read(self):
         """The disclosure has to survive full_analysis to reach a reader.
 

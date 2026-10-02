@@ -34,15 +34,33 @@ and the LLM proxy refuses a loopback endpoint at the egress guard and reports
 from __future__ import annotations
 
 import dataclasses
+import importlib.util
 import json
 import warnings
 
-import matplotlib
 import numpy as np
 import pandas as pd
 import pytest
 
-matplotlib.use("Agg")
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
+needs_torch = pytest.mark.skipif(
+    importlib.util.find_spec("torch") is None, reason="needs the optional torch extra"
+)
+needs_jinja2 = pytest.mark.skipif(
+    importlib.util.find_spec("jinja2") is None,
+    reason="needs the optional [rendering] extra (jinja2)",
+)
 
 from vfairness.in_processing.analyzer import FairnessTrainingAnalyzer  # noqa: E402
 from vfairness.in_processing.loss_functions import DemographicParityLoss  # noqa: E402
@@ -204,6 +222,7 @@ def test_the_training_report_serialises_every_field_it_declares():
     assert json.loads(report.to_json()) == json.loads(json.dumps(payload, default=str))
 
 
+@needs_jinja2
 def test_the_training_report_renders_an_svg_a_browser_would_accept():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -219,6 +238,7 @@ def test_the_training_report_renders_an_svg_a_browser_would_accept():
 # ---------------------------------------------------------------------------
 
 
+@needs_torch
 def test_a_loss_with_no_epochs_reports_no_history_rather_than_a_zero():
     loss = DemographicParityLoss()
 
@@ -229,6 +249,7 @@ def test_a_loss_with_no_epochs_reports_no_history_rather_than_a_zero():
     )
 
 
+@needs_torch
 def test_resetting_history_is_idempotent_and_leaves_it_empty():
     loss = DemographicParityLoss()
     loss.reset_history()

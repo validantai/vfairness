@@ -399,7 +399,9 @@ def test_a_statistical_test_that_raises_is_not_a_p_of_one(monkeypatch) -> None:
     def _raise(*args: object, **kwargs: object) -> None:
         raise ValueError("All numbers are identical in mannwhitneyu")
 
-    monkeypatch.setattr("vfairness.llm.output_analysis.stats.mannwhitneyu", _raise)
+    # scipy's own attribute: _compare reaches it through the shared
+    # _mannwhitney_two_sided_p helper, not a module-level `stats` of its own.
+    monkeypatch.setattr("scipy.stats.mannwhitneyu", _raise)
 
     with pytest.warns(RuntimeWarning, match="could not run"):
         with warnings.catch_warnings():

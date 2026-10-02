@@ -4017,6 +4017,45 @@ def min_attainable_p_mannwhitney(n_a: int, n_b: int) -> Optional[float]:
         return None
 
 
+def _mannwhitney_two_sided_p(a: Any, b: Any) -> Optional[float]:
+    """Two-sided Mann-Whitney p, or ``None`` when the test produced no p-value.
+
+    TWO RULES, both because scipy 1.18 changed what a tied input returns.
+
+    1. All values finite and EVERY value tied across both samples: 1.0, the
+       exact permutation p. Every relabelling of one repeated value gives the
+       same U, so the chance of a U at least as extreme as the observed one is
+       exactly 1 (scipy's ``method="exact"`` returns 1.0). scipy <= 1.17
+       returned 1.0 here too; scipy 1.18's default asymptotic path divides by a
+       zero tie-corrected variance and returns nan. Measured 2026-10-02 on
+       scipy 1.18.1, ``mannwhitneyu([1.0] * 30, [1.0] * 31)`` gives
+       ``pvalue=nan``, and four call sites passed that nan on, where
+       ``nan < alpha`` is False and reads as a measured "not significant".
+    2. Any other non-finite p (a non-finite input, a degenerate case scipy
+       answers with nan instead of raising): ``None``. That is a test that did
+       not run, never a reading. Each caller maps ``None`` onto its own
+       could-not-check contract (``None``, ``nan`` plus a flag, a warning).
+
+    Exceptions from scipy propagate unchanged; the callers already decide what
+    a raising test means for them.
+    """
+    from scipy import stats as _st
+
+    a_f = np.asarray(a, dtype=float).ravel()
+    b_f = np.asarray(b, dtype=float).ravel()
+    pooled = np.concatenate([a_f, b_f])
+    if (
+        a_f.size > 0
+        and b_f.size > 0
+        and bool(np.all(np.isfinite(pooled)))
+        and float(np.ptp(pooled)) == 0.0
+    ):
+        return 1.0
+    _, p = _st.mannwhitneyu(a_f, b_f, alternative="two-sided")
+    p = float(p)
+    return p if math.isfinite(p) else None
+
+
 def min_attainable_p_mcnemar(n_discordant: int) -> Optional[float]:
     """Smallest p an exact two-sided McNemar can return for this many discordant pairs.
 

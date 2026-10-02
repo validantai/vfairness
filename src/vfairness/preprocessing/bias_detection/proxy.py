@@ -738,7 +738,18 @@ def _compute_all_correlations(
         if feature_is_numeric or True:  # Always try Pearson on encoded data
             mask = ~(np.isnan(feature_encoded) | np.isnan(attr_encoded))
             if mask.sum() >= 10:
-                corr, pvalue = stats.pearsonr(feature_encoded[mask], attr_encoded[mask])
+                # The mask drops NaN, not inf, so an inf cell reaches pearsonr.
+                # Recent scipy answers (nan, nan) for that; scipy before 1.11
+                # RAISES ValueError ("array must not contain infs or NaNs") from
+                # its finite-checked norm. Measured at the declared scipy floor:
+                # the raise escaped to the outer except below and took Cramer's V
+                # and the eta block with it, so ONE inf cell erased a CRITICAL
+                # race proxy (test_readiness6_names). Pearson is undefined on
+                # that input either way; record it as nan and keep screening.
+                try:
+                    corr, pvalue = stats.pearsonr(feature_encoded[mask], attr_encoded[mask])
+                except ValueError:
+                    corr, pvalue = float("nan"), float("nan")
                 results["pearson"] = float(corr)
                 results["pvalue"] = float(pvalue)
 
@@ -1847,8 +1858,18 @@ def multivariate_proxy_leakage(
                 if num_cols
                 else pd.DataFrame(index=sub.index)
             )
+            # dtype=float, not get_dummies' default bool. scikit-learn 1.4 (the
+            # declared floor) reads a pandas frame through the dataframe
+            # interchange protocol, and pandas 2.2 cannot export a bool column
+            # through it ("Conversion of boolean to Arrow C format string is not
+            # implemented"), so every attribute with a categorical feature came
+            # back NOT ASSESSED at the floor. 0/1 floats are the same numbers.
             Xcat = (
-                pd.get_dummies(sub[cat_cols].astype("string").fillna("missing"), dummy_na=False)
+                pd.get_dummies(
+                    sub[cat_cols].astype("string").fillna("missing"),
+                    dummy_na=False,
+                    dtype=float,
+                )
                 if cat_cols
                 else pd.DataFrame(index=sub.index)
             )

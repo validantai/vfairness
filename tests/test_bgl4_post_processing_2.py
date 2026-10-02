@@ -25,10 +25,21 @@ from __future__ import annotations
 
 import warnings
 
-import matplotlib
 import numpy as np
+import pytest
 
-matplotlib.use("Agg")
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 from vfairness.post_processing.calibration import visualization as calibration_plots
 from vfairness.post_processing.calibration.analyzer import CalibrationAnalyzer
@@ -260,6 +271,7 @@ def test_two_resamples_is_not_a_measured_confidence_interval():
 # ── A-10. The disparity chart removes the group that could unbalance it ───────
 
 
+@needs_matplotlib
 def test_the_disparity_chart_names_the_group_it_did_not_compare():
     """``plot_group_calibration`` in this same module puts the omitted group ON
     THE CHART, with the reasoning 'the plot answered "is calibration equal

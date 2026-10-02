@@ -1825,7 +1825,9 @@ class FairnessAnalyzer:
                 UserWarning,
                 stacklevel=2,
             )
-            out: Dict[str, Any] = {
+            # Annotated once, on the branch above that returns early; a second
+            # annotation of the same name in one function is a mypy redefinition.
+            out = {
                 "fairlearn_demographic_parity_difference": float("nan"),
                 "fairlearn_equalized_odds_difference": float("nan"),
                 "not_comparable": (

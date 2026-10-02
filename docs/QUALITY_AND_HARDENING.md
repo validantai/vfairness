@@ -3,7 +3,7 @@
 ## Where we are
 
 <!-- BGL:readiness:start -->
-**READY TO CUT A BETA.** 8 of 8 beta criteria pass; 0 block it. _Generated 2026-10-01 from `scripts/release_gate.py`._
+**READY TO CUT A BETA.** 8 of 8 beta criteria pass; 0 block it. _Generated 2026-10-02 from `scripts/release_gate.py`._
 
 | | Criterion | Measured now | Closes when |
 | --- | --- | --- | --- |
@@ -164,7 +164,7 @@ back up on an audit, B4 had passed 500 and come back down, and B1 had failed and
 passed again.
 
 <!-- BGL:gate:start -->
-_Generated 2026-10-01 by `scripts/release_gate.py`._
+_Generated 2026-10-02 by `scripts/release_gate.py`._
 
 **Beta bar: READY.** 8 of 8 criteria pass.
 
@@ -195,7 +195,7 @@ Reproduce with `python scripts/release_gate.py`. Every figure above is read from
 ## The second-round audit
 
 <!-- BGL:second_round:start -->
-The BGL5 fix wave was audited a **second time**, and that audit recorded **59 claims**. **59 are closed** and **0 are still open** (100% closed, as of 2026-10-01).
+The BGL5 fix wave was audited a **second time**, and that audit recorded **59 claims**. **59 are closed** and **0 are still open** (100% closed, as of 2026-10-02).
 
 A claim is CLOSED when its defect is fixed and its test has been inverted into a pin, in the same commit. OPEN means the test still records the defective value the unit produces today, with the measurement in its docstring, so every open row below is reproducible rather than suspected.
 

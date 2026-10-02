@@ -29,6 +29,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence
 import numpy as np
 
 from vfairness.evaluation.vfairness_metrics._statistics import (
+    _mannwhitney_two_sided_p,
     detectability,
     min_attainable_p_mannwhitney,
 )
@@ -312,11 +313,13 @@ class TextFairnessAnalyzer:
                 stacklevel=3,
             )
             return None
+        # EVERY SCORE TIED is the exact permutation p of 1.0, a measurement,
+        # where scipy 1.18's default path returns nan; the shared helper holds
+        # that rule and its evidence. Whether the design could have fired at all
+        # is _detectability's job, and a small tied design is still not assessed
+        # there. Same reading as CounterfactualTester._test_metric.
         try:
-            from scipy.stats import mannwhitneyu
-
-            _, p = mannwhitneyu(a, b, alternative="two-sided")
-            return float(p)
+            p = _mannwhitney_two_sided_p(a, b)
         except Exception as exc:  # pragma: no cover - defensive
             warnings.warn(
                 f"TextFairnessAnalyzer: the Mann-Whitney test raised {exc!r}, so "
@@ -325,6 +328,17 @@ class TextFairnessAnalyzer:
                 stacklevel=3,
             )
             return None
+        if p is None:
+            # A nan p is not a p-value. Passed on, `nan < 0.05` is False and it
+            # would be graded as "not significant"; it is a test that did not run.
+            warnings.warn(
+                "TextFairnessAnalyzer: the Mann-Whitney test returned no finite "
+                "p-value, so significance was NOT tested.",
+                UserWarning,
+                stacklevel=3,
+            )
+            return None
+        return p
 
     @staticmethod
     def _grade(

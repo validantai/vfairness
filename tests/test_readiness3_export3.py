@@ -397,6 +397,21 @@ _PATH_REFERENCE = re.compile(
 )
 
 
+@functools.lru_cache(maxsize=None)
+def _republished_globs() -> tuple[str, ...]:
+    """Paths the export deletes and then writes back as a cleaned copy.
+
+    Withheld grading waves sit in EXCLUDES and are republished by
+    scripts/publish_grading_waves.py (2026-10-01), so a reference to one DOES
+    resolve in the public repository. Parsed from the script's own `case` line,
+    like EXCLUDES itself, so this cannot drift from what the export does.
+    """
+    src = EXPORT_SCRIPT.read_text(encoding="utf-8")
+    globs = tuple(re.findall(r'case "\$path" in ([^)\s]+)\) waves\+=', src))
+    assert globs, f"could not find the republished-waves case line in {EXPORT_SCRIPT}"
+    return globs
+
+
 def _references_to_dropped_paths() -> dict[str, list[str]]:
     """``{shipped file: ["line: dropped path", ...]}`` for paths that exist here."""
     found: dict[str, list[str]] = {}
@@ -410,6 +425,8 @@ def _references_to_dropped_paths() -> dict[str, list[str]]:
                     continue  # never existed here: a different defect
                 if not _is_dropped(target):
                     continue
+                if any(fnmatch.fnmatch(target, g) for g in _republished_globs()):
+                    continue  # deleted, then published as the cleaned copy
                 found.setdefault(rel, []).append(f"{number}: {target}")
     return found
 

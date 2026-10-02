@@ -25,7 +25,7 @@
                     <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
                 </a>
                 <span class="logo-divider"></span>
-                <span class="lib-name"><span>v</span>fairness</span>
+                <a class="lib-name" href="../index.html" title="vfairness documentation home"><span>v</span>fairness</a>
             </div>
             <nav class="main-nav" aria-label="Main navigation">
                 <ul class="nav-links">
@@ -333,13 +333,13 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
   <a href="../quality-and-hardening/index.html">Quality &amp; Hardening</a>.</p>
 
   <div class="rp-status" id="status">
-    <h2>Status: 0.1.0 released on 2026-10-01</h2>
+    <h2>Status: 0.1.0 released on 2026-10-02</h2>
     <p>Version 0.1.0 is the first public beta, published from the <code>v0.1.0</code> tag through the workflow below. What had to be true before it could go out:</p>
     <ul class="rp-checks">
       <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>The beta gate reads BETA READY</strong>: all 8 conditions met (see Quality &amp; Hardening).</span></li>
+      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>Every CI check is green</strong> on the exact release commit, in the development repository and again on the public repository, including the full suite on Python 3.11 to 3.13 and the oldest declared dependency versions.</span></li>
       <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>Someone can approve.</strong> The <code>pypi</code> environment on the public repository admits <code>v</code>-tags and requires an active reviewer before anything reaches PyPI.</span></li>
-      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>PyPI trusts exactly this repository and workflow</strong> (trusted publishing over OIDC, no stored token). PyPI confirmed the registration when it refused to add it a second time.</span></li>
-      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>The public repository is filled</strong> by the export, and its own test suite must pass there before the tag can publish.</span></li>
+      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>PyPI trusts exactly this repository and workflow</strong> (trusted publishing over OIDC, no stored token).</span></li>
       <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>Tag <code>v0.1.0</code></strong> on the public repository. The earlier 0.0.1 on PyPI is our own name reservation and contains none of this code.</span></li>
     </ul>
   </div>

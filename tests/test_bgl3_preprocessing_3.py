@@ -59,12 +59,22 @@ only visible with both cases in the file.
 import warnings
 from typing import Any, List, Tuple
 
-import matplotlib
 import numpy as np
 import pandas as pd
 import pytest
 
-matplotlib.use("Agg")
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 from vfairness.preprocessing.bias_detection.detector import (  # noqa: E402
     AUDIT_MODULES,
@@ -600,6 +610,7 @@ def _panel_text(fig) -> str:
 
 
 class TestAnalysisDashboard:
+    @needs_matplotlib
     def test_the_summary_panel_states_what_was_never_measured(self):
         """Before: "Total features analyzed: 1 / Protected attributes: 1 / Proxy
         Variables Found:" with nothing under the heading, on 5 unmeasurable rows.
@@ -623,6 +634,7 @@ class TestAnalysisDashboard:
         assert "none found, on incomplete coverage" in text
         assert "Features analyzed: 0 of 1" in text
 
+    @needs_matplotlib
     def test_a_matrix_whose_coverage_cannot_be_read_says_so_rather_than_not_measured(self):
         """The third state. A hand-built matrix can declare a protected attribute
         that is not a column of its own `correlations` frame, and then how much
@@ -650,6 +662,7 @@ class TestAnalysisDashboard:
 
     # ── over-correction control ──
 
+    @needs_matplotlib
     def test_a_measured_dashboard_carries_the_finding_and_no_coverage_warning(self):
         df = _proxy_frame()
         with warnings.catch_warnings():

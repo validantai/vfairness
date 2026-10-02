@@ -47,7 +47,15 @@ import warnings
 import numpy as np
 import pandas as pd
 import pytest
-import torch
+
+# torch is an optional extra ([training]), so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that build tensors are marked needs_torch and skip; the rest still run.
+try:
+    import torch
+except ModuleNotFoundError:
+    torch = None
+needs_torch = pytest.mark.skipif(torch is None, reason="needs the optional torch extra")
 
 from vfairness.in_processing.diagnostics import (
     adversarial_convergence_diagnostics,
@@ -285,7 +293,12 @@ def _cf_batch():
     return y_pred, y_true, sens
 
 
-class _Sigmoid(torch.nn.Module):
+# Without torch the fixture model cannot exist; every test that builds one is
+# marked needs_torch, so the object base only keeps the module importable.
+_ModuleBase = torch.nn.Module if torch is not None else object
+
+
+class _Sigmoid(_ModuleBase):
     """The BGL3 fixture's model, so the generated arm keeps its recorded number."""
 
     def __init__(self) -> None:
@@ -316,6 +329,7 @@ class TestAPartiallyMovedCounterfactualIsDisclosed:
     score, and pulled the reported penalty down eightfold.
     """
 
+    @needs_torch
     def test_one_moved_row_in_eight_measures_the_row_it_compared(self):
         y_pred, y_true, sens = _cf_batch()
         cf = y_pred.clone()
@@ -340,6 +354,7 @@ class TestAPartiallyMovedCounterfactualIsDisclosed:
             for m in _messages(caught)
         ), _messages(caught)
 
+    @needs_torch
     def test_the_kl_metric_can_no_longer_pay_the_model_for_unfairness(self):
         """MEASURED BEFORE, same batch, distance_metric='kl', counterfactual =
         y_pred * 0.5: fairness_loss -0.1732867956161499, assessed True, total_loss
@@ -368,6 +383,7 @@ class TestAPartiallyMovedCounterfactualIsDisclosed:
         assert components.batch_metrics["fairness_penalty_assessed"] is True
         assert _messages(caught) == []
 
+    @needs_torch
     def test_kl_refuses_a_vector_that_is_not_a_probability(self):
         """A Bernoulli KL needs both sides in [0, 1]; outside it the quantity does
         not exist, so it is a could-not-check and not a penalty of any size."""
@@ -383,6 +399,7 @@ class TestAPartiallyMovedCounterfactualIsDisclosed:
         assert components.batch_metrics["fairness_loss_unassessed_value"] == pytest.approx(0.0)
         assert any("Bernoulli probabilities" in m for m in _messages(caught))
 
+    @needs_torch
     def test_control_a_fully_moved_counterfactual_is_untouched(self):
         """OVER-CORRECTION CONTROL, three arms, each with the number the BGL3 pin
         recorded: a supplied counterfactual that moved EVERY row, the l2 reading of
@@ -410,6 +427,7 @@ class TestAPartiallyMovedCounterfactualIsDisclosed:
         )
         assert l1.fairness_loss == pytest.approx(0.25, abs=1e-8)
 
+    @needs_torch
     def test_control_the_generated_arm_still_measures_its_own_number(self):
         """OVER-CORRECTION CONTROL. The row mask is built from the SUPPLIED
         counterfactual only; the generated arm, on the BGL3 fixture, must still
@@ -462,6 +480,7 @@ class TestCosineOnAZeroNormRowIsNotPerfectFairness:
     features measure 0.514285683631897.
     """
 
+    @needs_torch
     def test_all_zero_features_are_refused_not_scored_perfect(self):
         y_pred, y_true, sens = _eight_individuals()
         loss_fn = IndividualFairnessLoss(lambda_fairness=1.0, similarity_metric="cosine")
@@ -480,6 +499,7 @@ class TestCosineOnAZeroNormRowIsNotPerfectFairness:
         assert metrics["fairness_loss_unassessed_value"] == pytest.approx(0.0)
         assert any("cosine similarity is 0/0" in m for m in _messages(caught))
 
+    @needs_torch
     def test_a_single_zero_row_excludes_its_own_pairs_and_says_so(self):
         """One zero row among seven identical nonzero ones. Its seven pairs have no
         distance, so they leave the criterion instead of being recorded at the
@@ -498,6 +518,7 @@ class TestCosineOnAZeroNormRowIsNotPerfectFairness:
         assert metrics["fairness_penalty_partial"] is True
         assert any("7 pair(s) touching them were left out" in m for m in _messages(caught))
 
+    @needs_torch
     def test_the_nearest_neighbour_branch_excludes_them_too(self):
         """A branch the BGL3 pin never reached (counterfactual.py:706-718 was
         unexecuted). An undefined row must not be ranked as the most distant
@@ -519,6 +540,7 @@ class TestCosineOnAZeroNormRowIsNotPerfectFairness:
         assert math.isfinite(components.fairness_loss)
         assert any("cosine similarity is 0/0" in m for m in _messages(caught))
 
+    @needs_torch
     def test_control_the_measured_violation_is_unchanged_on_every_metric(self):
         """OVER-CORRECTION CONTROL, against the hand computation the BGL3 pin uses:
         16 cross pairs at 0.9 and 12 same pairs at 0.0 over 28 upper-triangle pairs
@@ -545,6 +567,7 @@ class TestCosineOnAZeroNormRowIsNotPerfectFairness:
             assert "fairness_penalty_partial" not in metrics, metric
             assert _messages(caught) == [], metric
 
+    @needs_torch
     def test_control_the_neighbour_branch_on_healthy_features_is_unchanged(self):
         """OVER-CORRECTION CONTROL for the divisor change: with every distance
         defined, the pairs summed ARE n * n_neighbors, so the penalty is the same
@@ -562,6 +585,7 @@ class TestCosineOnAZeroNormRowIsNotPerfectFairness:
         assert "fairness_penalty_partial" not in metrics
         assert _messages(caught) == []
 
+    @needs_torch
     def test_control_the_three_older_refusals_still_fire(self):
         """OVER-CORRECTION CONTROL. The new guard must not shadow the ones that
         were already there."""

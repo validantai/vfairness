@@ -28,11 +28,22 @@ from __future__ import annotations
 
 import importlib
 
-import matplotlib
 import pytest
 
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+    plt = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+    import matplotlib.pyplot as plt
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 CHART_NAMES = [
     "plot_fairness_metrics",
@@ -58,7 +69,8 @@ TARGET_MODULE = "vfairness.evaluation.vfairness_metrics.visualization"
 @pytest.fixture(autouse=True)
 def _close_figures():
     yield
-    plt.close("all")
+    if plt is not None:
+        plt.close("all")
 
 
 @pytest.mark.parametrize("wrapper_module", WRAPPER_MODULES)
@@ -110,6 +122,7 @@ def test_each_wrapper_and_its_target_agree_on_the_signature_they_document(wrappe
     assert getattr(target, name) is not None
 
 
+@needs_matplotlib
 def test_the_top_level_wrappers_reach_a_real_chart():
     """Control for the recorders above: with nothing patched, the documented
     top-level call must actually produce a chart. A forwarding test alone would pass

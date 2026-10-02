@@ -15,14 +15,24 @@ severities, truncation is honest, and a save path actually produces a file.
 
 from __future__ import annotations
 
-import matplotlib
-
-matplotlib.use("Agg")  # no display in CI; must precede pyplot
-
-import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import pytest  # noqa: E402
+
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+    plt = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+    import matplotlib.pyplot as plt
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 from vfairness.preprocessing.feature_engineering import visualization as viz  # noqa: E402
 from vfairness.preprocessing.feature_engineering.correlation import (  # noqa: E402
@@ -38,7 +48,8 @@ FEATURES = ["zipcode", "income", "age"]
 @pytest.fixture(autouse=True)
 def _close_figures():
     yield
-    plt.close("all")
+    if plt is not None:
+        plt.close("all")
 
 
 @pytest.fixture
@@ -87,6 +98,7 @@ def _text(ax) -> str:
     return " ".join(p for p in parts if p)
 
 
+@needs_matplotlib
 def test_every_flagged_proxy_reaches_the_chart(proxies):
     """A feature that is flagged and then not drawn is invisible to the reader."""
     ax = viz.plot_proxy_risk_chart(proxies)
@@ -95,6 +107,7 @@ def test_every_flagged_proxy_reaches_the_chart(proxies):
     assert not missing, f"flagged proxies absent from the chart: {missing}"
 
 
+@needs_matplotlib
 def test_the_bar_count_matches_the_number_of_proxies(proxies):
     ax = viz.plot_proxy_risk_chart(proxies)
     bars = [p for p in ax.patches if getattr(p, "get_width", None)]
@@ -103,6 +116,7 @@ def test_the_bar_count_matches_the_number_of_proxies(proxies):
     )
 
 
+@needs_matplotlib
 def test_truncation_is_honest_about_what_it_dropped(proxies):
     """max_features must not silently hide the rest of a risk list."""
     ax = viz.plot_proxy_risk_chart(proxies, max_features=1)
@@ -114,6 +128,7 @@ def test_truncation_is_honest_about_what_it_dropped(proxies):
     )
 
 
+@needs_matplotlib
 def test_the_risk_distribution_covers_every_severity_present(proxies):
     ax = viz.plot_risk_distribution(proxies)
     rendered = _text(ax).lower()
@@ -121,6 +136,7 @@ def test_the_risk_distribution_covers_every_severity_present(proxies):
         assert level in rendered, f"severity {level!r} is in the data but not on the chart"
 
 
+@needs_matplotlib
 def test_the_heatmap_labels_every_feature(correlation_matrix):
     ax = viz.plot_correlation_heatmap(correlation_matrix)
     rendered = _text(ax)
@@ -128,12 +144,14 @@ def test_the_heatmap_labels_every_feature(correlation_matrix):
     assert not missing, f"features missing from the heatmap axes: {missing}"
 
 
+@needs_matplotlib
 def test_the_dashboard_returns_a_figure_with_more_than_one_panel(correlation_matrix, proxies):
     fig = viz.create_analysis_dashboard(correlation_matrix, proxies)
     assert isinstance(fig, plt.Figure)
     assert len(fig.axes) > 1, "a one-panel 'dashboard' is a chart with a grander name"
 
 
+@needs_matplotlib
 def test_save_path_actually_writes_a_file(proxies, tmp_path):
     """A save that silently writes nothing is the reporting equivalent of a no-op."""
     target = tmp_path / "risk.png"
@@ -142,6 +160,7 @@ def test_save_path_actually_writes_a_file(proxies, tmp_path):
     assert target.stat().st_size > 0, "save_path produced an empty file"
 
 
+@needs_matplotlib
 def test_an_empty_proxy_list_does_not_pretend_to_have_findings():
     """Nothing flagged must not render as something flagged.
 
@@ -159,6 +178,7 @@ def test_an_empty_proxy_list_does_not_pretend_to_have_findings():
     )
 
 
+@needs_matplotlib
 def test_a_single_proxy_still_renders(proxies):
     """Degenerate sizes are where plotting code usually breaks."""
     ax = viz.plot_proxy_risk_chart(proxies[:1])

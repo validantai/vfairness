@@ -1412,7 +1412,10 @@ def compute_signed_test_log(
     # unreadable string and the epoch int already went.
     declared = test_results.get("timestamp")
     _declared_iso = None
-    if not isinstance(declared, str) and hasattr(declared, "isoformat"):
+    # `declared is not None` changes nothing at runtime (None has no isoformat,
+    # so hasattr already refused it); it is spelled out so the type checker can
+    # see None is excluded before .isoformat() is called.
+    if declared is not None and not isinstance(declared, str) and hasattr(declared, "isoformat"):
         try:
             _iso = declared.isoformat()
             # READ before believed, the same test the string branch applies.
@@ -2828,6 +2831,11 @@ def build_assurance_verdict(
         _graded: List[Tuple[float, dict]] = []
         for v in per_variable:
             if not v.get("assessable"):
+                continue
+            # A row whose findings already arrive, gated and corrected, through
+            # `bias` (the agent route) declares scope only; ranking its raw gap
+            # here would add a second, uncorrected finding. 2026-10-01.
+            if v.get("findingsFromBias"):
                 continue
             _g = _as_measured_number(v.get("gap"))
             if _g is not None:

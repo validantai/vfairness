@@ -47,6 +47,19 @@ run() {  # run <label> <cmd...>
     fi
 }
 
+# CAN THIS ENVIRONMENT CHECK AT ALL. The published figures were measured with
+# optional extras installed (mcp, torch and others), and without them the surface
+# walk measures a smaller package: 1,563 units instead of 1,580 on 2026-10-02.
+# Every check below would then print STALE and blame the documents. That is a
+# could-not-check, so it is said once, by name, and nothing is reported as
+# either current or stale. It still exits 1: an unchecked tree is never a pass.
+# It runs BEFORE a republish too, so a partial install cannot overwrite the
+# published ledger with its smaller count either.
+if ! envout=$("$PY" scripts/capability_status.py --env-check 2>&1); then
+    echo "$envout"
+    exit 1
+fi
+
 if [ -z "$CHECK" ]; then
     # The two beta-gate checks run first: the quality page renders their result
     # file, so it has to exist before the page is stamped. It EXECUTES both checks
@@ -62,6 +75,7 @@ if [ -z "$CHECK" ]; then
     "$PY" scripts/stamp_status_badges.py >/dev/null 2>&1
     "$PY" scripts/stamp_proof_status.py   >/dev/null 2>&1
     "$PY" scripts/render_readiness.py     >/dev/null 2>&1
+    "$PY" scripts/build_search_index.py   >/dev/null 2>&1
     echo "pass 2 of 2"
     "$PY" scripts/capability_status.py   >/dev/null 2>&1
     "$PY" scripts/bgl6_register.py       >/dev/null 2>&1
@@ -70,6 +84,7 @@ if [ -z "$CHECK" ]; then
     "$PY" scripts/stamp_status_badges.py >/dev/null 2>&1
     "$PY" scripts/stamp_proof_status.py   >/dev/null 2>&1
     "$PY" scripts/render_readiness.py     >/dev/null 2>&1
+    "$PY" scripts/build_search_index.py   >/dev/null 2>&1
     echo "verifying it converged"
 fi
 
@@ -88,6 +103,13 @@ run "readiness summary"          "$PY" scripts/render_readiness.py --check
 # command somebody had to remember, which is the same failure this script exists
 # to remove.
 run "docstring proof stamps"     "$PY" scripts/stamp_proof_status.py --check
+# THE SEARCH INDEX IS READ FROM THE PAGES THIS SCRIPT REWRITES, so it is the
+# last generator in each pass. It was not in this script at all: every republish
+# rewrote the quality page (its "As of" line among others) and left
+# docs/site/data/search-index.json describing the previous text, so the suite's
+# test_search_index_is_current failed on CI on 2026-10-02, and by then
+# the index still said 0.1.0 was unreleased a day after it shipped.
+run "search index"               "$PY" scripts/build_search_index.py --check
 
 if [ "$fail" -ne 0 ]; then
     echo
@@ -117,6 +139,7 @@ docs/site/api-reference/index.html
 docs/site/css/styles.css
 docs/site/data/capability-status.json
 docs/site/data/library-stats.json
+docs/site/data/search-index.json
 docs/site/quality-and-hardening/index.html
 docs/site/status/index.html
 src/vfairness/_capability_status.json

@@ -96,7 +96,8 @@ def _import_gcm():
     except ImportError as exc:
         raise ImportError(
             "vfairness.operations.causal.attribute needs dowhy's gcm module "
-            "(plus networkx). gcm requires dowhy>=0.11, which currently supports "
+            "(plus networkx). It needs dowhy>=0.13 (older releases call a networkx "
+            "function networkx has removed), which currently supports "
             "Python <=3.13 only; on Python 3.14 the available dowhy (0.8) has a gcm "
             "that is incompatible with numpy>=1.25. Run this op on a Python 3.13 "
             "worker, or use distribution-shift diagnostics that need no gcm. "
@@ -199,7 +200,11 @@ def _change_test(baseline: pd.Series, current: pd.Series) -> Tuple[Optional[floa
         if table.shape[1] < 2:
             return None, "single level"
         try:
-            return float(stats.chi2_contingency(table).pvalue), "chi-square on level counts"
+            # [1], not .pvalue: chi2_contingency returned a plain tuple before
+            # scipy 1.11, so .pvalue raised at the declared scipy floor and every
+            # categorical outcome shift read as "could not run". Index 1 is the
+            # p-value in both the old tuple and the newer result object.
+            return float(stats.chi2_contingency(table)[1]), "chi-square on level counts"
         except Exception as exc:  # noqa: BLE001 - reported, not swallowed
             return None, f"chi-square failed ({exc})"
     try:

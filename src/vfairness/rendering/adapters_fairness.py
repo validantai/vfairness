@@ -1846,9 +1846,13 @@ def confidence_intervals_to_svg(
     # instances of 'int' and 'str'``. Measured 2026-09-30 on a stringified real
     # report: this chart and two of its five siblings died while the radar and
     # the group comparison rendered the same input.
-    all_vals = [_to_finite_float(v) for v in metrics.values() if _is_finite(v)]
+    # Coerce once and keep the non-None results. `_is_finite(v)` is defined as
+    # `_to_finite_float(v) is not None`, so this is the same set of values; the
+    # explicit `is not None` filter is what lets the type checker see it.
+    coerced = (_to_finite_float(v) for v in metrics.values())
+    all_vals: List[float] = [c for c in coerced if c is not None]
     if not all_vals:
-        all_vals = [0]
+        all_vals = [0.0]
     val_min = min(all_vals + [0])
     val_max = max(all_vals + [0])
     for source in ci_sources:

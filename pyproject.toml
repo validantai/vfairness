@@ -158,11 +158,16 @@ viz = [
 rendering = [
     "jinja2>=3.0",
 ]
+# plotly 5.8.0, measured 2026-10-02 by the dependency-floor job's own install
+# (lowest-direct, Python 3.11): 5.0.0 rejects Heatmap(texttemplate=...) and
+# 5.0.0 .. 5.7.0 reject layout.xaxis.griddash ("Invalid property specified"),
+# which every intersectional heatmap and the fairness dashboard set, so 17
+# chart tests failed at 5.0.0 and 5 at 5.5.0 / 5.7.0; 5.8.0 passes all 123.
 dashboard = [
-    "plotly>=5.0",
+    "plotly>=5.8.0",
 ]
 interactive = [
-    "plotly>=5.0",
+    "plotly>=5.8.0",
     "dash>=2.0",
 ]
 monitoring = [
@@ -182,8 +187,15 @@ monitoring = [
 # darwin AND linux on 3.11-3.13 as the supported surface: at 1.13.0 the extra is
 # still uninstallable on half of it. 2.0.0 is the oldest release that resolves on
 # every environment this project claims to support.
+#
+# Raised to 2.1.0 on 2026-10-02, measured by the dependency-floor job's own
+# install (lowest-direct, Python 3.11): torch 2.0.0 and 2.0.1 have no CPU kernel
+# for clamp or unique on float16 ("clamp_scalar_cpu" / "unique" not implemented
+# for 'Half'), so temperature scaling and the half-precision training check
+# crash on a float16 input (tests/test_audit6_lane3_post_in_processing.py,
+# tests/test_surface_grade_g019.py). 2.1.0 passes both.
 training = [
-    "torch>=2.0.0",
+    "torch>=2.1.0",
 ]
 mlops = [
     "mlflow>=2.0",
@@ -208,8 +220,8 @@ llm-transformers = [
     "flair>=0.13",
     "detoxify>=0.5",
     # See the torch note above `training`: below 2.0.0 there is no cp311 artifact
-    # for every supported platform, and torch ships no sdist to fall back to.
-    "torch>=2.0.0",
+    # for every supported platform, and 2.0.x lacks the float16 CPU kernels.
+    "torch>=2.1.0",
 ]
 # Explainability subsystem (vfairness.xai). All MIT / BSD-3, so no licence
 # risk; optional install only. Resolves backlog decision D-01 (option a:
@@ -221,8 +233,8 @@ xai = [
     "dice-ml>=0.11",
     "captum>=0.7",
     # See the torch note above `training`: below 2.0.0 there is no cp311 artifact
-    # for every supported platform, and torch ships no sdist to fall back to.
-    "torch>=2.0.0",
+    # for every supported platform, and 2.0.x lacks the float16 CPU kernels.
+    "torch>=2.1.0",
     "anchor-exp>=0.0.2.0",
     "sage-importance>=0.0.5",
 ]
@@ -234,13 +246,26 @@ xai = [
 # here so the comparison is an installable, gated contract rather than an
 # accident of whatever happens to be on the machine.
 parity = [
-    "fairlearn>=0.10",
+    # 0.11.0, measured 2026-10-02 at the dependency floor: fairlearn 0.10.0 has
+    # no metrics.equal_opportunity_difference (6 parity tests error) and its
+    # MetricFrame calls groupby.apply in the way pandas 2.2 deprecates, so a
+    # clean comparison emitted a DeprecationWarning the library reports as
+    # noise. 0.11.0 passes all 180 tests that touch it.
+    "fairlearn>=0.11.0",
     "aif360>=0.6",
 ]
 # Causal estimation (vfairness.operations.causal): identification, mediation
 # (NDE/NIE), refutation, GCM counterfactuals, distribution-change attribution.
+#
+# dowhy 0.13, measured 2026-10-02 against the CURRENT networkx (3.6.1):
+# dowhy 0.11, 0.11.1 and 0.12 call networkx.algorithms.d_separated, which
+# networkx has since removed, so identification and mediation raised and 9
+# causal tests failed; 0.13 and 0.14 pass all 559. A fresh resolve of 0.11
+# with today's networkx was therefore broken for any user. At the floor
+# resolution 0.13 brings networkx 3.3 and keeps numpy 1.24 / scipy 1.9; the
+# same 559 pass there and again after upgrading networkx to 3.6.1.
 causal = [
-    "dowhy>=0.11",
+    "dowhy>=0.13",
     "networkx>=3.0",
 ]
 # Local-first Model Context Protocol server (vfairness.mcp). Exposes the
@@ -258,7 +283,13 @@ mcp = [
     # Verified 2026-08-27: mcp 2.0.0 -> ModuleNotFoundError on
     # mcp.server.fastmcp; mcp 1.29.1 imports it fine. Lift the cap only
     # after server.py has been ported to the 2.x server API.
-    "mcp>=1.2.0,<2; python_version >= '3.10'",
+    #
+    # Floor 1.14.0, measured 2026-10-02 at the dependency floor: before 1.10
+    # FastMCP.call_tool returns no structured content, so the coverage
+    # disclosure never crosses the MCP boundary as data; 1.10.0 .. 1.13.1 crash
+    # registering our tools at import (issubclass() on the string annotations
+    # `from __future__ import annotations` produces). 1.14.0 passes all 136.
+    "mcp>=1.14.0,<2; python_version >= '3.10'",
 ]
 # CI/CD hooks (operations.cicd.precommit, the shipped `vfairness-precommit`
 # console script). PyYAML is what `check-config` parses .yml/.yaml fairness gate

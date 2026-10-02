@@ -473,7 +473,7 @@
                     <img src="../img/VALIDANT_AI_logo_web_v1_1.svg" alt="validant.ai" class="logo-full">
                 </a>
                 <span class="logo-divider"></span>
-                <span class="lib-name"><span>v</span>fairness</span>
+                <a class="lib-name" href="../index.html" title="vfairness documentation home"><span>v</span>fairness</a>
             </div>
             <nav class="main-nav" aria-label="Main navigation">
                 <ul class="nav-links">
@@ -860,7 +860,7 @@ details.rd-more summary { cursor: pointer; color: var(--rd-mid); font-weight: 60
   .rd-answer__badge { white-space: normal; } .rd-conds td.rd-fig { width: auto; white-space: normal; } }
 </style>
 <section class="rd" id="readiness">
-  <span class="rd-eyebrow">vfairness 0.1.0 &middot; beta readiness &middot; checked 1 Oct 2026</span>
+  <span class="rd-eyebrow">vfairness 0.1.0 &middot; beta readiness &middot; checked 2 Oct 2026</span>
   <h1>Quality &amp; Hardening</h1>
   <div class="rd-answer" style="--rd-state:var(--rd-ok);--rd-state-bg:var(--rd-ok-bg)">
     <span class="rd-answer__badge">Beta-ready</span>
@@ -870,7 +870,7 @@ details.rd-more summary { cursor: pointer; color: var(--rd-mid); font-weight: 60
 <div class="rd-tile"><span class="rd-tile__big">34<small> / 34</small></span><span class="rd-tile__label">give the same number as an established library (fairlearn, scikit-learn, statsmodels, scipy)</span><div class="rd-bar"><span style="width:100%"></span></div></div>
 <div class="rd-tile"><span class="rd-tile__big">109<small> / 109</small></span><span class="rd-tile__label">capabilities that measure refuse to invent a number when the data cannot support one</span><div class="rd-bar"><span style="width:100%"></span></div></div>
 <div class="rd-tile"><span class="rd-tile__big">0</span><span class="rd-tile__label">known defects open. Every defect proved by running the code is fixed</span><div class="rd-bar"><span style="width:100%"></span></div></div>
-<div class="rd-tile"><span class="rd-tile__big">16,275</span><span class="rd-tile__label">automated tests, reaching 81% of lines and branches</span><div class="rd-bar"><span style="width:81%"></span></div></div>
+<div class="rd-tile"><span class="rd-tile__big">16,317</span><span class="rd-tile__label">automated tests, reaching 81% of lines and branches</span><div class="rd-bar"><span style="width:81%"></span></div></div>
   </div>
   <div class="rd-line" id="the-line">
     <h3>Where the line is</h3>
@@ -894,13 +894,13 @@ details.rd-more summary { cursor: pointer; color: var(--rd-mid); font-weight: 60
   <h2 id="rely">What you can rely on</h2>
   <div class="rd-cols">
 <div class="rd-col rd-col--ok"><h3>Guaranteed</h3><p class="rd-sub">A test fails the moment this stops being true.</p><ul><li><strong>Same answer as the reference libraries.</strong> 34 metrics are computed side by side with an established library on clean data, two groups and three groups of unequal size, and must match to the ninth decimal.</li><li><strong>No invented numbers.</strong> All 109 measuring capabilities are fed eight kinds of broken data. Each must refuse, or say it could not measure, and must still measure the healthy data alongside.<ul class="rd-chips"><li>only one group</li><li>no rows at all</li><li>every score missing</li><li>one outcome only</li><li>every score identical</li><li>two rows</li><li>a group of one row</li><li>a group with no positive outcomes</li></ul> 1 more is registered beside them but produces no number at all (run and confirmed), so there is nothing to invent.</li><li><strong>Three answers, never two.</strong> A result is measured, failed, or could-not-check, and the third is written into the result itself, not only into a warning that most programs never show.</li></ul></div>
-<div class="rd-col rd-col--mid"><h3>Tested</h3><p class="rd-sub">Checked by vfairness's own tests, not against an outside reference.</p><ul><li><strong>76 capabilities have no outside reference</strong> (LLM and agent analysis, LLM benchmarks, agent and multi-agent tracking, causal analysis, explainers and others). No other library computes these numbers, so their accuracy on normal data rests on vfairness's own tests. They are still checked never to invent a number.</li><li><strong>16,275 automated tests</strong> run on every change, reaching 81% of lines and branches. Covered code can still be wrong; this says it was exercised.</li></ul></div>
+<div class="rd-col rd-col--mid"><h3>Tested</h3><p class="rd-sub">Checked by vfairness's own tests, not against an outside reference.</p><ul><li><strong>76 capabilities have no outside reference</strong> (LLM and agent analysis, LLM benchmarks, agent and multi-agent tracking, causal analysis, explainers and others). No other library computes these numbers, so their accuracy on normal data rests on vfairness's own tests. They are still checked never to invent a number.</li><li><strong>16,317 automated tests</strong> run on every change, reaching 81% of lines and branches. Covered code can still be wrong; this says it was exercised.</li></ul></div>
 <div class="rd-col rd-col--open"><h3>Open</h3><p class="rd-sub">Not done yet, or not proven yet.</p><ul><li><strong>608 of 1,580 examined code units have not had a second, independent check</strong>, and 291 of the 872 re-checked so far were overturned. Treat those grades as evidence, not proof.</li><li><strong>Not yet published.</strong> Version 0.1.0 has never been released to PyPI; the release pipeline is built and gated but has not run.</li><li><strong>Some checks have not produced a result yet</strong>: code scanning (CodeQL, OpenSSF Scorecard) waits for the public repository, and mutation testing covers one module.</li></ul></div>
   </div>
 
   <h2 id="heatmap">Where each part of the library stands</h2>
-  <p class="rd-stamp"><strong>As of 1 Oct 2026.</strong> The last two columns were run on
-  1 Oct 2026. The first three come from the examination record, whose newest
+  <p class="rd-stamp"><strong>As of 2 Oct 2026.</strong> The last two columns were run on
+  2 Oct 2026. The first three come from the examination record, whose newest
   evidence is dated 1 Oct 2026.</p>
   <p class="rd-note">The same facts, by area. Green is done, amber is partly done, red is not
   started or broken, grey means the condition does not apply there.</p>
@@ -1200,7 +1200,7 @@ details.rd-more summary { cursor: pointer; color: var(--rd-mid); font-weight: 60
                             <span class="qa-board__sub">
                                 <span class="kpi-beta-fails">0</span> of
                                 <span class="kpi-beta-count">8</span> criteria block it.
-                                Measured <span class="kpi-gate-date">2026-10-01</span>.
+                                Measured <span class="kpi-gate-date">2026-10-02</span>.
                             </span>
                             <div class="qa-segbar" role="group" aria-label="0 of 8 beta criteria block the release."><span class="qa-seg" tabindex="0" role="button" aria-label="B1: Every public code unit has been EXECUTED and its result recorded. passes. 1580 of 1580 executed and recorded"><span class="qa-seg__tip"><b>B1 &mdash; passes</b><span>Every public code unit has been EXECUTED and its result recorded</span><span class="qa-seg__why">Has every public unit actually been RUN, with the result written down? Not a belief that it works: executed, by the suite or an audit, and recorded.</span><span class="qa-seg__now">Measured now: 1580 of 1580 executed and recorded</span></span></span><span class="qa-seg" tabindex="0" role="button" aria-label="B1b: Every public code unit's examination state is PUBLISHED where it is described. passes. 1580 of 1580 carry a published state"><span class="qa-seg__tip"><b>B1b &mdash; passes</b><span>Every public code unit's examination state is PUBLISHED where it is described</span><span class="qa-seg__why">Can a reader SEE that state where the unit is described? A measurement nobody can find is the defect this library is audited for.</span><span class="qa-seg__now">Measured now: 1580 of 1580 carry a published state</span></span></span><span class="qa-seg" tabindex="0" role="button" aria-label="B2: No open defect in code that returns a fairness number or verdict. passes. 0 open (0 measuring, 0 unclassified)"><span class="qa-seg__tip"><b>B2 &mdash; passes</b><span>No open defect in code that returns a fairness number or verdict</span><span class="qa-seg__why">Is anything still broken in code that hands back a fairness number or a verdict? This is the defect that reaches a user as a false clean bill.</span><span class="qa-seg__now">Measured now: 0 open (0 measuring, 0 unclassified)</span></span></span><span class="qa-seg" tabindex="0" role="button" aria-label="B2b: No open defect recorded by the second-round audit. passes. 0 open of 59 recorded claims"><span class="qa-seg__tip"><b>B2b &mdash; passes</b><span>No open defect recorded by the second-round audit</span><span class="qa-seg__why">The fix wave was audited a SECOND time, by agents attacking the fixes. Every open record is a test that reproduces its defect today.</span><span class="qa-seg__now">Measured now: 0 open of 59 recorded claims</span></span></span><span class="qa-seg" tabindex="0" role="button" aria-label="B3: Every remaining open defect carries an assessed severity. passes. 0 non-measuring open, severity unassessed"><span class="qa-seg__tip"><b>B3 &mdash; passes</b><span>Every remaining open defect carries an assessed severity</span><span class="qa-seg__why">Every defect still open has to carry a severity. A beta may ship with known defects; it may not ship with ones nobody has ranked.</span><span class="qa-seg__now">Measured now: 0 non-measuring open, severity unassessed</span></span></span><span class="qa-seg" tabindex="0" role="button" aria-label="B5: Capability census complete and clear. passes. see G5"><span class="qa-seg__tip"><b>B5 &mdash; passes</b><span>Capability census complete and clear</span><span class="qa-seg__why">The registered capabilities are the surface a user reaches on purpose, so the census over them has to be complete and clear.</span><span class="qa-seg__now">Measured now: see G5</span></span></span><span class="qa-seg" tabindex="0" role="button" aria-label="B6: Same answer as an established library, where one exists. passes. 34 of 34 agree; 76 have no outside reference"><span class="qa-seg__tip"><b>B6 &mdash; passes</b><span>Same answer as an established library, where one exists</span><span class="qa-seg__why">Where an established library computes the same number, does vfairness give the same answer on clean data?</span><span class="qa-seg__now">Measured now: 34 of 34 agree; 76 have no outside reference</span></span></span><span class="qa-seg" tabindex="0" role="button" aria-label="B7: No invented number on broken data. passes. 109 of 109 measuring capabilities pass; 0 fabricate, 0 over-refuse, 0 not covered"><span class="qa-seg__tip"><b>B7 &mdash; passes</b><span>No invented number on broken data</span><span class="qa-seg__why">Does every capability that measures refuse to invent a number when the data cannot support one, and still measure when it can?</span><span class="qa-seg__now">Measured now: 109 of 109 measuring capabilities pass; 0 fabricate, 0 over-refuse, 0 not covered</span></span></span></div>
                             <span class="qa-segbar__hint">One block per criterion, blocked ones first. Point at a block, or tab to it, for what it means and where it stands.</span>
@@ -1258,7 +1258,7 @@ details.rd-more summary { cursor: pointer; color: var(--rd-mid); font-weight: 60
                         The fix wave was audited again, and that audit recorded
                         <strong>59</strong> claims.
                         <strong>59</strong> are closed and
-                        <strong>0</strong> are still open (100% closed, as of 2026-10-01).
+                        <strong>0</strong> are still open (100% closed, as of 2026-10-02).
                         A claim is closed when its defect is fixed and its test has been
                         inverted into a pin, in the same commit. Open means the test still
                         records the defective value the unit produces today, with the
@@ -1544,7 +1544,7 @@ details.rd-more summary { cursor: pointer; color: var(--rd-mid); font-weight: 60
                                 <td>Packaging and release integrity</td>
                                 <td>Apache-2.0 licensing with a <code>NOTICE</code> and a single-source version, an sdist allowlist, <code>twine check</code> and <code>check-wheel-contents</code>, a clean-room wheel install exercised from outside the source tree, a CycloneDX SBOM, and trusted publishing over OIDC with provenance attestations.</td>
                                 <td>The release workflow and the gates in front of it.</td>
-                                <td>Built and gated, and <strong>0.1.0 was published from the <code>v0.1.0</code> tag on 2026-10-01</strong>, the first run to a publish. The TestPyPI rehearsal was removed on 2026-08-28, so no rehearsal upload stands in front of the real one and the remaining gates carry that weight.</td>
+                                <td>Built and gated, and <strong>0.1.0 was published from the <code>v0.1.0</code> tag on 2026-10-02</strong>, the first run to a publish. The TestPyPI rehearsal was removed on 2026-08-28, so no rehearsal upload stands in front of the real one and the remaining gates carry that weight.</td>
                             </tr>
                             <tr>
                                 <td>Public API surface and stability</td>
@@ -1673,7 +1673,7 @@ details.rd-more summary { cursor: pointer; color: var(--rd-mid); font-weight: 60
                             <tr>
                                 <td><code>release</code></td>
                                 <td>On a pushed <code>v*</code> tag, and on demand</td>
-                                <td>It publishes rather than checks; its first publish was 0.1.0 on 2026-10-01</td>
+                                <td>It publishes rather than checks; its first publish was 0.1.0 on 2026-10-02</td>
                             </tr>
                         </tbody>
                     </table>
@@ -2370,7 +2370,7 @@ details.rd-more summary { cursor: pointer; color: var(--rd-mid); font-weight: 60
                     <strong><span class="kpi-second-open">0</span> open records</strong>, every one
                     reproducible today, and criterion
                     <code>B2b</code> exists because the gate could not see them. Measured
-                    <span class="kpi-gate-date">2026-10-01</span>; reproduce with
+                    <span class="kpi-gate-date">2026-10-02</span>; reproduce with
                     <code>python scripts/release_gate.py</code>. Every figure in this section is
                     read from that script, including the date.</p>
 
@@ -2556,11 +2556,11 @@ details.rd-more summary { cursor: pointer; color: var(--rd-mid); font-weight: 60
                         </p>
                     </div>
                     <div class="callout callout-limitation">
-                        <div class="callout-title">Released 2026-10-01</div>
+                        <div class="callout-title">Released 2026-10-02</div>
                         <p>
-                            The <code>v0.1.0</code> tag was pushed on 2026-10-01 and the gated
+                            The <code>v0.1.0</code> tag was pushed on 2026-10-02 and the gated
                             release pipeline described below carried it to PyPI.
-                            The changelog heads its section <code>[0.1.0] - 2026-10-01</code>.
+                            The changelog heads its section <code>[0.1.0] - 2026-10-02</code>.
                         </p>
                     </div>
                     <details class="qa-details">
@@ -3185,7 +3185,7 @@ demographic_parity_ratio == 1.0  -&gt;  passed_metrics   (not failed_metrics)</c
                             </tr>
                             <tr>
                                 <td>Release</td>
-                                <td>Published 2026-10-01 from the <code>v0.1.0</code> tag, through the gated release pipeline described below.</td>
+                                <td>Published 2026-10-02 from the <code>v0.1.0</code> tag, through the gated release pipeline described below.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -3198,7 +3198,7 @@ demographic_parity_ratio == 1.0  -&gt;  passed_metrics   (not failed_metrics)</c
                     <p>
                         Beta means ready for real users to rely on while the library keeps
                         improving. <strong>That bar is not met today.</strong> Measured
-                        <span class="kpi-gate-date">2026-10-01</span>,
+                        <span class="kpi-gate-date">2026-10-02</span>,
                         <code>scripts/release_gate.py</code> returns
                         <span class="kpi-beta-verdict">BETA READY</span>, with
                         <span class="kpi-beta-fails">0</span> of its

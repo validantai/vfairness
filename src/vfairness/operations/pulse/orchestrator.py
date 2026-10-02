@@ -418,6 +418,18 @@ def _worst_tone(*tones: str) -> str:
     return {0: "pass", 1: "warn", 2: "critical"}[rank]
 
 
+def _cap_unconfirmed(tone: str, significant: bool) -> str:
+    """An unconfirmed disparity is at most a watch item ("warn").
+
+    29 CFR 1607.4(D): "Greater differences in selection rate may not constitute
+    adverse impact where the differences are based on small numbers and are not
+    statistically significant." Applied in every framework, so neither a large
+    gap nor a low four-fifths ratio can make a result critical on its own. The
+    single-attribute path needs this because _fdr_correct (which applies the
+    same cap) does not run when fewer than two attributes are assessable."""
+    return "warn" if (not significant and tone == "critical") else tone
+
+
 def _legal_screen_framework(domain: str, jurisdiction: str) -> Dict[str, Any]:
     """Return the disparity-severity framework that applies to a Pulse
     run given its (domain, jurisdiction) inputs.
@@ -1305,6 +1317,7 @@ def _per_variable(
     best_rate = max((d["rate"] for d in pool), default=0.0)
     four_fifths = (worst["rate"] / best_rate) if best_rate > 0 else 0.0
 
+    p_omnibus: Optional[float] = None
     # Bootstrap CI on the gap (statistical rigor: is it real or noise?).
     rng = np.random.default_rng(0)
     boots = []
@@ -1331,6 +1344,27 @@ def _per_variable(
         nb = len(ba)
         p_two = 2.0 * min((np.sum(ba <= 0) + 1) / (nb + 1), (np.sum(ba >= 0) + 1) / (nb + 1))
         p_value = float(min(1.0, p_two))
+        # The omnibus p is recorded so a reader can see the test that gated
+        # this attribute; the gate below uses the same table.
+        if len(pool) > 2:
+
+            def _omnibus_p() -> Optional[float]:
+                from scipy.stats import chi2_contingency
+
+                rows = []
+                for gr in pool:
+                    m = g == gr["label"]
+                    yp = np.asarray(y_pred[m], dtype=float)
+                    pos = int(np.nansum(yp >= 0.5))
+                    neg = int(m.sum()) - pos
+                    if pos + neg > 0:
+                        rows.append([pos, neg])
+                tbl = np.asarray(rows, dtype=float)
+                if tbl.shape[0] < 2 or tbl.sum(axis=0).min() == 0:
+                    return None  # degenerate table: no omnibus reading
+                return float(chi2_contingency(tbl)[1])
+
+            p_omnibus = _safe(_omnibus_p, None)
         # Selection-aware omnibus gate (audit fix pv-1): `worst` is the
         # MINIMUM-rate group of k, so the ref-vs-worst bootstrap above is an
         # implicit max over k-1 comparisons and is anti-conservative under
@@ -1394,6 +1428,7 @@ def _per_variable(
         "ciHigh": None if hi != hi else float(hi),
         "fourFifthsRatio": four_fifths,
         "pValue": p_value,
+        "pValueOmnibus": p_omnibus,
         "significant": significant,
         # Snapshot of the per-attribute bootstrap-CI verdict BEFORE
         # BH-FDR correction. _fdr_correct() may overwrite `significant`
@@ -1416,16 +1451,19 @@ def _per_variable(
         #       US employment; ratio+stats for other contexts)
         # The framework is resolved at run_pulse top level from the
         # caller's domain/jurisdiction inputs and threaded down.
-        "tone": _worst_tone(
-            _tone(gap),
-            _disparity_tone(
-                four_fifths,
-                significant,
-                worst["rate"],
-                best_rate,
-                framework=framework,
-                effect_size_h=effect_h,
+        "tone": _cap_unconfirmed(
+            _worst_tone(
+                _tone(gap),
+                _disparity_tone(
+                    four_fifths,
+                    significant,
+                    worst["rate"],
+                    best_rate,
+                    framework=framework,
+                    effect_size_h=effect_h,
+                ),
             ),
+            significant,
         ),
         "effectSizeH": float(effect_h),
         # G-32 disclosure fields: what the caller asked for and whether
@@ -2341,13 +2379,23 @@ def _proxies(
 
 
 def _statistical(
-    work: pd.DataFrame, usable: List[str], y_pred: np.ndarray, y_true: Optional[np.ndarray]
+    work: pd.DataFrame,
+    usable: List[str],
+    y_pred: np.ndarray,
+    y_true: Optional[np.ndarray],
+    axis_view: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """Significance + robustness battery. Permutation-based
     comprehensive_fairness_test per attribute and subgroup_robustness_audit
     -- the SAME top-level vfairness entry points the Navigator's
     vfairness_statistical_validation / vfairness_robustness_test handlers
-    use. Tells the user whether a gap is real and whether it is fragile."""
+    use. Tells the user whether a gap is real and whether it is fragile.
+
+    ``axis_view(attr) -> (frame, y_pred, y_true)``, when given, supplies the
+    rows each PER-ATTRIBUTE test runs on: the rows where that attribute is
+    recorded (regression R-B1). ``work`` / ``y_pred`` / ``y_true`` remain the
+    complete-row inputs of the robustness audit, which crosses every attribute.
+    Without it, every test reads ``work`` as before."""
     from vfairness import (
         comprehensive_fairness_test,
         sequential_fairness_test,
@@ -2357,23 +2405,28 @@ def _statistical(
     yt = y_true if y_true is not None else y_pred
     per_attr: List[Dict[str, Any]] = []
     for attr in usable:
-        sens = work[attr].astype("string").fillna("missing").to_numpy()
-        n = min(len(sens), len(yt), len(y_pred))
+        if axis_view is not None:
+            w_a, yp_a, yt_a = axis_view(attr)
+            yt_a = yt_a if yt_a is not None else yp_a
+        else:
+            w_a, yp_a, yt_a = work, y_pred, yt
+        sens = w_a[attr].astype("string").fillna("missing").to_numpy()
+        n = min(len(sens), len(yt_a), len(yp_a))
         res = _safe(
-            lambda s=sens, n=n: comprehensive_fairness_test(
-                yt[:n], y_pred[:n], s[:n], n_permutations=_BOOTSTRAP
+            lambda s=sens, n=n, yt_a=yt_a, yp_a=yp_a: comprehensive_fairness_test(
+                yt_a[:n], yp_a[:n], s[:n], n_permutations=_BOOTSTRAP
             ),
             None,
         )
 
         # Anytime-valid Wald SPRT between the two largest groups -- lets the
         # audit conclude (or not) without alpha-spending on repeated looks.
-        def _seq(s=sens, n=n):
+        def _seq(s=sens, n=n, yp_a=yp_a):
             vc = pd.Series(s[:n]).value_counts()
             if len(vc) < 2:
                 return None
             g1, g2 = vc.index[0], vc.index[1]
-            return sequential_fairness_test(y_pred[:n][s[:n] == g1], y_pred[:n][s[:n] == g2])
+            return sequential_fairness_test(yp_a[:n][s[:n] == g1], yp_a[:n][s[:n] == g2])
 
         seq = _as_mapping(_safe(_seq, None))
         rm = _as_mapping(res)
@@ -3821,8 +3874,14 @@ def _nonbinary_tabular_pulse(
     def _row(attr: str) -> Dict[str, Any]:
         g = work[attr].astype("string").fillna("missing").to_numpy()
         n = min(len(g), len(y_fav))
-        gv = g[:n]
-        yv = np.asarray(y_fav[:n], dtype=float)
+        # Rows where THIS attribute is recorded. The caller hands this path the
+        # available-case frame, where an absent protected value is NA (see
+        # run_pulse, regression R-B1), so no group is built out of an absence
+        # and no row is dropped for lacking a DIFFERENT attribute. All True on
+        # a complete frame. Every per-row array below is sliced with it.
+        keep = work[attr].notna().to_numpy(dtype=bool)[:n]
+        gv = g[:n][keep]
+        yv = np.asarray(y_fav[:n], dtype=float)[keep]
         sizes = {str(lab): int((gv == lab).sum()) for lab in pd.unique(gv)}
         rel = group_reliability(sizes)
         groups: List[Dict[str, Any]] = []
@@ -3926,6 +3985,8 @@ def _nonbinary_tabular_pulse(
 
                 def _lib_err():
                     yt = pd.to_numeric(work[label_col], errors="coerce").to_numpy(dtype=float)[:n]
+                    yt = yt[keep]
+                    va = vals[:n][keep]
                     mask = np.isfinite(yt)
                     if int(mask.sum()) < 10 or pd.Series(yt[mask]).nunique() <= 2:
                         return None  # not a regression ground truth
@@ -3939,12 +4000,12 @@ def _nonbinary_tabular_pulse(
                     return {
                         "maeParityDifference": float(
                             mae_parity_difference(
-                                yt[mask], vals[:n][mask], gv[mask], min_group_size=lib_min_group
+                                yt[mask], va[mask], gv[mask], min_group_size=lib_min_group
                             )
                         ),
                         "rmseParityDifference": float(
                             rmse_parity_difference(
-                                yt[mask], vals[:n][mask], gv[mask], min_group_size=lib_min_group
+                                yt[mask], va[mask], gv[mask], min_group_size=lib_min_group
                             )
                         ),
                     }
@@ -3960,7 +4021,7 @@ def _nonbinary_tabular_pulse(
                     normalized_discounted_kl_divergence,
                 )
 
-                pos = positions[:n]
+                pos = positions[:n][keep]
                 return {
                     "exposureParityDifference": float(
                         exposure_parity_difference(pos, gv, min_group_size=5)
@@ -4696,13 +4757,56 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
     # and ``isna()`` is False for it. Measured before, on 400 dated rows and 400
     # ``pd.NaT``: groups [under_18 n=400, missing n=400], headline 'material
     # disparity for "missing"'. See ``_rows_missing_a_protected_value``.
+    #
+    # BUT THE COMPLETE-ROW FRAME IS ONLY FOR READINGS THAT CROSS AXES (grade
+    # regression R-B1, 2026-10-02). Dropping every row that lacks ANY chosen
+    # attribute is listwise deletion: it makes the reading of one attribute
+    # conditional on every OTHER attribute having been recorded. Measured on
+    # the bundled recruitment dataset (2700 rows, gender recorded on all of
+    # them, disability_status absent on 2386 and religion on 864): the drop
+    # kept 204 rows, i.e. only applicants with a recorded disability, and the
+    # gender reading became Male n=104 vs Female n=97 vs Non-binary n=3, gap
+    # 0.008, p 0.85, tone "pass". The planted gender penalty (Non-binary at
+    # 0.36 of the Male rate on the full 2700, tone critical) disappeared, and
+    # the CI recall gate fell from 18 to 17. A false pass manufactured by the
+    # exclusion, on an attribute that has no missing value at all.
+    #
+    # So two frames exist below, and each reading uses the one its question
+    # needs, with absence handled by the SAME helper either way:
+    #
+    # * ``work_all``: every row with a decision, where an absent protected
+    #   value (including the level the binner minted, read from the raw column)
+    #   is normalised to NA. Single-attribute readings (perVariable and its
+    #   confound / trimmed-gap annotations, metric cards, the disparity matrix,
+    #   the per-attribute significance tests, calibration, label base rates,
+    #   the LL144 impact ratios and the mitigation sweep) take their rows from
+    #   ``_axis_view(attr)``: the rows where THAT attribute is recorded. A
+    #   pairwise reading (the confound stratification) takes the rows where
+    #   BOTH are recorded. No group is ever built out of an absence.
+    # * ``work``: the complete-row frame below, for readings that model the
+    #   chosen attributes jointly (bias taxonomy, proxies, intersectional,
+    #   causal, cohorts, individual fairness, robustness).
+    #
+    # On a complete frame the two are the same rows, so a clean run is
+    # byte-identical to before.
+    work_all = work
+    _complete_rows = np.ones(len(work), dtype=bool)
     protected_rows_excluded = 0
+    protected_rows_excluded_by_attr: Dict[str, int] = {}
     protected_exclusion_blocked: List[str] = []
     if usable:
         n_absent = int(_no_protected.sum())
         if n_absent:
             if n_absent < len(work):
-                work = work[(~_no_protected).to_numpy()].reset_index(drop=True)
+                work_all = work.copy()
+                for _a in usable:
+                    _m = _absent_by_axis.get(_a)
+                    if _m is None or not bool(_m.any()):
+                        continue
+                    work_all[_a] = work_all[_a].mask(_m.to_numpy(dtype=bool))
+                    protected_rows_excluded_by_attr[str(_a)] = int(_m.sum())
+                _complete_rows = (~_no_protected).to_numpy(dtype=bool)
+                work = work[_complete_rows].reset_index(drop=True)
                 protected_rows_excluded = n_absent
             else:
                 protected_exclusion_blocked = [
@@ -4715,7 +4819,9 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
     # value-identity de-dup that drops a duplicate age axis) plus every
     # column excluded and why. Audit-grade tools must never transform data
     # silently -- this is surfaced in the UI's "How your data was prepared".
-    data_preparation = {
+    # Dict[str, Any]: the values are lists that are appended to below, and an
+    # int; without the annotation the inferred value type is `object`.
+    data_preparation: Dict[str, Any] = {
         "binning": [{"label": str(lbl), "detail": str(det)} for (lbl, det) in (prep.notes or [])],
         "excluded": [
             {"column": str(col), "reason": str(rsn)} for (col, rsn) in (prep.excluded or [])
@@ -4724,20 +4830,31 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
         #: Rows dropped because no protected value was recorded for them. 0 on a
         #: complete frame, so a clean run reads exactly as it did before.
         "rowsExcludedNoProtectedValue": protected_rows_excluded,
+        #: Per attribute: rows excluded from THAT attribute's own readings because
+        #: its value was not recorded. Empty on a complete frame.
+        "rowsExcludedNoProtectedValueByAttribute": dict(protected_rows_excluded_by_attr),
     }
     if protected_rows_excluded:
+        _per_attr_counts = "; ".join(
+            f'"{a}": {n}' for a, n in protected_rows_excluded_by_attr.items()
+        )
         data_preparation["binning"].append(
             {
                 "label": "Coverage",
                 "detail": (
-                    f"{protected_rows_excluded} row(s) carry no recorded value for "
-                    f"{', '.join(chr(34) + str(a) + chr(34) for a in usable)} (blank, "
-                    "null or missing) and were EXCLUDED from every fairness comparison "
-                    "below. They are not a demographic group: a four-fifths ratio and "
-                    "an adverse-impact finding are claims about a protected class, and "
-                    "an absent attribute is not one. Nothing here says those rows were "
-                    "treated fairly or unfairly; they were not assessed. Supply the "
-                    "attribute for them, or analyse missingness as its own question."
+                    f"Some rows carry no recorded value for a protected attribute "
+                    f"(blank, null or missing; per attribute: {_per_attr_counts}). "
+                    "Each attribute's own comparison EXCLUDES the rows where that "
+                    "attribute is unrecorded and keeps every other row; readings that "
+                    "combine attributes (bias taxonomy, proxies, intersectional, causal, "
+                    f"cohorts, individual fairness) use only the {len(work)} row(s) with "
+                    f"every attribute recorded, so {protected_rows_excluded} row(s) are "
+                    "excluded from those. The unrecorded rows are not a demographic "
+                    "group: a four-fifths ratio and an adverse-impact finding are claims "
+                    "about a protected class, and an absent attribute is not one. "
+                    "Nothing here says those rows were treated fairly or unfairly; they "
+                    "were not assessed on the attribute they lack. Supply the attribute "
+                    "for them, or analyse missingness as its own question."
                 ),
             }
         )
@@ -4811,7 +4928,9 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
         sexish = ("sex", "gender")
         raceish = ("race", "ethnic", "nationality", "national_origin")
         for attr in usable:
-            vals = work[attr].dropna().astype(str)
+            # Every recorded value of this attribute, not only those on rows
+            # where every other attribute is recorded too (regression R-B1).
+            vals = work_all[attr].dropna().astype(str)
             levels = sorted(vals.unique().tolist())
             if len(levels) != 2:
                 continue
@@ -5017,7 +5136,9 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
     if output_type in ("continuous", "rank"):
         out = _nonbinary_tabular_pulse(
             df=df,
-            work=work,
+            # The available-case frame: every per-attribute row in that path
+            # reads only the rows where its own attribute is recorded.
+            work=work_all,
             usable=usable,
             inputs=inputs,
             schema=schema,
@@ -5043,8 +5164,13 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
             out, inputs, domain=domain, jurisdiction=jurisdiction, columns=list(df.columns)
         )
 
-    y_pred = _coerce_binary(work[pred_col])
-    y_true = _coerce_binary(work[label_col]) if has_truth else None
+    # Coerced ONCE over every decided row, then sliced to the complete rows, so
+    # the decision a row carries never depends on which protected attributes
+    # happen to be recorded for it (a median threshold over a subset would).
+    y_pred_all = _coerce_binary(work_all[pred_col])
+    y_true_all = _coerce_binary(work_all[label_col]) if has_truth else None
+    y_pred = y_pred_all[_complete_rows]
+    y_true = y_true_all[_complete_rows] if y_true_all is not None else None
 
     # Outcome polarity: for systems where the positive prediction is an
     # ADVERSE event (fraud flag, risk score, rejection), a raw selection-
@@ -5059,10 +5185,45 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
     polarity_flipped = polarity == "positive_unfavorable"
     if polarity_flipped:
         y_pred = 1 - y_pred
+        y_pred_all = 1 - y_pred_all
         if y_true is not None:
             y_true = 1 - y_true
+        if y_true_all is not None:
+            y_true_all = 1 - y_true_all
     data_preparation["outcomePolarity"] = polarity
     data_preparation["predictionsInvertedForAnalysis"] = bool(polarity_flipped)
+
+    # THE AVAILABLE-CASE VIEW (regression R-B1; see the frame comment where
+    # ``work_all`` is built). The rows on which every named attribute is
+    # recorded, with the polarity-normalised decisions and labels for exactly
+    # those rows. One attribute for a single-attribute reading, two for a
+    # pairwise one. Absence is read from ``work_all``, where the one helper
+    # ``_rows_missing_a_protected_value`` already turned it into NA, so this is
+    # not a second rule. On a complete frame it returns the complete frame.
+    _axis_views: Dict[Tuple[str, ...], Tuple[pd.DataFrame, np.ndarray, Optional[np.ndarray]]] = {}
+
+    def _axis_rows(*axes: str) -> np.ndarray:
+        """Boolean mask over ``work_all``: every named attribute is recorded."""
+        keep = np.ones(len(work_all), dtype=bool)
+        for ax in axes:
+            if ax in work_all.columns:
+                keep &= work_all[ax].notna().to_numpy(dtype=bool)
+        return keep
+
+    def _axis_view(*axes: str) -> Tuple[pd.DataFrame, np.ndarray, Optional[np.ndarray]]:
+        key = tuple(axes)
+        if key not in _axis_views:
+            keep = _axis_rows(*axes)
+            if bool(keep.all()):
+                w_ = work_all.reset_index(drop=True)
+            else:
+                w_ = work_all[keep].reset_index(drop=True)
+            _axis_views[key] = (
+                w_,
+                y_pred_all[keep],
+                (y_true_all[keep] if y_true_all is not None else None),
+            )
+        return _axis_views[key]
 
     # 3. per-variable metrics with bootstrap CIs. G-32: a caller-requested
     #    reference group (inputs.reference_group[attr]) is threaded through
@@ -5073,10 +5234,12 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
     per_variable = [
         _safe(
             lambda a=a: _per_variable(
-                work,
+                # The rows where THIS attribute is recorded (regression R-B1),
+                # never the rows where every attribute is.
+                _axis_view(a)[0],
                 a,
-                y_pred,
-                y_true,
+                _axis_view(a)[1],
+                _axis_view(a)[2],
                 min_group=min_group,
                 framework=framework,
                 reference_override=_reference_requests.get(a),
@@ -5107,15 +5270,35 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
             return  # nothing to correct (0/1 test): leave as-is
         from vfairness.evaluation.vfairness_metrics._statistics import benjamini_hochberg_correction
 
-        pvals = np.array([rows[i]["pValue"] for i in idx], dtype=float)
+        # Gate, then correct. An attribute the omnibus gate rejected
+        # (significantRaw False) enters the family at p = 1: it can neither be
+        # confirmed nor lower the threshold for the others. Gated-in attributes
+        # enter with their pairwise p. Measured 2026-10-01 on the synthetic
+        # pack: entering the gated-out national origin at its selected-pair p
+        # (0.010) is what pulled the clean control's age (0.006) under the BH
+        # line; entering every attribute at max(pairwise, omnibus) instead
+        # silenced it but also missed the planted race penalty (race omnibus
+        # p 0.0078 over ten attributes).
+        def _family_p(r):
+            return float(r["pValue"]) if r.get("significantRaw") else 1.0
+
+        pvals = np.array([_family_p(rows[i]) for i in idx], dtype=float)
         res = benjamini_hochberg_correction(pvals, alpha=1.0 - _CI)
         adj = np.asarray(res.adjusted_p_values, dtype=float)
         for j, i in enumerate(idx):
             ap = float(adj[j])
+            rows[i]["pValueFamily"] = float(pvals[j])
             rows[i]["pValueAdjusted"] = ap
             # `<=` (not the canonical strict `<`) so a hypothesis exactly
             # at the FDR boundary is still rejected (BH 1995 is inclusive).
-            rows[i]["significant"] = bool(ap <= (1.0 - _CI))
+            #
+            # AND the pre-correction verdict. The correction may only WITHDRAW
+            # a confirmation, never grant one the omnibus gate refused: this
+            # line used to read `ap <= alpha` alone, which overwrote the gate.
+            # Measured 2026-10-01 on the clean synthetic control: national
+            # origin was gated out (omnibus p 0.31, significantRaw False) and
+            # came back significant=True, critical, after correction.
+            rows[i]["significant"] = bool(rows[i].get("significantRaw")) and bool(ap <= (1.0 - _CI))
         # Recompute the four-fifths tone with the corrected significance so
         # severity never rests on an uncorrected test.
         for i in idx:
@@ -5148,6 +5331,17 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
                         effect_size_h=float(r.get("effectSizeH") or 0.0),
                     ),
                 )
+            # An UNCONFIRMED gap is a watch item, never a critical finding, in
+            # every framework. 29 CFR 1607.4(D), the rule the US-employment
+            # screen cites: "Greater differences in selection rate may not
+            # constitute adverse impact where the differences are based on
+            # small numbers and are not statistically significant." Before
+            # this cap, a 27-person group below the 0.50 ratio, or any gap of
+            # 20 points, read critical with no confirmation, and the clean
+            # synthetic control was "Not fit to deploy" (2026-10-01).
+            if not r["significant"] and r.get("tone") == "critical":
+                r["tone"] = "warn"
+                r["toneCappedUnconfirmed"] = True
 
     _safe(lambda: _fdr_correct(per_variable), None, degraded=degradations, label="per_variable_fdr")
 
@@ -5163,14 +5357,17 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
     def _stratified_gap(
         attr_x: str, worst_x: str, best_x: str, attr_y: str
     ) -> Optional[Dict[str, float]]:
-        if attr_x not in work.columns or attr_y not in work.columns:
+        if attr_x not in work_all.columns or attr_y not in work_all.columns:
             return None
-        n_ = min(len(work), len(y_pred))
+        # PAIRWISE rows: both attributes recorded (regression R-B1). Not the
+        # complete-row frame, which would also require every OTHER attribute.
+        w_xy, yp_xy, _ = _axis_view(attr_x, attr_y)
+        n_ = min(len(w_xy), len(yp_xy))
         if n_ == 0:
             return None
-        xs = work[attr_x].astype("string").fillna("missing").to_numpy()[:n_]
-        ys = work[attr_y].astype("string").fillna("missing").to_numpy()[:n_]
-        yp = np.asarray(y_pred[:n_], dtype=float)
+        xs = w_xy[attr_x].astype("string").fillna("missing").to_numpy()[:n_]
+        ys = w_xy[attr_y].astype("string").fillna("missing").to_numpy()[:n_]
+        yp = np.asarray(yp_xy[:n_], dtype=float)
         m_w = xs == worst_x
         m_b = xs == best_x
         if m_w.sum() < 20 or m_b.sum() < 20:
@@ -5303,12 +5500,11 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
         score_col = _pick(
             df, ("probability", "proba", "prob", "score", "y_score", "y_prob", "confidence")
         )
-        if not score_col or score_col not in work.columns:
+        if not score_col or score_col not in work_all.columns:
             return
-        sp = pd.to_numeric(work[score_col], errors="coerce")
+        sp = pd.to_numeric(work_all[score_col], errors="coerce")
         if sp.notna().mean() < 0.5 or sp.nunique() < 5:
             return
-        sv = sp.to_numpy(dtype=float)
         for r in per_variable:
             if not isinstance(r, dict) or not r.get("assessable"):
                 continue
@@ -5316,13 +5512,16 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
             # Gaps below one point have no meaningful relative reading.
             if not isinstance(raw_gap, (int, float)) or abs(raw_gap) < 0.01:
                 continue
-            g = work[r["attribute"]].astype("string").fillna("missing").to_numpy()
-            n = min(len(g), len(y_pred), len(sv))
+            # The same rows the row's own gap was measured on (regression R-B1).
+            w_a, yp_a, _ = _axis_view(r["attribute"])
+            sv = pd.to_numeric(w_a[score_col], errors="coerce").to_numpy(dtype=float)
+            g = w_a[r["attribute"]].astype("string").fillna("missing").to_numpy()
+            n = min(len(g), len(yp_a), len(sv))
 
-            def _trimmed_rate(lbl, g=g, n=n):
+            def _trimmed_rate(lbl, g=g, n=n, sv=sv, yp_a=yp_a):
                 mask = g[:n] == lbl
                 s_g = sv[:n][mask]
-                y_g = np.asarray(y_pred[:n], dtype=float)[mask]
+                y_g = np.asarray(yp_a[:n], dtype=float)[mask]
                 fin = np.isfinite(s_g)
                 s_g, y_g = s_g[fin], y_g[fin]
                 if len(s_g) < 40:  # a 2.5% tail needs rows to trim
@@ -5388,7 +5587,11 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
             MetricResult,
         )
 
-        sens = work[attr].astype("string").fillna("missing").to_numpy()
+        # The rows where THIS attribute is recorded (regression R-B1). The
+        # local names shadow the complete-row arrays on purpose, so no line
+        # below can reach for the wrong rows.
+        w_a, y_pred, y_true = _axis_view(attr)
+        sens = w_a[attr].astype("string").fillna("missing").to_numpy()
         n = min(len(sens), len(y_pred))
         yt = y_true[:n] if y_true is not None else y_pred[:n]
         an = FairnessAnalyzer(yt, y_pred[:n], sens[:n], min_group_size=_MIN_GROUP)
@@ -5664,9 +5867,11 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
 
         out = {}
         for a in usable:
-            sens = work[a].astype("string").fillna("missing").to_numpy()
-            n = min(len(sens), len(y_pred))
-            out[a] = selection_rate_disparity_matrix(y_pred[:n], sens[:n])
+            # The rows where THIS attribute is recorded (regression R-B1).
+            w_a, yp_a, _ = _axis_view(a)
+            sens = w_a[a].astype("string").fillna("missing").to_numpy()
+            n = min(len(sens), len(yp_a))
+            out[a] = selection_rate_disparity_matrix(yp_a[:n], sens[:n])
         return out
 
     disparity_matrix = _safe(_disp, {}, degraded=degradations, label="disparity_matrix")
@@ -5772,7 +5977,7 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
     #     statistical_validation / robustness_test handlers).
     _p(5, "Running statistical robustness and confidence intervals", 78)
     statistical = _safe(
-        lambda: _statistical(work, usable, y_pred, y_true),
+        lambda: _statistical(work, usable, y_pred, y_true, axis_view=_axis_view),
         {"available": False, "perAttribute": []},
         degraded=degradations,
         label="statistical",
@@ -5790,7 +5995,9 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
         score_col = _pick(
             df, ("probability", "proba", "prob", "score", "y_score", "y_prob", "confidence")
         )
-        if not score_col or score_col not in work.columns:
+        # Read over every decided row (``work_all``); each attribute below
+        # takes the rows where IT is recorded (regression R-B1).
+        if not score_col or score_col not in work_all.columns:
             return {
                 "available": False,
                 "reason": (
@@ -5798,7 +6005,7 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
                     "calibration cannot be read."
                 ),
             }
-        if y_true is None:
+        if y_true_all is None:
             return {
                 "available": False,
                 "reason": (
@@ -5806,7 +6013,7 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
                     "ground-truth column was provided."
                 ),
             }
-        sp = pd.to_numeric(work[score_col], errors="coerce")
+        sp = pd.to_numeric(work_all[score_col], errors="coerce")
         if sp.notna().mean() < 0.5 or sp.nunique() < 5:
             return {
                 "available": False,
@@ -5832,20 +6039,23 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
         # was polarity-normalized above (1 == favorable); undo the flip
         # so an adverse-positive system's score is read against the
         # event it actually predicts.
-        y_cal = (1 - y_true) if polarity_flipped else y_true
+        y_cal_all = (1 - y_true_all) if polarity_flipped else y_true_all
         from vfairness.post_processing.calibration.metrics import (
             calibration_disparity,
         )
 
         per_attr: List[Dict[str, Any]] = []
         for attr in usable:
-            sens = work[attr].astype("string").fillna("missing").to_numpy()
-            n = min(len(sens), len(s), len(y_cal))
-            mask = np.isfinite(s[:n])
+            keep_a = _axis_rows(attr)
+            sens = work_all[attr].astype("string").fillna("missing").to_numpy()[keep_a]
+            s_a = s[keep_a]
+            y_cal = y_cal_all[keep_a]
+            n = min(len(sens), len(s_a), len(y_cal))
+            mask = np.isfinite(s_a[:n])
             if int(mask.sum()) < 10:
                 continue
             yt_ = y_cal[:n][mask]
-            sp_ = np.clip(s[:n][mask], 0.0, 1.0)
+            sp_ = np.clip(s_a[:n][mask], 0.0, 1.0)
             sv_ = sens[:n][mask]
             res = _safe(
                 lambda yt_=yt_, sp_=sp_, sv_=sv_: calibration_disparity(
@@ -5983,7 +6193,13 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
         # (a) favorable-label base rate per group.
         per_attr: List[Dict[str, Any]] = []
         for attr in usable:
-            gv = work[attr].astype("string").fillna("missing").to_numpy()[:n_rows]
+            # The rows where THIS attribute is recorded (regression R-B1). The
+            # agreement read in (b) crosses annotator columns and stays on the
+            # complete rows.
+            w_a, _, yt_a = _axis_view(attr)
+            n_a = int(min(len(w_a), len(yt_a))) if yt_a is not None else 0
+            gv = w_a[attr].astype("string").fillna("missing").to_numpy()[:n_a]
+            y_lab_a = np.asarray(yt_a[:n_a], dtype=float) if yt_a is not None else y_lab
             rows: List[Dict[str, Any]] = []
             for lab in pd.unique(gv):
                 mask = gv == lab
@@ -5991,7 +6207,7 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
                 if n_g < min_group:
                     continue
                 rows.append(
-                    {"group": str(lab), "n": n_g, "labelBaseRate": float(y_lab[mask].mean())}
+                    {"group": str(lab), "n": n_g, "labelBaseRate": float(y_lab_a[mask].mean())}
                 )
             if len(rows) < 2:
                 continue
@@ -6865,16 +7081,18 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
         score_col = _pick(
             df, ("probability", "proba", "prob", "score", "y_score", "y_prob", "confidence")
         )
-        if not score_col or score_col not in work.columns:
+        prim = pareto_attr
+        # The rows where the swept attribute is recorded (regression R-B1).
+        w_p, _, yt_p = _axis_view(prim)
+        if not score_col or score_col not in w_p.columns:
             raise ValueError("no continuous score")
-        sp = pd.to_numeric(work[score_col], errors="coerce")
+        sp = pd.to_numeric(w_p[score_col], errors="coerce")
         if sp.notna().mean() < 0.5 or sp.nunique() < 5:
             raise ValueError("score not continuous")
-        prim = pareto_attr
-        sens = work[prim].astype("string").fillna("missing").to_numpy()
+        sens = w_p[prim].astype("string").fillna("missing").to_numpy()
         n = min(len(sens), len(sp))
         return mitigation_pareto(
-            (y_true[:n] if y_true is not None else None), sp.to_numpy()[:n], sens[:n]
+            (yt_p[:n] if yt_p is not None else None), sp.to_numpy()[:n], sens[:n]
         )
 
     if polarity_flipped:
@@ -6900,14 +7118,14 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
         if not pareto or not pareto.get("available"):
             pareto = _safe(
                 lambda: _pareto(
-                    work,
+                    _axis_view(pareto_attr)[0],
                     df,
                     pareto_attr,
                     _pvw.get("referenceGroup") if _pvw else None,
                     _pvw.get("worstGroup") if _pvw else None,
                     label_col,
                     has_truth,
-                    y_pred,
+                    _axis_view(pareto_attr)[1],
                 ),
                 {
                     "available": False,
@@ -7000,9 +7218,9 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
         # when no usable score column exists (the export then reports
         # null, never an invented rate).
         sc = _pick(df, ("probability", "proba", "prob", "score", "y_score", "y_prob", "confidence"))
-        if not sc or sc not in work.columns:
+        if not sc or sc not in work_all.columns:
             return None
-        sp = pd.to_numeric(work[sc], errors="coerce")
+        sp = pd.to_numeric(work_all[sc], errors="coerce")
         if sp.notna().mean() < 0.5 or sp.nunique() < 5:
             return None
         return sp.to_numpy(dtype=float)
@@ -7011,9 +7229,13 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
 
     regulatory_exports = _safe(
         lambda: _regulatory.build_regulatory_exports(
-            work=work,
+            # The available-case frame (regression R-B1): the LL144 table
+            # already excludes, per column, the rows whose value is missing
+            # (its 'unknown' category), so it reads the same rows perVariable
+            # does instead of only the rows with every attribute recorded.
+            work=work_all,
             usable=usable,
-            y_pred=y_pred,
+            y_pred=y_pred_all,
             df=df,
             requested=requested,
             domain=domain,

@@ -19,9 +19,17 @@ import warnings
 
 import numpy as np
 import pytest
-import torch
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
+
+# torch is an optional extra ([training]), so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that build tensors are marked needs_torch and skip; the rest still run.
+try:
+    import torch
+except ModuleNotFoundError:
+    torch = None
+needs_torch = pytest.mark.skipif(torch is None, reason="needs the optional torch extra")
 
 from vfairness.in_processing.diagnostics import (
     adversarial_convergence_diagnostics,
@@ -231,6 +239,7 @@ class TestDefectAPartiallyMovedCounterfactualIsNotDisclosed:
         sens = torch.tensor([0, 0, 0, 0, 1, 1, 1, 1])
         return y_pred, y_true, sens
 
+    @needs_torch
     def test_one_moved_row_in_eight_is_reported_as_partial_coverage(self):
         y_pred, y_true, sens = self._batch()
         cf = y_pred.clone()
@@ -255,6 +264,7 @@ class TestDefectAPartiallyMovedCounterfactualIsNotDisclosed:
         assert metrics["fairness_rows_total"] == 8
         assert any("bit-identical to the factual one" in m for m in _messages(caught))
 
+    @needs_torch
     def test_the_kl_metric_no_longer_reports_a_penalty_better_than_the_best(self):
         """A SECOND input class the pin never tried: distance_metric='kl' is a
         documented constructor option. ``F.kl_div(log(y_pred), y_pred_cf)`` over
@@ -332,6 +342,7 @@ class TestDefectCosineOnZeroNormFeaturesScoresPerfectFairness:
         sens = torch.tensor([0, 0, 0, 0, 1, 1, 1, 1])
         return y_pred, y_true, sens
 
+    @needs_torch
     def test_all_zero_features_under_cosine_are_refused(self):
         y_pred, y_true, sens = self._eight_individuals()
         loss_fn = IndividualFairnessLoss(lambda_fairness=1.0, similarity_metric="cosine")
@@ -353,6 +364,7 @@ class TestDefectCosineOnZeroNormFeaturesScoresPerfectFairness:
         assert metrics["fairness_loss_unassessed_value"] == pytest.approx(0.0)
         assert any("cosine similarity is 0/0" in m for m in _messages(caught))
 
+    @needs_torch
     def test_the_same_individuals_measure_0_514286_when_the_distance_exists(self):
         """CONTROL for the test above: identical NONZERO rows, same metric,
         same predictions. The true violation is 16 * 0.9 / 28 = 0.5142857, the
@@ -366,6 +378,7 @@ class TestDefectCosineOnZeroNormFeaturesScoresPerfectFairness:
             )
             assert components.fairness_loss == pytest.approx(16 * 0.9 / 28, abs=1e-5), metric
 
+    @needs_torch
     def test_a_single_zero_row_no_longer_silently_exempts_its_seven_pairs(self):
         """The defect does not need every row: one zero row is at fabricated
         distance 1.0 from all seven others, so its seven pairs drop out of the
@@ -392,6 +405,7 @@ class TestDefectCosineOnZeroNormFeaturesScoresPerfectFairness:
         assert components.batch_metrics["fairness_penalty_partial"] is True
         assert any("7 pair(s) touching them were left out" in m for m in _messages(caught))
 
+    @needs_torch
     def test_the_no_pairs_compared_guard_is_never_reached_by_the_named_pin(self):
         """Not a defect in the code: the guard works. It is a gap in the
         EVIDENCE. The grade's judgement cites "a batch-level guard for

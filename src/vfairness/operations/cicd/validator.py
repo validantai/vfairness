@@ -365,6 +365,9 @@ class DataValidationResult:
                 + "/>"
             )
         elif coverage == COVERAGE_PARTIAL:
+            # execution_coverage() returns PARTIAL only after checking that
+            # checks_run is not None (None is UNRECORDED), so this cannot fire.
+            assert self.checks_run is not None
             ran = [str(c) for c in self.checks_run]
             missing = [c for c in VALIDATION_CHECKS if c not in set(ran)]
             coverage_lines.append(

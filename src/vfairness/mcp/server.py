@@ -22,7 +22,7 @@ from typing import Any, Dict, List, Optional
 
 # The version range this module's only import (mcp.server.fastmcp) exists in.
 # Keep in lockstep with the `mcp` extra in pyproject.toml.
-_MCP_REQUIREMENT = "mcp>=1.2.0,<2"
+_MCP_REQUIREMENT = "mcp>=1.14.0,<2"
 
 # Re-raise as ImportError, NOT SystemExit: SystemExit derives from
 # BaseException and escapes `except Exception`, so an import-time SystemExit

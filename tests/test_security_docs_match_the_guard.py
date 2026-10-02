@@ -103,7 +103,7 @@ def test_the_docs_still_discuss_the_guard_at_all():
     """NON-VACUITY. Deleting the whole section would pass every test above."""
     for doc in (SECURITY, OVERVIEW):
         text = doc.read_text(encoding="utf-8")
-        assert "egress guard" in text or "vfairness.net" in text, (
+        assert "egress guard" in text or re.search(r"\bvfairness\.net\b", text), (
             f"{doc.name} no longer describes the egress guard; the checks above "
             "have nothing left to hold to the code"
         )

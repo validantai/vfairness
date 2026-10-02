@@ -1558,6 +1558,10 @@ class FeatureSuppressor(BaseFeatureTransformer):
                                 "perturbs nothing, so the column would come back unchanged"
                             )
                     elif n_finite_rows and n_below_resolution == n_finite_rows:
+                        # n_finite_rows is only ever set non-zero inside the
+                        # `col_values is not None` block above, so col_values is
+                        # an array here. The assert states that; it cannot fire.
+                        assert col_values is not None
                         widest = float(np.nanmax(np.abs(col_values)))
                         suppression_failures[col] = (
                             f"the noise scale is {scale!r}, which is below the float64 "

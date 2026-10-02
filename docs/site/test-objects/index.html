@@ -24,7 +24,7 @@
                     <img src="../img/VALIDANT_AI_logo_v1.0_fancy_green.png" alt="validant.ai" class="logo-full">
                 </a>
                 <span class="logo-divider"></span>
-                <span class="lib-name"><span>v</span>fairness</span>
+                <a class="lib-name" href="../index.html" title="vfairness documentation home"><span>v</span>fairness</a>
             </div>
             <nav class="main-nav" aria-label="Main navigation">
                 <ul class="nav-links">
@@ -297,12 +297,6 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
 .to-card { border: 1px solid var(--line); border-radius: 14px; background: var(--card); padding: 1.2rem 1.4rem; margin: 1.2rem 0; }
 .to-answer { border-left: 6px solid var(--a1); }
 .to-answer h2 { margin: 0 0 .4rem; font-size: 1.2rem; }
-.to-pick { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .8rem; margin: .8rem 0 1rem; }
-.to-pick label { display: block; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--soft); margin-bottom: .3rem; }
-.to-pick select { width: 100%; padding: .55rem .6rem; border: 1px solid var(--line); border-radius: 8px; font: inherit; background: var(--card); color: var(--ink); }
-.to-result { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .9rem 1.1rem; align-items: start; background: var(--ground); border-radius: 12px; padding: 1rem 1.1rem; }
-.to-result dt { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--soft); padding-top: .15rem; }
-.to-result dd { margin: 0; line-height: 1.5; font-size: .95rem; min-width: 0; overflow-wrap: anywhere; }
 .to-tier { display: inline-block; font-weight: 800; font-size: .78rem; letter-spacing: .04em; color: #fff; border-radius: 999px; padding: .15rem .6rem; background: var(--c, var(--a1)); white-space: nowrap; }
 .to-tier--A0 { --c: var(--a0); } .to-tier--A1 { --c: var(--a1); } .to-tier--A2 { --c: var(--a2); } .to-tier--A3 { --c: var(--a3); } .to-tier--A4 { --c: var(--a4); }
 .to-scroll { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--line); border-radius: 12px; }
@@ -323,7 +317,55 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
 .to-cat { min-width: 1000px !important; } .to-cat td:first-child { min-width: 15rem; } .to-cat td:nth-child(4) { min-width: 22rem; } .to-cat td:nth-child(5) { min-width: 11rem; }
 .to-yes { color: var(--ok); font-weight: 700; } .to-no { color: var(--a4); font-weight: 700; } .to-na { color: var(--soft); }
 .to-quote { border-left: 3px solid var(--line); padding: .2rem 0 .2rem 1rem; color: var(--soft); font-style: italic; margin: 1rem 0; }
-@media (max-width: 640px) { .to-result { grid-template-columns: minmax(0, 1fr); } .to-result dt { padding-top: .4rem; } }
+.tx h2 { margin: 0 0 .2rem; font-size: 1.2rem; }
+.tx { --coral: #e4573d; --beam: var(--ink); border-left: 6px solid var(--a1); }
+.tx-paths { display: grid; grid-template-columns: repeat(5, 1fr); gap: .45rem; margin-bottom: 1rem; }
+.tx-paths button { text-align: left; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 10px; padding: .55rem .65rem; cursor: pointer; font: inherit; transition: border-color .15s, box-shadow .15s; }
+.tx-paths button b { display: block; font-size: .92rem; }
+.tx-paths button span { display: block; font-size: .74rem; color: var(--soft); line-height: 1.3; }
+.tx-paths button[aria-checked="true"] { border-color: var(--a1); box-shadow: inset 0 0 0 1.5px var(--a1); }
+.tx-paths button:focus-visible, .tx-col:focus-visible { outline: 2px solid var(--a1); outline-offset: 2px; }
+.tx-desk { display: grid; grid-template-columns: minmax(260px, 340px) 1fr; gap: 1.2rem; align-items: stretch; }
+.tx-stage { position: relative; height: 230px; border-radius: 12px; background: var(--ground); padding: 10px 12px 30px 78px; }
+.tx-bands { position: absolute; left: 0; right: 0; top: 10px; bottom: 30px; display: grid; grid-template-rows: 1fr 1fr 1fr; pointer-events: none; }
+.tx-bands span { font-size: .66rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--soft); padding: 0 0 0 10px; border-top: 1px dashed var(--line); display: flex; align-items: center; }
+.tx-cols { position: relative; height: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.tx-col { position: relative; height: 100%; cursor: ns-resize; touch-action: none; border-radius: 8px; }
+.tx-fill { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 8px 8px 4px 4px; background: var(--a1); opacity: .85; transition: height .35s cubic-bezier(.2,.8,.2,1), background .2s; }
+.tx-col.is-weak .tx-fill { background: var(--coral); }
+.tx-tick-wrap { position: absolute; inset: 0; }
+.tx-tick-wrap i { position: absolute; left: 0; right: 0; border-top: 1px solid rgba(255,255,255,.55); font-style: normal; font-size: .62rem; font-weight: 700; color: var(--soft); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 2px; }
+.tx-tick-wrap i.on { color: #fff; }
+.tx-name { position: absolute; bottom: -24px; left: 0; right: 0; text-align: center; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--soft); }
+.tx-beam { position: absolute; left: 72px; right: 6px; height: 4px; border-radius: 2px; background: var(--beam); transition: bottom .35s cubic-bezier(.2,.8,.2,1); }
+.tx-beam-label { position: absolute; right: 0; top: -22px; font-size: .72rem; font-weight: 800; background: var(--beam); color: var(--card); padding: .1rem .45rem; border-radius: 999px; }
+.tx-read { display: flex; flex-direction: column; gap: .7rem; }
+.tx-claim { display: grid; gap: .1rem; }
+.tx-claim-k { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--soft); }
+.tx-claim-v { font-size: 1.6rem; line-height: 1.1; }
+.tx-claim-t { color: var(--soft); font-size: .92rem; }
+.tx-levels { display: grid; grid-template-columns: auto 1fr; gap: .3rem .8rem; margin: 0; font-size: .9rem; }
+.tx-levels dt { font-weight: 700; color: var(--soft); font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; padding-top: .15rem; }
+.tx-levels dd { margin: 0; line-height: 1.4; }
+.tx-extra { display: flex; gap: .5rem; align-items: flex-start; font-size: .9rem; background: var(--ground); border-radius: 10px; padding: .55rem .7rem; cursor: pointer; }
+.tx-extra[hidden] { display: none; }
+.tx-extra.is-muted { opacity: .5; }
+.tx-caps-head { margin: 1.1rem 0 .4rem; font-weight: 700; font-size: .9rem; }
+.tx-caps { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+.tx-caps li::before, .tx-caps li::marker { content: none !important; display: none !important; }
+.tx-caps li { margin: 0; border: 1px solid var(--line); border-radius: 999px; padding: .28rem .7rem; font-size: .82rem; transition: background .2s, color .2s, opacity .2s; }
+.tx-caps li.on { background: var(--ok-bg); border-color: transparent; color: var(--ok); font-weight: 600; }
+.tx-caps li.off { opacity: .55; }
+.tx-caps li small { font-weight: 700; margin-left: .3rem; color: var(--soft); }
+.tx-foot { display: grid; grid-template-columns: auto 1fr; gap: .4rem .9rem; margin: 1rem 0 0; font-size: .92rem; }
+.tx-foot dt { font-weight: 700; color: var(--soft); font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; padding-top: .15rem; }
+.tx-foot dd { margin: 0; }
+.tx-fine { margin: .9rem 0 0; font-size: .8rem; }
+@media (max-width: 760px) {
+  .tx-paths { grid-template-columns: repeat(2, 1fr); }
+  .tx-desk { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .tx-fill, .tx-beam { transition: none; } }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .to { --card: #111827; --ground: #1f2937; --line: #374151; --ink: #f3f4f6; --soft: #9ca3af; --ok-bg: #0b2b22; --warn-bg: #2d2210; } }
 </style>
 <section class="to" id="overview">
@@ -334,30 +376,47 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
   you want, and gives you a working one for every pathway, ready to download. Every file below was run
   through vfairness before it was published, and the page shows what happened.</p>
 
-  <div class="to-card to-answer" id="start">
-    <h2>Start here: what are you testing, and what can you see?</h2>
-    <p class="to-note" style="margin:0">Pick the two answers. The result is your access tier, the strongest claim that
-    tier supports, and a file to start with.</p>
-    <div class="to-pick">
-      <div><label for="to-pathway">What kind of AI system</label>
-        <select id="to-pathway">
-          <option value="predictive">Predictive: scores, approves, ranks (tabular)</option>
-          <option value="llm">Generative: an LLM or chat assistant</option>
-          <option value="agent">Agent: an LLM that calls tools and acts</option>
-          <option value="multi">Multi-agent: several agents working together</option>
-          <option value="synthetic">I want data with a known answer (synthetic)</option>
-        </select></div>
-      <div><label for="to-access">What you have</label>
-        <select id="to-access"></select></div>
+  <div class="to-card tx" id="start">
+    <h2>Start here: what are you testing, and how well can you see it?</h2>
+    <p class="to-note" style="margin:.2rem 0 .9rem">Pick the system, then set the three columns. A claim is only as
+    strong as the shortest column: the beam rests on it.</p>
+    <div class="tx-paths" role="radiogroup" aria-label="What kind of AI system">
+      <button type="button" role="radio" data-p="predictive"><b>Predictive</b><span>scores, approves, ranks</span></button>
+      <button type="button" role="radio" data-p="llm"><b>Generative</b><span>an LLM or chat assistant</span></button>
+      <button type="button" role="radio" data-p="agent"><b>Agent</b><span>an LLM that calls tools</span></button>
+      <button type="button" role="radio" data-p="multi"><b>Multi-agent</b><span>agents working together</span></button>
+      <button type="button" role="radio" data-p="synthetic"><b>Synthetic</b><span>a known answer</span></button>
     </div>
-    <dl class="to-result" id="to-result" aria-live="polite">
-      <dt>Access tier</dt><dd id="to-r-tier"></dd>
-      <dt>Strongest claim</dt><dd id="to-r-claim"></dd>
-      <dt>You can run</dt><dd id="to-r-run"></dd>
-      <dt>You cannot claim</dt><dd id="to-r-ceiling"></dd>
-      <dt>Start with</dt><dd id="to-r-start"></dd>
+    <div class="tx-desk">
+      <div class="tx-stage" aria-hidden="false">
+        <div class="tx-bands" aria-hidden="true"><span>Reasonable</span><span>Limited</span><span>Indicative</span></div>
+        <div class="tx-cols">
+          <div class="tx-col" data-k="a" role="slider" tabindex="0" aria-label="Access" aria-valuemin="0" aria-valuemax="4"><div class="tx-fill"></div><div class="tx-tick-wrap"></div><div class="tx-name">Access</div></div>
+          <div class="tx-col" data-k="e" role="slider" tabindex="0" aria-label="Evidence" aria-valuemin="0" aria-valuemax="3"><div class="tx-fill"></div><div class="tx-tick-wrap"></div><div class="tx-name">Evidence</div></div>
+          <div class="tx-col" data-k="v" role="slider" tabindex="0" aria-label="Validity" aria-valuemin="0" aria-valuemax="3"><div class="tx-fill"></div><div class="tx-tick-wrap"></div><div class="tx-name">Validity</div></div>
+        </div>
+        <div class="tx-beam" aria-hidden="true"><span class="tx-beam-label"></span></div>
+      </div>
+      <div class="tx-read" aria-live="polite">
+        <div class="tx-claim"><span class="tx-claim-k">Strongest claim</span><strong class="tx-claim-v"></strong><span class="tx-claim-t"></span></div>
+        <dl class="tx-levels">
+          <dt>Access</dt><dd class="tx-l-a"></dd>
+          <dt>Evidence</dt><dd class="tx-l-e"></dd>
+          <dt>Validity</dt><dd class="tx-l-v"></dd>
+        </dl>
+        <label class="tx-extra"><input type="checkbox"> <span></span></label>
+      </div>
+    </div>
+    <div class="tx-caps-head">What you can run <span class="to-note">(locked ones show the tier that unlocks them)</span></div>
+    <ul class="tx-caps"></ul>
+    <dl class="tx-foot">
+      <dt>You cannot claim</dt><dd class="tx-ceiling"></dd>
+      <dt>Start with</dt><dd class="tx-start"></dd>
     </dl>
+    <p class="to-note tx-fine">Bands follow the weakest-link rule of <em>Precision Is Not Proof</em>: the lowest of the three
+    readings caps the claim. The cut-offs between bands are our reading of it.</p>
   </div>
+  <script type="application/json" id="tx-data">{"pathways": {"predictive": {"label": "Predictive", "sub": "scores, approves, ranks", "extra": {"label": "I also have the true outcomes (labels)", "unlocks": "Error-rate parity"}, "access": ["A vendor's documentation or model card only", "The decisions and each person's group", "Also the model's scores or probabilities", "The model itself: a file, its weights, or a predict() you can call", "Also the training data and how it was built"], "caps": [["Read and cross-check what is stated", 0, false], ["Selection-rate disparity, demographic parity", 1, false], ["Error-rate parity: equalised odds, equal opportunity", 1, true], ["Calibration by group, AUROC parity, multicalibration", 2, false], ["Threshold trade-offs", 2, false], ["Feature attribution, counterfactual what-if", 3, false], ["Retraining with fairness constraints", 3, false], ["Where the disparity entered the data", 4, false]], "start": ["a model card; then ask for decisions", "predictive/adult_test_with_predictions.csv", "predictive/adult_test_with_predictions.csv", "predictive/adult_logreg_model.json", "predictive/adult_logreg_model.json"], "ceiling": ["Any claim about how the system actually decides.", "Calibration, and anything about why it decides as it does.", "Which features or internal parts carry the disparity.", "Where the bias entered the data (no training lineage).", "Nothing structural; the limits are now statistical."]}, "llm": {"label": "Generative", "sub": "an LLM or chat assistant", "extra": {"label": "I can send prompts automatically, not only type them", "unlocks": "Counterfactual tests and benchmarks at scale"}, "access": ["A model card or published evaluations only", "Prompts in, text out", "Also the log probabilities of each token", "Open weights you run yourself", "Open weights and open training data"], "caps": [["Cross-check stated evaluations", 0, false], ["Hand-run counterfactual pairs, red-teaming", 1, false], ["Counterfactual testing and BBQ, BOLD, HolisticBias at scale", 1, true], ["Refusal, tone and sentiment disparity", 1, true], ["Likelihood bias: the probability of yes, of each option", 2, false], ["Embedding bias (WEAT, SEAT) on the model's own vectors", 3, false], ["Hidden-state probes", 3, false], ["Which corpus patterns carry the bias", 4, false]], "start": ["the provider's model card", "llm/discrim_eval_qwen25_7b.csv", "llm/discrim_eval_qwen25_7b.csv", "GPT-2 or Apertus 8B (see the public table)", "Apertus 8B (see the public table)"], "ceiling": ["Any claim about how the model treats people.", "Differences hidden inside the answer probabilities; anything about why.", "Which internal parts carry the bias.", "Where the bias came from in training.", "Nothing structural."]}, "agent": {"label": "Agent", "sub": "an LLM that calls tools", "extra": {"label": "I also have the traces: tool calls, handoffs, steps", "unlocks": "Tool-selection, delegation and trajectory bias"}, "access": ["Documentation only", "Inputs in, final outcomes out", "Also log probabilities at each step", "An open-weight model inside the agent", "Also that model's training data"], "caps": [["Cross-check what is stated", 0, false], ["Outcome disparity, correspondence tests", 1, false], ["Tool-selection, delegation and trajectory bias", 1, true], ["The margin behind each decision", 2, false], ["Internal probes of the model inside", 3, false], ["Training lineage", 4, false]], "start": ["ask for a submission API", "agent/loan_agent_persona_runs.csv", "scripts/loan_agent_persona_harness.py", "scripts/loan_agent_persona_harness.py", "scripts/loan_agent_persona_harness.py"], "ceiling": ["Anything about behaviour.", "Why the agent chose what it chose (no scores, no internals).", "Internal mechanism.", "Training lineage.", "Rarely reachable for agents in practice."]}, "multi": {"label": "Multi-agent", "sub": "agents working together", "extra": {"label": "I also have each agent's own output", "unlocks": "Compositionality, emergent bias, groupthink"}, "access": ["Documentation only", "The system's inputs and final outputs", "Also log probabilities per agent", "Open-weight models inside the agents", "Also their training data"], "caps": [["Cross-check what is stated", 0, false], ["Disparity in the system's outcomes", 1, false], ["Compositionality, emergent bias, groupthink", 1, true], ["Margins behind each agent's choice", 2, false], ["Internal probes per agent", 3, false], ["Training lineage", 4, false]], "start": ["ask for the system's decisions", "multi_agent/loan_committee_runs.csv", "multi_agent/loan_committee_harness_trace.json", "multi_agent/loan_committee_harness_trace.json", "multi_agent/loan_committee_harness_trace.json"], "ceiling": ["Anything about behaviour.", "Which agent introduced the bias, unless you keep each agent's output.", "Internal mechanism.", "Training lineage.", "Rarely reachable in practice."]}, "synthetic": {"label": "Synthetic", "sub": "data with a known answer", "extra": null, "access": ["A description of a generator", "A file where you planted the bias", "Planted bias plus model scores", "The generator and a model you trained", "The generator, its code and every setting"], "caps": [["Nothing measured yet", 0, false], ["Check a detector both ways: planted found, clean silent", 1, false], ["Check calibration detectors the same way", 2, false], ["Check attribution methods against a known cause", 3, false], ["Reproduce the whole pack byte for byte", 4, false]], "start": ["a planted-bias file from this page", "synthetic/gender_penalty.csv", "synthetic/clean.csv", "predictive/adult_logreg_model.json", "synthetic/surname_proxy.csv"], "ceiling": ["Anything.", "Anything about a real system: synthetic data tests the tool, not the world.", "Anything about a real system.", "Anything about a real system.", "Anything about a real system."]}}, "evidence": [["E0", "Asserted", "a statement, or the model describing itself"], ["E1", "Observational", "logs or data you happened to have"], ["E2", "Controlled", "counterfactual pairs, powered, pre-registered"], ["E3", "Interventional", "you manipulate the mechanism itself"]], "validity": [["V0", "Unpinned", "no version recorded: treat as disqualifying"], ["V1", "Pinned", "version and date recorded, one point in time"], ["V2", "Resampled", "re-tested on a schedule, changes detected"], ["V3", "Continuous", "monitored live with alerts"]], "claims": ["Indicative", "Limited", "Reasonable"], "claimText": ["Taken largely at the subject's word.", "Supports a conclusion without being conclusive.", "The strongest class: measured, controlled and current."]}</script>
 
   <h2 id="assessment">What an assessment is, in 90 seconds</h2>
   <p>A fairness result is only as good as two things that must travel with it. Validant's article
@@ -505,30 +564,35 @@ print(result["data"]["verdict"]["headline"])</code></pre>
   <div class="to-scroll"><table>
     <thead><tr><th>File</th><th>Planted</th><th>Planted mechanism</th><th>Confirmed but not planted</th><th>Top-level verdict</th></tr></thead>
     <tbody>
-      <tr><td>synthetic/clean.csv</td><td>nothing</td><td><span class="to-na">nothing to find</span></td><td><span class="to-no">age, national_origin</span></td><td>critical</td></tr>
-      <tr><td>synthetic/gender_penalty.csv</td><td>a gap on gender</td><td><span class="to-no">missed</span></td><td><span class="to-yes">none</span></td><td>critical</td></tr>
+      <tr><td>synthetic/clean.csv</td><td>nothing</td><td><span class="to-na">nothing to find</span></td><td><span class="to-yes">none</span></td><td>warn</td></tr>
+      <tr><td>synthetic/gender_penalty.csv</td><td>a gap on gender</td><td><span class="to-no">missed</span></td><td><span class="to-yes">none</span></td><td>warn</td></tr>
       <tr><td>synthetic/race_penalty.csv</td><td>a gap on race_ethnicity</td><td><span class="to-yes">found</span></td><td><span class="to-no">national_origin</span></td><td>critical</td></tr>
       <tr><td>synthetic/age_cliff.csv</td><td>a gap on age</td><td><span class="to-yes">found</span></td><td><span class="to-yes">none</span></td><td>critical</td></tr>
       <tr><td>synthetic/disability_penalty.csv</td><td>a gap on disability_status</td><td><span class="to-yes">found</span></td><td><span class="to-no">age</span></td><td>critical</td></tr>
-      <tr><td>synthetic/zip_redlining.csv</td><td>a proxy, zip_minority_majority (a race_ethnicity gap follows from it)</td><td><span class="to-yes">found</span></td><td><span class="to-yes">none</span></td><td>critical</td></tr>
-      <tr><td>synthetic/surname_proxy.csv</td><td>not checkable (race is not in the file)</td><td><span class="to-na">nothing to find</span></td><td><span class="to-yes">none</span></td><td>critical</td></tr>
-      <tr><td>synthetic/photo_laundering.csv</td><td>a proxy, photo_attractiveness_score (a race_ethnicity gap follows from it)</td><td><span class="to-yes">found</span></td><td><span class="to-no">national_origin, primary_language</span></td><td>critical</td></tr>
+      <tr><td>synthetic/zip_redlining.csv</td><td>a proxy, zip_minority_majority (a race_ethnicity gap follows from it)</td><td><span class="to-no">missed</span></td><td><span class="to-yes">none</span></td><td>warn</td></tr>
+      <tr><td>synthetic/surname_proxy.csv</td><td>not checkable (race is not in the file)</td><td><span class="to-na">nothing to find</span></td><td><span class="to-yes">none</span></td><td>warn</td></tr>
+      <tr><td>synthetic/photo_laundering.csv</td><td>a proxy, photo_attractiveness_score (a race_ethnicity gap follows from it)</td><td><span class="to-yes">found</span></td><td><span class="to-no">national_origin</span></td><td>critical</td></tr>
     </tbody>
   </table></div>
 <!-- END:synthetic-grading -->
-  <div class="to-warn"><strong>What the pack showed about vfairness itself.</strong> Graded on what Pulse
-  <em>statistically confirmed</em> (significant after its own correction), it found five of the six mechanisms that can
-  be found, and missed one: the gender penalty, which removes half of women's invitations in technical roles only and is
-  about as large, at 500 applicants, as the gaps chance alone produces there. It also confirmed gaps where nothing was
-  planted, including on the clean control: age (the youngest band really was invited less often in this random draw,
-  raw p 0.025, but that should not survive a correction across ten attributes) and national origin (which fails an
-  overall test across origins, p 0.31). And its top-level verdict was "critical" on all eight files, the clean one
-  included, because in US employment the four-fifths screen sets the severity from the ratio, and a 27-person group
-  falls below 0.80 easily. So on this pack the headline verdict could not tell planted from clean; the per-attribute
-  confirmed results mostly could. That is the reason this pack exists: to measure the tool before trusting it, and to
-  publish what it found. The false confirmations on the clean control are being investigated as a defect.</div>
-  <p class="to-note">Tone alone is not detection. Graded on tone (any warn or critical), every file, the clean control
-  included, would show six or more attributes "flagged", which says nothing.</p>
+  <div class="to-warn"><strong>What the pack showed about vfairness itself, and what changed.</strong> The first run
+  of this pack, on 1 October 2026, found three defects in Pulse. On the clean control it confirmed gaps where nothing was
+  planted and called the file "Not fit to deploy"; its top-level verdict was "critical" on all eight files, so it could not
+  tell planted from clean; and it reported a measured agent null as "insufficient data". All three were fixed the same day:
+  the multiple-testing correction may no longer re-confirm what the across-groups test rejected, and an unconfirmed gap is
+  at most a watch item, as 29 CFR 1607.4(D) itself says for small, non-significant differences. The table above is the run
+  after the fix. Graded on what Pulse <em>statistically confirmed</em>, it now finds four of the six mechanisms that can be
+  found (race, age, disability, and the race gap the photo score creates) and stays quiet on the clean control, and the
+  verdict reads "Not fit to deploy" on exactly those four files and "monitor" on the rest. Two mechanisms are still missed:
+  the gender penalty, which removes half of women's invitations in technical roles only and is about as large, at 500
+  applicants, as the gaps chance produces there; and ZIP redlining, whose race gap does not reach confirmation (it is found
+  when the ZIP column itself is declared as an attribute, as notebook 10 shows). In three files one extra attribute is
+  confirmed by chance (national origin twice, age once), and in two of them the headline names that chance gap rather
+  than the planted one. That is the reason this pack exists: to measure the tool before trusting it, and to publish what it
+  found.</div>
+  <p class="to-note">Tone alone is not detection, and neither is a name in the proxy list: that list names the ZIP flag,
+  the photo score and the surname in the clean control too. A planted proxy counts as found only when the gap it causes
+  is confirmed.</p>
 
   <h2 id="llm">Generative (LLM)</h2>
   <p>An LLM is tested by what it says. Change only the person in the prompt (a name, an age, a stated gender) and
@@ -603,10 +667,11 @@ result = run_pulse(named, {"source_kind": "agent", "protected_attributes": ["gro
 agent = result["data"]["agent"]
 print(agent["sampleAdequacy"]["perGroup"])   # episodes per group
 print(agent["summary"])                       # what the probe measured</code></pre>
-  <p class="to-note">Print the probe's own summary, not only the top-level verdict. On this file the probe measures all
-  six groups (120 episodes each) and finds no tool-selection bias, while the top-level verdict reads "Insufficient
-  assessable data". That wording is wrong: it reports a measured null as a could-not-check. It is a known defect in how
-  Pulse words a clean agent result, and the table below shows both readings until it is fixed.</p>
+  <p class="to-note">Print the probe's own summary next to the top-level verdict: they should agree, and here they now
+  do. Until 1 October 2026 they did not: the probe measured all six groups (120 episodes each) and found no tool-selection
+  bias, while the top-level verdict read "Insufficient assessable data", a measured null reported as a could-not-check.
+  This page found that defect; it was fixed the same day, and the verdict on this file now reads "no material fairness
+  defect found on the assessed attributes".</p>
 
   <h2 id="multi-agent">Multi-agent</h2>
   <p>Several agents can each look fair and still be unfair together: one agent's note can steer the next. The test
@@ -658,14 +723,14 @@ print(shift.round(2))   # how far the screener's note moves the reviewer, by ori
       <tr><td>predictive/lending_fairness.csv</td><td>1,000</td><td>Within fairness budget on the assessed attributes.</td><td>gender (pass), race (pass)</td></tr>
       <tr><td>predictive/hiring_fairness.csv</td><td>1,000</td><td>Within fairness budget on the assessed attributes.</td><td>gender (pass), ethnicity (pass)</td></tr>
       <tr><td>predictive/healthcare_fairness.csv</td><td>1,000</td><td>Within fairness budget on the assessed attributes.</td><td>sex (pass), race (pass)</td></tr>
-      <tr><td>predictive/recruitment_fairness_dataset.csv</td><td>2,700</td><td>Not fit to deploy as-is: material disparity for &quot;Cognitive/Neurodivergent&quot;.</td><td>gender (warn), race_ethnicity (critical), age (critical), disability_status (critical)</td></tr>
+      <tr><td>predictive/recruitment_fairness_dataset.csv</td><td>2,700</td><td>Deployable only with monitoring: watch-level gap for &quot;Cognitive/Neurodivergent&quot;.</td><td>gender (warn), race_ethnicity (warn), age (warn), disability_status (warn)</td></tr>
       <tr><td>llm/generative_support_fairness.csv</td><td>210</td><td>Qualified opinion: deployable only with the documented remediations and active monitoring below; material but bounded fairness issues were found.</td><td><span class="to-na">none assessable</span></td></tr>
       <tr><td>llm/discrim_eval_qwen25_7b.csv</td><td>3,240</td><td>Within fairness budget on the assessed attributes.</td><td>gender (pass), race (pass)</td></tr>
       <tr><td>agent/agent_traces_support.csv</td><td>240</td><td>Adverse opinion: material fairness defects make this system unfit to deploy as-is. Trajectory gap on &#x27;steps&#x27;: man averages 6.97 vs 5.10 for woman (steps per episode; permutation test, BH-adjusted p 0.002997, Cohen&#x27;s d 1.32); Episodes for &#x27;woman&#x27; lean on memory-carried context in 100% of cases vs 60% for &#x27;nonbinary&#x27; (chi-square p 8.176e-09).<br><span class="to-note">Agent probe: 13 agentic-bias finding(s) after omnibus gating and family-wise Benjamini-Hochberg correction.</span></td><td><span class="to-na">none assessable</span></td></tr>
       <tr><td>agent/agent_traces_otel.jsonl</td><td>2,130</td><td>Adverse opinion: material fairness defects make this system unfit to deploy as-is. Episodes for &#x27;woman&#x27; lean on memory-carried context in 100% of cases vs 60% for &#x27;nonbinary&#x27; (chi-square p 8.176e-09).<br><span class="to-note">Agent probe: 12 agentic-bias finding(s) after omnibus gating and family-wise Benjamini-Hochberg correction.</span></td><td><span class="to-na">none assessable</span></td></tr>
       <tr><td>agent/agent_traces_langfuse.jsonl</td><td>240</td><td>Adverse opinion: material fairness defects make this system unfit to deploy as-is. Trajectory gap on &#x27;steps&#x27;: woman averages 6.37 vs 5.30 for nonbinary (steps per episode; permutation test, BH-adjusted p 0.002997, Cohen&#x27;s d 0.85); Episodes for &#x27;woman&#x27; lean on memory-carried context in 100% of cases vs 60% for &#x27;nonbinary&#x27; (chi-square p 8.176e-09).<br><span class="to-note">Agent probe: 10 agentic-bias finding(s) after omnibus gating and family-wise Benjamini-Hochberg correction.</span></td><td><span class="to-na">none assessable</span></td></tr>
-      <tr><td>agent/loan_agent_persona_runs.csv</td><td>720</td><td>Insufficient assessable data to issue a fairness opinion. Provide grouped protected attributes and, ideally, outcome labels.<br><span class="to-note">Agent probe: No significant tool/action selection bias detected across groups (omnibus-gated, family-wise corrected). 6 per-tool test(s) could not fire at any data (too few uses of that tool to reach p&lt;0.05) and are reported as not assessed, not as absence of bias.</span></td><td><span class="to-na">none assessable</span></td></tr>
-      <tr><td>agent/loan_agent_otel.jsonl</td><td>1,550</td><td>Insufficient assessable data to issue a fairness opinion. Provide grouped protected attributes and, ideally, outcome labels.<br><span class="to-note">Agent probe: No significant tool/action selection bias detected across groups (omnibus-gated, family-wise corrected). 7 per-tool test(s) could not fire at any data (too few uses of that tool to reach p&lt;0.05) and are reported as not assessed, not as absence of bias.</span></td><td><span class="to-na">none assessable</span></td></tr>
+      <tr><td>agent/loan_agent_persona_runs.csv</td><td>720</td><td>Unqualified opinion: no material fairness defect found on the assessed attributes. Keep monitoring.<br><span class="to-note">Agent probe: No significant tool/action selection bias detected across groups (omnibus-gated, family-wise corrected). 6 per-tool test(s) could not fire at any data (too few uses of that tool to reach p&lt;0.05) and are reported as not assessed, not as absence of bias.</span></td><td><span class="to-na">none assessable</span></td></tr>
+      <tr><td>agent/loan_agent_otel.jsonl</td><td>1,550</td><td>Unqualified opinion: no material fairness defect found on the assessed attributes. Keep monitoring.<br><span class="to-note">Agent probe: No significant tool/action selection bias detected across groups (omnibus-gated, family-wise corrected). 7 per-tool test(s) could not fire at any data (too few uses of that tool to reach p&lt;0.05) and are reported as not assessed, not as absence of bias.</span></td><td><span class="to-na">none assessable</span></td></tr>
     </tbody>
   </table></div>
 <!-- END:verification -->
@@ -756,74 +821,103 @@ print(shift.round(2))   # how far the screener's note moves the reviewer, by ori
 <script>
 (function () {
   var D = "data/";
-  var OPTIONS = {
-    predictive: [
-      ["A0", "A vendor's documentation or model card only", "The subject's own claims, checked for internal consistency.", "Read and cross-check what is stated. Nothing is measured.", "Any claim about how the system actually decides.", "a model card; then ask for decisions"],
-      ["A1", "The decisions and each person's group", "Disparity in observed outcomes, at a stated sensitivity.", "Selection rates and demographic parity per group (run_pulse in label-free mode).", "Anything about errors (you have no true outcomes), calibration, or why.", "predictive/adult_test_with_predictions.csv (drop y_true and y_prob)"],
-      ["A1", "Also the true outcomes (labels)", "Disparity in outcomes and in errors, at a stated sensitivity.", "Everything above plus equalised odds, equal opportunity, predictive parity.", "Calibration (no scores) and anything about mechanism.", "predictive/adult_test_with_predictions.csv, or COMPAS via scripts/get_compas.py"],
-      ["A2", "Also the model's scores or probabilities", "Calibration and threshold behaviour by group.", "Everything above plus calibration by group, AUROC parity, multicalibration, threshold trade-offs.", "Which features or internal parts carry the disparity.", "predictive/adult_test_with_predictions.csv (y_prob)"],
-      ["A3", "The model itself: a file, its weights, or a predict() you can call", "Which parts of the model carry the disparity.", "Feature attribution, counterfactual what-if, retraining with fairness constraints.", "Where the bias entered the data (no training lineage).", "predictive/adult_logreg_model.json"],
-      ["A4", "Also the training data and how it was built", "Where in the lifecycle the disparity came from.", "Everything above plus tracing the disparity back to the data and its collection.", "Nothing structural; the limits are now statistical.", "Adult from UCI plus the model JSON (the training split is public)"]
-    ],
-    llm: [
-      ["A0", "A model card or published evaluations only", "The provider's own claims, checked for consistency.", "Cross-check stated evaluations. Nothing is measured.", "Any claim about how the model treats people.", "the provider's model card"],
-      ["A1", "A chat window only", "Disparity in observed answers, at a stated sensitivity (small samples).", "Hand-run counterfactual pairs and red-teaming.", "Anything that needs hundreds of runs; likelihoods; why.", "llm/generative_support_fairness.csv (already collected)"],
-      ["A1", "An endpoint that returns text (a wrapper or the provider's API)", "Disparity in observed answers, at a stated sensitivity.", "Counterfactual testing, BBQ, BOLD, HolisticBias, refusal and tone disparity.", "Differences hidden inside the answer probabilities; anything about why.", "llm/discrim_eval_qwen25_7b.csv (answer column)"],
-      ["A2", "An endpoint that also returns log probabilities", "Likelihood and margin disparity by group.", "Everything above plus the probability of yes, of each answer option, per group.", "Which internal parts carry the bias.", "llm/discrim_eval_qwen25_7b.csv (p_yes column)"],
-      ["A3", "Open weights you run yourself", "Which internal structures carry the disparity.", "Everything above plus WEAT or SEAT on the model's own embeddings and hidden-state probes.", "Where the bias came from in training.", "GPT-2 or Apertus 8B (see the public table)"],
-      ["A4", "Open weights and open training data", "Where in the lifecycle the disparity came from.", "Everything above plus corpus analysis.", "Nothing structural.", "Apertus 8B (see the public table)"]
-    ],
-    agent: [
-      ["A0", "Documentation only", "The provider's own claims.", "Cross-check what is stated.", "Anything about behaviour.", "ask for a submission API"],
-      ["A1", "The product interface only", "Disparity in observed outcomes, small samples.", "Manual correspondence testing.", "Tool choice, routing, anything that needs many runs.", "agent/loan_agent_persona_runs.csv (outcome column)"],
-      ["A1", "Submit inputs and receive final outcomes", "Disparity in observed outcomes, at a stated sensitivity.", "Automated correspondence tests, outcome disparity.", "Which tool or route produced the outcome.", "scripts/loan_agent_persona_harness.py"],
-      ["A1", "Also the traces: tool calls, handoffs, steps", "Disparity in outcomes and in the path taken.", "Everything above plus tool-selection, delegation and trajectory bias.", "Why the model chose a tool (no scores, no internals).", "agent/loan_agent_persona_runs.csv or agent/loan_agent_otel.jsonl"],
-      ["A2", "Also log probabilities at each step", "The margin behind each choice, by group.", "Everything above plus how close each decision was.", "Internal mechanism.", "extend the harness to request logprobs"],
-      ["A3", "An open-weight model inside the agent", "Which internal structures drive the choice.", "Everything above plus internal probes.", "Training lineage.", "run the harness against an open model"]
-    ],
-    multi: [
-      ["A1", "End-to-end inputs and outputs only", "Disparity in the system's outcomes.", "Outcome disparity for the system as a whole.", "Which agent introduced the bias; whether the system amplifies it.", "multi_agent/loan_committee_runs.csv (reviewer_after columns)"],
-      ["A1", "Also each agent's own output", "Disparity per agent and for the system.", "Compositionality, emergent bias, groupthink: is the whole worse than the parts?", "Why each agent behaved as it did.", "multi_agent/loan_committee_harness_trace.json"],
-      ["A3", "Open-weight models inside the agents", "Internal structures in each agent.", "Everything above plus internal probes per agent.", "Training lineage.", "run the harness against open models"]
-    ],
-    synthetic: [
-      ["A1", "A generator, or a file where you planted the bias", "Whether a tool finds a known bias and stays quiet on a clean control.", "Detector checks both ways: planted found, clean silent.", "Anything about a real system: synthetic data tests the tool, not the world.", "synthetic/clean.csv with synthetic/gender_penalty.csv"]
-    ]
-  };
-  var p = document.getElementById("to-pathway"), a = document.getElementById("to-access");
-  if (!p || !a) return;
+  var el = document.getElementById("tx-data"); if (!el) return;
+  var X = JSON.parse(el.textContent);
+  var root = document.getElementById("start");
+  var st = { p: "predictive", a: 1, e: 1, v: 1, extra: false };
+  var MAX = { a: 4, e: 3, v: 3 };
   var FILE = /([a-z_]+\/[A-Za-z0-9_.]+\.(csv|jsonl|json|py))/g;
-  function link(el, text) {
-    el.textContent = "";
-    var last = 0, m;
-    FILE.lastIndex = 0;
+  function q(s) { return root.querySelector(s); }
+  // Each level sits INSIDE its claim band, so a column's height reads off the
+  // claim directly: level 0 in Indicative, 1 in Limited, 2 and up shared out
+  // inside Reasonable. The beam then rests on the shortest column's top.
+  function band(k, lvl) { return Math.min(lvl, 2); }
+  function span(k, lvl) {
+    var b = band(k, lvl);
+    if (b < 2) return [b / 3, (b + 1) / 3];
+    var n = MAX[k] - 1, j = lvl - 2;
+    return [2 / 3 + j / (3 * n), 2 / 3 + (j + 1) / (3 * n)];
+  }
+  function link(node, text) {
+    node.textContent = ""; var last = 0, m; FILE.lastIndex = 0;
     while ((m = FILE.exec(text)) !== null) {
-      el.appendChild(document.createTextNode(text.slice(last, m.index)));
-      var a = document.createElement("a");
-      a.className = "to-dl"; a.setAttribute("href", D + m[1]); a.textContent = m[1];
-      el.appendChild(a);
-      last = m.index + m[1].length;
+      node.appendChild(document.createTextNode(text.slice(last, m.index)));
+      var a = document.createElement("a"); a.className = "to-dl"; a.setAttribute("href", D + m[1]); a.textContent = m[1];
+      node.appendChild(a); last = m.index + m[1].length;
     }
-    el.appendChild(document.createTextNode(text.slice(last)));
+    node.appendChild(document.createTextNode(text.slice(last)));
   }
-  function fill() {
-    a.innerHTML = "";
-    OPTIONS[p.value].forEach(function (o, i) {
-      var opt = document.createElement("option"); opt.value = i; opt.textContent = o[1]; a.appendChild(opt);
+  var cols = {};
+  root.querySelectorAll(".tx-col").forEach(function (c) {
+    var k = c.getAttribute("data-k"); cols[k] = c;
+    var wrap = c.querySelector(".tx-tick-wrap");
+    for (var i = 0; i <= MAX[k]; i++) {
+      var t = document.createElement("i"); var sp = span(k, i);
+      t.style.bottom = (sp[0] * 100) + "%"; t.style.height = ((sp[1] - sp[0]) * 100) + "%";
+      t.textContent = k.toUpperCase() + i; wrap.appendChild(t);
+    }
+    function setFromY(clientY) {
+      var r = c.getBoundingClientRect(); var f = 1 - (clientY - r.top) / r.height; var lvl = 0;
+      for (var i = 0; i <= MAX[k]; i++) { if (f >= span(k, i)[0]) lvl = i; }
+      st[k] = lvl; render();
+    }
+    c.addEventListener("pointerdown", function (ev) { c.setPointerCapture(ev.pointerId); setFromY(ev.clientY); });
+    c.addEventListener("pointermove", function (ev) { if (c.hasPointerCapture(ev.pointerId)) setFromY(ev.clientY); });
+    c.addEventListener("keydown", function (ev) {
+      var d = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1 }[ev.key];
+      if (ev.key === "Home") d = -9; if (ev.key === "End") d = 9;
+      if (d === undefined) return; ev.preventDefault();
+      st[k] = Math.max(0, Math.min(MAX[k], st[k] + d)); render();
     });
-    a.selectedIndex = Math.min(1, OPTIONS[p.value].length - 1);
-    show();
+  });
+  root.querySelectorAll(".tx-paths button").forEach(function (b) {
+    b.addEventListener("click", function () { st.p = b.getAttribute("data-p"); st.extra = false; render(); });
+  });
+  var extraBox = q(".tx-extra input");
+  extraBox.addEventListener("change", function () { st.extra = extraBox.checked; render(); });
+  function render() {
+    var P = X.pathways[st.p];
+    root.querySelectorAll(".tx-paths button").forEach(function (b) { b.setAttribute("aria-checked", b.getAttribute("data-p") === st.p ? "true" : "false"); });
+    var lv = { a: st.a, e: st.e, v: st.v };
+    var bands = { a: band("a", st.a), e: band("e", st.e), v: band("v", st.v) };
+    var claim = Math.min(bands.a, bands.e, bands.v);
+    var frac = {}, minK = "a";
+    ["a", "e", "v"].forEach(function (k) { frac[k] = span(k, lv[k])[1]; });
+    ["e", "v"].forEach(function (k) { if (frac[k] < frac[minK]) minK = k; });
+    ["a", "e", "v"].forEach(function (k) {
+      var c = cols[k];
+      c.querySelector(".tx-fill").style.height = (frac[k] * 100) + "%";
+      c.classList.toggle("is-weak", k === minK && claim < 2);
+      c.setAttribute("aria-valuenow", lv[k]);
+      c.querySelectorAll(".tx-tick-wrap i").forEach(function (t, i) { t.classList.toggle("on", i <= lv[k]); });
+    });
+    var stage = q(".tx-cols"); var h = stage.getBoundingClientRect().height || 190;
+    q(".tx-beam").style.bottom = (30 + frac[minK] * h - 2) + "px";
+    q(".tx-beam-label").textContent = X.claims[claim];
+    q(".tx-claim-v").textContent = X.claims[claim];
+    q(".tx-claim-t").textContent = X.claimText[claim] + (st.v === 0 ? " Unpinned (V0) is disqualifying: record the version first." : "");
+    var accessText = P.access[st.a];
+    cols.a.setAttribute("aria-valuetext", "A" + st.a + ", " + accessText);
+    cols.e.setAttribute("aria-valuetext", X.evidence[st.e][0] + ", " + X.evidence[st.e][1]);
+    cols.v.setAttribute("aria-valuetext", X.validity[st.v][0] + ", " + X.validity[st.v][1]);
+    q(".tx-l-a").textContent = "A" + st.a + ": " + accessText;
+    q(".tx-l-e").textContent = X.evidence[st.e][0] + " " + X.evidence[st.e][1] + ": " + X.evidence[st.e][2];
+    q(".tx-l-v").textContent = X.validity[st.v][0] + " " + X.validity[st.v][1] + ": " + X.validity[st.v][2];
+    var lab = q(".tx-extra");
+    if (P.extra) { lab.hidden = false; lab.querySelector("span").textContent = P.extra.label + " (unlocks: " + P.extra.unlocks + ")"; extraBox.checked = st.extra; lab.classList.toggle("is-muted", st.a < 1); extraBox.disabled = st.a < 1; }
+    else { lab.hidden = true; }
+    var ul = q(".tx-caps"); ul.textContent = "";
+    P.caps.forEach(function (c) {
+      var li = document.createElement("li"); var open = st.a >= c[1] && (!c[2] || st.extra);
+      li.className = open ? "on" : "off"; li.textContent = c[0];
+      if (!open) { var s = document.createElement("small"); s.textContent = c[2] && st.a >= c[1] ? "needs the extra above" : "A" + c[1]; li.appendChild(s); }
+      ul.appendChild(li);
+    });
+    q(".tx-ceiling").textContent = P.ceiling[st.a];
+    link(q(".tx-start"), P.start[st.a]);
   }
-  function show() {
-    var o = OPTIONS[p.value][a.value];
-    document.getElementById("to-r-tier").innerHTML = '<span class="to-tier to-tier--' + o[0] + '">' + o[0] + "</span>";
-    document.getElementById("to-r-claim").textContent = o[2];
-    document.getElementById("to-r-run").textContent = o[3];
-    document.getElementById("to-r-ceiling").textContent = o[4];
-    link(document.getElementById("to-r-start"), o[5]);
-  }
-  p.addEventListener("change", fill); a.addEventListener("change", show);
-  fill();
+  window.addEventListener("resize", render);
+  render();
 })();
 </script>
             </div>

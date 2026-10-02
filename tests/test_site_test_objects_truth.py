@@ -78,13 +78,18 @@ def test_page_links_and_catalogue_cover_exactly_the_manifest():
         assert rec["sha256"][:12] in block, f"{rel}: the catalogue shows a stale hash"
 
 
-def test_the_chooser_only_names_published_files():
+def test_the_explorer_only_names_published_files():
+    """Every file the "Start here" explorer offers must be published."""
     page = PAGE.read_text()
-    script = page[page.index("var OPTIONS") : page.index("var p = document")]
-    named = set(re.findall(r"([a-z_]+/[A-Za-z0-9_.]+\.(?:csv|jsonl|json|py))", script))
-    assert named, "the chooser names no files at all"
+    blob = page[page.index('id="tx-data">') + len('id="tx-data">') :]
+    data = json.loads(blob[: blob.index("</script>")])
+    named = set()
+    for p in data["pathways"].values():
+        for text in p["start"]:
+            named |= set(re.findall(r"([a-z_]+/[A-Za-z0-9_.]+\.(?:csv|jsonl|json|py))", text))
+    assert named, "the explorer names no files at all"
     assert named <= set(_manifest()), (
-        f"chooser names unpublished files: {sorted(named - set(_manifest()))}"
+        f"explorer names unpublished files: {sorted(named - set(_manifest()))}"
     )
 
 

@@ -2,8 +2,8 @@
   "version": "0.1.0",
   "status": "Beta",
   "lines_of_code": {
-    "total": 224643,
-    "code": 166742,
+    "total": 225213,
+    "code": 167043,
     "files": 228
   },
   "capabilities": 215,
@@ -1394,8 +1394,8 @@
   "kpis": {
     "size": {
       "lines_of_code": {
-        "total": 224643,
-        "code": 166742,
+        "total": 225213,
+        "code": 167043,
         "files": 228
       },
       "svg_templates": 44,
@@ -3058,7 +3058,7 @@
         "fixed": 157
       },
       "tests": {
-        "collected": 16275,
+        "collected": 16317,
         "note": "collected in the published tree"
       },
       "ci": {
@@ -3083,9 +3083,9 @@
         "no return annotation, needs a human": 41
       },
       "test_composition": {
-        "test_files": 584,
-        "test_function_definitions": 10288,
-        "refusal_named_tests": 2946,
+        "test_files": 590,
+        "test_function_definitions": 10324,
+        "refusal_named_tests": 2951,
         "refusal_named_files": 281,
         "vocabulary": [
           "fabricat",
@@ -3606,7 +3606,7 @@
       ]
     },
     "release_gate": {
-      "measured_on": "2026-10-01",
+      "measured_on": "2026-10-02",
       "verdict": "NOT READY",
       "criteria": [
         {
@@ -3718,7 +3718,7 @@
       "recorded": 59,
       "closed": 59,
       "open": 0,
-      "generated_on": "2026-10-01",
+      "generated_on": "2026-10-02",
       "batches": {
         "f01": {
           "subject": "refusal scoring and the explainer's root predicate",

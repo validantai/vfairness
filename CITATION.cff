@@ -11,10 +11,11 @@ authors:
     website: "https://validant.ai"
 license: Apache-2.0
 version: 0.1.0
-# Filled in by scripts/cut_release.py at the cut, never ahead of it: this file is
-# what an academic citation is generated from, and it once carried "2026-08-23",
-# a date on which nothing had been released.
-date-released: 2026-10-01
+# Filled in at the cut by the maintainers' release tooling (not part of this
+# published repository), never ahead of it: this file is what an academic
+# citation is generated from, and it once carried "2026-08-23", a date on which
+# nothing had been released.
+date-released: 2026-10-02
 repository-code: "https://github.com/validantai/vfairness"
 url: "https://vfairness.validant.ai"
 keywords:

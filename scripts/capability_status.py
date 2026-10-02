@@ -916,7 +916,28 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true", help="exit 1 if the published ledger is stale")
     ap.add_argument("--matrix", action="store_true", help="print the markdown matrix")
+    ap.add_argument(
+        "--env-check",
+        action="store_true",
+        help="exit 2 if this environment lacks an extra the published ledger was measured with",
+    )
     args = ap.parse_args()
+
+    if args.env_check:
+        # Cheap, and run FIRST by refresh-docs.sh --check: every reader downstream
+        # of the surface (register, readiness board, beta pages) otherwise turns a
+        # partial install's smaller count into a list of STALE lines, which names
+        # the documents as the fault when the environment is.
+        published = json.loads(LEDGER.read_text(encoding="utf-8")) if LEDGER.exists() else {}
+        absent = K.missing_extras(published.get("extras_present"))
+        if absent:
+            print(
+                f"COULD NOT CHECK: the published ledger was measured with the optional extras "
+                f"{absent} importable and this environment lacks them. Install the extras "
+                "the published-docs CI job installs and run the check again."
+            )
+            return 2
+        return 0
 
     led = build()
     if args.matrix:
@@ -927,6 +948,20 @@ def main() -> int:
             print("capability-status.json missing; run scripts/capability_status.py")
             return 1
         published = json.loads(LEDGER.read_text(encoding="utf-8"))
+        # THREE STATES, not two. A ledger measured with the mcp and torch extras
+        # importable cannot be re-measured without them: the walk then sees 1,563
+        # units instead of 1,580, and printing that as STALE (as the public CI did
+        # on 2026-10-02) both misnames the cause and invites a regeneration that
+        # would publish a partial install's count. See K.missing_extras.
+        absent = K.missing_extras(published.get("extras_present"))
+        if absent:
+            print(
+                "COULD NOT CHECK: the published ledger was measured with the optional "
+                f"extras {absent} importable and this environment lacks them, so it "
+                "would measure a smaller surface than the one published. Install the "
+                "extras the published-docs CI job installs and run the check again."
+            )
+            return 2
         problems = []
         if len(published.get("units", {})) != led["surface_total"]:
             problems.append(

@@ -7,7 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 See [docs/API_STABILITY.md](docs/API_STABILITY.md) for the frozen public surface
 and the deprecation policy that governs what a version bump is allowed to change.
 
-## [0.1.0] - 2026-10-01
+## [0.1.0] - 2026-10-02
+
+### Pulse: no false alarm on clean data, agent nulls are opinions, pandas 3 (2026-10-01)
+
+Found by running the new downloadable test objects (docs/site/test-objects/).
+
+#### Fixed
+
+- **A clean control read "Not fit to deploy".** The family-wise correction set
+  `significant` from the adjusted p alone and so re-confirmed attributes the
+  across-groups omnibus gate had rejected (national origin, omnibus p 0.31).
+  The correction can now only withdraw a confirmation; a gated-out attribute
+  enters the family at p = 1; and an unconfirmed gap is at most a watch item
+  in every framework, as 29 CFR 1607.4(D) says for small, non-significant
+  differences. Per-attribute rows carry `pValueOmnibus` and `pValueFamily`.
+  On the synthetic pack the clean control is now quiet and the verdict reads
+  "Not fit to deploy" on exactly the files where a planted bias is confirmed.
+- **A measured agent null read "Insufficient assessable data".** The agent route
+  now tells the assurance verdict which attribute it assessed (only when the
+  omnibus test ran with at least one degree of freedom), so an adequately
+  sampled agent with no tool-choice bias gets an opinion, not a disclaimer.
+- **pandas 3 broke the agent probe** on any trace where an episode calls no
+  tool (a float NaN among tool names made the sort raise, reported as "could not
+  analyze these traces"). A missing action is now the explicit label
+  `"(no tool call)"`, identical on pandas 2 and 3.
 
 ### The beta gate is met, and two checks anyone can re-run (2026-10-01)
 
@@ -823,11 +847,12 @@ the healthy case shown to survive.
   deployment host names or private checkout paths. Export denylist, secret-scan
   and positive-control checks remain enabled and unchanged.
 
-**Released 2026-10-01.** Tagged `v0.1.0` on `validantai/vfairness` and published
+**Released 2026-10-02.** Tagged `v0.1.0` on `validantai/vfairness` and published
 to PyPI from that tag by the Trusted Publisher pipeline. The date on the heading
-above is the publication date, filled in by `scripts/cut_release.py` at the cut
-and not before: earlier revisions of this file asserted a release event twice
-over that had not happened, and both dates were fiction.
+above is the publication date, filled in at the cut by the maintainers' release
+tooling (not part of this published repository) and not before: earlier
+revisions of this file asserted a release event twice over that had not
+happened, and both dates were fiction.
 
 **Everything continues to accumulate under this heading** until then. There is
 deliberately no separate `[Unreleased]` section: while 0.1.0 is itself

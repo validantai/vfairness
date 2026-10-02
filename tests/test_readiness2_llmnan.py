@@ -29,7 +29,6 @@ import warnings
 import numpy as np
 import pytest
 
-from vfairness.llm import output_analysis
 from vfairness.llm.output_analysis import (
     OutputAnalysisResult,
     OutputAnalyzer,
@@ -315,9 +314,10 @@ class TestUnscoredValuesAreNotANegativeVerdict:
 
     def test_a_non_finite_p_value_from_the_test_is_not_a_negative_verdict(self, monkeypatch):
         """The boundary itself, with finite scores: the test comes back with no answer."""
+        # scipy's own attribute: _compare reaches it through the shared
+        # _mannwhitney_two_sided_p helper, not a module-level `stats` of its own.
         monkeypatch.setattr(
-            output_analysis.stats,
-            "mannwhitneyu",
+            "scipy.stats.mannwhitneyu",
             lambda *a, **k: (float("nan"), float("nan")),
         )
         analyzer = _analyzer()

@@ -90,6 +90,17 @@ def _bootstrap_ci(xs: List[float]) -> Optional[List[float]]:
         return None
 
 
+def _measured_float(value: Optional[float]) -> float:
+    """``float(value)`` for a value :func:`is_measured` has ALREADY accepted.
+
+    Never a substitute: it does not turn a None into a number, it only states
+    for the type checker what the caller's ``is_measured`` filter guaranteed.
+    ``is_measured(None)`` is False, so the assert cannot fire on that path.
+    """
+    assert value is not None
+    return float(value)
+
+
 def aggregate_validity(results: List[GroundednessResult]) -> Dict[str, Any]:
     """Summarise a batch of GroundednessResult into VG-* aggregates (fail-closed)."""
     n = len(results)
@@ -128,9 +139,11 @@ def aggregate_validity(results: List[GroundednessResult]) -> Dict[str, Any]:
             "note": "No measured validity results; nothing feeds the grade (fail-closed).",
         }
 
-    grounded = [float(r.value) for r in measured]
-    faith = [float(r.faithfulness) for r in measured if is_measured(r.faithfulness)]
-    ctx_prec = [float(r.context_precision) for r in measured if is_measured(r.context_precision)]
+    grounded = [_measured_float(r.value) for r in measured]
+    faith = [_measured_float(r.faithfulness) for r in measured if is_measured(r.faithfulness)]
+    ctx_prec = [
+        _measured_float(r.context_precision) for r in measured if is_measured(r.context_precision)
+    ]
     mean_grounded = _mean(grounded)
 
     # VG-005 = "Share of answers with unsupported or fabricated content" (the frozen
@@ -143,7 +156,9 @@ def aggregate_validity(results: List[GroundednessResult]) -> Dict[str, Any]:
     # it carries any unsupported span.
     # Every record in `measured` now carries a real finite value, so the `< 1.0`
     # comparison cannot be silently False for a value nobody measured.
-    n_hallucinated = sum(1 for r in measured if float(r.value) < 1.0 or r.unsupported_spans)
+    n_hallucinated = sum(
+        1 for r in measured if _measured_float(r.value) < 1.0 or r.unsupported_spans
+    )
     hallucination_share = n_hallucinated / len(measured)
 
     # READINESS-6, 2026-09-10. COVERAGE, stated rather than left to be derived.

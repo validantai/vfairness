@@ -108,7 +108,16 @@ jobs:
           # therefore been effectively untested in CI, and the only reason it
           # became visible is that a newer test imports the dashboard module
           # directly, which raises instead of skipping.
-          pip install -e '.[dev,rendering,viz,dashboard,monitoring,causal,xai,training,parity,cicd]'
+          #
+          # `mcp` added 2026-10-02, so the suite measures the package that was
+          # published. Without it vfairness.mcp.server cannot be imported and the
+          # surface walk sees 1,568 code units, not the 1,580 the ledger was
+          # measured on: run 36929555087 failed the ledger, register, readiness
+          # and doc-block tests on that difference alone. The monorepo's
+          # vfairness-tests.yml already installs it, which is why the same commit
+          # was green there. The checks now say COULD NOT CHECK, naming the extra,
+          # when it is missing, instead of reporting a smaller count as stale.
+          pip install -e '.[dev,rendering,viz,dashboard,monitoring,causal,xai,training,parity,cicd,mcp]'
 
       - name: Install gitleaks (pinned + checksum-verified)
         # Two tests in this suite prove the secret-scan gate by RUNNING it, and

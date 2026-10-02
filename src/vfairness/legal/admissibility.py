@@ -151,6 +151,9 @@ def map_domain_to_use_case(domain: Optional[str]) -> str:
     """
     if _absent_free_text(domain):
         return "generic"
+    # _absent_free_text returns False only for a non-blank str, so domain is a
+    # str here. The assert states that for the type checker; it cannot fire.
+    assert isinstance(domain, str)
     norm = _normalise(domain)
     for entry in _load_use_cases()["use_cases"]:
         for kw in entry.get("domain_keywords", []):
@@ -168,6 +171,9 @@ def map_jurisdiction(jurisdiction: Optional[str]) -> Optional[str]:
     """
     if _absent_free_text(jurisdiction):
         return None
+    # _absent_free_text returns False only for a non-blank str, so jurisdiction
+    # is a str here. The assert states that for the type checker; it cannot fire.
+    assert isinstance(jurisdiction, str)
     norm = _normalise(jurisdiction)
     keywords: Dict[str, List[str]] = _load_use_cases().get("jurisdiction_keywords", {})
     # Prefer longer, more specific keywords first (e.g. "us-ca" before "us").

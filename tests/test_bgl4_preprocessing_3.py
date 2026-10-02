@@ -23,12 +23,22 @@ from __future__ import annotations
 
 import warnings
 
-import matplotlib
 import numpy as np
 import pandas as pd
 import pytest
 
-matplotlib.use("Agg")
+# matplotlib is the optional [viz] extra, so the module must still import
+# without it (the lowest-versions CI job installs no extras). Only the tests
+# that draw are marked needs_matplotlib and skip; the rest still run.
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    matplotlib = None
+else:
+    matplotlib.use("Agg")  # no display in CI; must precede pyplot
+needs_matplotlib = pytest.mark.skipif(
+    matplotlib is None, reason="needs the optional [viz] extra (matplotlib)"
+)
 
 from vfairness.preprocessing.bias_detection.historical import (  # noqa: E402
     attribute_historical_pattern,
@@ -294,6 +304,7 @@ class TestDashboardPublishesTheGraderFallThroughBandAsAMeasuredRisk:
     now keeps such a pair out of both and names it under NOT GRADED.
     """
 
+    @needs_matplotlib
     def test_an_unmeasured_pair_is_drawn_as_a_negligible_risk_beside_the_not_measured_line(self):
         """Measured on 300 rows: 'income' determines 'gender', 'age' is constant
         so its association with 'gender' cannot be computed.
