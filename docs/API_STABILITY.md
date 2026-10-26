@@ -230,7 +230,7 @@ The versioning rules above allow the numeric output of a frozen metric to change
 only to fix a demonstrable correctness bug, and require that change to be called
 out. The changes below are the ones a consumer pinned to an earlier revision will
 notice, all of them recorded in the [CHANGELOG](../CHANGELOG.md) under
-`[0.1.0] - UNRELEASED`. None of them removes, renames or repurposes a frozen
+`[0.1.0] - 2026-10-02`, the first public beta. None of them removes, renames or repurposes a frozen
 symbol, so no deprecation cycle is owed; each of them changes a value that was
 previously fabricated.
 
@@ -285,6 +285,16 @@ that a fix which merely suppresses every verdict fails the suite. Checked on
 each accepts: 39 rendered the NOT CHECKED panel, 5 raised, none produced a
 verdict. Treat that as a property the library intends to keep rather than a
 frozen signature; the symbols themselves remain uncovered by the guarantee above.
+
+The deployment gate in `vfairness.operations.cicd` is in the same position. Its
+classes are not on the frozen list, but three meanings are treated as properties
+the library intends to keep, and changing any of them is recorded in the
+CHANGELOG as a behaviour change: `approved` on a gate decision means nothing
+blocked on the levels that ran; `CONDITIONAL` means approved with something that
+could not be checked; and under a `CoveragePolicy`, only `PolicyDecision.permitted`
+means the model may be deployed under that policy (added after 0.1.0, vfairness
+issue #1). A new field on a decision is added with a default and appears in its
+`to_dict()`; a field is not removed or renamed without the deprecation steps below.
 
 ## Deprecation policy
 

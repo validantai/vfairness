@@ -858,7 +858,7 @@ def compute_feature_correlations(
         ... )
         >>> print(matrix.correlations)
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1445,7 +1445,7 @@ def find_proxy_chains(
         >>> if not result.complete:
         ...     print(result.pairs_not_computed)
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

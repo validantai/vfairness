@@ -596,6 +596,8 @@
             '<a href="' + issue + '" target="_blank" rel="noopener">Report a problem with this page</a></div>';
         foot.innerHTML = html;
         main.appendChild(foot);
+        // The API Reference folds its package pager into this one pager.
+        document.dispatchEvent(new CustomEvent('vf:pagefoot'));
         fetch(root + 'data/page-dates.json', { cache: 'no-cache' })
             .then(function (r) { return r.ok ? r.json() : null; })
             .then(function (d) {
@@ -746,12 +748,21 @@
         }).join('') + '<a href="?pkg=all" data-k="all" class="pkg-switch__all">All on one page</a>';
         var anchor = keep[keep.length - 1] || h1;
         anchor.parentNode.insertBefore(nav, anchor.nextSibling);
-        // 3. Next / previous package at the end of each package.
-        var pager = document.createElement('nav');
-        pager.className = 'page-pager pkg-pager';
-        pager.setAttribute('aria-label', 'Previous and next package');
-        var foot = box.querySelector('.page-foot');
-        box.insertBefore(pager, foot || null);
+        // 3. Next / previous package: written INTO the page-foot pager, so the
+        // page has one pager, never two (Daniel, 2026-10-02). Inside the
+        // packages it steps package by package; at either end it falls back
+        // to the previous / next page of the site's reading order.
+        var pageLinks = null;
+        function syncFootPager() {
+            var fp = document.querySelector('.page-foot .page-pager');
+            if (!fp || !visible) return;
+            if (!pageLinks) pageLinks = { prev: fp.children[0] ? fp.children[0].outerHTML : '<span></span>', next: fp.children[1] ? fp.children[1].outerHTML : '<span></span>' };
+            var i = API_PACKAGES.map(function (p) { return p.k; }).indexOf(visible);
+            var prev = i > 0 ? API_PACKAGES[i - 1] : null, next = i >= 0 && i < API_PACKAGES.length - 1 ? API_PACKAGES[i + 1] : null;
+            fp.innerHTML = (prev ? '<a class="page-pager__prev" href="?pkg=' + prev.k + '"><span><i aria-hidden="true">\u2190</i>Previous package</span><strong>' + (prev.n ? prev.n + '. ' : '') + prev.t + '</strong></a>' : pageLinks.prev) +
+                (next ? '<a class="page-pager__next" href="?pkg=' + next.k + '"><span>Next package<i aria-hidden="true">\u2192</i></span><strong>' + (next.n ? next.n + '. ' : '') + next.t + '</strong></a>' : pageLinks.next);
+        }
+        document.addEventListener('vf:pagefoot', syncFootPager);
 
         var visible = null;
         function show(k, opts) {
@@ -766,11 +777,7 @@
                 if (k === 'all' || k === 'overview') el.removeAttribute('hidden'); else el.setAttribute('hidden', 'until-found');
             });
             nav.querySelectorAll('a').forEach(function (a) { a.classList.toggle('is-active', a.getAttribute('data-k') === k); a.setAttribute('aria-current', a.getAttribute('data-k') === k ? 'page' : 'false'); });
-            var i = API_PACKAGES.map(function (p) { return p.k; }).indexOf(k);
-            var prev = i > 0 ? API_PACKAGES[i - 1] : null, next = i >= 0 && i < API_PACKAGES.length - 1 ? API_PACKAGES[i + 1] : null;
-            pager.hidden = k === 'all';
-            pager.innerHTML = (prev ? '<a class="page-pager__prev" href="?pkg=' + prev.k + '"><span><i aria-hidden="true">\u2190</i>Previous package</span><strong>' + (prev.n ? prev.n + '. ' : '') + prev.t + '</strong></a>' : '<span></span>') +
-                (next ? '<a class="page-pager__next" href="?pkg=' + next.k + '"><span>Next package<i aria-hidden="true">\u2192</i></span><strong>' + (next.n ? next.n + '. ' : '') + next.t + '</strong></a>' : '<span></span>');
+            syncFootPager();
             if (typeof mermaid !== 'undefined') {
                 var todo = Array.prototype.filter.call(document.querySelectorAll('.mermaid:not([data-processed])'), function (n) { return !n.closest('[hidden]'); });
                 if (todo.length) mermaid.run({ nodes: todo }).catch(function () {});
@@ -804,8 +811,8 @@
             var a = e.target.closest('a[data-k]'); if (!a) return;
             e.preventDefault(); show(a.getAttribute('data-k'), { push: true, top: true });
         });
-        pager.addEventListener('click', function (e) {
-            var a = e.target.closest('a'); if (!a) return;
+        document.addEventListener('click', function (e) {
+            var a = e.target.closest('.page-foot .page-pager a[href^="?pkg="]'); if (!a) return;
             e.preventDefault(); show(new URLSearchParams(a.getAttribute('href').slice(1)).get('pkg'), { push: true, top: true });
         });
         // In-page links (sidebar, overview cards, search results on this page).
@@ -1158,7 +1165,8 @@
 
             // Changelog
             { title: 'Changelog', path: 'concepts/changelog.html', section: 'Resources', type: 'page', icon: 'history', keywords: ['changelog', 'version', 'history', 'update', 'release', 'changes', 'new', 'whats new'], description: 'Version history and release notes' },
-            { title: 'Version 0.1.0', path: 'concepts/changelog.html#v0.1.0', section: 'Changelog', type: 'version', icon: 'tag', keywords: ['0.1.0', 'beta', 'latest', 'new', 'current', 'recent'], description: 'Current beta release features' },
+            { title: 'Version 0.2.0', path: 'concepts/changelog.html#v0.2.0', section: 'Changelog', type: 'version', icon: 'tag', keywords: ['0.2.0', 'beta', 'latest', 'new', 'current', 'recent', 'coverage policy', 'deployment policy'], description: 'Current beta release: deployment policies, coded group names in trackers' },
+            { title: 'Version 0.1.0', path: 'concepts/changelog.html#v0.1.0', section: 'Changelog', type: 'version', icon: 'tag', keywords: ['0.1.0', 'beta', 'first beta', 'previous'], description: 'First public beta' },
             { title: 'Version 0.0.9', path: 'concepts/changelog.html#v0.0.9', section: 'Changelog', type: 'version', icon: 'tag', keywords: ['0.0.9', 'previous', 'older'], description: 'Previous release features' },
 
             // Legal
@@ -1936,7 +1944,7 @@
             var sum = document.createElement('summary');
             var toggle = document.createElement('span');
             toggle.className = 'version-toggle';
-            toggle.innerHTML = '<span>' + (det.open ? 'Hide details' : 'Show details') + '</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
+            toggle.innerHTML = '<span>' + (det.open ? 'Hide' : 'Show') + '</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
             header.appendChild(toggle);
             var body = document.createElement('div');
             body.className = 'version-body';
@@ -1965,7 +1973,7 @@
             details.addEventListener('toggle', function() {
                 var toggleText = details.querySelector('.version-toggle span');
                 if (toggleText) {
-                    toggleText.textContent = details.open ? 'Hide details' : 'Show details';
+                    toggleText.textContent = details.open ? 'Hide' : 'Show';
                 }
             });
         });
@@ -2050,7 +2058,7 @@
 
     function checkVersion() {
         const currentVersion = document.querySelector('meta[name="version"]')?.content;
-        const latestVersion = '0.1.0'; // Would fetch from API in production
+        const latestVersion = '0.2.0'; // Would fetch from API in production
 
         if (currentVersion && currentVersion !== latestVersion) {
             const banner = document.createElement('div');

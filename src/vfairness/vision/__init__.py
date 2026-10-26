@@ -50,7 +50,7 @@ def skew(labels: Sequence[str], reference: Optional[Dict[str, float]] = None) ->
     observed groups). Returns per-group skew and the max/min: the standard
     fairness-in-retrieval / generated-set diversity measure.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -236,7 +236,7 @@ def ndkl(rankings: Sequence[Sequence[str]], reference: Optional[Dict[str, float]
     rest. ``nan`` (also an :class:`NDKLValue`) is returned when nothing was
     measurable.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -368,7 +368,7 @@ def bias_amplification(generated: Sequence[str], reference: Dict[str, float]) ->
     a raw proportion difference, NOT a difference of log-skew values as
     computed by :func:`skew`.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -514,7 +514,7 @@ def representation_severity(
     ``min_skew`` explicitly. A bare ``max_skew`` float is still accepted and
     thresholds on its magnitude only, for backward compatibility.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY

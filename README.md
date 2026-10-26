@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/status-0.1.0%20beta-006686.svg" alt="Status: 0.1.0 beta">
+  <img src="https://img.shields.io/badge/status-0.2.0%20beta-006686.svg" alt="Status: 0.2.0 beta">
   <img src="https://img.shields.io/badge/python-3.11%2B-blue.svg" alt="Requires Python 3.11 or newer">
   <a href="https://github.com/validantai/vfairness/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a>
   <a href="https://vfairness.validant.ai"><img src="https://img.shields.io/badge/docs-vfairness.validant.ai-006686.svg" alt="Documentation"></a>
@@ -34,13 +34,15 @@ the same honest way, never as a silent pass.
 
 > **Documentation, guides, and a live example gallery: [vfairness.validant.ai](https://vfairness.validant.ai)**
 
-> ### First beta
+> ### Beta
 >
-> `0.1.0` is the first public beta, released 2026-10-02 and installable with
-> `pip install vfairness`. It is a `0.x` release: the frozen public surface is
-> stable and changes only through a deprecation cycle, while experimental
-> surface may still move before `1.0.0`. See
-> [Beta and API stability](#beta-and-api-stability).
+> `0.2.0` is the second public beta, released 2026-10-26 and installable with
+> `pip install vfairness`. New in 0.2.0: deployment policies that hold a model
+> to the coverage a deployment requires. It is a `0.x` release: the frozen
+> public surface is stable and changes only through a deprecation cycle, while
+> experimental surface may still move before `1.0.0`. See
+> [Beta and API stability](#beta-and-api-stability) and the
+> [release history](https://vfairness.validant.ai/concepts/changelog.html).
 
 ## Why vfairness
 
@@ -259,8 +261,8 @@ explanation, and the assurance handled for you.
 ## Beta and API stability
 
 vfairness follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-`0.1.0` is the first beta, published to PyPI on 2026-10-02 from the `v0.1.0`
-tag on `validantai/vfairness`. The API is
+`0.2.0` is the second beta, published to PyPI on 2026-10-26 from the `v0.2.0`
+tag on `validantai/vfairness`; the first, `0.1.0`, was published on 2026-10-02. The API is
 not frozen until `1.0.0`, so a `0.x` minor release may still change experimental
 surface. The frozen public surface
 (`FairnessAnalyzer`, `MetricResult`, and the core classification, regression, and

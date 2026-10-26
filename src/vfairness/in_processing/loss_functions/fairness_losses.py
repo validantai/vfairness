@@ -373,7 +373,7 @@ class FairnessAwareBCELoss(_CoverageTrackingLoss):
     References:
         - Zafar et al. (2017): Fairness Constraints
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -798,7 +798,7 @@ class DemographicParityLoss(_CoverageTrackingLoss):
         - Dwork et al. (2012): Fairness through Awareness
         - Zafar et al. (2017): Fairness Constraints
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -905,7 +905,7 @@ class EqualizedOddsLoss(_CoverageTrackingLoss):
     References:
         - Hardt et al. (2016): Equality of Opportunity in Supervised Learning
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -1091,7 +1091,7 @@ class EqualOpportunityLoss(_CoverageTrackingLoss):
     References:
         - Hardt et al. (2016): Equality of Opportunity in Supervised Learning
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -1210,7 +1210,7 @@ class FalsePositiveRateParityLoss(_CoverageTrackingLoss):
     References:
         - Chouldechova (2017): Fair Prediction with Disparate Impact
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -1327,7 +1327,7 @@ class BoundedGroupLoss(_CoverageTrackingLoss):
         - Hashimoto et al. (2018): Fairness Without Demographics
         - Mohri et al. (2019): Agnostic Federated Learning
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1451,7 +1451,7 @@ def create_fairness_loss(
         ...     lambda_fairness=0.1
         ... )
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

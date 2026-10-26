@@ -192,7 +192,7 @@ def demographic_parity_difference(
         >>> dp = demographic_parity_difference(y_true, y_pred, gender)
         >>> print(f"DP Difference: {dp:.3f}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -275,7 +275,7 @@ def demographic_parity_ratio(
         >>> if ratio < 0.8:
         ...     print("Potential disparate impact detected")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -380,7 +380,7 @@ def equal_opportunity_difference(
         >>> eo = equal_opportunity_difference(y_true, y_pred, race)
         >>> print(f"Equal Opportunity Difference: {eo:.3f}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -473,7 +473,7 @@ def equalized_odds_difference(
         >>> eod = equalized_odds_difference(y_true, y_pred, gender)
         >>> print(f"Equalized Odds Difference: {eod:.3f}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -597,7 +597,7 @@ def predictive_parity_difference(
         >>> pp = predictive_parity_difference(y_true, y_pred, race)
         >>> print(f"Predictive Parity Difference: {pp:.3f}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -864,7 +864,7 @@ def fpr_parity_difference(
         Maximum absolute difference in FPR across groups; NaN (insufficient evidence) when
         fewer than two groups have a DEFINED FPR.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -946,7 +946,7 @@ def fnr_parity_difference(
         the same rule ``equal_opportunity_difference`` applies, and since FNR = 1 - TPR
         the two must be assessable under exactly the same conditions.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1025,7 +1025,7 @@ def accuracy_parity_difference(
         Maximum absolute difference in accuracy across groups; NaN (insufficient evidence)
         when fewer than two groups have a defined accuracy.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1088,7 +1088,7 @@ def worst_group_accuracy(
         group was excluded by the size gate (the excluded group could be the
         worst, so the worst-group statistic is not assessable).
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1176,7 +1176,7 @@ def disparate_impact_ratio(
         to test for adverse impact, and a 1.0 would clear the four-fifths floor - and
         the sealed ``lower_bound >= 0.80`` gate with it - on an undefined quotient.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1220,7 +1220,7 @@ def negative_predictive_value_difference(
         dropped and the survivors' spread reported in its place: that spread is a LOWER
         bound, not a measurement. Same rule as ``equal_opportunity_difference``.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1358,7 +1358,7 @@ def conditional_demographic_disparity(
     alter already-sealed verdicts. Full record: ``docs/DIVERGENCES.md`` in the project
     repository, section "Conditional demographic disparity (CDD)".
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1488,7 +1488,7 @@ def auroc_parity(
         is uninformative for a group, and a spread computed over the survivors is a LOWER
         bound on the real gap, not a measurement of it.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1571,7 +1571,7 @@ def net_benefit_parity(
         Max |net_benefit_g - net_benefit_h| across groups; NaN (insufficient evidence) when
         fewer than two groups have a defined net benefit.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1675,7 +1675,7 @@ def conditional_adverse_impact(
     joint-fit fair-lending regression estimand (Ross & Yinger 2002), the binary-outcome
     counterpart of ``pricing_disparity``.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1831,7 +1831,7 @@ def demographic_parity_difference_with_ci(
         ...       f"95% CI [{result.lower_bound:.3f}, {result.upper_bound:.3f}]")
         >>> print(f"Interval type: {result.interval_type.value}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1891,7 +1891,7 @@ def predictive_parity_difference_with_ci(
     Returns:
         StatisticalResult with point estimate and confidence/credible interval.
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -1950,7 +1950,7 @@ def equalized_odds_difference_with_ci(
     Returns:
         StatisticalResult with point estimate and interval
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -2009,7 +2009,7 @@ def equal_opportunity_difference_with_ci(
     Returns:
         StatisticalResult with point estimate and interval
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -2078,7 +2078,7 @@ def compute_effect_sizes(
         ...     print(f"{pair}: Cohen's d = {e['cohens_d_positive_rate']:.3f}")
         ...     print(f"  Risk Ratio = {e['risk_ratio'][0]:.2f}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -2827,7 +2827,7 @@ def disparate_impact_ratio_with_ci(
     seal gates on the CI LOWER bound (``lower_bound >= 0.80``, one-sided equivalence), so a noisy
     point estimate below 0.80 does not fail a model whose interval clears the floor.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -2885,7 +2885,7 @@ def fpr_parity_difference_with_ci(
     EU-hiring / healthcare seal gates on the whole CI being within [-margin, +margin] (TOST
     equivalence), completing the sealed equalized-odds criterion on affirmative evidence.
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -2929,7 +2929,7 @@ def negative_predictive_value_difference_with_ci(
     """Confidence interval for the negative-predictive-value parity gap (a criminal-justice
     sufficiency diagnostic), via the shared stratified-bootstrap / Bayesian router.
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -2998,7 +2998,7 @@ def conditional_demographic_disparity_with_ci(
     margin for this metric, or pass ``method='percentile'`` explicitly to reproduce a sealed
     cell issued before this date.
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

@@ -397,7 +397,9 @@ def test_mlflow_logger_names_the_interval_it_could_not_log(fake_mlflow):
     the two other series both trackers write kept the whole of the defect the
     metric series had just been fixed for.
     """
-    logged = log_fairness_to_mlflow(_report_whose_interval_failed(), log_artifacts=False)
+    logged = log_fairness_to_mlflow(
+        _report_whose_interval_failed(), log_artifacts=False, group_labels="names"
+    )
     params = fake_mlflow.params
 
     # The write is unchanged: an unmeasurable series is still logged as nothing.
@@ -423,7 +425,9 @@ def test_wandb_logger_names_the_interval_it_could_not_log(fake_wandb):
     n_group_stats_not_measured 0 and nothing else, while
     fairness/demographic_parity_difference/ci_lower and /ci_upper were absent.
     """
-    logged = log_fairness_to_wandb(_report_whose_interval_failed(), log_artifacts=False)
+    logged = log_fairness_to_wandb(
+        _report_whose_interval_failed(), log_artifacts=False, group_labels="names"
+    )
     summary = fake_wandb.run.summary
 
     assert "fairness/demographic_parity_difference/ci_lower" not in fake_wandb.logged
@@ -445,7 +449,7 @@ def test_logger_interval_disclosure_reads_zero_when_everything_was_measured(
     """
     report = _measured_report()
     if backend == "mlflow":
-        log_fairness_to_mlflow(report, log_artifacts=False)
+        log_fairness_to_mlflow(report, log_artifacts=False, group_labels="names")
         params = fake_mlflow.params
         assert params["fairness.n_intervals_not_measured"] == 0
         assert params["fairness.intervals_not_measured"] == "[]"
@@ -455,7 +459,7 @@ def test_logger_interval_disclosure_reads_zero_when_everything_was_measured(
         assert fake_mlflow.metrics["fairness.demographic_parity_difference.ci_upper"] == 0.53
         assert fake_mlflow.metrics["fairness.effect_size.F_vs_M.cohens_d"] == -0.81
     else:
-        log_fairness_to_wandb(report, log_artifacts=False)
+        log_fairness_to_wandb(report, log_artifacts=False, group_labels="names")
         summary = fake_wandb.run.summary
         assert summary["fairness/n_intervals_not_measured"] == 0
         assert summary["fairness/intervals_not_measured"] == "[]"
@@ -482,7 +486,7 @@ def test_a_numpy_typed_measurement_is_logged_and_not_called_unmeasured(fake_mlfl
     report["metrics_with_ci"] = {}
     report["effect_sizes"] = {}
 
-    log_fairness_to_mlflow(report, log_artifacts=False)
+    log_fairness_to_mlflow(report, log_artifacts=False, group_labels="names")
 
     assert fake_mlflow.metrics["fairness.demographic_parity_difference"] == pytest.approx(0.42)
     assert fake_mlflow.metrics["fairness.group.M.size"] == 150.0

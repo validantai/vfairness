@@ -482,7 +482,7 @@ def bootstrap_ci(
     Raises:
         ConfigurationError: If confidence_level is not strictly inside (0, 1).
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1034,7 +1034,7 @@ def bayesian_proportion_ci(
     Raises:
         ConfigurationError: If confidence_level is not strictly inside (0, 1).
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1341,6 +1341,137 @@ def wilson_score_interval(
     )
 
 
+def _wilson_limits(successes: int, trials: int, z: float) -> Tuple[float, float]:
+    """Wilson (1927) score limits for one proportion at a given normal quantile.
+
+    The limits are pinned to exactly 0 at zero successes and exactly 1 at
+    ``trials`` successes, where the closed form equals them analytically but
+    floating point can land a hair either side.
+    """
+    p_hat = successes / trials
+    z2 = z * z
+    denom = 1.0 + z2 / trials
+    center = (p_hat + z2 / (2.0 * trials)) / denom
+    half = (z / denom) * math.sqrt(p_hat * (1.0 - p_hat) / trials + z2 / (4.0 * trials * trials))
+    lower = 0.0 if successes == 0 else max(0.0, center - half)
+    upper = 1.0 if successes == trials else min(1.0, center + half)
+    return lower, upper
+
+
+def _newcombe_bounds(
+    successes1: int, trials1: int, successes2: int, trials2: int, z: float
+) -> Tuple[float, float, float]:
+    """Newcombe hybrid score bounds on p1 - p2 at one normal quantile ``z``."""
+    p1 = successes1 / trials1
+    p2 = successes2 / trials2
+    l1, u1 = _wilson_limits(successes1, trials1, z)
+    l2, u2 = _wilson_limits(successes2, trials2, z)
+    diff = p1 - p2
+    lower = diff - math.sqrt((p1 - l1) ** 2 + (u2 - p2) ** 2)
+    upper = diff + math.sqrt((u1 - p1) ** 2 + (p2 - l2) ** 2)
+    return diff, lower, upper
+
+
+def _newcombe_hybrid_score_difference(
+    successes1: int,
+    trials1: int,
+    successes2: int,
+    trials2: int,
+    confidence_level: float = 0.95,
+) -> Tuple[float, float, float, float]:
+    """Interval for a difference of two independent proportions, and its p-value.
+
+    Returns ``(p1 - p2, lower, upper, p_value)``.
+
+    WHY THIS METHOD (Pulse gap interval, 2026-10-09). Pulse used to put a
+    percentile bootstrap on the reference-minus-worst selection-rate gap. A group
+    with no positives resamples nothing but zeros, so it contributes no variance
+    and the interval reflects only the OTHER group's sampling error. Measured on
+    the platform's recruitment sample: 0 of 22 Native American applicants
+    invited against 114 of 1,601 White gave a "95% interval" of 5.8 to 8.4
+    points, confirmed after FDR correction (adjusted p 0.009), while the Wilson
+    95% interval for 0 of 22 alone runs from 0% to 14.9%. The bootstrap had
+    certified a gap that 22 people cannot establish.
+
+    The Newcombe hybrid score interval (Newcombe 1998, method 10) combines the
+    two groups' Wilson score limits, so each group's own uncertainty enters the
+    interval, and it stays valid at zero counts and small n:
+
+        L = d - sqrt((p1 - l1)^2 + (u2 - p2)^2)
+        U = d + sqrt((u1 - p1)^2 + (p2 - l2)^2)
+
+    with ``d = p1 - p2`` and ``(l_i, u_i)`` the Wilson limits of group i.
+    Fagerland, Lydersen & Laake (2015) include it among their recommended
+    intervals for the difference between two independent proportions. At
+    healthy counts it agrees closely with the Wald and bootstrap intervals, so
+    well-populated groups barely move.
+
+    THE P-VALUE IS THE DUAL OF THE INTERVAL (test inversion, Casella & Berger
+    2002, section 9.2.1): the smallest two-sided level ``alpha`` at which the
+    ``1 - alpha`` Newcombe interval reaches zero. Wilson intervals nest as the
+    level rises, so the bound that faces zero moves monotonically and the
+    crossing is found by bisection on the normal quantile. By construction
+    ``p_value < 1 - confidence_level`` exactly when this interval excludes zero,
+    so a confirmation decided on the p-value (and on its Benjamini-Hochberg
+    adjustment, which can only raise it) never contradicts the printed interval.
+
+    References:
+        Wilson EB (1927). Probable inference, the law of succession, and
+        statistical inference. JASA 22(158):209-212.
+        Newcombe RG (1998). Interval estimation for the difference between
+        independent proportions: comparison of eleven methods. Statistics in
+        Medicine 17(8):873-890.
+        Fagerland MW, Lydersen S, Laake P (2015). Recommended confidence
+        intervals for two independent binomial proportions. Statistical
+        Methods in Medical Research 24(2):224-254.
+        Casella G, Berger RL (2002). Statistical Inference, 2nd ed., 9.2.1.
+
+    Raises:
+        ConfigurationError: on an impossible count pair, an empty group, or a
+            confidence level outside (0, 1).
+    """
+    from statistics import NormalDist
+
+    confidence_level = validate_confidence_level(confidence_level)
+    counts = (int(successes1), int(trials1), int(successes2), int(trials2))
+    x1, n1, x2, n2 = counts
+    if n1 <= 0 or n2 <= 0 or not (0 <= x1 <= n1) or not (0 <= x2 <= n2):
+        raise ConfigurationError(
+            f"_newcombe_hybrid_score_difference: ({x1}/{n1}, {x2}/{n2}) is not a valid "
+            "pair of counts (need 0 <= successes <= trials and trials >= 1 in each group)"
+        )
+    z_level = NormalDist().inv_cdf(1.0 - (1.0 - confidence_level) / 2.0)
+    diff, lower, upper = _newcombe_bounds(x1, n1, x2, n2, z_level)
+
+    if diff == 0.0:
+        return diff, lower, upper, 1.0
+
+    def _facing_zero(z: float) -> float:
+        # The bound on the side of zero, signed so it starts at |d| > 0 at z = 0
+        # and falls monotonically as z grows.
+        _, lo_z, hi_z = _newcombe_bounds(x1, n1, x2, n2, z)
+        return lo_z if diff > 0 else -hi_z
+
+    z_lo, z_hi = 0.0, 1.0
+    while _facing_zero(z_hi) > 0.0:
+        z_hi *= 2.0
+        if z_hi > 1.0e6:
+            # The bound never reaches zero at any representable level: the
+            # p-value is below the smallest positive double.
+            return diff, lower, upper, 0.0
+    for _ in range(200):
+        z_mid = 0.5 * (z_lo + z_hi)
+        if _facing_zero(z_mid) > 0.0:
+            z_lo = z_mid
+        else:
+            z_hi = z_mid
+        if z_hi - z_lo <= 1e-12 * max(1.0, z_hi):
+            break
+    z_star = 0.5 * (z_lo + z_hi)
+    p_value = float(min(1.0, math.erfc(z_star / math.sqrt(2.0))))
+    return diff, lower, upper, p_value
+
+
 def bayesian_mean_ci(
     data: np.ndarray,
     confidence_level: float = 0.95,
@@ -1534,7 +1665,7 @@ def bonferroni_correction(p_values: np.ndarray, alpha: float = 0.05) -> Multiple
         Adjusted p-value = min(p * n, 1) where n is number of tests
         Very conservative - may have low power with many tests
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1594,7 +1725,7 @@ def benjamini_hochberg_correction(
     Reference:
         Benjamini & Hochberg (1995). "Controlling the False Discovery Rate"
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY

@@ -224,7 +224,10 @@ class TestMeasuredZeroExposureIsNotADenominatorOfOne:
 # C-2: an interval nobody computed is named, never rounded to "95% CI 0-0 pts"
 # ---------------------------------------------------------------------------
 
-_FABRICATED_CI = "95% CI 0-0 pts"
+# The fabricated interval in the wording the finding uses since 2026-10-09
+# ("to", not a hyphen, so a negative lower bound reads clearly). The historical
+# output quoted above printed the same claim as "95% CI 0-0 pts".
+_FABRICATED_CI = "95% CI 0 to 0 pts"
 _NO_CI = "no 95% confidence interval was computed"
 
 _ROW = {
@@ -290,10 +293,10 @@ class TestAnUncomputedConfidenceIntervalIsNeverPrintedAsMeasured:
         assert "23 pts less" in without["evidence"]
 
     def test_a_real_interval_still_prints_its_real_numbers(self):
-        """OVER-CORRECTION CONTROL. 0.14 to 0.31 must read as 14-31 pts."""
+        """OVER-CORRECTION CONTROL. 0.14 to 0.31 must read as 14 to 31 pts."""
         finding = _disparate_impact(ciLow=0.14, ciHigh=0.31)
 
-        assert "95% CI 14-31 pts" in finding["evidence"]
+        assert "95% CI 14 to 31 pts" in finding["evidence"]
         assert _NO_CI not in finding["evidence"]
 
     def test_a_measured_lower_bound_of_zero_is_still_a_number(self):
@@ -303,7 +306,7 @@ class TestAnUncomputedConfidenceIntervalIsNeverPrintedAsMeasured:
         withhold it."""
         finding = _disparate_impact(ciLow=0.0, ciHigh=0.18, significant=False)
 
-        assert "95% CI 0-18 pts" in finding["evidence"]
+        assert "95% CI 0 to 18 pts" in finding["evidence"]
         assert _NO_CI not in finding["evidence"]
 
     def test_a_measured_zero_width_interval_is_still_printed(self):

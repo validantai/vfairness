@@ -462,7 +462,7 @@ def test_wandb_logger_names_the_metrics_and_group_stats_it_could_not_measure(fak
     on the run said nothing had been left out.
     """
     report = _mixed_report()
-    logged = log_fairness_to_wandb(report, log_artifacts=False)
+    logged = log_fairness_to_wandb(report, log_artifacts=False, group_labels="names")
 
     summary = fake_wandb.run.summary
     assert summary["fairness/n_metrics_not_measured"] == 3
@@ -480,7 +480,7 @@ def test_wandb_logger_names_the_metrics_and_group_stats_it_could_not_measure(fak
 def test_mlflow_logger_names_the_metrics_and_group_stats_it_could_not_measure(fake_mlflow):
     """The MLflow path had the identical gap and gets the identical disclosure."""
     report = _mixed_report()
-    logged = log_fairness_to_mlflow(report, log_artifacts=False)
+    logged = log_fairness_to_mlflow(report, log_artifacts=False, group_labels="names")
 
     params = fake_mlflow.params
     assert params["fairness.n_metrics_not_measured"] == 3
@@ -502,13 +502,13 @@ def test_logger_disclosure_is_empty_when_everything_was_measured(backend, fake_m
     """
     report = _measurable_report()
     if backend == "mlflow":
-        log_fairness_to_mlflow(report, log_artifacts=False)
+        log_fairness_to_mlflow(report, log_artifacts=False, group_labels="names")
         assert fake_mlflow.params["fairness.n_metrics_not_measured"] == 0
         assert fake_mlflow.params["fairness.metrics_not_measured"] == "[]"
         assert fake_mlflow.params["fairness.n_group_stats_not_measured"] == 0
         assert "fairness.group.F.tpr" in fake_mlflow.metrics
     else:
-        log_fairness_to_wandb(report, log_artifacts=False)
+        log_fairness_to_wandb(report, log_artifacts=False, group_labels="names")
         assert fake_wandb.run.summary["fairness/n_metrics_not_measured"] == 0
         assert fake_wandb.run.summary["fairness/group_stats_not_measured"] == "[]"
         assert "fairness/group/F/tpr" in fake_wandb.logged
@@ -527,7 +527,7 @@ def test_auto_log_fairness_carries_the_disclosure_through_the_decorator(fake_wan
     y_true = np.where(gender == "F", 0, rng.integers(0, 2, n))
     y_pred = np.where(gender == "M", rng.random(n) < 0.8, rng.random(n) < 0.3).astype(int)
 
-    @auto_log_fairness(backend="wandb")
+    @auto_log_fairness(backend="wandb", group_labels="names")
     def train():
         return y_pred, y_true, gender
 
@@ -553,7 +553,7 @@ def test_auto_log_fairness_warns_and_substitutes_nothing_for_a_missing_metric(fa
     """
     y_true, y_pred, gender = _fair_run(n=200)
 
-    @auto_log_fairness(backend="wandb", metrics=["disparate_impact"])
+    @auto_log_fairness(backend="wandb", metrics=["disparate_impact"], group_labels="names")
     def train():
         return y_pred, y_true, gender
 

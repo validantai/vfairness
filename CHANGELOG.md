@@ -7,6 +7,239 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 See [docs/API_STABILITY.md](docs/API_STABILITY.md) for the frozen public surface
 and the deprecation policy that governs what a version bump is allowed to change.
 
+## [0.2.0] - 2026-10-26
+
+The second public beta. **New:** deployment policies that hold a model to the
+coverage a deployment requires before it is permitted
+([vfairness issue #1](https://github.com/validantai/vfairness/issues/1)).
+**Changed default:** the MLflow and Weights & Biases writers code group names
+(set `VFAIRNESS_GROUP_LABEL_KEY` once, or pass `group_labels="names"` for the
+previous output). **Fixed:** pandas 3.1 deprecation warnings and five Pulse
+findings of 9 Oct. **Behaviour change:** a Pulse run on a text decision column
+needs its favourable value declared (`decision_labels.favourable_values`); it no
+longer guesses. Tagged `v0.2.0` on `validantai/vfairness` and published to PyPI from
+that tag by the Trusted Publisher pipeline; the date above is the publication
+date. A minor version under [docs/API_STABILITY.md](docs/API_STABILITY.md):
+new functionality, nothing on the frozen surface removed or repurposed.
+
+### Deployment policies: required coverage before approval (2026-10-24)
+
+[vfairness issue #1](https://github.com/validantai/vfairness/issues/1). The gate
+knew what it was configured to check, not what a deployment requires, so every way
+of configuring it to check less still approved. Measured on four cells of 100 rows,
+each attribute alone at a 0.5 selection rate and the cells at 0.8 / 0.2 / 0.2 /
+0.8, threshold 0.1: `check_intersections=False`, a threshold of 0.7, a relaxed or
+overridden intersection threshold, `blocking_metrics=[]` and an attribute not
+supplied all returned `approved=True`, and `min_group_size=1` approved five-person
+cells. Results without a policy are unchanged.
+
+#### Added
+
+- `CoveragePolicy`: an opt-in, versioned requirement (required attributes, named
+  intersections, metrics with the loosest acceptable bound, its own minimum group
+  size). A policy that could not be enforced as written raises
+  `ConfigurationError` when it is built.
+- `ModelFairnessGate.evaluate_against_policy()`, returning a `PolicyDecision`: the
+  unchanged hierarchical measurement plus one `CoverageItem` per required group set
+  and metric, each with a `CoverageState` (assessed, insufficient evidence, omitted
+  by configuration, input absent) and, separately, a `MeasuredOutcome`.
+  `permitted` is True only when every item is assessed and passes and the
+  measurement was not blocked. SHA-256 fingerprints of the policy and the effective
+  configuration (fingerprints, not signatures). No exception parameter: exceptions
+  belong to the integration that enforces the policy.
+- `assess_coverage()`, to hold a stored measurement to a policy.
+- `evaluated_scope` (`EvaluatedScope`, `ScopeLevel`, `ScopeGap`) on every
+  `GateDecision` and `IntersectionalGateDecision`, and in their `to_dict()`: the
+  levels that ran, the threshold each applied, and the group sets left out with
+  the setting that left them out.
+
+#### Changed
+
+- `create_github_check()` accepts a `PolicyDecision` and concludes `failure`
+  whenever its policy is not met.
+- `FairnessReportCard` accepts a `PolicyDecision` and leads with the policy result
+  instead of "Approved for deployment"; its `to_dict()` adds `policy_permitted`.
+
+The meaning of `approved` and `CONDITIONAL` is unchanged (see
+[docs/API_STABILITY.md](docs/API_STABILITY.md)).
+
+### Experiment trackers: group names are coded by default (2026-10-24)
+
+A tracker run is read by many people, and the names of protected groups
+("Female", "Over 60", a postcode) are sensitive in themselves. The MLflow and
+Weights & Biases writers now hide them by default. No team uses the MLflow writer
+yet, so the default changes now rather than behind a deprecation period; the
+writers are not on the frozen public surface (docs/API_STABILITY.md).
+
+#### Changed
+
+- **`log_fairness_to_mlflow`, `log_fairness_to_wandb` and `auto_log_fairness`
+  replace every group name they write with a keyed code** such as
+  `g_3fa91c07d2e4`: the first 12 hex characters of
+  HMAC-SHA256(key, `b"vfairness.group-label.v1\x00"` + the name in UTF-8). That
+  covers the per-group metric keys, the effect-size pairs, the `groups` and
+  excluded-levels params, the disclosure lists and the JSON report artifact. The
+  code is keyed on purpose: a plain hash of "Female" is found again by hashing a
+  short list of likely names. The same key gives the same code in every run, so
+  model versions stay comparable.
+- **New keyword arguments** on all three: `group_labels="coded"` (the default) or
+  `"names"`, and `label_key` (str or bytes). Without `label_key` the key is read
+  from the environment variable `VFAIRNESS_GROUP_LABEL_KEY`. With neither, the
+  writers raise `ValueError` before anything is written, with the one-line fix;
+  `auto_log_fairness` warns and writes nothing, not even its thresholds. An
+  unknown `group_labels` value raises `ValueError`, and two different names that
+  would share a code raise rather than merge.
+- **`group_labels="names"` writes exactly what the writers wrote before**, plus
+  one tag. Every run is tagged `<prefix>.group_labels` (`"coded"` or `"names"`).
+  A coded run is also tagged `<prefix>.group_label_key_id` (8 hex characters of
+  HMAC-SHA256(key, `b"vfairness.group-label.key-id.v1"`), which tells keys apart
+  without revealing them) and `<prefix>.n_left_out_by_group_coding` /
+  `<prefix>.left_out_by_group_coding`.
+- **The order of groups does not give the names away.** The library orders
+  groups by their real names, so a coded run lists them in code order and writes
+  each effect-size pair as `<lower code>_vs_<higher code>`. When the library
+  compared the pair the other way round, the pair's values are restated for that
+  direction (Cohen's d and h and the mean differences negated, risk and odds
+  ratios and their bounds inverted, the group1 and group2 fields swapped); the
+  tests compare the restated values with the library's own computation for the
+  reversed pair.
+- **The report artifact of a coded run is the coded copy**, built from the
+  report's structure, never by replacing every string equal to a name (a label
+  can be "0" or "yes"). The sentences that name groups (`assessment.summary`,
+  `explanations`) cannot be coded and are left out, and so is any part the coder
+  cannot read or check. Every part left out is named in the tag and in the
+  artifact's own `group_label_coding` note; the raw report is never uploaded.
+
+#### Added
+
+- `group_label_codes(labels, label_key=None)` rebuilds the name to code mapping
+  on your own machine; the mapping itself is never written to a tracker. It
+  lives in the pre-release module `vfairness._group_codes`: it has not been
+  through the library's grading yet, so it is outside the frozen public surface,
+  the capability ledger and the beta gate, and its import path may change.
+
+To keep the previous output, pass `group_labels="names"`. To code, set
+`VFAIRNESS_GROUP_LABEL_KEY` once (any secret, kept like a password) and keep using
+the same key.
+
+### Model Register fingerprints and evidence bundles (2026-10-24)
+
+A new pre-release module, `vfairness._register`, identifies a model version by its bytes
+where the model lives, so a team that keeps its models in its own MLflow can
+register an assessed version with the Validant Model Register without sending
+the model, the data or the results anywhere in clear.
+
+#### Added
+
+- `model_fingerprint(model)`: SHA-256 of a model file, or the manifest digest of
+  a model folder (sorted `path`, NUL, file SHA-256 lines, UTF-8 byte order); an
+  MLflow URI (`models:/<name>/<version>`, `models:/<name>@<alias>`, `runs:/...`)
+  is downloaded through your own MLflow client into a temporary folder first.
+  Symbolic links in a folder are refused.
+- `folder_fingerprint`, `file_fingerprint`, `dataset_fingerprint` and
+  `manifest_digest` for the same rule on folders, files, datasets and
+  precomputed file digests.
+- `build_evidence_bundle`, `write_evidence_bundle`, `read_evidence_bundle`: one
+  validated JSON document per assessed version (`validant.register.evidence.v1`)
+  holding the fingerprint, the dataset fingerprint, the system type, the
+  MLflow model URI, model id, run id and version, and the results you choose to
+  keep. Unknown MLflow keys and non-JSON values are refused.
+
+The module is private on purpose: it has not been through the library's grading yet, so it is outside the frozen public surface, the capability ledger and the beta gate, and its names may change. It becomes the public `vfairness.register` once its units are graded. The top-level `vfairness` namespace is unchanged.
+Reading an MLflow URI needs the `mlops` extra. Tests reproduce shared vectors
+computed with `hashlib` alone and, when MLflow is installed, register two model
+versions in a local SQLite store and check that they get two fingerprints and
+that one version read twice gets one.
+
+### pandas 3.1: no deprecation warning from the library (2026-10-23)
+
+pandas 3.1.0 (released 22 Oct 2026) deprecates the `inplace` keyword (PDEP-8),
+`Series.dt.dayofweek` and `pandas.api.types.is_categorical_dtype`. The library
+used each of them, so on healthy data it emitted a `Pandas4Warning`, and the eight
+tests that pin "a healthy series is analysed silently" failed on every Python
+version from the nightly run of 23 Oct. Results are unchanged.
+
+#### Fixed
+
+- `TemporalFairnessAnalyzer.update_daily_metrics` sorts and re-indexes by
+  reassignment instead of `inplace=True`.
+- `TemporalFairnessAnalyzer.detect_weekly_degradation` reads `dt.day_of_week`
+  instead of `dt.dayofweek`.
+- `IntersectionalTransformer.fit` and `.transform` drop their helper column by
+  reassignment; the frame is the method's own copy, so nothing a caller passed in
+  changes.
+- `detect_protected_attributes` tests for a categorical dtype with
+  `isinstance(dtype, pd.CategoricalDtype)`.
+
+Checked on Python 3.14 with pandas 3.1.0 and 3.0.1, and on
+Python 3.12 with pandas 2.2.1 (the oldest supported): 429 of 429 in the affected
+test files; the old code fails exactly the eight tests under pandas 3.1.0.
+
+### Pulse: a gap interval that holds at zero counts, and every Fail has a finding (2026-10-09)
+
+Found on the platform's recruitment sample (2,700 rows, hiring, EU).
+
+#### Fixed
+
+- **A group with nobody selected got a falsely narrow, "confirmed" gap interval.**
+  The reference-versus-worst selection-rate gap carried a percentile bootstrap. A
+  group with no positives resamples only zeros, so it added no variance: 0 of 22
+  Native American applicants invited against 114 of 1,601 White read "95% CI 5.8
+  to 8.4 points", confirmed after FDR correction (adjusted p 0.009), while the
+  permutation test across race_ethnicity read p 0.70. The gap now carries the
+  Newcombe hybrid score interval (Newcombe 1998, method 10), built from both
+  groups' Wilson limits and valid at zero counts and small n: that pair reads
+  -7.8 to 8.5 points, not confirmed. The p-value that enters the
+  Benjamini-Hochberg family is the interval's dual, so a confirmed gap always
+  prints an interval that excludes zero. Healthy counts barely move (300 of 1,000
+  against 200 of 1,000 sits within 0.001 of the Wald interval). Per-attribute
+  rows now name the method: `ciMethod` (`newcombe_hybrid_score`, or
+  `percentile_bootstrap` for continuous outputs), `ciLevel`, and
+  `ciNotComputedReason` when no interval was computed.
+- **An attribute graded Fail could have no finding behind it.**
+  `build_assurance_verdict` raised its disparate-impact finding only for a gap of
+  5 points or more outside US employment, so a confirmed exclusion at a low base
+  rate (age: 0 of 318 applicants aged 18 to 24 invited, four-fifths ratio 0.00,
+  graded Fail, gap 4.6 points) had no finding and no recommendation. A row graded
+  critical with statistical confirmation now always raises a critical DSP finding,
+  the severity its status already states. The finding prints its interval as
+  "95% CI a to b pts" so a negative lower bound reads clearly.
+- **The reported pair was confirmed as if it had been chosen in advance.** Found
+  while proving the first fix: with an honest interval the published clean
+  control (synthetic/clean.csv, nothing planted, US employment) read age as
+  confirmed and critical (9 of 56 against 45 of 118, pair p 0.0034, Fisher
+  0.0030, BH 0.034). The bootstrap had hidden this only through its 1/1000
+  resolution (p 0.006). The worst group is the most extreme of several
+  comparisons with the reference, so its p is now Bonferroni-corrected for that
+  choice (`pValueSelection`, `selectionComparisons`) before it may confirm the
+  pair or enter the Benjamini-Hochberg family. The clean control is quiet again;
+  on the synthetic pack every planted mechanism previously confirmed is still
+  confirmed and the three spurious confirmations (national origin twice, age
+  once) are gone; on the recruitment sample age stays confirmed.
+- **A text decision column was coded by guessing.** `run_pulse` took a fixed
+  list of "truthy" words as the favourable outcome (on "Invited"/"Rejected"
+  nobody was invited), `DataBiasValidator` took the alphabetically later value
+  (on "Invited"/"Rejected" the favourable outcome was "Rejected", and the
+  recruitment sample's gender four-fifths ratio read 0.96 instead of 0.36), and
+  the quarantined legacy pipeline did the same. A text decision is now coded only
+  from a declared favourable value, `inputs.decision_labels.favourable_values`
+  (the shape the platform's other analyses use) or
+  `DataBiasValidator.validate(..., outcome_favourable_value=...)`; numeric,
+  boolean, 0/1 and true/false columns need nothing. Undeclared, `run_pulse`
+  refuses by name (`refused`, `decisionColumn`, `decisionValues`), an undeclared
+  text label is not used as ground truth, and the validator reports
+  `outcome_not_coded`. The coding applied is published in
+  `dataPreparation.decisionCoding`. **Behaviour change:** a Pulse run on a text
+  decision column now needs the declaration.
+- **The quarantined legacy grid gave an empty cell a gap of 0.0.**
+  `pipeline._intersectional_grid` (unreachable: `run_pulse_pipeline` raises
+  first) applied no size floor, so on the recruitment sample an empty cell read
+  as parity and a 6-person cell (Hispanic, Non-binary) was the worst of
+  race_ethnicity by gender. A cell below the floor, empty included, now carries
+  no gap, keeps its n and stays out of the worst cell and the concentration,
+  matching the platform heatmap fix. The live Pulse grid already excluded such
+  cells and is unchanged.
+
 ## [0.1.0] - 2026-10-02
 
 ### Pulse: no false alarm on clean data, agent nulls are opinions, pandas 3 (2026-10-01)
@@ -854,20 +1087,17 @@ tooling (not part of this published repository) and not before: earlier
 revisions of this file asserted a release event twice over that had not
 happened, and both dates were fiction.
 
-**Everything continues to accumulate under this heading** until then. There is
-deliberately no separate `[Unreleased]` section: while 0.1.0 is itself
-unreleased, a second holding pen would only invite the same mistake again, of
-work sitting under one heading while shipping inside another. Every change made
-between now and the tag belongs here, because this is where a reader of the
-published 0.1.0 will look for it, and PyPI is immutable: a later version's
-changelog cannot retroactively say what 0.1.0 contained.
+**Until the tag, everything accumulated under this heading.** There was
+deliberately no separate `[Unreleased]` section while 0.1.0 was itself
+unreleased, so that no work sat under one heading while shipping inside another.
+Changes made after the tag are listed under the version that ships them.
 
-**What 0.1.0 will be, when it ships.** A plain SemVer 0.x first public beta
-carrying the `Development Status :: 4 - Beta` trove classifier, installable with
-a normal `pip install vfairness` and no `--pre` flag. The API is not frozen until
-`1.0.0`, though the public surface in `docs/API_STABILITY.md` is already treated
-as stable under the deprecation policy. Pushing the tag is what starts the
-PyPI publish pipeline described in `docs/RELEASE_PIPELINE.md`.
+**What 0.1.0 is.** A plain SemVer 0.x first public beta carrying the
+`Development Status :: 4 - Beta` trove classifier, installable with a normal
+`pip install vfairness` and no `--pre` flag. The API is not frozen until
+`1.0.0`, though the public surface in `docs/API_STABILITY.md` is treated as
+stable under the deprecation policy. Pushing the tag started the PyPI publish
+pipeline described in `docs/RELEASE_PIPELINE.md`.
 
 ### Grading wave 2 (2026-09-18)
 

@@ -333,14 +333,15 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
   <a href="../quality-and-hardening/index.html">Quality &amp; Hardening</a>.</p>
 
   <div class="rp-status" id="status">
-    <h2>Status: 0.1.0 released on 2026-10-02</h2>
-    <p>Version 0.1.0 is the first public beta, published from the <code>v0.1.0</code> tag through the workflow below. What had to be true before it could go out:</p>
+    <h2>Status: 0.2.0 released on 2026-10-26</h2>
+    <p>Version 0.2.0 is the second public beta, published to <a href="https://pypi.org/project/vfairness/0.2.0/">PyPI</a> from the <code>v0.2.0</code> tag through the workflow below, with a <a href="https://github.com/validantai/vfairness/releases/tag/v0.2.0">GitHub Release</a>. The first, 0.1.0, went out the same way on 2026-10-02 (<a href="https://github.com/validantai/vfairness/releases/tag/v0.1.0">its release</a>). What had to be true before each could go out:</p>
     <ul class="rp-checks">
       <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>The beta gate reads BETA READY</strong>: all 8 conditions met (see Quality &amp; Hardening).</span></li>
-      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>Every CI check is green</strong> on the exact release commit, in the development repository and again on the public repository, including the full suite on Python 3.11 to 3.13 and the oldest declared dependency versions.</span></li>
       <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>Someone can approve.</strong> The <code>pypi</code> environment on the public repository admits <code>v</code>-tags and requires an active reviewer before anything reaches PyPI.</span></li>
-      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>PyPI trusts exactly this repository and workflow</strong> (trusted publishing over OIDC, no stored token).</span></li>
-      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>Tag <code>v0.1.0</code></strong> on the public repository. The earlier 0.0.1 on PyPI is our own name reservation and contains none of this code.</span></li>
+      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>Every CI check is green</strong> on the exact release commit, in the development repository and again on the public repository, including the full suite on Python 3.11 to 3.13 and the oldest declared dependency versions.</span></li>
+      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>PyPI trusts exactly this repository and workflow</strong> (trusted publishing over OIDC, no stored token). The wheel and the sdist each carry a provenance attestation on PyPI.</span></li>
+      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>Tag <code>v0.2.0</code></strong> on the public repository, published 2026-10-26 (<code>v0.1.0</code> on 2026-10-02).</span></li>
+      <li><span class="rp-tag rp-tag--ok">Done</span><span><strong>The 0.0.1 placeholder is yanked</strong> on PyPI (2026-10-02), with the reason &ldquo;Name reservation, contains no library code. Use 0.1.0 or later.&rdquo; A resolver no longer selects it.</span></li>
     </ul>
   </div>
 
@@ -385,7 +386,7 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
     <!-- release -->
     <g font-size="12.5">
       <rect x="604" y="70" width="110" height="58" rx="9" fill="#fdf3e3" stroke="#b45309" stroke-width="1.5"/>
-      <text x="616" y="94" font-weight="700" fill="#b45309">Tag v0.1.0</text><text x="616" y="113" fill="#111827">starts the run</text>
+      <text x="616" y="94" font-weight="700" fill="#b45309">Tag v0.2.0</text><text x="616" y="113" fill="#111827">starts the run</text>
       <rect x="728" y="70" width="118" height="58" rx="9" fill="#e7f7f0" stroke="#0f9f6e" stroke-width="1.5"/>
       <text x="740" y="94" font-weight="700" fill="#0f9f6e">Tests passed?</text><text x="740" y="113" fill="#111827">on this commit</text>
       <rect x="860" y="70" width="118" height="58" rx="9" fill="#e6f6f9" stroke="#0e7490" stroke-width="1.5"/>
@@ -527,7 +528,7 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
                         <h4>Resources</h4>
                         <ul>
                             <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
-                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.2.0/" target="_blank">PyPI (0.2.0)</a></li>
                             <li><a href="../concepts/references.html">Academic References</a></li>
                             <li><a href="../concepts/changelog.html">Changelog</a></li>
                         </ul>

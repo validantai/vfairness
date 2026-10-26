@@ -416,8 +416,11 @@ class TestAutoLogFairnessExample:
             train_model(X, y, sensitive)
         assert recording_mlflow.metrics == {}
 
-    def test_the_published_example_now_logs_a_measured_value(self, recording_mlflow):
+    def test_the_published_example_now_logs_a_measured_value(self, recording_mlflow, monkeypatch):
         """OVER-CORRECTION CONTROL. The exact metric value, not "some metrics"."""
+        # The page says the example assumes the group-label key is set, as it is
+        # for any team that logs with coded group names (the default).
+        monkeypatch.setenv("VFAIRNESS_GROUP_LABEL_KEY", "a team secret")
         X, y, sensitive = _training_data()
         namespace = {"X_train": X, "y_train": y, "gender": sensitive}
         with warnings.catch_warnings(record=True) as caught:

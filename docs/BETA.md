@@ -1,18 +1,19 @@
 # vfairness Beta Programme
 
-vfairness is heading for its first public beta on PyPI, versioned `0.1.0` with
-the `Development Status :: 4 - Beta` classifier. A plain SemVer 0.x release
+vfairness is in public beta on PyPI: `0.1.0`, the first beta, was published on
+2026-10-02 and `0.2.0`, the second, on 2026-10-26, both with the
+`Development Status :: 4 - Beta` classifier. A plain SemVer 0.x release
 installs with a normal `pip install`, signals beta maturity through the
 classifier, and is honest about stability: the API is not frozen until `1.0.0`.
 Beta means: ready for real users to rely on, while we keep improving it. It is
 free and open source under Apache-2.0, and it stays that way.
 
-**The beta gate passes; nothing is published yet.** `scripts/release_gate.py`
-is what decides it, and on 2026-10-01 it reports **BETA READY**: all eight beta
-conditions are met and no known defect is open. The stricter 1.0 gate is not met:
-a second, independent examiner still has to confirm part of the graded code.
-Nothing has been published: there is no `v0.1.0` tag and no artifact on PyPI or
-TestPyPI.
+**The beta gate passes.** `scripts/release_gate.py` is what decides it, and it
+reported **BETA READY** before each tag (2026-10-01 for `v0.1.0`, 2026-10-26 for
+`v0.2.0`): all eight beta conditions are met and no known defect is open. The
+stricter 1.0 gate is not met: a second, independent examiner still has to confirm
+part of the graded code. Each version is published from its `v<version>` tag on
+`validantai/vfairness` by the release pipeline; there is no TestPyPI leg.
 
 ## What "done enough for beta" means (exit criteria)
 
@@ -36,8 +37,8 @@ _Generated 2026-10-02 by `scripts/release_gate.py`._
 
 | | Criterion | Measured | Verdict |
 | --- | --- | --- | --- |
-| B1 | Every public code unit has been EXECUTED and its result recorded | 1580 of 1580 executed and recorded | passes |
-| B1b | Every public code unit's examination state is PUBLISHED where it is described | 1580 of 1580 carry a published state | passes |
+| B1 | Every public code unit has been EXECUTED and its result recorded | 1599 of 1599 executed and recorded | passes |
+| B1b | Every public code unit's examination state is PUBLISHED where it is described | 1599 of 1599 carry a published state | passes |
 | B2 | No open defect in code that returns a fairness number or verdict | 0 open (0 measuring, 0 unclassified) | passes |
 | B2b | No open defect recorded by the second-round audit | 0 open of 59 recorded claims | passes |
 | B3 | Every remaining open defect carries an assessed severity | 0 non-measuring open, severity unassessed | passes |
@@ -49,8 +50,8 @@ _Generated 2026-10-02 by `scripts/release_gate.py`._
 
 | | Criterion | Measured | Verdict |
 | --- | --- | --- | --- |
-| G1 | Every public code unit carries a grade | 1580 of 1580 | passes |
-| G2 | Every grade was confirmed by an independent check | 618 unaudited | **fails** |
+| G1 | Every public code unit carries a grade | 1599 of 1599 | passes |
+| G2 | Every grade was confirmed by an independent check | 637 unaudited | **fails** |
 | G3 | No open defect anywhere in the public surface | 0 open | passes |
 | G4 | Every open defect has an assessed severity | 0 unassessed | passes |
 | G5 | Capability census complete and clear | 0 open, 0 unproven | passes |

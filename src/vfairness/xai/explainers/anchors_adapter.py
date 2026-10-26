@@ -70,7 +70,7 @@ def _unperturbable_features(background: np.ndarray, names: list[str]) -> list[st
 class AnchorsExplainer(Explainer):
     """anchor-exp tabular: high-precision sufficient-condition rules.
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

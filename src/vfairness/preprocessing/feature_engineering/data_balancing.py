@@ -1026,7 +1026,7 @@ class SyntheticResampler(BaseFeatureTransformer):
 class SMOTEResampler(SyntheticResampler):
     """SMOTE oversampling (fixed ``method='smote'``).
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -1053,7 +1053,7 @@ class SMOTEResampler(SyntheticResampler):
 class ADASYNResampler(SyntheticResampler):
     """ADASYN oversampling (fixed ``method='adasyn'``): density-weighted synthesis.
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -1080,7 +1080,7 @@ class ADASYNResampler(SyntheticResampler):
 class TomekResampler(SyntheticResampler):
     """Tomek-link undersampling (fixed ``method='tomek'``): boundary cleaning.
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -1906,7 +1906,7 @@ class _PropensityWeighter(BaseFeatureTransformer):
 class PropensityScoreWeighter(_PropensityWeighter):
     """Propensity Score Weighting (mean-1 normalised inverse-propensity weights).
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -1927,7 +1927,7 @@ class PropensityScoreWeighter(_PropensityWeighter):
 class InversePropensityWeighter(_PropensityWeighter):
     """Inverse Propensity Scoring (raw Horvitz-Thompson inverse-propensity weights).
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -2153,7 +2153,7 @@ class CounterfactualAugmenter(BaseFeatureTransformer):
             value (swap toward the first alternative level).
         random_state: Reserved for reproducibility.
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

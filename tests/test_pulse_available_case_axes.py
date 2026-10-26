@@ -153,6 +153,9 @@ def test_the_bundled_recruitment_gender_penalty_is_read_on_all_2700_rows():
             "jurisdiction": "US",
             "source_kind": "tabular",
             "protected_attributes": ["gender", "disability_status", "religion"],
+            # invite_decision is "Yes"/"No": coded only from its declared
+            # favourable value, never guessed (2026-10-09).
+            "decision_labels": {"favourable_values": {"invite_decision": "Yes"}},
         },
     )
     pv = _row(data, "gender")

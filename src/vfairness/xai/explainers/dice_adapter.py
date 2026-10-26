@@ -49,7 +49,7 @@ from .base import Explainer, ExplainerCapabilities, prediction_fn_available
 class DiceCounterfactualExplainer(Explainer):
     """DiCE diverse counterfactuals. Local-only, async-eligible.
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

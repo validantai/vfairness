@@ -10,7 +10,7 @@
     <link rel="icon" type="image/svg+xml" href="../img/favicon-v2.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
 
     <script src="https://validant.ai/consent/v1/consent.js" defer></script>
@@ -290,82 +290,136 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
 .to { --a0: #6b7280; --a1: #0e7490; --a2: #7c3aed; --a3: #b45309; --a4: #be123c; --ok: #0f9f6e; --ok-bg: #e7f7f0;
   --warn: #b45309; --warn-bg: #fdf3e3; --ink: var(--color-gray-900, #111827); --soft: var(--color-gray-600, #4b5563);
   --line: var(--color-gray-200, #e5e7eb); --card: #fff; --ground: var(--color-gray-50, #f9fafb); color: var(--ink); }
-.to h1 { margin-bottom: .3rem; }
-.to h2 { margin-top: 2.6rem; }
+.to h1 { margin-bottom: .6rem; }
+.to h2 { margin-top: 4.2rem; margin-bottom: 1rem; }
+.to h3 { margin-top: 0; }
+.to > p, .to > ul { line-height: 1.7; margin: 0 0 1.1rem; max-width: 74ch; }
+.to > ul li { margin-bottom: .45rem; }
 .to-eyebrow { font-size: .72rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--soft); }
-.to-lead { font-size: 1.08rem; line-height: 1.6; color: var(--soft); max-width: 72ch; }
-.to-card { border: 1px solid var(--line); border-radius: 14px; background: var(--card); padding: 1.2rem 1.4rem; margin: 1.2rem 0; }
+.to-lead { font-size: 1.1rem; line-height: 1.7; color: var(--soft); max-width: 70ch; margin-bottom: 2.4rem; }
+.to-card { border: 1px solid var(--line); border-radius: 14px; background: var(--card); padding: 1.5rem 1.7rem; margin: 1.8rem 0; }
 .to-answer { border-left: 6px solid var(--a1); }
 .to-answer h2 { margin: 0 0 .4rem; font-size: 1.2rem; }
 .to-tier { display: inline-block; font-weight: 800; font-size: .78rem; letter-spacing: .04em; color: #fff; border-radius: 999px; padding: .15rem .6rem; background: var(--c, var(--a1)); white-space: nowrap; }
 .to-tier--A0 { --c: var(--a0); } .to-tier--A1 { --c: var(--a1); } .to-tier--A2 { --c: var(--a2); } .to-tier--A3 { --c: var(--a3); } .to-tier--A4 { --c: var(--a4); }
-.to-scroll { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--line); border-radius: 12px; }
+.to-scroll { overflow-x: auto; margin: 1.8rem 0 2.2rem; border: 1px solid var(--line); border-radius: 12px; }
 .to-scroll table { width: 100%; border-collapse: collapse; font-size: .9rem; min-width: 720px; }
-.to-scroll th, .to-scroll td { text-align: left; vertical-align: top; padding: .6rem .75rem; border-bottom: 1px solid var(--line); line-height: 1.45; }
+.to-scroll th, .to-scroll td { text-align: left; vertical-align: top; padding: .85rem 1rem; border-bottom: 1px solid var(--line); line-height: 1.55; }
 .to-scroll thead th { background: var(--ground); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--soft); }
 .to-scroll tr:last-child td { border-bottom: 0; }
 .to-scroll td code { font-size: .82em; }
-.to-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+.to-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.4rem; margin: 1.8rem 0; }
+.to-two .to-card { margin: 0; }
 .to-path { border-top: 4px solid var(--c, var(--a1)); }
-.to-path h3 { margin: 0 0 .4rem; }
+.to-path h3 { margin: 0 0 .7rem; }
+.to-path p { line-height: 1.65; margin: 0 0 .8rem; }
 .to-note { color: var(--soft); font-size: .9rem; line-height: 1.55; }
-.to-warn { background: var(--warn-bg); border: 1px solid #f3d9b1; border-radius: 12px; padding: .9rem 1.1rem; margin: 1rem 0; line-height: 1.55; }
-.to-ok { background: var(--ok-bg); border-radius: 12px; padding: .9rem 1.1rem; margin: 1rem 0; line-height: 1.55; }
-.to pre { overflow-x: auto; }
+.to-warn { background: var(--warn-bg); border: 1px solid #f3d9b1; border-radius: 12px; padding: 1.2rem 1.4rem; margin: 1.8rem 0 2.2rem; line-height: 1.7; }
+.to-ok { background: var(--ok-bg); border-radius: 12px; padding: 1.2rem 1.4rem; margin: 1.8rem 0 2.2rem; line-height: 1.7; }
+.to pre { overflow-x: auto; margin: 1.4rem 0 2rem; }
 .to-dl { white-space: nowrap; font-weight: 600; }
 .to-result .to-dl { white-space: normal; overflow-wrap: anywhere; }
 .to-cat { min-width: 1000px !important; } .to-cat td:first-child { min-width: 15rem; } .to-cat td:nth-child(4) { min-width: 22rem; } .to-cat td:nth-child(5) { min-width: 11rem; }
 .to-yes { color: var(--ok); font-weight: 700; } .to-no { color: var(--a4); font-weight: 700; } .to-na { color: var(--soft); }
-.to-quote { border-left: 3px solid var(--line); padding: .2rem 0 .2rem 1rem; color: var(--soft); font-style: italic; margin: 1rem 0; }
-.tx h2 { margin: 0 0 .2rem; font-size: 1.2rem; }
-.tx { --coral: #e4573d; --beam: var(--ink); border-left: 6px solid var(--a1); }
-.tx-paths { display: grid; grid-template-columns: repeat(5, 1fr); gap: .45rem; margin-bottom: 1rem; }
-.tx-paths button { text-align: left; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 10px; padding: .55rem .65rem; cursor: pointer; font: inherit; transition: border-color .15s, box-shadow .15s; }
-.tx-paths button b { display: block; font-size: .92rem; }
-.tx-paths button span { display: block; font-size: .74rem; color: var(--soft); line-height: 1.3; }
-.tx-paths button[aria-checked="true"] { border-color: var(--a1); box-shadow: inset 0 0 0 1.5px var(--a1); }
-.tx-paths button:focus-visible, .tx-col:focus-visible { outline: 2px solid var(--a1); outline-offset: 2px; }
-.tx-desk { display: grid; grid-template-columns: minmax(260px, 340px) 1fr; gap: 1.2rem; align-items: stretch; }
-.tx-stage { position: relative; height: 230px; border-radius: 12px; background: var(--ground); padding: 10px 12px 30px 78px; }
-.tx-bands { position: absolute; left: 0; right: 0; top: 10px; bottom: 30px; display: grid; grid-template-rows: 1fr 1fr 1fr; pointer-events: none; }
-.tx-bands span { font-size: .66rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--soft); padding: 0 0 0 10px; border-top: 1px dashed var(--line); display: flex; align-items: center; }
-.tx-cols { position: relative; height: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.tx-col { position: relative; height: 100%; cursor: ns-resize; touch-action: none; border-radius: 8px; }
-.tx-fill { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 8px 8px 4px 4px; background: var(--a1); opacity: .85; transition: height .35s cubic-bezier(.2,.8,.2,1), background .2s; }
-.tx-col.is-weak .tx-fill { background: var(--coral); }
-.tx-tick-wrap { position: absolute; inset: 0; }
-.tx-tick-wrap i { position: absolute; left: 0; right: 0; border-top: 1px solid rgba(255,255,255,.55); font-style: normal; font-size: .62rem; font-weight: 700; color: var(--soft); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 2px; }
-.tx-tick-wrap i.on { color: #fff; }
-.tx-name { position: absolute; bottom: -24px; left: 0; right: 0; text-align: center; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--soft); }
-.tx-beam { position: absolute; left: 72px; right: 6px; height: 4px; border-radius: 2px; background: var(--beam); transition: bottom .35s cubic-bezier(.2,.8,.2,1); }
-.tx-beam-label { position: absolute; right: 0; top: -22px; font-size: .72rem; font-weight: 800; background: var(--beam); color: var(--card); padding: .1rem .45rem; border-radius: 999px; }
-.tx-read { display: flex; flex-direction: column; gap: .7rem; }
-.tx-claim { display: grid; gap: .1rem; }
-.tx-claim-k { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--soft); }
-.tx-claim-v { font-size: 1.6rem; line-height: 1.1; }
-.tx-claim-t { color: var(--soft); font-size: .92rem; }
-.tx-levels { display: grid; grid-template-columns: auto 1fr; gap: .3rem .8rem; margin: 0; font-size: .9rem; }
-.tx-levels dt { font-weight: 700; color: var(--soft); font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; padding-top: .15rem; }
-.tx-levels dd { margin: 0; line-height: 1.4; }
-.tx-extra { display: flex; gap: .5rem; align-items: flex-start; font-size: .9rem; background: var(--ground); border-radius: 10px; padding: .55rem .7rem; cursor: pointer; }
-.tx-extra[hidden] { display: none; }
-.tx-extra.is-muted { opacity: .5; }
-.tx-caps-head { margin: 1.1rem 0 .4rem; font-weight: 700; font-size: .9rem; }
-.tx-caps { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
-.tx-caps li::before, .tx-caps li::marker { content: none !important; display: none !important; }
-.tx-caps li { margin: 0; border: 1px solid var(--line); border-radius: 999px; padding: .28rem .7rem; font-size: .82rem; transition: background .2s, color .2s, opacity .2s; }
-.tx-caps li.on { background: var(--ok-bg); border-color: transparent; color: var(--ok); font-weight: 600; }
-.tx-caps li.off { opacity: .55; }
-.tx-caps li small { font-weight: 700; margin-left: .3rem; color: var(--soft); }
-.tx-foot { display: grid; grid-template-columns: auto 1fr; gap: .4rem .9rem; margin: 1rem 0 0; font-size: .92rem; }
-.tx-foot dt { font-weight: 700; color: var(--soft); font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; padding-top: .15rem; }
-.tx-foot dd { margin: 0; }
-.tx-fine { margin: .9rem 0 0; font-size: .8rem; }
-@media (max-width: 760px) {
-  .tx-paths { grid-template-columns: repeat(2, 1fr); }
-  .tx-desk { grid-template-columns: 1fr; }
+.to-quote { border-left: 3px solid var(--line); padding: .2rem 0 .2rem 1rem; color: var(--soft); font-style: italic; margin: 2rem 0; padding-top: .4rem; padding-bottom: .4rem; }
+.tx2 { --coral: #b8432c; --bar: #0e6f87; --rail: color-mix(in srgb, var(--line) 70%, transparent); border-left: 6px solid var(--a1); padding: 2.2rem 2.4rem 2rem; margin: 2rem 0 1rem; }
+.tx2-intro { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 2.2rem; align-items: start; margin-bottom: 2.4rem; }
+.to .tx2 h2 { margin: 0 0 .6rem; }
+.tx2-fig { margin: 0; }
+.tx2-fig img { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); }
+.tx2-fig figcaption { font-size: .8rem; color: var(--soft); line-height: 1.5; margin-top: .55rem; }
+.tx2 h2 { margin: 0 0 .35rem; font-size: 1.3rem; }
+.tx2-lead { margin: 0; color: var(--soft); line-height: 1.55; max-width: 62ch; }
+.tx2-step { display: flex; align-items: center; flex-wrap: wrap; gap: .3rem .6rem; font-weight: 700; margin: 0 0 .8rem; }
+.tx2-num { width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--a1); color: #fff; display: inline-grid; place-items: center; font-size: .82rem; }
+.tx2-hint { font-weight: 400; color: var(--soft); font-size: .9rem; }
+.tx2-paths { display: grid; grid-template-columns: repeat(5, 1fr); gap: .7rem; margin-bottom: 2.6rem; }
+.tx2-paths button { text-align: left; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 12px; padding: .75rem .85rem; cursor: pointer; font: inherit; transition: border-color .15s, box-shadow .15s, background .15s; }
+.tx2-paths button:hover { border-color: var(--a1); }
+.tx2-paths button b { display: block; font-size: .95rem; }
+.tx2-paths button span { display: block; font-size: .78rem; color: var(--soft); line-height: 1.35; margin-top: .15rem; }
+.tx2-paths button[aria-checked="true"] { border-color: var(--a1); box-shadow: inset 0 0 0 1.5px var(--a1); background: color-mix(in srgb, var(--a1) 6%, var(--card)); }
+.tx2-tip { position: absolute; z-index: 5; width: min(320px, calc(100% - 1rem)); background: var(--ink); color: var(--card); border-radius: 12px; padding: .85rem 1rem .9rem; font-size: .84rem; line-height: 1.5; box-shadow: 0 10px 30px rgba(0,0,0,.18); pointer-events: none; }
+.tx2-tip::after { content: ""; position: absolute; left: var(--arrow, 50%); width: 12px; height: 12px; margin-left: -6px; background: var(--ink); transform: rotate(45deg); bottom: -6px; }
+.tx2-tip.is-below::after { bottom: auto; top: -6px; }
+.tx2-tip .tt-code { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .74rem; font-weight: 700; letter-spacing: .03em; opacity: .75; }
+.tx2-tip .tt-name { display: block; font-weight: 700; font-size: .95rem; margin: .1rem 0 .4rem; }
+.tx2-tip .tt-def { display: block; }
+.tx2-tip .tt-here, .tx2-tip .tt-claim { display: block; margin-top: .5rem; padding-top: .5rem; border-top: 1px solid rgba(255,255,255,.18); }
+.tx2-tip .tt-k { display: block; font-size: .66rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .65; margin-bottom: .1rem; }
+.tx2-board { position: relative; background: var(--ground); border-radius: 16px; padding: 1.8rem 2rem 1.6rem; margin-bottom: 2.2rem; }
+.tx2-scale, .tx2-row { display: grid; grid-template-columns: 11rem 1fr; gap: 1.4rem; align-items: center; }
+.tx2-bands { display: grid; grid-template-columns: 22fr 22fr 56fr; }
+.tx2-bands span { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); text-align: center; padding-bottom: .55rem; border-bottom: 2px solid var(--rail); transition: color .2s, border-color .2s; }
+.tx2-bands span.is-claim { color: var(--ink); border-bottom-color: var(--ink); }
+.tx2-row { margin-top: 1.5rem; }
+.tx2-rlabel b { display: block; font-size: 1rem; }
+.tx2-rlabel b em { font-style: normal; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .74rem; font-weight: 600; color: var(--soft); margin-left: .35rem; }
+.tx2-rlabel small { display: block; color: var(--soft); font-size: .8rem; line-height: 1.35; }
+.tx2-track { position: relative; height: 62px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+.tx2-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 12px; background: var(--bar); transition: width .4s cubic-bezier(.2,.8,.2,1), background .25s; }
+.tx2-row.is-weak .tx2-fill { background: var(--coral); }
+.tx2-over { position: absolute; top: 0; bottom: 0; border-radius: 0 12px 12px 0; background: repeating-linear-gradient(135deg, rgba(0,0,0,.16) 0 5px, rgba(0,0,0,0) 5px 11px); opacity: .9; transition: left .4s cubic-bezier(.2,.8,.2,1), width .4s cubic-bezier(.2,.8,.2,1); pointer-events: none; }
+.tx2-seg { position: absolute; top: 0; bottom: 0; border: 0; background: transparent; cursor: pointer; font: inherit; font-size: .78rem; font-weight: 600; color: var(--soft); padding: 0 .3rem; line-height: 1.2; border-left: 1px solid var(--rail); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .18rem; }
+.tx2-seg em { font-style: normal; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .64rem; font-weight: 600; letter-spacing: .04em; opacity: .7; }
+.tx2-seg:first-child { border-left: 0; }
+.tx2-seg.is-in { color: #fff; border-left-color: rgba(255,255,255,.35); }
+.tx2-seg[aria-checked="true"] { font-weight: 800; }
+.tx2-seg[aria-checked="true"]::after { content: ""; position: absolute; left: 22%; right: 22%; bottom: 8px; height: 3px; border-radius: 2px; background: #fff; }
+.tx2-seg:hover:not(.is-in) { color: var(--ink); background: color-mix(in srgb, var(--a1) 8%, transparent); }
+.tx2-seg:focus-visible, .tx2-paths button:focus-visible { outline: 2px solid var(--a1); outline-offset: 2px; z-index: 2; }
+.tx2-cap { position: absolute; top: -8px; bottom: -8px; width: 0; border-left: 2px dashed var(--ink); transition: left .4s cubic-bezier(.2,.8,.2,1); pointer-events: none; z-index: 1; }
+.tx2-extra { display: flex; align-items: center; gap: .7rem; margin: 1.3rem 0 0 calc(11rem + 1.4rem); font-size: .9rem; cursor: pointer; }
+.tx2-extra[hidden] { display: none; }
+.tx2-extra input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.tx2-switch { flex: none; width: 2.4rem; height: 1.35rem; border-radius: 999px; background: var(--line); position: relative; transition: background .2s; }
+.tx2-switch::after { content: ""; position: absolute; left: 3px; top: 3px; width: calc(1.35rem - 6px); height: calc(1.35rem - 6px); border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.tx2-extra input:checked + .tx2-switch { background: var(--a1); }
+.tx2-extra input:checked + .tx2-switch::after { transform: translateX(1.05rem); }
+.tx2-extra input:focus-visible + .tx2-switch { outline: 2px solid var(--a1); outline-offset: 2px; }
+.tx2-extra.is-muted { opacity: .45; cursor: default; }
+.tx2-result { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 2rem; align-items: start; margin-bottom: 2.4rem; }
+.tx2-k { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); margin-bottom: .35rem; }
+.tx2-code { font-family: "JetBrains Mono", ui-monospace, monospace; letter-spacing: .02em; text-transform: none; color: var(--ink); margin-left: .5rem; padding: .1rem .45rem; border-radius: 6px; background: var(--ground); }
+.tx2-claim strong { display: block; font-size: 2rem; line-height: 1.1; margin-bottom: .3rem; }
+.tx2-why { color: var(--soft); line-height: 1.5; }
+.tx2-next { border-radius: 12px; padding: 1rem 1.15rem; background: color-mix(in srgb, var(--coral) 10%, var(--card)); line-height: 1.5; }
+.tx2-next.is-top { background: var(--ok-bg); }
+.tx2-next b { display: block; margin-bottom: .2rem; }
+.tx2-caps { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+.tx2-caps ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+.tx2-caps li::before, .tx2-caps li::marker { content: none !important; display: none !important; }
+.tx2-caps li { margin: 0; display: grid; grid-template-columns: 1.3rem 1fr; gap: .4rem; line-height: 1.45; font-size: .92rem; }
+.tx2-caps li i { font-style: normal; font-weight: 800; }
+.tx2-on li i { color: var(--ok); }
+.tx2-off li { color: var(--soft); }
+.tx2-off li small { display: block; font-size: .76rem; }
+.tx2-foot { display: grid; grid-template-columns: auto 1fr; gap: .5rem 1.2rem; margin: 0; font-size: .95rem; border-top: 1px solid var(--line); padding-top: 1.1rem; }
+.tx2-foot dt { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); padding-top: .2rem; }
+.tx2-foot dd { margin: 0; overflow-wrap: anywhere; }
+.tx2-foot .to-dl { white-space: normal; overflow-wrap: anywhere; }
+.tx2-fine { margin: 1.1rem 0 0; font-size: .8rem; color: var(--soft); }
+@media (max-width: 900px) { .tx2-paths { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 700px) {
+  .tx2 { padding: 1.2rem 1rem; }
+  .tx2-paths { grid-template-columns: 1fr 1fr; }
+  .tx2-board { padding: 1.1rem .9rem; }
+  .tx2-scale, .tx2-row { grid-template-columns: 1fr; gap: .45rem; }
+  .tx2-scale > div:first-child { display: none; }
+  .tx2-track { height: 70px; }
+  .tx2-seg em { font-size: .56rem; }
+  .tx2 { padding: 1.5rem 1.1rem; }
+  .tx2-intro { grid-template-columns: 1fr; gap: 1.4rem; }
+  .tx2-seg { font-size: .6rem; padding: 0 .1rem; letter-spacing: -.01em; overflow-wrap: anywhere; }
+  .tx2-bands span { font-size: .56rem; letter-spacing: 0; }
+  .tx2-seg[aria-checked="true"]::after { bottom: 6px; }
+  .tx2-hint { flex-basis: 100%; padding-left: 2.2rem; }
+  .tx2-foot { grid-template-columns: 1fr; gap: .15rem; }
+  .tx2-foot dd { margin-bottom: .6rem; }
+  .tx2-extra { margin-left: 0; }
+  .tx2-result, .tx2-caps { grid-template-columns: 1fr; }
 }
-@media (prefers-reduced-motion: reduce) { .tx-fill, .tx-beam { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .tx2-fill, .tx2-over, .tx2-cap { transition: none; } }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .to { --card: #111827; --ground: #1f2937; --line: #374151; --ink: #f3f4f6; --soft: #9ca3af; --ok-bg: #0b2b22; --warn-bg: #2d2210; } }
 </style>
 <section class="to" id="overview">
@@ -376,47 +430,60 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
   you want, and gives you a working one for every pathway, ready to download. Every file below was run
   through vfairness before it was published, and the page shows what happened.</p>
 
-  <div class="to-card tx" id="start">
-    <h2>Start here: what are you testing, and how well can you see it?</h2>
-    <p class="to-note" style="margin:.2rem 0 .9rem">Pick the system, then set the three columns. A claim is only as
-    strong as the shortest column: the beam rests on it.</p>
-    <div class="tx-paths" role="radiogroup" aria-label="What kind of AI system">
+  <div class="to-card tx2" id="start">
+    <div class="tx2-intro">
+      <div>
+        <h2>Start here: how strong a claim can your evidence carry?</h2>
+        <p class="tx2-lead">Choose what you are testing, then click how far you can see on each of the three bars.
+        The shortest bar sets the strongest claim you can make. The bars and their codes (A0 to A4, E0 to E3,
+        V0 to V3) come from <a href="https://validant.ai/signal/precision-is-not-proof" target="_blank" rel="noopener"><em>Precision Is Not Proof</em></a>, where
+        each step is defined.</p>
+      </div>
+      <figure class="tx2-fig">
+        <img src="img/weakest-link.png" width="1280" height="714" loading="lazy" alt="Fine grey-blue technical drawing on warm paper: three tall calibrated columns of different heights standing side by side, a horizontal beam resting across the top of the shortest column, and a vertical graduated scale beside them from which the resting height is read off; the shortest, limiting column carries a soft coral wash, a small human figure at the base for scale.">
+        <figcaption>One weak component caps the verdict; the beam rests on the shortest column, and no averaging can
+        raise it. From <a href="https://validant.ai/signal/precision-is-not-proof" target="_blank" rel="noopener"><em>Precision Is Not Proof</em></a>.</figcaption>
+      </figure>
+    </div>
+
+    <div class="tx2-step"><span class="tx2-num">1</span>What are you testing?</div>
+    <div class="tx2-paths" role="radiogroup" aria-label="What kind of AI system">
       <button type="button" role="radio" data-p="predictive"><b>Predictive</b><span>scores, approves, ranks</span></button>
       <button type="button" role="radio" data-p="llm"><b>Generative</b><span>an LLM or chat assistant</span></button>
       <button type="button" role="radio" data-p="agent"><b>Agent</b><span>an LLM that calls tools</span></button>
       <button type="button" role="radio" data-p="multi"><b>Multi-agent</b><span>agents working together</span></button>
-      <button type="button" role="radio" data-p="synthetic"><b>Synthetic</b><span>a known answer</span></button>
+      <button type="button" role="radio" data-p="synthetic"><b>Synthetic</b><span>data with a known answer</span></button>
     </div>
-    <div class="tx-desk">
-      <div class="tx-stage" aria-hidden="false">
-        <div class="tx-bands" aria-hidden="true"><span>Reasonable</span><span>Limited</span><span>Indicative</span></div>
-        <div class="tx-cols">
-          <div class="tx-col" data-k="a" role="slider" tabindex="0" aria-label="Access" aria-valuemin="0" aria-valuemax="4"><div class="tx-fill"></div><div class="tx-tick-wrap"></div><div class="tx-name">Access</div></div>
-          <div class="tx-col" data-k="e" role="slider" tabindex="0" aria-label="Evidence" aria-valuemin="0" aria-valuemax="3"><div class="tx-fill"></div><div class="tx-tick-wrap"></div><div class="tx-name">Evidence</div></div>
-          <div class="tx-col" data-k="v" role="slider" tabindex="0" aria-label="Validity" aria-valuemin="0" aria-valuemax="3"><div class="tx-fill"></div><div class="tx-tick-wrap"></div><div class="tx-name">Validity</div></div>
-        </div>
-        <div class="tx-beam" aria-hidden="true"><span class="tx-beam-label"></span></div>
-      </div>
-      <div class="tx-read" aria-live="polite">
-        <div class="tx-claim"><span class="tx-claim-k">Strongest claim</span><strong class="tx-claim-v"></strong><span class="tx-claim-t"></span></div>
-        <dl class="tx-levels">
-          <dt>Access</dt><dd class="tx-l-a"></dd>
-          <dt>Evidence</dt><dd class="tx-l-e"></dd>
-          <dt>Validity</dt><dd class="tx-l-v"></dd>
-        </dl>
-        <label class="tx-extra"><input type="checkbox"> <span></span></label>
-      </div>
+
+    <div class="tx2-step"><span class="tx2-num">2</span>How far can you see? <span class="tx2-hint">Click a step on each bar.</span></div>
+    <div class="tx2-board">
+      <div class="tx2-scale" aria-hidden="true"><div></div><div class="tx2-bands"><span>Indicative</span><span>Limited</span><span>Reasonable</span></div></div>
+      <div class="tx2-row" data-k="a"><div class="tx2-rlabel"><b></b><small></small></div><div class="tx2-track" role="radiogroup"></div></div>
+      <div class="tx2-row" data-k="e"><div class="tx2-rlabel"><b></b><small></small></div><div class="tx2-track" role="radiogroup"></div></div>
+      <div class="tx2-row" data-k="v"><div class="tx2-rlabel"><b></b><small></small></div><div class="tx2-track" role="radiogroup"></div></div>
+      <div class="tx2-tip" role="tooltip" id="tx2-tip" hidden></div>
+      <label class="tx2-extra"><input type="checkbox"><span class="tx2-switch" aria-hidden="true"></span><span class="tx2-extra-t"></span></label>
     </div>
-    <div class="tx-caps-head">What you can run <span class="to-note">(locked ones show the tier that unlocks them)</span></div>
-    <ul class="tx-caps"></ul>
-    <dl class="tx-foot">
-      <dt>You cannot claim</dt><dd class="tx-ceiling"></dd>
-      <dt>Start with</dt><dd class="tx-start"></dd>
+
+    <div class="tx2-result" aria-live="polite">
+      <div class="tx2-claim"><span class="tx2-k">Strongest claim <span class="tx2-code"></span></span><strong></strong><span class="tx2-why"></span></div>
+      <div class="tx2-next"></div>
+    </div>
+
+    <div class="tx2-caps">
+      <div><div class="tx2-k">You can run</div><ul class="tx2-on"></ul></div>
+      <div><div class="tx2-k">Unlocks further up</div><ul class="tx2-off"></ul></div>
+    </div>
+    <dl class="tx2-foot">
+      <dt>You cannot claim</dt><dd class="tx2-ceiling"></dd>
+      <dt>Start with</dt><dd class="tx2-start"></dd>
     </dl>
-    <p class="to-note tx-fine">Bands follow the weakest-link rule of <em>Precision Is Not Proof</em>: the lowest of the three
-    readings caps the claim. The cut-offs between bands are our reading of it.</p>
+    <p class="tx2-fine">The bars follow the weakest-link rule of
+    <a href="https://validant.ai/signal/precision-is-not-proof" target="_blank" rel="noopener"><em>Precision Is Not Proof</em></a> (Validant Signal, 2026): the
+    lowest of access (A), evidence (E) and validity (V) caps the claim, and no average can lift it. Where each step sits
+    on the scale is our reading of that rule; the article gives the full definitions and the five reporting rules.</p>
   </div>
-  <script type="application/json" id="tx-data">{"pathways": {"predictive": {"label": "Predictive", "sub": "scores, approves, ranks", "extra": {"label": "I also have the true outcomes (labels)", "unlocks": "Error-rate parity"}, "access": ["A vendor's documentation or model card only", "The decisions and each person's group", "Also the model's scores or probabilities", "The model itself: a file, its weights, or a predict() you can call", "Also the training data and how it was built"], "caps": [["Read and cross-check what is stated", 0, false], ["Selection-rate disparity, demographic parity", 1, false], ["Error-rate parity: equalised odds, equal opportunity", 1, true], ["Calibration by group, AUROC parity, multicalibration", 2, false], ["Threshold trade-offs", 2, false], ["Feature attribution, counterfactual what-if", 3, false], ["Retraining with fairness constraints", 3, false], ["Where the disparity entered the data", 4, false]], "start": ["a model card; then ask for decisions", "predictive/adult_test_with_predictions.csv", "predictive/adult_test_with_predictions.csv", "predictive/adult_logreg_model.json", "predictive/adult_logreg_model.json"], "ceiling": ["Any claim about how the system actually decides.", "Calibration, and anything about why it decides as it does.", "Which features or internal parts carry the disparity.", "Where the bias entered the data (no training lineage).", "Nothing structural; the limits are now statistical."]}, "llm": {"label": "Generative", "sub": "an LLM or chat assistant", "extra": {"label": "I can send prompts automatically, not only type them", "unlocks": "Counterfactual tests and benchmarks at scale"}, "access": ["A model card or published evaluations only", "Prompts in, text out", "Also the log probabilities of each token", "Open weights you run yourself", "Open weights and open training data"], "caps": [["Cross-check stated evaluations", 0, false], ["Hand-run counterfactual pairs, red-teaming", 1, false], ["Counterfactual testing and BBQ, BOLD, HolisticBias at scale", 1, true], ["Refusal, tone and sentiment disparity", 1, true], ["Likelihood bias: the probability of yes, of each option", 2, false], ["Embedding bias (WEAT, SEAT) on the model's own vectors", 3, false], ["Hidden-state probes", 3, false], ["Which corpus patterns carry the bias", 4, false]], "start": ["the provider's model card", "llm/discrim_eval_qwen25_7b.csv", "llm/discrim_eval_qwen25_7b.csv", "GPT-2 or Apertus 8B (see the public table)", "Apertus 8B (see the public table)"], "ceiling": ["Any claim about how the model treats people.", "Differences hidden inside the answer probabilities; anything about why.", "Which internal parts carry the bias.", "Where the bias came from in training.", "Nothing structural."]}, "agent": {"label": "Agent", "sub": "an LLM that calls tools", "extra": {"label": "I also have the traces: tool calls, handoffs, steps", "unlocks": "Tool-selection, delegation and trajectory bias"}, "access": ["Documentation only", "Inputs in, final outcomes out", "Also log probabilities at each step", "An open-weight model inside the agent", "Also that model's training data"], "caps": [["Cross-check what is stated", 0, false], ["Outcome disparity, correspondence tests", 1, false], ["Tool-selection, delegation and trajectory bias", 1, true], ["The margin behind each decision", 2, false], ["Internal probes of the model inside", 3, false], ["Training lineage", 4, false]], "start": ["ask for a submission API", "agent/loan_agent_persona_runs.csv", "scripts/loan_agent_persona_harness.py", "scripts/loan_agent_persona_harness.py", "scripts/loan_agent_persona_harness.py"], "ceiling": ["Anything about behaviour.", "Why the agent chose what it chose (no scores, no internals).", "Internal mechanism.", "Training lineage.", "Rarely reachable for agents in practice."]}, "multi": {"label": "Multi-agent", "sub": "agents working together", "extra": {"label": "I also have each agent's own output", "unlocks": "Compositionality, emergent bias, groupthink"}, "access": ["Documentation only", "The system's inputs and final outputs", "Also log probabilities per agent", "Open-weight models inside the agents", "Also their training data"], "caps": [["Cross-check what is stated", 0, false], ["Disparity in the system's outcomes", 1, false], ["Compositionality, emergent bias, groupthink", 1, true], ["Margins behind each agent's choice", 2, false], ["Internal probes per agent", 3, false], ["Training lineage", 4, false]], "start": ["ask for the system's decisions", "multi_agent/loan_committee_runs.csv", "multi_agent/loan_committee_harness_trace.json", "multi_agent/loan_committee_harness_trace.json", "multi_agent/loan_committee_harness_trace.json"], "ceiling": ["Anything about behaviour.", "Which agent introduced the bias, unless you keep each agent's output.", "Internal mechanism.", "Training lineage.", "Rarely reachable in practice."]}, "synthetic": {"label": "Synthetic", "sub": "data with a known answer", "extra": null, "access": ["A description of a generator", "A file where you planted the bias", "Planted bias plus model scores", "The generator and a model you trained", "The generator, its code and every setting"], "caps": [["Nothing measured yet", 0, false], ["Check a detector both ways: planted found, clean silent", 1, false], ["Check calibration detectors the same way", 2, false], ["Check attribution methods against a known cause", 3, false], ["Reproduce the whole pack byte for byte", 4, false]], "start": ["a planted-bias file from this page", "synthetic/gender_penalty.csv", "synthetic/clean.csv", "predictive/adult_logreg_model.json", "synthetic/surname_proxy.csv"], "ceiling": ["Anything.", "Anything about a real system: synthetic data tests the tool, not the world.", "Anything about a real system.", "Anything about a real system.", "Anything about a real system."]}}, "evidence": [["E0", "Asserted", "a statement, or the model describing itself"], ["E1", "Observational", "logs or data you happened to have"], ["E2", "Controlled", "counterfactual pairs, powered, pre-registered"], ["E3", "Interventional", "you manipulate the mechanism itself"]], "validity": [["V0", "Unpinned", "no version recorded: treat as disqualifying"], ["V1", "Pinned", "version and date recorded, one point in time"], ["V2", "Resampled", "re-tested on a schedule, changes detected"], ["V3", "Continuous", "monitored live with alerts"]], "claims": ["Indicative", "Limited", "Reasonable"], "claimText": ["Taken largely at the subject's word.", "Supports a conclusion without being conclusive.", "The strongest class: measured, controlled and current."]}</script>
+  <script type="application/json" id="tx-data">{"pathways": {"predictive": {"label": "Predictive", "sub": "scores, approves, ranks", "extra": {"label": "I also have the true outcomes (labels)", "unlocks": "Error-rate parity"}, "access": ["A vendor's documentation or model card only", "The decisions and each person's group", "Also the model's scores or probabilities", "The model itself: a file, its weights, or a predict() you can call", "Also the training data and how it was built"], "caps": [["Read and cross-check what is stated", 0, false], ["Selection-rate disparity, demographic parity", 1, false], ["Error-rate parity: equalised odds, equal opportunity", 1, true], ["Calibration by group, AUROC parity, multicalibration", 2, false], ["Threshold trade-offs", 2, false], ["Feature attribution, counterfactual what-if", 3, false], ["Retraining with fairness constraints", 3, false], ["Where the disparity entered the data", 4, false]], "start": ["a model card; then ask for decisions", "predictive/adult_test_with_predictions.csv", "predictive/adult_test_with_predictions.csv", "predictive/adult_logreg_model.json", "predictive/adult_logreg_model.json"], "ceiling": ["Any claim about how the system actually decides.", "Calibration, and anything about why it decides as it does.", "Which features or internal parts carry the disparity.", "Where the bias entered the data (no training lineage).", "Nothing structural; the limits are now statistical."], "short": ["Docs only", "Decisions", "+ Scores", "The model", "+ Training data"]}, "llm": {"label": "Generative", "sub": "an LLM or chat assistant", "extra": {"label": "I can send prompts automatically, not only type them", "unlocks": "Counterfactual tests and benchmarks at scale"}, "access": ["A model card or published evaluations only", "Prompts in, text out", "Also the log probabilities of each token", "Open weights you run yourself", "Open weights and open training data"], "caps": [["Cross-check stated evaluations", 0, false], ["Hand-run counterfactual pairs, red-teaming", 1, false], ["Counterfactual testing and BBQ, BOLD, HolisticBias at scale", 1, true], ["Refusal, tone and sentiment disparity", 1, true], ["Likelihood bias: the probability of yes, of each option", 2, false], ["Embedding bias (WEAT, SEAT) on the model's own vectors", 3, false], ["Hidden-state probes", 3, false], ["Which corpus patterns carry the bias", 4, false]], "start": ["the provider's model card", "llm/discrim_eval_qwen25_7b.csv", "llm/discrim_eval_qwen25_7b.csv", "GPT-2 or Apertus 8B (see the public table)", "Apertus 8B (see the public table)"], "ceiling": ["Any claim about how the model treats people.", "Differences hidden inside the answer probabilities; anything about why.", "Which internal parts carry the bias.", "Where the bias came from in training.", "Nothing structural."], "short": ["Model card", "Text in, text out", "+ Log probabilities", "Open weights", "+ Training data"]}, "agent": {"label": "Agent", "sub": "an LLM that calls tools", "extra": {"label": "I also have the traces: tool calls, handoffs, steps", "unlocks": "Tool-selection, delegation and trajectory bias"}, "access": ["Documentation only", "Inputs in, final outcomes out", "Also log probabilities at each step", "An open-weight model inside the agent", "Also that model's training data"], "caps": [["Cross-check what is stated", 0, false], ["Outcome disparity, correspondence tests", 1, false], ["Tool-selection, delegation and trajectory bias", 1, true], ["The margin behind each decision", 2, false], ["Internal probes of the model inside", 3, false], ["Training lineage", 4, false]], "start": ["ask for a submission API", "agent/loan_agent_persona_runs.csv", "scripts/loan_agent_persona_harness.py", "scripts/loan_agent_persona_harness.py", "scripts/loan_agent_persona_harness.py"], "ceiling": ["Anything about behaviour.", "Why the agent chose what it chose (no scores, no internals).", "Internal mechanism.", "Training lineage.", "Rarely reachable for agents in practice."], "short": ["Docs only", "Outcomes", "+ Log probabilities", "Open weights", "+ Training data"]}, "multi": {"label": "Multi-agent", "sub": "agents working together", "extra": {"label": "I also have each agent's own output", "unlocks": "Compositionality, emergent bias, groupthink"}, "access": ["Documentation only", "The system's inputs and final outputs", "Also log probabilities per agent", "Open-weight models inside the agents", "Also their training data"], "caps": [["Cross-check what is stated", 0, false], ["Disparity in the system's outcomes", 1, false], ["Compositionality, emergent bias, groupthink", 1, true], ["Margins behind each agent's choice", 2, false], ["Internal probes per agent", 3, false], ["Training lineage", 4, false]], "start": ["ask for the system's decisions", "multi_agent/loan_committee_runs.csv", "multi_agent/loan_committee_harness_trace.json", "multi_agent/loan_committee_harness_trace.json", "multi_agent/loan_committee_harness_trace.json"], "ceiling": ["Anything about behaviour.", "Which agent introduced the bias, unless you keep each agent's output.", "Internal mechanism.", "Training lineage.", "Rarely reachable in practice."], "short": ["Docs only", "System in and out", "+ Log probabilities", "Open weights", "+ Training data"]}, "synthetic": {"label": "Synthetic", "sub": "data with a known answer", "extra": null, "access": ["A description of a generator", "A file where you planted the bias", "Planted bias plus model scores", "The generator and a model you trained", "The generator, its code and every setting"], "caps": [["Nothing measured yet", 0, false], ["Check a detector both ways: planted found, clean silent", 1, false], ["Check calibration detectors the same way", 2, false], ["Check attribution methods against a known cause", 3, false], ["Reproduce the whole pack byte for byte", 4, false]], "start": ["a planted-bias file from this page", "synthetic/gender_penalty.csv", "synthetic/clean.csv", "predictive/adult_logreg_model.json", "synthetic/surname_proxy.csv"], "ceiling": ["Anything.", "Anything about a real system: synthetic data tests the tool, not the world.", "Anything about a real system.", "Anything about a real system.", "Anything about a real system."], "short": ["A description", "A planted file", "+ Scores", "+ Your model", "Full generator"]}}, "evidence": [["E0", "Asserted", "a statement, or the model describing itself"], ["E1", "Observational", "logs or data you happened to have"], ["E2", "Controlled", "counterfactual pairs, powered, pre-registered"], ["E3", "Interventional", "you manipulate the mechanism itself"]], "validity": [["V0", "Unpinned", "no version recorded: treat as disqualifying"], ["V1", "Pinned", "version and date recorded, one point in time"], ["V2", "Resampled", "re-tested on a schedule, changes detected"], ["V3", "Continuous", "monitored live with alerts"]], "claims": ["Indicative", "Limited", "Reasonable"], "claimText": ["Taken largely at the subject's word.", "Supports a conclusion without being conclusive.", "The strongest class: measured, controlled and current."], "evidenceShort": ["Asserted", "Observed", "Controlled", "Intervened"], "validityShort": ["Unpinned", "Pinned", "Re-tested", "Monitored"], "rows": {"a": ["Access", "what the system gives you"], "e": ["Evidence", "how the test was designed"], "v": ["Validity", "is the version pinned and current"]}, "defs": {"a": [["Attested", "Vendor documentation, model card, published evaluations. No probing.", "The subject\u2019s own claims, recorded and checked for internal consistency."], ["Behavioural", "Query access. Terminal output only: text, label, decision.", "Disparity in observed outcomes, present or absent at a stated sensitivity."], ["Scored", "A1 plus per-output scores: log probabilities, class probabilities, ranked alternatives, confidence.", "Calibration and threshold behaviour by group. Ranking and margin disparity."], ["Internal", "Weights, activations, gradients. The ability to intervene on the computation.", "Which internal structures carry the disparity. Mechanistic attribution."], ["Provenance", "A3 plus training-corpus lineage, fine-tuning and preference-data history, evaluation history.", "Where in the lifecycle the disparity came from."]], "e": [["Asserted", "Rests on a statement by the subject, or a self-report by the model. No independent measurement."], ["Observational", "Measured on found or convenience data. Confounds uncontrolled. Descriptive only."], ["Controlled", "Pre-registered protocol, powered sample, controlled counterfactual perturbation, interval estimates, multiple-testing correction."], ["Interventional", "The mechanism gets manipulated rather than watched: randomised assignment of the varied attribute, ablation, or activation-level intervention with mediation analysis."]], "v": [["Unpinned", "No version identifier, no configuration record, no expiry.", "The article treats this as disqualifying."], ["Pinned", "Snapshot or version identifier, configuration and timestamp recorded. One point in time, with a stated expiry."], ["Resampled", "V1 plus scheduled re-testing at a declared interval, with change detection between runs."], ["Continuous", "Production monitoring with drift detection and alert thresholds. The claim is live rather than historical."]]}}</script>
 
   <h2 id="assessment">What an assessment is, in 90 seconds</h2>
   <p>A fairness result is only as good as two things that must travel with it. Validant's article
@@ -828,15 +895,29 @@ print(shift.round(2))   # how far the screener's note moves the reviewer, by ori
   var MAX = { a: 4, e: 3, v: 3 };
   var FILE = /([a-z_]+\/[A-Za-z0-9_.]+\.(csv|jsonl|json|py))/g;
   function q(s) { return root.querySelector(s); }
-  // Each level sits INSIDE its claim band, so a column's height reads off the
-  // claim directly: level 0 in Indicative, 1 in Limited, 2 and up shared out
-  // inside Reasonable. The beam then rests on the shortest column's top.
-  function band(k, lvl) { return Math.min(lvl, 2); }
+  // Each step sits INSIDE its claim band: step 0 in Indicative, 1 in Limited,
+  // 2 and up shared out inside Reasonable. A bar's end therefore reads off the
+  // claim directly, and the cap line falls at the end of the shortest bar.
+  function band(lvl) { return Math.min(lvl, 2); }
+  // Band edges on the bar: Indicative and Limited hold one step each,
+  // Reasonable holds the rest, so it gets the room (kept in step with the
+  // .tx2-bands grid in the CSS).
+  var EDGE = [0, 0.22, 0.44, 1];
   function span(k, lvl) {
-    var b = band(k, lvl);
-    if (b < 2) return [b / 3, (b + 1) / 3];
-    var n = MAX[k] - 1, j = lvl - 2;
-    return [2 / 3 + j / (3 * n), 2 / 3 + (j + 1) / (3 * n)];
+    var b = band(lvl);
+    if (b < 2) return [EDGE[b], EDGE[b + 1]];
+    var n = MAX[k] - 1, j = lvl - 2, w = (EDGE[3] - EDGE[2]) / n;
+    return [EDGE[2] + j * w, EDGE[2] + (j + 1) * w];
+  }
+  function labels(k) {
+    var P = X.pathways[st.p];
+    return k === "a" ? P.short : k === "e" ? X.evidenceShort : X.validityShort;
+  }
+  function longText(k, lvl) {
+    var P = X.pathways[st.p];
+    if (k === "a") return P.access[lvl];
+    var row = (k === "e" ? X.evidence : X.validity)[lvl];
+    return row[1] + ": " + row[2];
   }
   function link(node, text) {
     node.textContent = ""; var last = 0, m; FILE.lastIndex = 0;
@@ -847,76 +928,139 @@ print(shift.round(2))   # how far the screener's note moves the reviewer, by ori
     }
     node.appendChild(document.createTextNode(text.slice(last)));
   }
-  var cols = {};
-  root.querySelectorAll(".tx-col").forEach(function (c) {
-    var k = c.getAttribute("data-k"); cols[k] = c;
-    var wrap = c.querySelector(".tx-tick-wrap");
+  var rows = {};
+  root.querySelectorAll(".tx2-row").forEach(function (r) {
+    var k = r.getAttribute("data-k"); rows[k] = r;
+    var rb = r.querySelector(".tx2-rlabel b"); rb.textContent = X.rows[k][0];
+    var code = document.createElement("em"); code.textContent = k.toUpperCase() + "0 to " + k.toUpperCase() + MAX[k]; rb.appendChild(code);
+    r.querySelector(".tx2-rlabel small").textContent = X.rows[k][1];
+    var t = r.querySelector(".tx2-track"); t.setAttribute("aria-label", X.rows[k][0]);
+    var fill = document.createElement("div"); fill.className = "tx2-fill"; t.appendChild(fill);
+    var over = document.createElement("div"); over.className = "tx2-over"; t.appendChild(over);
     for (var i = 0; i <= MAX[k]; i++) {
-      var t = document.createElement("i"); var sp = span(k, i);
-      t.style.bottom = (sp[0] * 100) + "%"; t.style.height = ((sp[1] - sp[0]) * 100) + "%";
-      t.textContent = k.toUpperCase() + i; wrap.appendChild(t);
+      var b = document.createElement("button"); b.type = "button"; b.className = "tx2-seg";
+      b.setAttribute("role", "radio"); b.setAttribute("data-l", i);
+      var sp = span(k, i); b.style.left = (sp[0] * 100) + "%"; b.style.width = ((sp[1] - sp[0]) * 100) + "%";
+      b.addEventListener("click", function (ev) { st[k] = +ev.currentTarget.getAttribute("data-l"); render(); showTip(k, st[k], ev.currentTarget); });
+      b.addEventListener("pointerenter", function (ev) { if (ev.pointerType === "mouse") showTip(k, +ev.currentTarget.getAttribute("data-l"), ev.currentTarget); });
+      b.addEventListener("pointerleave", function (ev) { if (ev.pointerType === "mouse") hideTip(); });
+      b.addEventListener("focus", function (ev) { showTip(k, +ev.currentTarget.getAttribute("data-l"), ev.currentTarget); });
+      b.addEventListener("blur", hideTip);
+      b.addEventListener("keydown", function (ev) {
+        var d = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[ev.key]; if (d === undefined) return;
+        ev.preventDefault(); st[k] = Math.max(0, Math.min(MAX[k], st[k] + d)); render();
+        t.querySelector('[data-l="' + st[k] + '"]').focus();
+      });
+      t.appendChild(b);
     }
-    function setFromY(clientY) {
-      var r = c.getBoundingClientRect(); var f = 1 - (clientY - r.top) / r.height; var lvl = 0;
-      for (var i = 0; i <= MAX[k]; i++) { if (f >= span(k, i)[0]) lvl = i; }
-      st[k] = lvl; render();
-    }
-    c.addEventListener("pointerdown", function (ev) { c.setPointerCapture(ev.pointerId); setFromY(ev.clientY); });
-    c.addEventListener("pointermove", function (ev) { if (c.hasPointerCapture(ev.pointerId)) setFromY(ev.clientY); });
-    c.addEventListener("keydown", function (ev) {
-      var d = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1 }[ev.key];
-      if (ev.key === "Home") d = -9; if (ev.key === "End") d = 9;
-      if (d === undefined) return; ev.preventDefault();
-      st[k] = Math.max(0, Math.min(MAX[k], st[k] + d)); render();
-    });
+    var cap = document.createElement("div"); cap.className = "tx2-cap"; t.appendChild(cap);
   });
-  root.querySelectorAll(".tx-paths button").forEach(function (b) {
+  root.querySelectorAll(".tx2-paths button").forEach(function (b) {
     b.addEventListener("click", function () { st.p = b.getAttribute("data-p"); st.extra = false; render(); });
   });
-  var extraBox = q(".tx-extra input");
+  var tip = q(".tx2-tip"), board = q(".tx2-board");
+  function line(cls, label, text) {
+    var w = document.createElement("span"); w.className = cls;
+    if (label) { var k = document.createElement("span"); k.className = "tt-k"; k.textContent = label; w.appendChild(k); }
+    w.appendChild(document.createTextNode(text)); return w;
+  }
+  // The definitions are quoted from Precision Is Not Proof; the pathway line
+  // and the band line are this page's own.
+  function showTip(k, i, btn) {
+    var d = X.defs[k][i], names = labels(k);
+    tip.textContent = "";
+    var code = document.createElement("span"); code.className = "tt-code";
+    code.textContent = k.toUpperCase() + i + " \u00b7 on the bar: \u201c" + names[i] + "\u201d"; tip.appendChild(code);
+    var nm = document.createElement("span"); nm.className = "tt-name"; nm.textContent = d[0]; tip.appendChild(nm);
+    tip.appendChild(line("tt-def", "", d[1]));
+    if (k === "a") tip.appendChild(line("tt-here", "For a " + X.pathways[st.p].label.toLowerCase() + " system", X.pathways[st.p].access[i] + "."));
+    if (k === "a") tip.appendChild(line("tt-claim", "Highest claim it supports", d[2]));
+    else tip.appendChild(line("tt-claim", "Counts towards", X.claims[band(i)] + (d[2] ? ". " + d[2] : "")));
+    tip.hidden = false;
+    btn.setAttribute("aria-describedby", "tx2-tip");
+    var br = board.getBoundingClientRect(), r = btn.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+    var cx = r.left + r.width / 2 - br.left;
+    var left = Math.max(8, Math.min(br.width - tw - 8, cx - tw / 2));
+    var below = r.top - th - 14 < 8;
+    tip.classList.toggle("is-below", below);
+    tip.style.left = left + "px";
+    tip.style.top = (below ? r.bottom - br.top + 12 : r.top - br.top - th - 12) + "px";
+    tip.style.setProperty("--arrow", (cx - left) + "px");
+  }
+  function hideTip() { tip.hidden = true; }
+  document.addEventListener("pointerdown", function (ev) { if (!ev.target.closest || !ev.target.closest(".tx2-seg")) hideTip(); });
+  window.addEventListener("scroll", hideTip, { passive: true });
+  var extraBox = q(".tx2-extra input");
   extraBox.addEventListener("change", function () { st.extra = extraBox.checked; render(); });
+
   function render() {
     var P = X.pathways[st.p];
-    root.querySelectorAll(".tx-paths button").forEach(function (b) { b.setAttribute("aria-checked", b.getAttribute("data-p") === st.p ? "true" : "false"); });
-    var lv = { a: st.a, e: st.e, v: st.v };
-    var bands = { a: band("a", st.a), e: band("e", st.e), v: band("v", st.v) };
-    var claim = Math.min(bands.a, bands.e, bands.v);
-    var frac = {}, minK = "a";
-    ["a", "e", "v"].forEach(function (k) { frac[k] = span(k, lv[k])[1]; });
-    ["e", "v"].forEach(function (k) { if (frac[k] < frac[minK]) minK = k; });
+    root.querySelectorAll(".tx2-paths button").forEach(function (b) {
+      b.setAttribute("aria-checked", b.getAttribute("data-p") === st.p ? "true" : "false");
+    });
+    var end = {}, weak = "a";
+    ["a", "e", "v"].forEach(function (k) { end[k] = span(k, st[k])[1]; });
+    ["e", "v"].forEach(function (k) { if (end[k] < end[weak]) weak = k; });
+    var x = end[weak], claim = band(st[weak]);
     ["a", "e", "v"].forEach(function (k) {
-      var c = cols[k];
-      c.querySelector(".tx-fill").style.height = (frac[k] * 100) + "%";
-      c.classList.toggle("is-weak", k === minK && claim < 2);
-      c.setAttribute("aria-valuenow", lv[k]);
-      c.querySelectorAll(".tx-tick-wrap i").forEach(function (t, i) { t.classList.toggle("on", i <= lv[k]); });
+      var r = rows[k], names = labels(k);
+      r.classList.toggle("is-weak", k === weak && claim < 2);
+      r.querySelector(".tx2-fill").style.width = (end[k] * 100) + "%";
+      var over = r.querySelector(".tx2-over");
+      over.style.left = (x * 100) + "%"; over.style.width = (Math.max(0, end[k] - x) * 100) + "%";
+      r.querySelector(".tx2-cap").style.left = (x * 100) + "%";
+      r.querySelectorAll(".tx2-seg").forEach(function (b, i) {
+        b.textContent = "";
+        var c = document.createElement("em"); c.textContent = k.toUpperCase() + i; b.appendChild(c);
+        b.appendChild(document.createTextNode(names[i]));
+        b.classList.toggle("is-in", i <= st[k]);
+        b.setAttribute("aria-checked", i === st[k] ? "true" : "false");
+        b.setAttribute("tabindex", i === st[k] ? "0" : "-1");
+        b.setAttribute("aria-label", X.rows[k][0] + " " + k.toUpperCase() + i + ": " + longText(k, i));
+      });
     });
-    var stage = q(".tx-cols"); var h = stage.getBoundingClientRect().height || 190;
-    q(".tx-beam").style.bottom = (30 + frac[minK] * h - 2) + "px";
-    q(".tx-beam-label").textContent = X.claims[claim];
-    q(".tx-claim-v").textContent = X.claims[claim];
-    q(".tx-claim-t").textContent = X.claimText[claim] + (st.v === 0 ? " Unpinned (V0) is disqualifying: record the version first." : "");
-    var accessText = P.access[st.a];
-    cols.a.setAttribute("aria-valuetext", "A" + st.a + ", " + accessText);
-    cols.e.setAttribute("aria-valuetext", X.evidence[st.e][0] + ", " + X.evidence[st.e][1]);
-    cols.v.setAttribute("aria-valuetext", X.validity[st.v][0] + ", " + X.validity[st.v][1]);
-    q(".tx-l-a").textContent = "A" + st.a + ": " + accessText;
-    q(".tx-l-e").textContent = X.evidence[st.e][0] + " " + X.evidence[st.e][1] + ": " + X.evidence[st.e][2];
-    q(".tx-l-v").textContent = X.validity[st.v][0] + " " + X.validity[st.v][1] + ": " + X.validity[st.v][2];
-    var lab = q(".tx-extra");
-    if (P.extra) { lab.hidden = false; lab.querySelector("span").textContent = P.extra.label + " (unlocks: " + P.extra.unlocks + ")"; extraBox.checked = st.extra; lab.classList.toggle("is-muted", st.a < 1); extraBox.disabled = st.a < 1; }
-    else { lab.hidden = true; }
-    var ul = q(".tx-caps"); ul.textContent = "";
+    root.querySelectorAll(".tx2-bands span").forEach(function (s, i) { s.classList.toggle("is-claim", i === claim); });
+    q(".tx2-claim strong").textContent = X.claims[claim];
+    q(".tx2-why").textContent = X.claimText[claim] + " Capped by " + X.rows[weak][0].toLowerCase() + " (" + weak.toUpperCase() + st[weak] + "): " + longText(weak, st[weak]) + ".";
+    q(".tx2-code").textContent = "A" + st.a + " \u00b7 E" + st.e + " \u00b7 V" + st.v;
+    var next = q(".tx2-next");
+    if (claim >= 2) {
+      next.className = "tx2-next is-top";
+      next.innerHTML = "";
+      var b0 = document.createElement("b"); b0.textContent = "This is the strongest class."; next.appendChild(b0);
+      next.appendChild(document.createTextNode("Going further along access changes what you can explain (why the system decides), not how strongly you can claim the disparity."));
+    } else {
+      next.className = "tx2-next"; next.innerHTML = "";
+      var target = X.claims[claim + 1];
+      var lifts = ["a", "e", "v"].filter(function (k) { return band(st[k]) <= claim; });
+      var b1 = document.createElement("b"); b1.textContent = "To reach " + target + ": "; next.appendChild(b1);
+      next.appendChild(document.createTextNode(lifts.map(function (k) {
+        return "raise " + X.rows[k][0].toLowerCase() + " to " + k.toUpperCase() + (claim + 1) + " “" + labels(k)[claim + 1] + "” (" + longText(k, claim + 1).replace(/\.$/, "").toLowerCase() + ")";
+      }).join("; and ") + "."));
+    }
+    if (st.v === 0) next.appendChild(document.createTextNode(" An unpinned version is disqualifying: record which version you tested before anything else."));
+    var lab = q(".tx2-extra");
+    if (P.extra) {
+      lab.hidden = false; q(".tx2-extra-t").textContent = P.extra.label + " \u00b7 unlocks " + P.extra.unlocks.toLowerCase();
+      extraBox.checked = st.extra; extraBox.disabled = st.a < 1; lab.classList.toggle("is-muted", st.a < 1);
+    } else { lab.hidden = true; }
+    var on = q(".tx2-on"), off = q(".tx2-off"); on.textContent = ""; off.textContent = "";
     P.caps.forEach(function (c) {
-      var li = document.createElement("li"); var open = st.a >= c[1] && (!c[2] || st.extra);
-      li.className = open ? "on" : "off"; li.textContent = c[0];
-      if (!open) { var s = document.createElement("small"); s.textContent = c[2] && st.a >= c[1] ? "needs the extra above" : "A" + c[1]; li.appendChild(s); }
-      ul.appendChild(li);
+      var open = st.a >= c[1] && (!c[2] || st.extra);
+      var li = document.createElement("li"); var i = document.createElement("i");
+      i.textContent = open ? "✓" : "→"; li.appendChild(i);
+      var t = document.createElement("span"); t.textContent = c[0];
+      if (!open) {
+        var sm = document.createElement("small");
+        sm.textContent = c[2] && st.a >= c[1] ? "needs the switch above" : "needs access “" + P.short[c[1]] + "”";
+        t.appendChild(sm);
+      }
+      li.appendChild(t); (open ? on : off).appendChild(li);
     });
-    q(".tx-ceiling").textContent = P.ceiling[st.a];
-    link(q(".tx-start"), P.start[st.a]);
+    if (!off.children.length) { var li = document.createElement("li"); li.textContent = "Nothing: you are at the top of the access ladder."; off.appendChild(li); }
+    q(".tx2-ceiling").textContent = P.ceiling[st.a];
+    link(q(".tx2-start"), P.start[st.a]);
   }
-  window.addEventListener("resize", render);
   render();
 })();
 </script>
@@ -946,7 +1090,7 @@ print(shift.round(2))   # how far the screener's note moves the reviewer, by ori
                         <h4>Resources</h4>
                         <ul>
                             <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
-                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.2.0/" target="_blank">PyPI (0.2.0)</a></li>
                             <li><a href="../concepts/references.html">Academic References</a></li>
                             <li><a href="../concepts/changelog.html">Changelog</a></li>
                         </ul>

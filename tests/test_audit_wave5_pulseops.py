@@ -268,7 +268,7 @@ def test_seasonal_pattern_period7_identical_to_weekday():
     tr = _analyzer_with(dates, vals)
     pat = tr.detect_seasonal_pattern("m", period=7)
     df = tr._daily_metrics.copy()
-    df["wd"] = df["date"].dt.dayofweek
+    df["wd"] = df["date"].dt.day_of_week
     expected = df.groupby("wd")["m"].mean().to_dict()
     assert pat == expected
     # And slot 0 is Monday (2026-01-05 is a Monday).

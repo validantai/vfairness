@@ -742,7 +742,7 @@ class AdversarialDebiasingLoss(_AdversarialCoverageLoss):
     References:
         - Zhang et al. (2018): Mitigating Unwanted Biases with Adversarial Learning
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1234,7 +1234,7 @@ class ProjectedAdversarialLoss(_AdversarialCoverageLoss):
           Backpropagation (gradient reversal)
         - Madras et al. (2018): Learning Adversarially Fair Representations
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -1451,7 +1451,7 @@ class FairRepresentationLoss(_AdversarialCoverageLoss):
         - Zemel et al. (2013): Learning Fair Representations
         - Louizos et al. (2016): The Variational Fair Autoencoder
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

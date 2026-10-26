@@ -100,6 +100,10 @@ def grade_variant(csv_path: str, code: str):
         "jurisdiction": "US",
         "source_kind": "tabular",
         "protected_attributes": [c for c in H.PROTECTED if c in audit.columns],
+        # invite_decision is text ("Yes"/"No"); Pulse codes a text decision only
+        # from its declared favourable value and never guesses (2026-10-09).
+        # "Yes" is an invitation, the favourable outcome.
+        "decision_labels": {"favourable_values": {"invite_decision": "Yes"}},
     }
     res = H.run_pulse(audit, inputs)
     if isinstance(res, dict) and "data" in res and "perVariable" in res.get("data", {}):

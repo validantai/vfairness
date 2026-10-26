@@ -83,7 +83,16 @@ References:
     - Bellamy, R.K.E., et al. (2018). AI Fairness 360: An Extensible Toolkit.
 """
 
+from .coverage import (
+    CoverageItem,
+    CoveragePolicy,
+    CoverageState,
+    MeasuredOutcome,
+    PolicyDecision,
+    assess_coverage,
+)
 from .gate import (
+    EvaluatedScope,
     FairnessReportCard,
     GateConfig,
     GateDecision,
@@ -92,6 +101,8 @@ from .gate import (
     IntersectionalGateDecision,
     MetricEvaluation,
     ModelFairnessGate,
+    ScopeGap,
+    ScopeLevel,
     SmallSampleWarning,
 )
 from .monitor import (
@@ -140,6 +151,16 @@ __all__ = [
     "IntersectionalGateDecision",
     "SmallSampleWarning",
     "FairnessReportCard",
+    # What a decision evaluated, and deployment policies (vfairness issue #1)
+    "EvaluatedScope",
+    "ScopeLevel",
+    "ScopeGap",
+    "CoveragePolicy",
+    "CoverageItem",
+    "CoverageState",
+    "MeasuredOutcome",
+    "PolicyDecision",
+    "assess_coverage",
     # Testing
     "FairnessTestSuite",
     "FairnessTestResult",

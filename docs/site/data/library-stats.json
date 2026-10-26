@@ -1,10 +1,10 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "status": "Beta",
   "lines_of_code": {
-    "total": 225213,
-    "code": 167043,
-    "files": 228
+    "total": 228098,
+    "code": 169364,
+    "files": 231
   },
   "capabilities": 215,
   "classes": 116,
@@ -1394,9 +1394,9 @@
   "kpis": {
     "size": {
       "lines_of_code": {
-        "total": 225213,
-        "code": 167043,
-        "files": 228
+        "total": 228098,
+        "code": 169364,
+        "files": 231
       },
       "svg_templates": 44,
       "sub_packages": {
@@ -1422,7 +1422,7 @@
     },
     "surface": {
       "functions": {
-        "total": 486,
+        "total": 489,
         "graded": 98,
         "graded_names": [
           "vfairness.evaluation.vfairness_metrics._statistics.bayesian_proportion_ci",
@@ -1713,6 +1713,9 @@
           "vfairness.operations.causal.task_handlers.handle_refute",
           "vfairness.operations.causal.task_handlers.load_dataset_from_payload",
           "vfairness.operations.causal.task_handlers.main",
+          "vfairness.operations.cicd.coverage.assess_coverage",
+          "vfairness.operations.cicd.coverage.policy_check_conclusion",
+          "vfairness.operations.cicd.coverage.policy_result_line",
           "vfairness.operations.cicd.precommit.check_fairness_config",
           "vfairness.operations.cicd.precommit.main",
           "vfairness.operations.cicd.quality_report.build_quality_report",
@@ -1916,7 +1919,7 @@
         ]
       },
       "classes": {
-        "total": 397,
+        "total": 405,
         "graded": 117,
         "graded_names": [
           "vfairness.agents.action_bias.ActionBiasAnalyzer",
@@ -2166,12 +2169,20 @@
           "vfairness.operations.causal.mediate.MediationResult",
           "vfairness.operations.causal.refute.RefutationOutcome",
           "vfairness.operations.causal.refute.RefutationResult",
+          "vfairness.operations.cicd.coverage.CoverageItem",
+          "vfairness.operations.cicd.coverage.CoveragePolicy",
+          "vfairness.operations.cicd.coverage.CoverageState",
+          "vfairness.operations.cicd.coverage.MeasuredOutcome",
+          "vfairness.operations.cicd.coverage.PolicyDecision",
+          "vfairness.operations.cicd.gate.EvaluatedScope",
           "vfairness.operations.cicd.gate.GateConfig",
           "vfairness.operations.cicd.gate.GateDecision",
           "vfairness.operations.cicd.gate.GateStatus",
           "vfairness.operations.cicd.gate.HierarchicalGateConfig",
           "vfairness.operations.cicd.gate.IntersectionalGateDecision",
           "vfairness.operations.cicd.gate.MetricEvaluation",
+          "vfairness.operations.cicd.gate.ScopeGap",
+          "vfairness.operations.cicd.gate.ScopeLevel",
           "vfairness.operations.cicd.gate.SmallSampleWarning",
           "vfairness.operations.cicd.monitor.AlertSeverity",
           "vfairness.operations.cicd.monitor.DriftAlert",
@@ -2321,7 +2332,7 @@
         ]
       },
       "methods": {
-        "total": 697,
+        "total": 705,
         "graded": 7,
         "graded_names": [
           "vfairness.evaluation.vfairness_metrics.analyzer.FairnessAnalyzer.demographic_parity_difference",
@@ -2623,6 +2634,11 @@
           "vfairness.operations.causal.identify.IdentificationResult.to_dict",
           "vfairness.operations.causal.mediate.MediationResult.to_dict",
           "vfairness.operations.causal.refute.RefutationResult.to_dict",
+          "vfairness.operations.cicd.coverage.CoverageItem.to_dict",
+          "vfairness.operations.cicd.coverage.CoveragePolicy.to_dict",
+          "vfairness.operations.cicd.coverage.PolicyDecision.to_dict",
+          "vfairness.operations.cicd.coverage.PolicyDecision.to_markdown_report",
+          "vfairness.operations.cicd.gate.EvaluatedScope.to_dict",
           "vfairness.operations.cicd.gate.FairnessReportCard.to_dict",
           "vfairness.operations.cicd.gate.FairnessReportCard.to_github_comment_payload",
           "vfairness.operations.cicd.gate.FairnessReportCard.to_markdown",
@@ -2635,9 +2651,12 @@
           "vfairness.operations.cicd.gate.MetricEvaluation.to_dict",
           "vfairness.operations.cicd.gate.ModelFairnessGate.create_github_check",
           "vfairness.operations.cicd.gate.ModelFairnessGate.evaluate",
+          "vfairness.operations.cicd.gate.ModelFairnessGate.evaluate_against_policy",
           "vfairness.operations.cicd.gate.ModelFairnessGate.evaluate_from_metrics",
           "vfairness.operations.cicd.gate.ModelFairnessGate.evaluate_hierarchical",
           "vfairness.operations.cicd.gate.ModelFairnessGate.get_explanation",
+          "vfairness.operations.cicd.gate.ScopeGap.to_dict",
+          "vfairness.operations.cicd.gate.ScopeLevel.to_dict",
           "vfairness.operations.cicd.gate.SmallSampleWarning.to_dict",
           "vfairness.operations.cicd.monitor.BiasMonitor.drift_detected",
           "vfairness.operations.cicd.monitor.BiasMonitor.get_alerts",
@@ -3026,15 +3045,15 @@
         ]
       },
       "total": {
-        "total": 1580,
+        "total": 1599,
         "graded": 222,
-        "ungraded": 1358
+        "ungraded": 1377
       },
       "capabilities": {
         "rows": 215,
         "objects": 222
       },
-      "modules_scanned": 206,
+      "modules_scanned": 207,
       "import_failures": [],
       "optional_extras_present": {
         "mcp": true,
@@ -3058,7 +3077,7 @@
         "fixed": 157
       },
       "tests": {
-        "collected": 16317,
+        "collected": 16503,
         "note": "collected in the published tree"
       },
       "ci": {
@@ -3076,16 +3095,16 @@
         "note": "Measured by CI with pytest --cov across the full dependency matrix on three interpreters. It is not recomputed on every docs build, so it is published AS OF the date above rather than as a live figure. The fix for a stale number is a date, not a silent refresh."
       },
       "remaining": {
-        "unclassified, needs a human": 391,
+        "unclassified, needs a human": 393,
         "returns a number or a result": 309,
-        "returns nothing or text": 121,
-        "renders, prints or converts": 216,
+        "returns nothing or text": 123,
+        "renders, prints or converts": 223,
         "no return annotation, needs a human": 41
       },
       "test_composition": {
-        "test_files": 590,
-        "test_function_definitions": 10324,
-        "refusal_named_tests": 2951,
+        "test_files": 597,
+        "test_function_definitions": 10459,
+        "refusal_named_tests": 2978,
         "refusal_named_files": 281,
         "vocabulary": [
           "fabricat",
@@ -3118,7 +3137,7 @@
       },
       "grading": {
         "available": true,
-        "measured_on": "2026-10-01",
+        "measured_on": "2026-10-24",
         "later_waves": [
           "surface-grading-2026-09-25.json",
           "surface-grading-2026-09-25b.json",
@@ -3134,7 +3153,8 @@
           "surface-grading-2026-09-30b.json",
           "surface-grading-2026-09-30c.json",
           "surface-grading-2026-09-30d.json",
-          "surface-grading-2026-10-01.json"
+          "surface-grading-2026-10-01.json",
+          "surface-grading-2026-10-24.json"
         ],
         "superseded": {
           "vfairness.evaluation.vfairness_metrics._grouping.GroupManager.get_invalid_groups": "DEFECT OPEN -> PROVEN (2026-09-29)",
@@ -3243,16 +3263,16 @@
           "vfairness.operations.monitoring.tracker.TemporalFairnessAnalyzer.update_daily_metrics": "NOT A MEASUREMENT -> PROVEN (2026-09-30)"
         },
         "unsupported_later_claims": [],
-        "items": 1374,
-        "by_agent": 1374,
+        "items": 1393,
+        "by_agent": 1393,
         "by_probe_alone": 0,
         "by_grade": {
           "SEMI-PROVEN": 79,
-          "PROVEN": 936,
+          "PROVEN": 955,
           "NOT A MEASUREMENT": 359
         },
         "audited": 756,
-        "unaudited": 618,
+        "unaudited": 637,
         "audit_overturned": 55,
         "audit_overturned_ever": 291,
         "audited_ever": 872,
@@ -3531,6 +3551,21 @@
           "retired": 0
         },
         {
+          "file": "surface-grading-2026-10-24.json",
+          "label": "grade-1",
+          "measured_on": "2026-10-24",
+          "rows": 19,
+          "by_grade": {
+            "PROVEN": 19
+          },
+          "audited": 0,
+          "overturned": 0,
+          "found_fabricating": 0,
+          "fixed": 0,
+          "sabotaged": 19,
+          "retired": 0
+        },
+        {
           "file": "surface-grading-from-probe.json",
           "label": "probe (withdrawn)",
           "measured_on": "2026-09-18",
@@ -3549,7 +3584,7 @@
     },
     "ledger": {
       "available": true,
-      "total": 1580,
+      "total": 1599,
       "core_areas": [
         "Agent fairness testing",
         "Bias detection",
@@ -3565,8 +3600,8 @@
         "Reporting",
         "Top level"
       ],
-      "core_total": 1398,
-      "core_checked": 1398,
+      "core_total": 1417,
+      "core_checked": 1417,
       "core_fix_pending": 0,
       "core_not_checked": 0,
       "core_to_close": 0,
@@ -3592,7 +3627,7 @@
       "path_fix_pending": 0,
       "path_not_checked": 0,
       "preview_to_close": 0,
-      "checked": 1580,
+      "checked": 1599,
       "fix_pending": 0,
       "not_checked": 0,
       "evidence_dates": [
@@ -3602,7 +3637,8 @@
         "2026-09-27",
         "2026-09-29",
         "2026-09-30",
-        "2026-10-01"
+        "2026-10-01",
+        "2026-10-24"
       ]
     },
     "release_gate": {
@@ -3612,14 +3648,14 @@
         {
           "id": "G1",
           "name": "Every public code unit carries a grade",
-          "measured": "1580 of 1580",
+          "measured": "1599 of 1599",
           "passes": true,
           "why": "An ungraded code unit is not a clean one. It is the absence of a measurement, and it is where every defect this campaign found was living: in code nobody had ever run on undefined input."
         },
         {
           "id": "G2",
           "name": "Every grade was confirmed by an independent check",
-          "measured": "618 unaudited",
+          "measured": "637 unaudited",
           "passes": false,
           "why": "291 of 872 grades were overturned when an independent agent was told to refute them. A grade nobody checked is a claim, not a measurement, and at that rate a large share of them are wrong."
         },
@@ -3650,7 +3686,7 @@
         {
           "id": "B1",
           "name": "Every public code unit has been EXECUTED and its result recorded",
-          "measured": "1580 of 1580 executed and recorded",
+          "measured": "1599 of 1599 executed and recorded",
           "passes": true,
           "why": "An unexamined code unit is the absence of a measurement, and it is where every defect this campaign found was living. Counted here: the capability census, the grading waves, the surface probe AND the test suite, which executes most of the surface and was credited for none of it until 2026-09-25. What remains is the genuinely untouched pile. See B1b for the disclosure half.",
           "plain": "Has every public unit actually been RUN, with the result written down? Not a belief that it works: executed, by the suite or an audit, and recorded."
@@ -3658,7 +3694,7 @@
         {
           "id": "B1b",
           "name": "Every public code unit's examination state is PUBLISHED where it is described",
-          "measured": "1580 of 1580 carry a published state",
+          "measured": "1599 of 1599 carry a published state",
           "passes": true,
           "why": "The clause the beta tier's own definition ends with, and the one that decides whether an unexamined unit can mislead anybody: not that everything was checked, but that nothing unchecked is presented as checked. Each row states which of the three states it is in and, when it is unexamined, why. Enforced by scripts/capability_status.py --check, scripts/stamp_status_badges.py --check and tests/test_capability_status_badges.py, each sabotage-tested.",
           "plain": "Can a reader SEE that state where the unit is described? A measurement nobody can find is the defect this library is audited for."

@@ -186,8 +186,8 @@ including where the readiness bar currently stands, is one page:
    edits plus 23 shared navigation replacements across 25 files (it was 24 files on
    2026-09-09). The anchors go stale whenever a page is reworded: on 2026-10-01
    three of them no longer matched and the script refused, correctly, until they
-   were updated. Run `--check` well before release day, not on it. Twenty `docs/site` pages carry a shared navigation literal
-   ("PyPI (0.1.0 not yet published)"), and further claims sit in a callout title,
+   were updated. Run `--check` well before release day, not on it. While a version is unreleased, twenty `docs/site` pages carry a shared navigation literal
+   ("PyPI (X.Y.Z not yet published)"), and further claims sit in a callout title,
    a table cell, a `version-date` span and several prose paragraphs. The gate
    below checks EVERY `docs/site` page on the released side, so editing only the
    three prose files leaves the suite red with twenty-odd places left to find, at
@@ -216,13 +216,18 @@ including where the readiness bar currently stands, is one page:
    this step: update that test in the SAME commit so it asserts the released
    form. Do not reach for `--no-verify`; a gate you can only satisfy by bypassing
    it is a broken gate, and here it is telling you the step is not finished.
-4. **Tag and push, on `validantai/vfairness`.** Create an annotated tag and push
-   it:
+4. **Tag and push, on `validantai/vfairness`.** From the private monorepo this is
+   one command, and it tags by itself: `scripts/export-vfairness-to-public.sh
+   --push` (after a dry run without `--push`) commits the snapshot to
+   `validantai/vfairness` main as "Release vX.Y.Z", creates the annotated tag
+   `vX.Y.Z` and pushes both. Do not tag by hand as well. Only when working
+   directly in a clone of `validantai/vfairness`, with no monorepo, create and push
+   the tag yourself:
 
    ```bash
-   # Run this in a clone of validantai/vfairness, not in the private monorepo.
-   git tag -a v0.1.0 -m "vfairness 0.1.0"
-   git push origin v0.1.0
+   # Only in a clone of validantai/vfairness, never in the private monorepo.
+   git tag -a vX.Y.Z -m "vfairness X.Y.Z"
+   git push origin vX.Y.Z
    ```
 
    Build, verify and smoke run automatically. When the run reaches the `pypi`

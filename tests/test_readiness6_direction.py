@@ -319,7 +319,7 @@ def _weekly(friday: float, other: float, metric: str, days: int = 28):
     for i in range(days):
         # 2025-01-06 is a Monday, so dayofweek 4 is Friday.
         date = pd.Timestamp("2025-01-06") + pd.Timedelta(days=i)
-        analyzer.update_daily_metrics(date, {metric: friday if date.dayofweek == 4 else other})
+        analyzer.update_daily_metrics(date, {metric: friday if date.day_of_week == 4 else other})
     return analyzer
 
 

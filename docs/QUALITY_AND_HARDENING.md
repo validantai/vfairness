@@ -7,8 +7,8 @@
 
 | | Criterion | Measured now | Closes when |
 | --- | --- | --- | --- |
-| PASS | `B1` Every public code unit has been EXECUTED and its result recorded | 1580 of 1580 executed and recorded |  |
-| PASS | `B1b` Every public code unit's examination state is PUBLISHED where it is described | 1580 of 1580 carry a published state |  |
+| PASS | `B1` Every public code unit has been EXECUTED and its result recorded | 1599 of 1599 executed and recorded |  |
+| PASS | `B1b` Every public code unit's examination state is PUBLISHED where it is described | 1599 of 1599 carry a published state |  |
 | PASS | `B2` No open defect in code that returns a fairness number or verdict | 0 open (0 measuring, 0 unclassified) |  |
 | PASS | `B2b` No open defect recorded by the second-round audit | 0 open of 59 recorded claims |  |
 | PASS | `B3` Every remaining open defect carries an assessed severity | 0 non-measuring open, severity unassessed |  |
@@ -150,12 +150,11 @@ Checking one honestly is five:
 
 Multiplied across the public surface, that ratio is the whole of this page.
 
-**Nothing has been released yet.** There is no `v0.1.0` tag, the repository
-carries no tags at all, and no artifact has reached PyPI or TestPyPI. The
-release pipeline below is built and gated but has never run to a publish.
-`CHANGELOG.md` heads its section `[0.1.0] - UNRELEASED` for that reason.
+**Released as a beta.** `0.1.0` was published to PyPI on 2026-10-02 and `0.2.0`
+on 2026-10-26, each from its tag on `validantai/vfairness` by the release
+pipeline below. Both passed the beta gate; neither is the stable 1.0.
 
-**And it is not ready to be.** The verdict below is generated on every docs build
+**And 1.0 is not ready yet.** The verdict below is generated on every docs build
 rather than typed, because this is the paragraph a reader consults to decide whether
 to publish, and it is the worst place in the repository for a stale number. The
 previous version said "Run on 2026-09-25 ... four of the six beta criteria pass ...
@@ -170,8 +169,8 @@ _Generated 2026-10-02 by `scripts/release_gate.py`._
 
 | | Criterion | Measured | Verdict |
 | --- | --- | --- | --- |
-| B1 | Every public code unit has been EXECUTED and its result recorded | 1580 of 1580 executed and recorded | passes |
-| B1b | Every public code unit's examination state is PUBLISHED where it is described | 1580 of 1580 carry a published state | passes |
+| B1 | Every public code unit has been EXECUTED and its result recorded | 1599 of 1599 executed and recorded | passes |
+| B1b | Every public code unit's examination state is PUBLISHED where it is described | 1599 of 1599 carry a published state | passes |
 | B2 | No open defect in code that returns a fairness number or verdict | 0 open (0 measuring, 0 unclassified) | passes |
 | B2b | No open defect recorded by the second-round audit | 0 open of 59 recorded claims | passes |
 | B3 | Every remaining open defect carries an assessed severity | 0 non-measuring open, severity unassessed | passes |
@@ -183,8 +182,8 @@ _Generated 2026-10-02 by `scripts/release_gate.py`._
 
 | | Criterion | Measured | Verdict |
 | --- | --- | --- | --- |
-| G1 | Every public code unit carries a grade | 1580 of 1580 | passes |
-| G2 | Every grade was confirmed by an independent check | 618 unaudited | **fails** |
+| G1 | Every public code unit carries a grade | 1599 of 1599 | passes |
+| G2 | Every grade was confirmed by an independent check | 637 unaudited | **fails** |
 | G3 | No open defect anywhere in the public surface | 0 open | passes |
 | G4 | Every open defect has an assessed severity | 0 unassessed | passes |
 | G5 | Capability census complete and clear | 0 open, 0 unproven | passes |
@@ -295,12 +294,12 @@ markdown API reference, in its own docstring, and in the full grid at
 <!-- STATUS:summary:start -->
 | State | Whole public surface | Share | Core |
 | --- | ---: | ---: | ---: |
-| **CHECKED** | 1580 | 100.0% | 1398 |
+| **CHECKED** | 1599 | 100.0% | 1417 |
 | **FIX PENDING** | 0 | 0.0% | 0 |
 | **NOT CHECKED** | 0 | 0.0% | 0 |
-| | **1580** | 100% | **1398** |
+| | **1599** | 100% | **1417** |
 
-Assembled by `scripts/capability_status.py` from evidence dated 2026-09-11, 2026-09-18, 2026-09-25, 2026-09-27, 2026-09-29, 2026-09-30, 2026-10-01; the newest rows are 2026-10-01. **Core** is what the beta promises: every area this project publishes a guide or a product page for, plus the top-level namespace, which is Agent fairness testing, Bias detection, CI/CD gates, Explainability (XAI), Fairness metrics, In-processing mitigation, LLM fairness testing, Monitoring, Post-processing mitigation, Preprocessing mitigation, Report rendering, Reporting and Top level (1398 code units). The rest is preview: documented and usable, and not covered by the beta bar.
+Assembled by `scripts/capability_status.py` from evidence dated 2026-09-11, 2026-09-18, 2026-09-25, 2026-09-27, 2026-09-29, 2026-09-30, 2026-10-01, 2026-10-24; the newest rows are 2026-10-24. **Core** is what the beta promises: every area this project publishes a guide or a product page for, plus the top-level namespace, which is Agent fairness testing, Bias detection, CI/CD gates, Explainability (XAI), Fairness metrics, In-processing mitigation, LLM fairness testing, Monitoring, Post-processing mitigation, Preprocessing mitigation, Report rendering, Reporting and Top level (1417 code units). The rest is preview: documented and usable, and not covered by the beta bar.
 <!-- STATUS:summary:end -->
 
 - **CHECKED** means graded and assessed: it was executed on healthy input and on
@@ -328,9 +327,9 @@ ways: anything we are not prepared to examine has to stop being presented as rea
 <!-- BGL:scope_table:start -->
 | Scope | Units | Checked | Fix pending | Not checked |
 | --- | ---: | ---: | ---: | ---: |
-| **Core**, what the beta promises | 1,398 | 1,398 | 0 | **0** |
+| **Core**, what the beta promises | 1,417 | 1,417 | 0 | **0** |
 | **Preview**, documented but not certified | 182 | 182 | 0 | **0** |
-| _total_ | 1,580 | 1,580 | 0 | 0 |
+| _total_ | 1,599 | 1,599 | 0 | 0 |
 <!-- BGL:scope_table:end -->
 
 **In core:** the assessment path itself (fairness metrics, bias detection,
@@ -420,7 +419,7 @@ render time:
 | --- | ---: | --- |
 | Carry a proof batch | 215 | yes, one of BGL-A/B/C/D above |
 | Plain functions with no batch | 90 | **no grade at all** |
-| Classes with no batch | 114 | no grade; mostly result containers, configs and exceptions |
+| Classes with no batch | 120 | no grade; mostly result containers, configs and exceptions |
 
 Those **90 functions were never executed on degenerate input by this
 census**. They are NOT BGL-C: BGL-C is a measured statement about a capability
@@ -547,21 +546,21 @@ of 2026-09-25 it stood at 64 defect open, none of them an observed fabrication.
 The 100% above is 100% of the 215.
 
 <!-- BGL:grading:start -->
-_Generated from the grading evidence. Newest wave: 2026-10-01._
+_Generated from the grading evidence. Newest wave: 2026-10-24._
 
 | State | Count |
 | --- | --: |
-| Proven | 936 |
+| Proven | 955 |
 | Semi-Proven | 79 |
 | Not A Measurement | 359 |
 | Defect Open | 0 |
 | Unproven | 0 |
-| **Graded, total** | **1374** |
+| **Graded, total** | **1393** |
 
 | How settled the grades are | Count |
 | --- | --: |
 | Current grade independently checked | 756 |
-| **No independent check yet** | **618** |
+| **No independent check yet** | **637** |
 | Overturned on audit, ever | 291 |
 | ... of which the row was later re-graded | 236 |
 | Caught fabricating, by execution | 417 |
@@ -589,18 +588,19 @@ these do not sum to the totals above:
 | bgl5 | 2026-09-30 | 1 | 0 | 1 | 1 | **none** | not checked |
 | grade-1 | 2026-09-30 | 481 | 0 | 0 | 481 | **none** | not checked |
 | grade-1 | 2026-10-01 | 6 | 0 | 0 | 6 | **none** | not checked |
+| grade-1 | 2026-10-24 | 19 | 0 | 0 | 19 | **none** | not checked |
 | probe (withdrawn) | 2026-09-18 | 0 | 0 | 0 | 0 | **none** | not checked |
 
 | The surface those grades sit in | Count |
 | --- | --: |
-| Public code units in the library | 1580 |
+| Public code units in the library | 1599 |
 | Graded by the capability census | 222 |
-| Graded by the wider-surface waves | 1374 |
+| Graded by the wider-surface waves | 1393 |
 | **Carrying no grade from either** | **-16** |
 
 Executed is a different and weaker measurement than graded, and the two are never added: the release gate's B1 counts a unit as executed once any of the census, the waves, the probes or the test suite has run it and recorded what came back. Reproduce both with `python scripts/release_gate.py`.
 
-**618 unaudited grades is the largest thing open here.** 291 grades have been overturned when somebody independent attacked them, better than one in five of those checked, so an unaudited grade is a claim with evidence behind it rather than a settled measurement. The two overturn figures answer different questions: 55 rows carry an overturn AND still carry their audited grade, while 236 more were re-graded by a later wave, which resets them to unaudited and used to delete the record of the overturn with them.
+**637 unaudited grades is the largest thing open here.** 291 grades have been overturned when somebody independent attacked them, better than one in five of those checked, so an unaudited grade is a claim with evidence behind it rather than a settled measurement. The two overturn figures answer different questions: 55 rows carry an overturn AND still carry their audited grade, while 236 more were re-graded by a later wave, which resets them to unaudited and used to delete the record of the overturn with them.
 <!-- BGL:grading:end -->
 
 The graded and executed counts are in the generated block above rather than typed

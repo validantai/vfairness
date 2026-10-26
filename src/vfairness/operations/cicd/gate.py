@@ -18,7 +18,7 @@ from dataclasses import dataclass, field, replace
 from datetime import datetime
 from enum import Enum
 from itertools import combinations
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -31,6 +31,10 @@ from vfairness.evaluation.vfairness_metrics._metric_direction import (
     relax_threshold,
     vacuous_bound_reason,
 )
+
+if TYPE_CHECKING:
+    # coverage.py builds on this module, so it is imported where it is used.
+    from .coverage import CoveragePolicy, PolicyDecision
 
 
 class GateStatus(Enum):
@@ -196,6 +200,127 @@ class SmallSampleWarning:
             "metric_name": self.metric_name,
             "message": self.message,
         }
+
+
+# ---------------------------------------------------------------------------
+# WHAT A DECISION ACTUALLY EVALUATED, as data rather than prose.
+# ---------------------------------------------------------------------------
+#
+# vfairness issue #1 (2026-10-07). The scope of a decision was carried only as
+# sentences: blocking reasons, warnings and the NOT SIZED strings. A consumer that
+# had to compare it with what a deployment REQUIRES had to parse English. Measured
+# 2026-10-24 on four cells of 100 rows whose single attributes are all at a 0.5
+# selection rate and whose two-way cells are at 0.8 / 0.2 / 0.2 / 0.8, threshold
+# 0.1: check_intersections=False returned approved=True, status APPROVED, and the
+# only trace of the skipped level was the string "the intersection cells of
+# sex_x_race (check_intersections is off)".
+#
+# Recorded as the levels run, never derived from the config afterwards, for the
+# reason evaluate_hierarchical gives for its coverage lists: a second reading of
+# the config is a second chance to disagree with it.
+
+
+@dataclass(frozen=True)
+class ScopeLevel:
+    """One level a decision evaluated, and the threshold it applied to each metric.
+
+    Attributes:
+        name: The level key, as in ``IntersectionalGateDecision.level_results``
+            (``'overall'``, ``'attr:<a>'``, ``'intersection:<a>_x_<b>'``), or
+            ``'flat'`` for :meth:`ModelFairnessGate.evaluate` and
+            ``'provided_metrics'`` for :meth:`ModelFairnessGate.evaluate_from_metrics`.
+        attributes: The named attributes this level compared groups of. Empty for
+            the flat entry points, which are handed one unnamed array or none.
+        thresholds: The threshold actually applied at this level to each
+            configured metric, AFTER any intersectional relaxation or override.
+            ``None`` where the metric had no threshold there.
+    """
+
+    name: str
+    attributes: Tuple[str, ...]
+    thresholds: Dict[str, Optional[float]]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "name": self.name,
+            "attributes": list(self.attributes),
+            "thresholds": dict(self.thresholds),
+        }
+
+
+@dataclass(frozen=True)
+class ScopeGap:
+    """A group set the data defines that no level evaluated, and the setting why.
+
+    Attributes:
+        attributes: The attribute, or the attributes of the intersection.
+        setting: The configuration field that left it out
+            (``'check_single_attributes'``, ``'check_intersections'`` or
+            ``'intersection_depth'``).
+        reason: The same cause in words.
+    """
+
+    attributes: Tuple[str, ...]
+    setting: str
+    reason: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"attributes": list(self.attributes), "setting": self.setting, "reason": self.reason}
+
+
+@dataclass(frozen=True)
+class EvaluatedScope:
+    """The structured record of what one decision evaluated.
+
+    Attributes:
+        attributes_supplied: The attribute names handed to the gate, in order.
+        metrics: The configured metrics.
+        blocking_metrics: ``GateConfig.blocking_metrics`` as configured (``None``
+            means every metric blocks).
+        min_group_size: The minimum group size the levels certified against.
+        levels: Every level that ran, in the order it ran.
+        not_evaluated: Every group set inside the configured depth that no level
+            evaluated. Combinations deeper than the configured depth are not
+            listed, exactly as ``small_sample_unsized`` does not list them.
+    """
+
+    attributes_supplied: Tuple[str, ...]
+    metrics: Tuple[str, ...]
+    blocking_metrics: Optional[Tuple[str, ...]]
+    min_group_size: Union[int, float]
+    levels: Tuple[ScopeLevel, ...]
+    not_evaluated: Tuple[ScopeGap, ...] = ()
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "attributes_supplied": list(self.attributes_supplied),
+            "metrics": list(self.metrics),
+            "blocking_metrics": (
+                list(self.blocking_metrics) if self.blocking_metrics is not None else None
+            ),
+            "min_group_size": self.min_group_size,
+            "levels": [level.to_dict() for level in self.levels],
+            "not_evaluated": [gap.to_dict() for gap in self.not_evaluated],
+        }
+
+
+def _flat_scope(config: "GateConfig", level_name: str) -> EvaluatedScope:
+    """The scope of a decision made on one unnamed group array, or on bare numbers."""
+    return EvaluatedScope(
+        attributes_supplied=(),
+        metrics=tuple(config.metrics),
+        blocking_metrics=(
+            tuple(config.blocking_metrics) if config.blocking_metrics is not None else None
+        ),
+        min_group_size=config.min_group_size,
+        levels=(
+            ScopeLevel(
+                name=level_name,
+                attributes=(),
+                thresholds={m: config.thresholds.get(m) for m in config.metrics},
+            ),
+        ),
+    )
 
 
 def _undersized_groups(protected_attr: np.ndarray, min_group_size: int) -> List[SmallSampleWarning]:
@@ -1033,6 +1158,9 @@ class GateDecision:
             evaluate_from_metrics' own docstring insists on the distinction ("an
             empty list means NOT CHECKED, not 'no small groups'") and no
             consumer of ``to_dict`` or of the markdown report could read it.
+        evaluated_scope: What this decision evaluated, as data (vfairness issue
+            #1). ``None`` on a hand-built decision, which records nothing about its
+            scope.
     """
 
     approved: bool
@@ -1057,6 +1185,7 @@ class GateDecision:
     # compared, and the numbers from a caller-supplied compute_metrics_fn rest on
     # rows the gate cannot see.
     small_sample_unsized: List[str] = field(default_factory=list)
+    evaluated_scope: Optional[EvaluatedScope] = None
 
     @property
     def summary(self) -> str:
@@ -1091,6 +1220,11 @@ class GateDecision:
             # twin: a True above covers the counts this gate sized, never every
             # count behind every number it was handed.
             "small_sample_unsized": list(self.small_sample_unsized),
+            # The same scope as data (vfairness issue #1), so a consumer comparing
+            # it with a requirement does not have to parse the sentences above.
+            "evaluated_scope": (
+                self.evaluated_scope.to_dict() if self.evaluated_scope is not None else None
+            ),
         }
 
     def to_markdown_report(self) -> str:
@@ -1352,6 +1486,10 @@ class IntersectionalGateDecision:
     # is the bound ITS scan applies and it can be just as unbreachable. A NaN
     # minimum is carried as float("nan"), hence Union[int, float] (W4).
     small_sample_vacuous_minimum: Optional[Union[int, float]] = None
+    # What this hierarchy evaluated, as data (vfairness issue #1): every level that
+    # ran with the thresholds it applied, and every group set it left out with the
+    # setting that left it out. None on a hand-built decision.
+    evaluated_scope: Optional[EvaluatedScope] = None
 
     @property
     def summary(self) -> str:
@@ -1398,6 +1536,9 @@ class IntersectionalGateDecision:
             # data, and the difference is exactly where the intersection cells of
             # five people live.
             "small_sample_unsized": list(self.small_sample_unsized),
+            "evaluated_scope": (
+                self.evaluated_scope.to_dict() if self.evaluated_scope is not None else None
+            ),
         }
 
     def to_markdown_report(self) -> str:
@@ -1581,7 +1722,7 @@ class ModelFairnessGate:
         ... else:
         ...     block_deployment(decision.blocking_reasons)
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -2319,6 +2460,7 @@ class ModelFairnessGate:
             # W4: what that True does NOT cover. Empty for the default path, which
             # sizes every denominator of every metric it computes.
             small_sample_unsized=rate_unsized,
+            evaluated_scope=_flat_scope(self.config, "flat"),
         )
 
     def _compute_default_metrics(
@@ -2931,6 +3073,7 @@ class ModelFairnessGate:
             # must not read as "no group was too small". The docstring said so
             # and, until 2026-09-27, no consumer could see it.
             small_sample_check_ran=False,
+            evaluated_scope=_flat_scope(self.config, "provided_metrics"),
         )
 
     def get_explanation(self, decision):
@@ -2949,7 +3092,9 @@ class ModelFairnessGate:
 
         return FairnessExplainer.explain(decision)
 
-    def create_github_check(self, decision: GateDecision) -> Dict[str, Any]:
+    def create_github_check(
+        self, decision: Union[GateDecision, IntersectionalGateDecision, "PolicyDecision"]
+    ) -> Dict[str, Any]:
         """Create a GitHub Check Run compatible payload.
 
         THREE CONCLUSIONS, because the decision has three states. ``failure``
@@ -2957,12 +3102,34 @@ class ModelFairnessGate:
         not be checked (:attr:`GateStatus.CONDITIONAL`), ``success`` only for a
         gate that measured every configured metric and passed all of them.
 
+        A :class:`~vfairness.operations.cicd.coverage.PolicyDecision` is judged by
+        its policy (vfairness issue #1): ``failure`` whenever the policy is not
+        met, however the measurement came out, so a required check that was
+        switched off fails the pull request instead of passing it.
+
         Args:
-            decision: Gate decision to convert.
+            decision: Gate decision, or policy decision, to convert.
 
         Returns:
             Dictionary compatible with GitHub Checks API.
         """
+        from .coverage import PolicyDecision, policy_check_conclusion
+
+        if isinstance(decision, PolicyDecision):
+            met = "met" if decision.permitted else "not met"
+            return {
+                "name": "Fairness Gate",
+                "status": "completed",
+                "conclusion": policy_check_conclusion(decision),
+                "output": {
+                    "title": (
+                        f"Fairness policy {decision.policy.policy_id} "
+                        f"v{decision.policy.version}: {met}"
+                    ),
+                    "summary": decision.summary,
+                    "text": decision.to_markdown_report(),
+                },
+            }
         # BGL-3, measured 2026-09-27. `"success" if decision.approved else
         # "failure"` collapsed CONDITIONAL onto success, and CONDITIONAL exists
         # for exactly one reason: a metric was NOT measured and the gate chose
@@ -3080,6 +3247,13 @@ class ModelFairnessGate:
         # 2026-09-30). Recorded here, beside its sibling, at the point the sizing
         # happens.
         small_sample_sized_intersections: List[str] = []
+        # The same record as data, with the threshold each level APPLIED (vfairness
+        # issue #1): an intersection runs on relaxed or overridden thresholds, and a
+        # requirement can only be compared with the number that was actually used.
+        scope_levels: List[ScopeLevel] = []
+
+        def _applied(thresholds: Dict[str, Any]) -> Dict[str, Optional[float]]:
+            return {m: thresholds.get(m) for m in self.config.metrics}
 
         # Level 1: Overall (using first attribute as reference)
         if hconfig.check_overall and attr_names:
@@ -3092,6 +3266,9 @@ class ModelFairnessGate:
                 model_metadata=model_metadata,
             )
             level_results["overall"] = decision
+            scope_levels.append(
+                ScopeLevel("overall", (attr_names[0],), _applied(level_gate.config.thresholds))
+            )
             all_blocking.extend(decision.blocking_reasons)
             all_warnings.extend(decision.warnings)
             # This level measures attr_names[0] and ONLY attr_names[0]. Every
@@ -3126,6 +3303,11 @@ class ModelFairnessGate:
                     model_metadata=model_metadata,
                 )
                 level_results[f"attr:{attr_name}"] = decision
+                scope_levels.append(
+                    ScopeLevel(
+                        f"attr:{attr_name}", (attr_name,), _applied(level_gate.config.thresholds)
+                    )
+                )
                 all_blocking.extend(decision.blocking_reasons)
                 all_warnings.extend(decision.warnings)
                 evaluated_attrs.append(attr_name)
@@ -3249,6 +3431,9 @@ class ModelFairnessGate:
                         model_metadata=model_metadata,
                     )
                     level_results[level_name] = decision
+                    scope_levels.append(
+                        ScopeLevel(level_name, tuple(combo), _applied(intersection_thresholds))
+                    )
                     all_blocking.extend(decision.blocking_reasons)
                     all_warnings.extend(decision.warnings)
                     evaluated_attrs.extend(combo)
@@ -3406,6 +3591,43 @@ class ModelFairnessGate:
         if self.compute_metrics_fn is not None:
             small_sample_unsized.append(_unsized_rate_scope_sentence())
 
+        # THE GROUP SETS NO LEVEL EVALUATED, as data (vfairness issue #1). The same
+        # combinations and the same causes as the NOT SIZED list above, but about
+        # EVALUATION rather than sizing: an attribute the overall level compared is
+        # evaluated even when check_single_attributes is off.
+        single_levels = {
+            level.attributes[0]
+            for level in scope_levels
+            if level.name == "overall" or level.name.startswith("attr:")
+        }
+        scope_gaps: List[ScopeGap] = [
+            ScopeGap((a,), "check_single_attributes", "check_single_attributes is off")
+            for a in attr_names
+            if a not in single_levels
+        ]
+        evaluated_intersections = {level.name for level in scope_levels}
+        gap_setting = (
+            "intersection_depth"
+            if hconfig.check_intersections and hconfig.intersection_depth < 2
+            else "check_intersections"
+        )
+        for r in range(2, definable_depth + 1):
+            for combo in combinations(attr_names, r):
+                if f"intersection:{'_x_'.join(combo)}" not in evaluated_intersections:
+                    scope_gaps.append(ScopeGap(tuple(combo), gap_setting, unsized_cause))
+        evaluated_scope = EvaluatedScope(
+            attributes_supplied=tuple(attr_names),
+            metrics=tuple(self.config.metrics),
+            blocking_metrics=(
+                tuple(self.config.blocking_metrics)
+                if self.config.blocking_metrics is not None
+                else None
+            ),
+            min_group_size=hconfig.min_group_size,
+            levels=tuple(scope_levels),
+            not_evaluated=tuple(scope_gaps),
+        )
+
         return IntersectionalGateDecision(
             approved=approved,
             status=status,
@@ -3431,6 +3653,79 @@ class ModelFairnessGate:
             # infer the scope of a True from the configuration.
             small_sample_unsized=small_sample_unsized,
             small_sample_vacuous_minimum=vacuous_minimum,
+            evaluated_scope=evaluated_scope,
+        )
+
+    def evaluate_against_policy(
+        self,
+        policy: "CoveragePolicy",
+        y_true: np.ndarray,
+        y_pred: np.ndarray,
+        protected_attrs: Dict[str, np.ndarray],
+        *,
+        hierarchical_config: Optional[HierarchicalGateConfig] = None,
+        baseline_metrics: Optional[Dict[str, float]] = None,
+        model_metadata: Optional[Dict[str, Any]] = None,
+    ) -> "PolicyDecision":
+        """Measure hierarchically, then hold the result to a deployment policy.
+
+        vfairness issue #1. :meth:`evaluate_hierarchical` runs exactly as it would
+        without a policy, and its decision is returned UNCHANGED as
+        ``PolicyDecision.measurement``. The policy never switches a level on, never
+        tightens a threshold and never drops a supplied attribute: it compares what
+        ran with what it requires, and every difference is named. So switching a
+        required check off produces an incomplete assessment against the policy,
+        however well the levels that did run came out.
+
+        Use ``PolicyDecision.permitted`` as the deployment decision. The
+        measurement's ``approved`` keeps its meaning, "nothing blocked on the levels
+        that ran", and is not a permission under the policy.
+
+        There is no parameter for an exception or an approver, on purpose: nothing a
+        caller passes can turn a coverage gap into a permission. Exceptions, who may
+        grant them, their expiry and revocation belong to the integration that
+        enforces the policy. ``model_metadata`` is carried into the measurement as
+        before and is never read by the comparison.
+
+        Args:
+            policy: The :class:`~vfairness.operations.cicd.coverage.CoveragePolicy`.
+            y_true: True labels.
+            y_pred: Predicted labels.
+            protected_attrs: Attribute names to arrays, as for
+                :meth:`evaluate_hierarchical`.
+            hierarchical_config: Which levels to run (default: all of them).
+            baseline_metrics: Optional baseline for improvement checks.
+            model_metadata: Optional model metadata.
+
+        Returns:
+            A :class:`~vfairness.operations.cicd.coverage.PolicyDecision`.
+        """
+        from .coverage import CoveragePolicy, assess_coverage
+
+        if not isinstance(policy, CoveragePolicy):
+            raise TypeError(
+                f"policy must be a CoveragePolicy, got {type(policy).__name__}; build one "
+                f"with CoveragePolicy(policy_id=..., version=..., required_attributes=..., "
+                f"required_metrics=...)"
+            )
+        hconfig = hierarchical_config or HierarchicalGateConfig()
+        measurement = self.evaluate_hierarchical(
+            y_true,
+            y_pred,
+            protected_attrs,
+            hierarchical_config=hconfig,
+            baseline_metrics=baseline_metrics,
+            model_metadata=model_metadata,
+        )
+        return assess_coverage(
+            policy,
+            measurement,
+            protected_attrs=protected_attrs,
+            y_true=y_true,
+            y_pred=y_pred,
+            gate_config=self.config,
+            hierarchical_config=hconfig,
+            compute_metrics_fn=self.compute_metrics_fn,
         )
 
 
@@ -3451,7 +3746,7 @@ class FairnessReportCard:
         >>> # Or get a payload for the GitHub Comments API:
         >>> payload = card.to_github_comment_payload()
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -3462,11 +3757,21 @@ class FairnessReportCard:
 
     def __init__(
         self,
-        decision: Union[GateDecision, IntersectionalGateDecision],
+        decision: Union[GateDecision, IntersectionalGateDecision, "PolicyDecision"],
         model_name: Optional[str] = None,
         include_intersectional: bool = True,
     ):
-        self.decision = decision
+        from .coverage import PolicyDecision
+
+        # A PolicyDecision (vfairness issue #1) is carded as its policy result above
+        # the card of its measurement. Everything below the header reads
+        # self.decision, so the measurement renders exactly as it would alone.
+        self.policy_decision: Optional[PolicyDecision] = (
+            decision if isinstance(decision, PolicyDecision) else None
+        )
+        self.decision: Union[GateDecision, IntersectionalGateDecision] = (
+            decision.measurement if isinstance(decision, PolicyDecision) else decision
+        )
         self.model_name = model_name or "model"
         self.include_intersectional = include_intersectional
 
@@ -3476,14 +3781,34 @@ class FairnessReportCard:
         status = self.decision.status
         approved = self.decision.approved
 
-        # Header with status badge
-        lines = [
-            f"## Fairness Report Card: {self.model_name}",
-            "",
-            f"**Status**: `{status.value.upper()}`",
-            f"**Result**: {'Approved for deployment' if approved else 'Deployment blocked'}",
-            "",
-        ]
+        if self.policy_decision is not None:
+            from .coverage import _policy_section_lines, policy_result_line
+
+            # NOT "Approved for deployment". That line is a deployment claim, and
+            # under a policy the measurement's approval is not one: with
+            # check_intersections off, a required intersection never ran and the
+            # measurement still approves (the measured table in coverage.py).
+            lines = [
+                f"## Fairness Report Card: {self.model_name}",
+                "",
+                policy_result_line(self.policy_decision),
+                f"**Measurement status**: `{status.value.upper()}` on the levels that ran, "
+                f"which is not a permission to deploy under the policy",
+                "",
+            ]
+            lines.extend(
+                _policy_section_lines(self.policy_decision, heading="###", include_result=False)
+            )
+            lines.append("")
+        else:
+            # Header with status badge
+            lines = [
+                f"## Fairness Report Card: {self.model_name}",
+                "",
+                f"**Status**: `{status.value.upper()}`",
+                f"**Result**: {'Approved for deployment' if approved else 'Deployment blocked'}",
+                "",
+            ]
 
         if is_hierarchical:
             lines.extend(self._format_hierarchical())
@@ -3766,10 +4091,20 @@ class FairnessReportCard:
         }
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert report card to dictionary."""
-        return {
+        """Convert report card to dictionary.
+
+        For a policy decision, ``approved`` and ``status`` are still the
+        MEASUREMENT's, as they always were, and ``policy_permitted`` is the
+        deployment decision.
+        """
+        card = {
             "model_name": self.model_name,
             "approved": self.decision.approved,
             "status": self.decision.status.value,
             "markdown": self.to_markdown(),
         }
+        if self.policy_decision is not None:
+            card["policy_permitted"] = self.policy_decision.permitted
+            card["policy_id"] = self.policy_decision.policy.policy_id
+            card["policy_version"] = self.policy_decision.policy.version
+        return card

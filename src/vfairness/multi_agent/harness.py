@@ -177,7 +177,7 @@ class MultiAgentRunHarness:
     :meth:`as_collusion_inputs`, :meth:`as_delegation_inputs`, and
     :meth:`as_negotiation_inputs`.
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

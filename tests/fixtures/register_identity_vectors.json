@@ -1,0 +1,37 @@
+{
+  "about": "Model Register fingerprint vectors, computed independently with Python hashlib on 24 Oct 2026. The Validant platform's browser code reproduces the same digests.",
+  "manifest": [
+    {
+      "name": "three files, unsorted, one Windows path",
+      "files": [
+        {
+          "path": "sub\\conda.yaml",
+          "base64": "bmFtZTogZW52Cg=="
+        },
+        {
+          "path": "MLmodel",
+          "base64": "YXJ0aWZhY3RfcGF0aDogbW9kZWwKZmxhdm9yczoKICBza2xlYXJuOiB7fQo="
+        },
+        {
+          "path": "model.skops",
+          "base64": "AAECc2tvcHM="
+        }
+      ],
+      "digest": "535c8e1ef6d44ac225a62a7127205832e7363552c16fda799a972d5fe6e79e21"
+    },
+    {
+      "name": "UTF-8 byte order, not UTF-16 order (U+FFFD sorts before U+1F600)",
+      "files": [
+        {
+          "path": "😀.txt",
+          "base64": "ZW1vamk="
+        },
+        {
+          "path": "�.txt",
+          "base64": "cmVwbGFjZW1lbnQ="
+        }
+      ],
+      "digest": "09f75048f54b67a5c81b3ca62879a78747e6040cb272ffea2ab81c059511a542"
+    }
+  ]
+}

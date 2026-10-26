@@ -5,6 +5,13 @@ routes = [
   { pattern = "vfairness.validant.ai", custom_domain = true }
 ]
 
+# The site is served on its custom domain only, never on a workers.dev address.
+workers_dev = false
+# Pull requests that change the docs upload a Worker VERSION (never a deployment)
+# under the alias pr-<number>. Preview URLs make that version reachable for review
+# before the merge, while vfairness.validant.ai keeps serving what main deployed.
+preview_urls = true
+
 [assets]
 directory = "./docs/site"
 not_found_handling = "404-page"

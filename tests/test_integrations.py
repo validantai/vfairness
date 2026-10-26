@@ -175,7 +175,7 @@ class TestMLflowIntegration:
         # This should either work (if mlflow installed) or raise ImportError/RuntimeError
         try:
             # Will fail with RuntimeError if mlflow is installed but no active run
-            log_fairness_to_mlflow(analyzer)
+            log_fairness_to_mlflow(analyzer, group_labels="names")
         except (ImportError, RuntimeError):
             # Expected - either mlflow not installed or no active run
             pass
@@ -185,4 +185,4 @@ class TestMLflowIntegration:
         from vfairness.evaluation.vfairness_metrics.integrations import log_fairness_to_mlflow
 
         with pytest.raises((TypeError, ImportError, RuntimeError)):
-            log_fairness_to_mlflow("invalid_input")
+            log_fairness_to_mlflow("invalid_input", group_labels="names")

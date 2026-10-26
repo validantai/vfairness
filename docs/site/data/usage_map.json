@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-10-01T16:40:36Z",
-  "library_version": "0.1.0",
+  "generated_at": "2026-10-25T20:59:15Z",
+  "library_version": "0.2.0",
   "summary": {
-    "total_symbols": 347,
-    "active": 227,
+    "total_symbols": 348,
+    "active": 228,
     "library_only": 0,
     "unused": 120,
-    "coverage_pct": 65.4,
+    "coverage_pct": 65.5,
     "tracks_scanned": 16,
-    "total_usages": 492,
+    "total_usages": 493,
     "svg_templates_total": 44,
     "svg_templates_active": 44
   },
@@ -56,7 +56,7 @@
     {
       "label": "Operations \u00b7 CI/CD",
       "track_count": 2,
-      "active_symbols": 15
+      "active_symbols": 16
     },
     {
       "label": "Rendering \u00b7 SVG",
@@ -940,8 +940,8 @@
           "label": "10. Summary"
         }
       ],
-      "usage_count": 14,
-      "symbol_count": 10
+      "usage_count": 15,
+      "symbol_count": 11
     },
     {
       "id": "track-nb-vfairness-9-multi-agent-demo",
@@ -15939,6 +15939,51 @@
         }
       ],
       "use_count": 3,
+      "nav_steps": []
+    },
+    {
+      "symbol": "log_fairness_to_mlflow",
+      "module": "vfairness",
+      "stage": "",
+      "kind": "imported",
+      "capability": "",
+      "svg_templates": [],
+      "status": "active",
+      "categories": [
+        "Operations \u00b7 CI/CD"
+      ],
+      "tracks": [
+        {
+          "id": "track-nb-vfairness-8-workflow-integration",
+          "label": "Workflow Integration Demo",
+          "category": "Operations \u00b7 CI/CD"
+        }
+      ],
+      "steps": [
+        {
+          "track_id": "track-nb-vfairness-8-workflow-integration",
+          "step_id": "nb-2-experiment-tracking",
+          "step_label": "2. Experiment Tracking",
+          "track_label": "Workflow Integration Demo"
+        }
+      ],
+      "usages": [
+        {
+          "track_id": "track-nb-vfairness-8-workflow-integration",
+          "track_label": "Workflow Integration Demo",
+          "track_category": "Operations \u00b7 CI/CD",
+          "file": "notebooks/vfairness_8_workflow_integration.ipynb",
+          "line": -1,
+          "cell": 4,
+          "step_id": "nb-2-experiment-tracking",
+          "step_label": "2. Experiment Tracking",
+          "symbol_local": "log_fairness_to_mlflow",
+          "qualified": "vfairness.log_fairness_to_mlflow",
+          "module": "vfairness",
+          "ref_kind": "call"
+        }
+      ],
+      "use_count": 1,
       "nav_steps": []
     },
     {

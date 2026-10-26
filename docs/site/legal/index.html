@@ -259,6 +259,10 @@
             margin-bottom: var(--spacing-2);
             line-height: var(--line-height-relaxed);
         }
+        /* Contrast (2026-10-02): the CC badge and the BY symbol measured 4.08 and
+           2.78:1; an outlined ink chip and a darker green both pass. */
+        .license-badge.cc { background: transparent !important; color: var(--color-gray-800) !important; border: 1px solid var(--rule-strong) !important; }
+        .cc-icon-symbol.by { background: #1d7a3a !important; }
     </style>
     <style>
         /* Dot pattern background for page title */
@@ -756,7 +760,7 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
             <!-- Sponsorship & Pro Terms -->
             <section id="sponsorship-terms">
                 <h2>Sponsorship &amp; Pro Terms</h2>
-                <p>These terms govern the vfairness sponsorships and the vfairness Pro supporter subscription described on <a href="../our-offering/index.html">Our Offering</a>. Sponsorship runs through <a href="https://github.com/sponsors/validantai">GitHub Sponsors</a> for the validantai organization, which GitHub is still reviewing; it opens once GitHub approves it. The terms below apply from then on.</p>
+                <p>These terms govern the vfairness sponsorships and the vfairness Pro supporter subscription described on <a href="../our-offering/index.html">Our Offering</a>. Sponsorship runs through <a href="https://github.com/sponsors/validantai">GitHub Sponsors</a> for the validantai organization. The terms below apply to every sponsorship.</p>
 
                 <h3>Patronage, not a purchase</h3>
                 <p>A sponsorship or Pro subscription is support for an open-source project, not the purchase of software, features, or guarantees. The complete vfairness library is free for everyone under Apache-2.0 regardless of sponsorship, and sponsoring does not unlock any functionality.</p>
@@ -782,7 +786,7 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
                 <h2>Legal Disclaimer</h2>
 
                 <div class="callout callout-warning" style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: var(--spacing-6); border-radius: var(--radius-md); margin-bottom: var(--spacing-6);">
-                    <h4 style="margin-top: 0; color: #92400e;">Not Legal Advice</h4>
+                    <h4 style="margin-top: 0; color: var(--color-warning);">Not Legal Advice</h4>
                     <p style="margin-bottom: 0;">The vfairness library and the AI Fairness Assessment and Interventions Platform are technical tools for measuring statistical properties of machine learning models. The metrics, thresholds, and recommendations provided by this software do not constitute legal advice regarding compliance with anti-discrimination laws, regulations, or standards.</p>
                 </div>
 
@@ -1148,7 +1152,7 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
                         <h4>Resources</h4>
                         <ul>
                             <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
-                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.2.0/" target="_blank">PyPI (0.2.0)</a></li>
                             <li><a href="../concepts/references.html">Academic References</a></li>
                             <li><a href="../concepts/changelog.html">Changelog</a></li>
                         </ul>

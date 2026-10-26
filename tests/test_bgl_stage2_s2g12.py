@@ -339,7 +339,7 @@ def _analyzer_with_60_days():
             {
                 "demographic_parity_difference": 0.05
                 + 0.002 * day
-                + (0.25 if date.dayofweek == 4 else 0.0)
+                + (0.25 if date.day_of_week == 4 else 0.0)
             },
         )
     return analyzer

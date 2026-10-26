@@ -1199,6 +1199,41 @@ default and is misroute-safe (a feature CSV has neither column).
 > metrics handler get it identically; the generative path reuses the same
 > `OutputAnalyzer` the Navigator's LLM-output-analysis step uses.
 
+### Text decision columns: the favourable value is declared, never guessed
+
+A decision column that holds text ("Yes"/"No", "Invited"/"Rejected") does not
+say which value is the favourable outcome, and the right answer depends on what
+the column records. `run_pulse` therefore codes it only from a declared value,
+in the same shape the platform's other analyses use:
+
+```python
+run_pulse(df, {
+    "protected_attributes": ["gender", "age"],
+    "decision_labels": {"favourable_values": {"invite_decision": "Yes"}},
+})
+```
+
+- The declared value becomes the favourable outcome and every other value the
+  unfavourable one; missing cells stay missing. `outcome_polarity` is honoured
+  the same way as for a 0/1 column.
+- Numeric and boolean columns, text that parses as numbers, and text whose values
+  are 0/1 or true/false need no declaration.
+- Undeclared, or declared with a value the column does not hold, the run is
+  **refused** with `success: False`, `refused: True`, an `error` that names the
+  column, its values and the setting, plus `decisionColumn` and
+  `decisionValues` so a caller can ask the user. Nothing is guessed.
+- The coding applied is published in `dataPreparation.decisionCoding`. A text
+  ground-truth (label) column is coded the same way from its own declaration;
+  undeclared, it is not used as ground truth and
+  `dataPreparation.decisionCoding.labelNotUsed` says why.
+
+Why: the old coding took a fixed list of "truthy" words as 1 (so
+"Invited"/"Rejected" read as nobody invited), and `DataBiasValidator` took the
+alphabetically later value (so "Rejected" read as favourable, and a gender
+four-fifths ratio of 0.36 read 0.96 on the platform's hiring sample).
+`DataBiasValidator.validate(..., outcome_favourable_value=...)` follows the same
+rule; an undeclared text outcome is reported as `outcome_not_coded`.
+
 ### Live progress telemetry
 
 **Category:** Pulse orchestration — real per-stage progress.
@@ -1291,6 +1326,55 @@ for r in v['recommendations']: print(r['id'], '->', r['routeTo'])
 Pure assembly + rules; never raises. The structured object is the durable
 artefact that powers the Pulse banner **and** pre-fills the Navigator
 assessment (one source of truth).
+
+#### How a selection-rate gap is confirmed, and when it becomes a finding
+
+For each protected attribute, tabular Pulse compares the worst-served group with
+a reference group (the most populous reliable group) and reports the gap with an
+interval:
+
+- **The interval is the Newcombe hybrid score interval** (Newcombe 1998,
+  method 10), built from each group's Wilson score limits, so the uncertainty of
+  both groups' rates enters it and it stays valid at zero counts and small
+  groups. The row names it (`ciMethod: "newcombe_hybrid_score"`, `ciLevel`).
+  With fewer than 5 rows in either group, or decisions that are not 0/1, no
+  interval is computed and `ciNotComputedReason` says why. Continuous and rank
+  outputs keep a percentile bootstrap on the normalized mean gap
+  (`ciMethod: "percentile_bootstrap"`).
+- **A gap is statistically confirmed** (`significant`) only when its 95%
+  interval excludes zero, an omnibus chi-square across all groups rejects (when
+  there are more than two), the pair survives its **selection correction**, and
+  it survives Benjamini-Hochberg correction across the attributes. The pair's
+  p-value (`pValue`) is the dual of the interval (the smallest level at which
+  the interval reaches zero). Because the worst group is the most extreme of
+  several comparisons with the reference, that p is multiplied by the number of
+  comparisons it was chosen from (`selectionComparisons`: k-1, or k(k-1)/2 when
+  the reference itself had to be re-picked) before it may confirm the pair;
+  that Bonferroni-corrected `pValueSelection` is what enters the
+  Benjamini-Hochberg family. A confirmed gap therefore always prints an
+  interval that excludes zero, while a pair whose interval excludes zero can
+  still be unconfirmed once the choice and the number of attributes are
+  accounted for.
+- **Measured on a 2,700-row hiring sample (2026-10-09).** 0 of 22 Native
+  American against 114 of 1,601 White: the percentile bootstrap used before read
+  5.8 to 8.4 points, confirmed; the Newcombe interval reads -7.8 to 8.5 points,
+  not confirmed. 0 of 318 aged 18 to 24 against 30 of 646 aged 45 to 54: 2.8 to
+  6.6 points, confirmed (pair p 0.0002, 0.0009 after choosing among 4 bands).
+  On the published clean control (nothing planted) the selection correction is
+  what keeps a chance age gap from being confirmed: 9 of 56 against 45 of 118,
+  pair p 0.0034, 0.014 after choosing among 4 bands, not confirmed across ten
+  attributes.
+
+A per-attribute row raises a disparate-impact finding (`DSP-n`) when:
+
+1. the gap is 5 points or more (severity from the gap: `warn`, `high` from 10
+   points when confirmed, `critical` from 20 points when confirmed);
+2. under US employment, the four-fifths ratio is below 0.80, at any gap
+   (`critical` when confirmed, `high` otherwise); or
+3. the attribute is graded Fail (`tone` critical, which requires statistical
+   confirmation): the finding is then `critical` whatever the gap in points, so a
+   Fail on the four-fifths row is always traceable to a finding and to the
+   recommendation that addresses it.
 
 ### selection_rate_disparity_matrix
 
@@ -2954,6 +3038,97 @@ threshold, which would send someone after a violation nobody measured. It says
 the metric was never evaluated, and that an unevaluated metric cannot clear a
 gate. That is the third state applied to a deployment decision.
 
+### Deployment Policies: Required Coverage
+
+The gate knows what it was configured to check, not what a deployment requires.
+Switching a check off, leaving an attribute out or loosening a threshold therefore
+still ends in `approved=True` on the levels that ran (vfairness issue #1). A
+`CoveragePolicy` states the requirement separately from the configuration, and
+`ModelFairnessGate.evaluate_against_policy()` compares the two. The measurement
+runs exactly as `evaluate_hierarchical()` would and is returned unchanged as
+`decision.measurement`.
+
+**Worked example: required scope versus executed scope.** 400 applicants in four
+cells of 100. Each attribute alone is balanced (every gender and every race group
+is selected at 50%), the combined cells at 80%, 20%, 20% and 80%. The policy
+requires gender, race and their intersection; the pipeline has intersections off.
+
+```python
+from vfairness import CoveragePolicy, GateConfig, HierarchicalGateConfig, ModelFairnessGate
+
+policy = CoveragePolicy(                       # REQUIRED scope
+    policy_id="hiring-eu",
+    version="3",
+    required_attributes=["gender", "race"],
+    required_intersections=[("gender", "race")],
+    required_metrics={"demographic_parity_difference": 0.1},
+    min_group_size=30,
+)
+gate = ModelFairnessGate(config=GateConfig(    # EXECUTED scope
+    metrics=["demographic_parity_difference"],
+    thresholds={"demographic_parity_difference": 0.1},
+))
+decision = gate.evaluate_against_policy(
+    policy, y_true, y_pred, {"gender": gender, "race": race},
+    hierarchical_config=HierarchicalGateConfig(check_intersections=False),
+)
+
+decision.measurement.status   # GateStatus.APPROVED  (the levels that ran)
+decision.permitted            # False                (the deployment decision)
+[(i.label, i.state.value, i.outcome.value) for i in decision.items]
+# [('gender', 'assessed', 'pass'),
+#  ('race', 'assessed', 'pass'),
+#  ('gender × race', 'omitted_by_configuration', 'not_measured')]
+decision.reasons
+# ['gender × race, demographic_parity_difference: omitted by configuration:
+#   check_intersections is off, so no level compared this intersection']
+```
+
+With the intersection on (and `default_intersection_threshold_multiplier=1.0`, see
+below), the same policy reports `gender × race` as assessed with a measured breach
+of 0.6 against the bound of 0.1, and the measurement itself is BLOCKED.
+
+**Four coverage states, one per required item** (each required group set on each
+required metric):
+
+| State | Means |
+|-------|-------|
+| `assessed` | A level compared it, the gate enforces it at least as strictly as the policy, and every group held enough rows |
+| `insufficient_evidence` | It ran, but a group or a rate denominator is below the policy's own `min_group_size`, or the value could not be measured |
+| `omitted_by_configuration` | A level switched off, the metric not configured or not blocking, or a threshold looser than the policy bound at that level. The reason names the setting |
+| `input_absent` | An attribute it needs was not supplied. The required scope is never reduced to the supplied attributes |
+
+The measured outcome (`pass`, `fail`, `not_measured`) is graded against the policy
+bound and kept apart from the state, so a five-person group that happens to pass is
+insufficient evidence, not a pass and not a fairness failure. `permitted` is True
+only when every item is assessed and passes and the measurement was not blocked.
+Group sizes are counted against the policy's minimum, never the configured one, so
+`min_group_size=1` cannot hide a small cell.
+
+**Compatibility.** Without a policy nothing changes, except that every decision
+now carries `evaluated_scope`: the levels that ran, the threshold each applied, and
+the group sets left out with the setting that left them out. `approved` keeps its
+meaning (nothing blocked on the levels that ran) and so does `CONDITIONAL`; under a
+policy neither means "may be deployed", `permitted` does.
+`create_github_check(decision)` concludes `failure` whenever a supplied policy is
+not met, and `FairnessReportCard(decision)` leads with the policy result.
+
+**The default intersection relaxation.** `HierarchicalGateConfig` relaxes
+intersection thresholds by 1.2 by default, so 0.1 becomes 0.12 at the
+intersection, which is looser than a policy bound of 0.1. The item is then omitted
+by configuration with the multiplier named. Set the multiplier to 1.0, or write the
+relaxed bound into the policy if the policy accepts it.
+
+**What belongs to the integration.** The library compares and nothing more: there
+is no parameter for an exception or an approver, so nothing a caller passes turns a
+coverage gap into a permission. Which policy applies to which deployment, who may
+grant an exception and how that person is verified, its scope, rationale,
+evidence, expiry and revocation belong to the integration that enforces the
+policy, which also keeps the historical assessment. `assess_coverage()` re-checks
+a stored measurement against a newer policy version. Each decision carries SHA-256
+fingerprints of the policy and the effective configuration; they identify which
+policy and settings were used and are not signatures.
+
 ### MLflow Logging
 
 Log fairness metrics to MLflow for experiment tracking:
@@ -2965,23 +3140,44 @@ import mlflow
 # Create analyzer
 analyzer = FairnessAnalyzer(y_true, y_pred, gender)
 
+# Group names are coded by default; set the key once, in the shell:
+#   export VFAIRNESS_GROUP_LABEL_KEY=...   (any secret, kept like a password)
+
 # Log within an MLflow run
 with mlflow.start_run():
     log_fairness_to_mlflow(
         analyzer,
         prefix="fairness",          # Metric prefix
-        log_artifacts=True,         # Save full report as JSON artifact
-        include_group_stats=True    # Log per-group rates as metrics
+        log_artifacts=True,         # Save the (coded) report as JSON artifact
+        include_group_stats=True,   # Log per-group rates as metrics
+        group_labels="coded",       # the default; "names" writes real group names
     )
 ```
 
 Requires `pip install mlflow` (optional dependency).
 
+**Group names are coded by default.** Every group name the run would hold is
+replaced by a keyed code such as `g_3fa91c07d2e4` (the first 12 hex characters of
+HMAC-SHA256 of the name under your key; a plain hash would hide nothing, because
+"Female" is found again by hashing a short list of likely names). The same key
+gives the same codes in every run, so versions stay comparable. The key comes from
+`label_key=` or `VFAIRNESS_GROUP_LABEL_KEY`; with neither, the function raises
+`ValueError` before anything is written. `group_labels="names"` writes the real
+names on purpose, exactly as before. The mapping is never written to the tracker:
+rebuild it locally with `vfairness._group_codes.group_label_codes(names)` (a
+pre-release module, so its import path may change). Groups are listed in code
+order and each effect-size pair is written as `<lower code>_vs_<higher code>`,
+restated for that direction when needed, because the library's own order follows
+the real names. The report's sentences that name groups (`assessment.summary`,
+`explanations`) are left out of the artifact and named in the
+`fairness.left_out_by_group_coding` tag. `log_fairness_to_wandb` and
+`auto_log_fairness` behave the same way.
+
 **What gets logged**:
-- Metrics: `fairness.demographic_parity_difference`, etc. (plus `.ci_lower` / `.ci_upper` / `.std_error` variants when CIs are available)
-- Parameters: `fairness.task_type`, `fairness.n_samples`, `fairness.n_groups`, `fairness.groups`
-- Tags: `fairness.library`, `fairness.library_version`
-- Artifacts: the full report JSON under `fairness_report/` (if `log_artifacts=True`)
+- Metrics: `fairness.demographic_parity_difference`, etc. (plus `.ci_lower` / `.ci_upper` / `.std_error` variants when CIs are available), and per group `fairness.group.<code>.<stat>`
+- Parameters: `fairness.task_type`, `fairness.n_samples`, `fairness.n_groups`, `fairness.groups` (codes)
+- Tags: `fairness.library`, `fairness.library_version`, `fairness.group_labels`, and on a coded run `fairness.group_label_key_id`, `fairness.n_left_out_by_group_coding`, `fairness.left_out_by_group_coding`
+- Artifacts: the report JSON under `fairness_report/` (if `log_artifacts=True`), the coded copy on a coded run
 
 ### Pytest Assertions
 

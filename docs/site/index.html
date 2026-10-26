@@ -7,7 +7,7 @@
     <meta name="description" content="vfairness - A comprehensive Python library for measuring fairness in machine learning models and detecting bias. Built by validant.ai">
     <meta name="keywords" content="AI fairness, machine learning, bias detection, algorithmic fairness, ethical AI, MLOps">
     <meta name="author" content="validant.ai">
-    <meta name="version" content="0.1.0">
+    <meta name="version" content="0.2.0">
 
     <title>vfairness Documentation | validant.ai</title>
 
@@ -200,6 +200,140 @@
             opacity: 1;
             filter: grayscale(0);
         }
+        /* From the Signal: editorial plates. The drawings sit on the page's own
+           paper (multiply), framed by a hairline; in dark mode they keep a
+           light paper frame, since line art does not invert well. */
+        .signal-plates { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.5rem 2rem; margin-top: 3rem; }
+        .signal-plate { margin: 0; display: flex; flex-direction: column; min-width: 0; }
+        .signal-plate__img { display: block; position: relative; border: 1px solid var(--rule); background: #fff; overflow: hidden; }
+        .signal-plate__img::after { content: ''; position: absolute; left: -1px; right: -1px; top: -1px; height: 2px; background: var(--grad-brand, linear-gradient(90deg, #43c9fe, #14b8a6, #41ba1b)); transform: scaleX(0); transform-origin: left; transition: transform .35s ease; }
+        .signal-plate__img:hover::after, .signal-plate__img:focus-visible::after { transform: scaleX(1); }
+        .signal-plate__img img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; mix-blend-mode: multiply; transition: transform .6s ease; }
+        .signal-plate__img:hover img { transform: scale(1.025); }
+        .signal-plate figcaption { display: flex; flex-direction: column; gap: .85rem; padding-top: 1.25rem; flex: 1; }
+        .signal-plate__quote { margin: 0; font-size: 1.02rem; line-height: 1.6; color: var(--color-gray-800); }
+        .signal-plate__answer { margin: 0; display: flex; flex-direction: column; gap: .2rem; padding-left: .85rem; border-left: 2px solid var(--color-primary); }
+        .signal-plate__answer span { font-family: var(--font-mono); font-size: .64rem; letter-spacing: .14em; text-transform: uppercase; color: var(--color-gray-500); }
+        .signal-plate__answer a { font-weight: 600; font-size: .92rem; color: var(--color-gray-900); text-decoration: none; }
+        .signal-plate__answer a:hover { color: var(--color-primary); }
+        .signal-plate__src { margin-top: auto; font-family: var(--font-mono); font-size: .7rem; letter-spacing: .06em; color: var(--color-primary); text-decoration: none; }
+        .signal-plate__src:hover { text-decoration: underline; }
+        html[data-theme="dark"] .signal-plate__img { background: #f4f1ec; }
+        html[data-theme="dark"] .signal-plate__img img { mix-blend-mode: normal; }
+        @media (max-width: 980px) { .signal-plates { grid-template-columns: minmax(0, 1fr); max-width: 560px; } }
+        @media (prefers-reduced-motion: reduce) { .signal-plate__img img, .signal-plate__img::after { transition: none; } .signal-plate__img:hover img { transform: none; } }
+        /* Condensed capability grid */
+        #feature-cards.is-condensed > .card:nth-child(n+7) { display: none; }
+        .cards-more { display: flex; justify-content: center; margin-top: 2rem; }
+        .cards-more button { background: none; border: 1px solid var(--rule-strong); padding: .7rem 1.4rem; font: inherit; font-size: .88rem; font-weight: 600; color: var(--color-gray-900); cursor: pointer; transition: border-color .2s ease, color .2s ease; }
+        .cards-more button:hover, .cards-more button:focus-visible { border-color: var(--color-primary); color: var(--color-primary); }
+        /* A real run section: copy left, the audit.py panel right. */
+        .run-layout { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: start; }
+        /* The panel on the right grows while it types; the copy stays put. */
+        .run-copy { position: sticky; top: 110px; }
+        .run-copy h2 { margin: .25rem 0 1.25rem; }
+        .run-copy .vf-lede { margin: 0 0 1.75rem; max-width: 34rem; }
+        .run-points { list-style: none; margin: 0 !important; padding: 0 !important; display: grid; gap: 1rem; max-width: 34rem; }
+        .run-points li { margin: 0 !important; padding-left: 1rem; border-left: 2px solid var(--color-primary); color: var(--color-gray-600); font-size: .95rem; line-height: 1.6; }
+        .run-points b { color: var(--color-gray-900); }
+        @media (max-width: 960px) { .run-layout { grid-template-columns: minmax(0, 1fr); } .run-copy { position: static; } }
+        /* ── Live hero (#hero-run). A real run: dark code panel like the site's
+           code blocks, then the measured rates. Bars carry the logo gradient;
+           the withheld group is hatched, never drawn as a bar. ── */
+        .hero-run { margin: 0; min-width: 0; background: #1b2735; color: #d6dee6; border: 1px solid #2c3d52; box-shadow: 0 30px 60px -30px rgba(27, 39, 53, .45); font-family: var(--font-mono); position: relative; }
+        .hero-run::before { content: ''; position: absolute; left: -1px; right: -1px; top: -1px; height: 2px; background: var(--grad-brand, linear-gradient(90deg, #43c9fe, #14b8a6, #41ba1b)); }
+        .hero-run__bar { display: flex; align-items: center; gap: .75rem; padding: .6rem .9rem; border-bottom: 1px solid #2c3d52; font-size: .68rem; letter-spacing: .06em; color: #8fa1b3; }
+        .hero-run__dots { display: inline-flex; gap: 5px; } .hero-run__dots i { width: 8px; height: 8px; background: #33465c; display: block; }
+        .hero-run__file { color: #d6dee6; }
+        .hero-run__meta { margin-left: auto; text-transform: uppercase; letter-spacing: .12em; }
+        .hero-run__replay { background: none; border: 1px solid #3c5068; color: #d6dee6; font: inherit; font-size: .64rem; letter-spacing: .12em; text-transform: uppercase; padding: .2rem .55rem; cursor: pointer; }
+        .hero-run__replay:hover, .hero-run__replay:focus-visible { border-color: #5cc3e0; color: #fff; }
+        .hero-run__code { margin: 0; padding: .9rem 1rem .4rem; background: none !important; border: 0 !important; font-size: .74rem; line-height: 1.6; color: #d6dee6; white-space: pre; overflow-x: auto; min-height: 15.2em; }
+        .hero-run__code code { background: none !important; color: inherit; font: inherit; padding: 0; }
+        .hero-run .tk-k { color: #8dd8ee; } .hero-run .tk-s { color: #a8dd8a; } .hero-run .tk-f { color: #e6c47a; } .hero-run .tk-n { color: #f0a58f; }
+        .hr-caret { display: inline-block; width: .55em; height: 1.05em; vertical-align: -0.18em; background: #5cc3e0; animation: hrBlink 1s steps(1) infinite; }
+        @keyframes hrBlink { 50% { opacity: 0; } }
+        .hero-run__out { padding: 0 1rem; font-size: .7rem; line-height: 1.55; min-height: 5.2em; }
+        .hr-prompt { color: #8fa1b3; margin-top: .3rem; }
+        .hr-line { color: #f1f5f8; white-space: pre-wrap; overflow-wrap: anywhere; }
+        .hero-run__chart { padding: .8rem 1rem 1rem; border-top: 1px solid #2c3d52; margin-top: .7rem; opacity: 0; transition: opacity .4s ease; }
+        .hero-run__chart.is-shown { opacity: 1; }
+        .hr-axis { display: grid; grid-template-columns: 11.5rem 1fr auto; font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: #8fa1b3; margin-bottom: .35rem; }
+        .hr-axis span:nth-child(2) { padding-left: .1rem; }
+        .hr-row { display: grid; grid-template-columns: 11.5rem minmax(0, 1fr); align-items: center; gap: .5rem; height: 1.3rem; font-size: .64rem; }
+        .hr-label { color: #c3ccd5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .hr-label small { color: #7d8fa1; font-size: .92em; }
+        .hr-track { position: relative; display: flex; align-items: center; gap: .4rem; height: .55rem; }
+        .hr-bar { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #43c9fe, #14b8a6 60%, #41ba1b); transition: width .7s cubic-bezier(.2, .7, .2, 1); }
+        .hero-run__chart.is-shown .hr-bar { width: var(--w); }
+        .hero-run__chart.is-shown .hr-row:nth-child(3) .hr-bar { transition-delay: .05s; } .hero-run__chart.is-shown .hr-row:nth-child(4) .hr-bar { transition-delay: .1s; }
+        .hero-run__chart.is-shown .hr-row:nth-child(5) .hr-bar { transition-delay: .15s; } .hero-run__chart.is-shown .hr-row:nth-child(6) .hr-bar { transition-delay: .2s; }
+        .hero-run__chart.is-shown .hr-row:nth-child(7) .hr-bar { transition-delay: .25s; } .hero-run__chart.is-shown .hr-row:nth-child(8) .hr-bar { transition-delay: .3s; }
+        .hero-run__chart.is-shown .hr-row:nth-child(9) .hr-bar { transition-delay: .35s; } .hero-run__chart.is-shown .hr-row:nth-child(10) .hr-bar { transition-delay: .4s; }
+        .hr-val { color: #9fb0c0; font-size: .6rem; }
+        .hr-row.is-high .hr-label, .hr-row.is-low .hr-label, .hr-row.is-high .hr-val, .hr-row.is-low .hr-val { color: #fff; }
+        .hr-row.is-high .hr-bar, .hr-row.is-low .hr-bar { box-shadow: 0 0 0 1px #f1f5f8; }
+        .hr-withheld { flex: 1; height: 100%; display: flex; align-items: center; padding-left: .45rem; font-size: .56rem; letter-spacing: .04em; color: #c3ccd5; background: repeating-linear-gradient(135deg, rgba(255,255,255,.14) 0 3px, transparent 3px 7px); height: 1rem; }
+        .hr-gap { margin: .7rem 0 0; font-size: .64rem; line-height: 1.55; color: #c3ccd5; }
+        .hr-gap b { color: #fff; } .hr-gap span { display: block; color: #8fa1b3; }
+        .hero-run__table, .hero-run__table th, .hero-run__table td { color: #d6dee6 !important; background: #1b2735 !important; }
+        .hero-run__cap { padding: .7rem 1rem .85rem; border-top: 1px solid #2c3d52; font-family: var(--font-sans); font-size: .72rem; line-height: 1.5; color: #8fa1b3; }
+        .hero-run__cap a { color: #8dd8ee; }
+        @media (max-width: 520px) { .hr-axis, .hr-row { grid-template-columns: 8.2rem minmax(0, 1fr); } .hr-axis span:last-child { display: none; } .hero-run__code { font-size: .66rem; } }
+        @media (prefers-reduced-motion: reduce) { .hr-caret { animation: none; } .hr-bar, .hero-run__chart { transition: none !important; } }
+
+        /* ── Threshold explorer (#threshold-explorer) ── */
+        .te { margin-top: 2.75rem; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); grid-template-areas: "controls controls" "plot readouts" "note note" "src src"; gap: 1.5rem 2.5rem; }
+        .te-controls { grid-area: controls; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.75rem; padding: 1rem 1.25rem; border: 1px solid var(--rule); background: var(--surface-veil); }
+        .te-mode { display: inline-flex; border: 1px solid var(--rule-strong); }
+        .te-mode button { background: none; border: 0; padding: .45rem .9rem; font: inherit; font-size: .8rem; font-weight: 600; color: var(--color-gray-600); cursor: pointer; }
+        .te-mode button + button { border-left: 1px solid var(--rule-strong); }
+        .te-mode button[aria-pressed="true"] { background: var(--color-gray-900); color: var(--color-white); }
+        .te-slider { display: inline-flex; align-items: center; gap: .6rem; font-family: var(--font-mono); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--color-gray-600); }
+        .te-slider output { min-width: 3.4em; font-weight: 600; color: var(--color-gray-900); }
+        .te-slider input[type=range] { width: clamp(140px, 22vw, 260px); accent-color: var(--color-primary); }
+        #threshold-explorer:not([data-mode="split"]) .te-split { display: none; }
+        #threshold-explorer[data-mode="split"] .te-one { display: none; }
+        .te-fix { margin-left: auto; background: var(--color-primary); color: #fff; border: 1px solid var(--color-primary); padding: .55rem 1rem; font: inherit; font-size: .82rem; font-weight: 600; cursor: pointer; }
+        .te-fix:hover { background: var(--color-primary-light); }
+        #threshold-explorer.is-fixed .te-fix { background: transparent; color: var(--color-primary); }
+        .te-plot { grid-area: plot; min-width: 0; }
+        .te-plot svg { width: 100%; height: auto; display: block; overflow: visible; }
+        .te-glabel { font-family: var(--font-mono); font-size: 13px; letter-spacing: .06em; fill: var(--color-gray-700); }
+        .te-tick { font-family: var(--font-mono); font-size: 12px; fill: var(--color-gray-500); }
+        .te-neg { fill: var(--color-gray-300); }
+        .te-pos { fill: #14b8a6; }
+        .te-shade { fill: rgba(0, 102, 134, .07); }
+        .te-base { stroke: var(--rule-strong); stroke-width: 1; }
+        .te-line { stroke: var(--color-gray-900); stroke-width: 2; }
+        .te-legend { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem 1.25rem; margin: .75rem 0 0; font-size: .75rem; color: var(--color-gray-500); }
+        .te-k { display: inline-block; width: 10px; height: 10px; margin-right: .4rem; vertical-align: -1px; }
+        .te-scale { margin-left: auto; font-family: var(--font-mono); font-size: .64rem; letter-spacing: .04em; }
+        .te-k--pos { background: #14b8a6; } .te-k--neg { background: var(--color-gray-300); } .te-k--shade { background: rgba(0, 102, 134, .14); border: 1px solid rgba(0, 102, 134, .3); }
+        .te-readouts { grid-area: readouts; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; border-top: 1px solid var(--rule-strong); border-left: 1px solid var(--rule); align-self: start; }
+        .te-tile { display: flex; flex-direction: column; gap: .35rem; padding: 1rem 1.1rem; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: var(--surface-veil); position: relative; }
+        .te-tile--rates, .te-tile--acc { grid-column: 1 / -1; }
+        .te-cap { font-family: var(--font-mono); font-size: .64rem; letter-spacing: .12em; text-transform: uppercase; color: var(--color-gray-500); }
+        .te-tile > b { font-size: 1.9rem; font-weight: 300; letter-spacing: -.02em; line-height: 1.1; color: var(--color-gray-900); font-variant-numeric: tabular-nums; }
+        .te-tile small { font-size: .74rem; color: var(--color-gray-600); display: flex; align-items: center; gap: .4rem; }
+        .te-tile small i { width: 8px; height: 8px; background: var(--color-gray-300); display: inline-block; }
+        .te-tile[data-state="ok"] small i { background: #41ba1b; }
+        .te-tile[data-state="over"] small i { background: #e06a4f; }
+        .te-tile[data-state="over"]::before, .te-tile[data-state="ok"]::before { content: ''; position: absolute; left: -1px; top: -1px; right: -1px; height: 2px; }
+        .te-tile[data-state="ok"]::before { background: #41ba1b; } .te-tile[data-state="over"]::before { background: #e06a4f; }
+        .te-rate { display: grid; grid-template-columns: 4.2rem minmax(0, 1fr) 3.6rem; align-items: center; gap: .6rem; font-size: .82rem; color: var(--color-gray-700); }
+        .te-rate b { text-align: right; font-variant-numeric: tabular-nums; color: var(--color-gray-900); }
+        .te-track { height: .55rem; background: var(--color-gray-100); position: relative; }
+        .te-track span { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, #43c9fe, #14b8a6 60%, #41ba1b); transition: width .25s ease; }
+        .te-note { grid-area: note; margin: 0; padding: .9rem 1.1rem; border-left: 2px solid var(--color-primary); background: var(--surface-sunk); font-size: .92rem; line-height: 1.6; color: var(--color-gray-700); min-height: 3.2em; }
+        .te-src { grid-area: src; margin: 0; font-size: .75rem; color: var(--color-gray-500); }
+        @media (max-width: 960px) { .te { grid-template-columns: minmax(0, 1fr); grid-template-areas: "controls" "plot" "readouts" "note" "src"; } .te-fix { margin-left: 0; } }
+        @media (max-width: 520px) { .te-readouts { grid-template-columns: minmax(0, 1fr); } .te-slider { flex-wrap: wrap; } .te-slider input[type=range] { width: 100%; } .te-slider { width: 100%; } }
+        @media (prefers-reduced-motion: reduce) { .te-track span { transition: none; } }
+        html[data-theme="dark"] .te-tile > b, html[data-theme="dark"] .te-rate b { color: var(--color-gray-900); }
+        html[data-theme="dark"] .te-fix { color: #0f1a24; }
+        html[data-theme="dark"] #threshold-explorer.is-fixed .te-fix { color: var(--color-primary); }
+        html[data-theme="dark"] .te-mode button[aria-pressed="true"] { color: #0f1a24; }
     </style>
     <script src="https://validant.ai/consent/v1/consent.js" defer></script>
   </head>
@@ -479,7 +613,6 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
         </div>
     </section>
 
-    <!-- Main Content -->
     <main class="page-wrapper">
         <!-- Audience Selection -->
         <section class="py-16" style="background: var(--color-gray-50);">
@@ -512,6 +645,9 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
             </div>
         </section>
 
+
+
+    <!-- Main Content -->
         <!-- Key Features -->
         <section id="why-vfairness" class="py-16">
             <div class="content-container">
@@ -560,7 +696,7 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
 
                 <div class="feature-subhead"><h3>What&rsquo;s inside</h3><p>Capabilities that cover every stage of the fairness lifecycle. Open any one for the detail.</p></div>
 
-                <div class="cards-grid mt-8" id="feature-cards">
+                <div class="cards-grid mt-8 is-condensed" id="feature-cards">
                     <div class="card" data-stage="mitigate">
                         <div class="card-header">
                             <div class="card-icon">
@@ -839,10 +975,133 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
                         <details class="card-more"><summary>Detail</summary><p>Structured logging via Python <code>logging</code>, audit-trail metadata (ISO&nbsp;8601 UTC timestamp, library version, parameters) on every result, a <code>methodology_version</code> stamped into every report, <code>to_dict()</code>/<code>to_json()</code> serialization, progress callbacks for batch operations, and configurable thresholds. That is the record-keeping material an obligation such as EU AI Act Art.&nbsp;12 asks for; conformity is a judgement about a deployment, which no library can make on its own.</p></details>
                     </div>
                 </div>
+                <div class="cards-more">
+                    <button type="button" id="feature-more" aria-controls="feature-cards" aria-expanded="false">Show all 17 capabilities</button>
+                </div>
             </div>
         </section>
 
         <!-- Integration Strip -->
+        <!-- From the Signal: three drawings from validant.ai's articles, each
+             paired with the part of the library that answers it. Captions are
+             quoted from the articles; images are copies of the published ones. -->
+        <section class="py-16 signal-band" id="from-the-signal">
+            <div class="content-container">
+                <div class="vf-section-head"><div><p class="vf-eyebrow">From the Signal</p><h2>What a fairness check is up against.</h2></div><p class="vf-lede">Three drawings from validant.ai&rsquo;s Signal articles, and the part of vfairness that answers each one.</p></div>
+                <div class="signal-plates">
+                    <figure class="signal-plate">
+                        <a class="signal-plate__img" href="https://validant.ai/signal/bias-is-the-foundation" target="_blank" rel="noopener"><img src="img/signal/corridor.webp" width="1174" height="783" loading="lazy" alt="Architectural line drawing of a long colonnade receding to a vanishing point, with a single figure walking down it."></a>
+                        <figcaption>
+                            <p class="signal-plate__quote">&ldquo;Each column is a fairness check the model must pass before a decision; the figure walking the corridor is the model under audit.&rdquo;</p>
+                            <p class="signal-plate__answer"><span>In vfairness</span><a href="concepts/index.html#fairness-definitions">35+ metrics, each with a three-state verdict</a></p>
+                            <a class="signal-plate__src" href="https://validant.ai/signal/bias-is-the-foundation" target="_blank" rel="noopener">Bias is the Foundation &rarr;</a>
+                        </figcaption>
+                    </figure>
+                    <figure class="signal-plate">
+                        <a class="signal-plate__img" href="https://validant.ai/signal/the-wrong-question-asked-at-scale" target="_blank" rel="noopener"><img src="img/signal/aggregation-mask.webp" width="1149" height="766" loading="lazy" alt="Line drawing of a row of short vertical bars with one bar spiking far above the others, softly stained coral, above a dashed threshold line."></a>
+                        <figcaption>
+                            <p class="signal-plate__quote">&ldquo;The single tall bar is the position where the harm lives; the average smooths it out of view.&rdquo;</p>
+                            <p class="signal-plate__answer"><span>In vfairness</span><a href="concepts/index.html#intersectionality">Intersectional subgroups, measured one by one</a></p>
+                            <a class="signal-plate__src" href="https://validant.ai/signal/the-wrong-question-asked-at-scale" target="_blank" rel="noopener">The Wrong Question, Asked at Scale &rarr;</a>
+                        </figcaption>
+                    </figure>
+                    <figure class="signal-plate">
+                        <a class="signal-plate__img" href="https://validant.ai/signal/bias-is-the-foundation" target="_blank" rel="noopener"><img src="img/signal/lifecycle.webp" width="1200" height="800" loading="lazy" alt="Diagram of the AI lifecycle: World, Data, AI/ML, Human Review and Actions, with the biases that enter at each stage and a feedback loop returning Actions to the World."></a>
+                        <figcaption>
+                            <p class="signal-plate__quote">&ldquo;Bias enters at every stage of the lifecycle, and a feedback loop carries it back into the world.&rdquo;</p>
+                            <p class="signal-plate__answer"><span>In vfairness</span><a href="#why-vfairness">Detect, mitigate, calibrate and monitor</a></p>
+                            <a class="signal-plate__src" href="https://validant.ai/signal/bias-is-the-foundation" target="_blank" rel="noopener">Bias is the Foundation &rarr;</a>
+                        </figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <!-- A real run: the audit.py panel (moved out of the hero, Daniel 2026-10-02). -->
+        <section class="py-16 run-section" id="real-run">
+            <div class="content-container run-layout">
+                <div class="run-copy">
+                    <p class="vf-eyebrow">A real run</p>
+                    <h2>Ten subgroups. One it will not guess.</h2>
+                    <p class="vf-lede">Eleven lines on the UCI Adult census data, grouped by race and sex. vfairness reports every rate it measured, the largest gap against its limit, and the one subgroup too small to judge: it is named and left out of the verdict, not counted as fair.</p>
+                    <ul class="run-points">
+                        <li><b>Provenance in the verdict.</b> How many rows were assessed, excluded and withheld, in the summary line itself.</li>
+                        <li><b>Three states, not two.</b> Measured, failed, or could not check. Never a silent zero.</li>
+                    </ul>
+                </div>
+                    <!-- A real run. The code is the exact snippet
+                         scripts/build_landing_demos.py executes; the output and every
+                         rate are its results (data/landing-demos.json). -->
+                    <figure class="hero-run" id="hero-run" data-demos-src="data/landing-demos.json" aria-labelledby="hero-run-cap">
+                        <div class="hero-run__bar">
+                            <span class="hero-run__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                            <span class="hero-run__file">audit.py</span>
+                            <span class="hero-run__meta">real output &middot; <span data-hr="version">vfairness</span></span>
+                            <button type="button" class="hero-run__replay" hidden>Replay</button>
+                        </div>
+                        <pre class="hero-run__code"><code>import pandas as pd
+from vfairness import FairnessAnalyzer
+
+df = pd.read_csv("adult_test_with_predictions.csv")
+analyzer = FairnessAnalyzer(
+    y_true=df.y_true, y_pred=df.y_pred,
+    sensitive_attr=df.race + " / " + df.sex,
+    min_group_size=50,
+)
+report = analyzer.get_report()
+print(report["assessment"]["summary"])</code></pre>
+                        <div class="hero-run__out" aria-live="off"></div>
+                        <div class="hero-run__chart" aria-hidden="true"></div>
+                        <table class="hero-run__table sr-only"></table>
+                        <figcaption id="hero-run-cap" class="hero-run__cap">A real run on the UCI Adult test split (15,060 people, a logistic-regression model): the share each race / sex subgroup is approved, as vfairness measured it. <a href="test-objects/index.html">The data</a></figcaption>
+                    </figure>
+            </div>
+        </section>
+
+
+
+        <!-- Threshold explorer: every number is looked up in
+             data/landing-demos.json (vfairness output per threshold). -->
+        <section class="py-16 te-section" id="threshold-explorer">
+            <div class="content-container">
+                <div class="vf-section-head"><div><p class="vf-eyebrow">Try it</p><h2>Move the threshold. Watch the verdict.</h2></div><p class="vf-lede">A model scores 15,060 people from the UCI Adult census data, and everyone above the threshold is approved. Each number below is what vfairness reports at that threshold.</p></div>
+                <div class="te">
+                    <div class="te-controls">
+                        <div class="te-mode" role="group" aria-label="Threshold mode">
+                            <button type="button" data-te-mode="one" aria-pressed="true">One threshold</button>
+                            <button type="button" data-te-mode="split" aria-pressed="false">One per group</button>
+                        </div>
+                        <label class="te-slider te-one">Threshold <output data-te="t">0.50</output>
+                            <input type="range" id="te-t" min="0" step="1" value="18"></label>
+                        <label class="te-slider te-split">Female <output data-te="tf">0.50</output>
+                            <input type="range" id="te-tf" min="0" step="1" value="9"></label>
+                        <label class="te-slider te-split">Male <output data-te="tm">0.50</output>
+                            <input type="range" id="te-tm" min="0" step="1" value="9"></label>
+                        <button type="button" class="te-fix">Let vfairness choose</button>
+                    </div>
+                    <div class="te-plot">
+                        <svg role="img" aria-label="Score distribution per group, with the threshold line. Approved people are to the right of the line."></svg>
+                        <p class="te-legend"><span><i class="te-k te-k--pos"></i>actually earned over 50K</span><span><i class="te-k te-k--neg"></i>did not</span><span><i class="te-k te-k--shade"></i>approved</span><span class="te-scale">bar height: share of the group, square-root scale</span></p>
+                    </div>
+                    <div class="te-readouts" aria-live="polite">
+                        <div class="te-tile te-tile--rates">
+                            <span class="te-cap">Approved</span>
+                            <div class="te-rate"><span>Female</span><span class="te-track"><span data-te="bar-Female"></span></span><b data-te="sel-Female"></b></div>
+                            <div class="te-rate"><span>Male</span><span class="te-track"><span data-te="bar-Male"></span></span><b data-te="sel-Male"></b></div>
+                        </div>
+                        <div class="te-tile" data-te-tile="dp"><span class="te-cap">Demographic parity difference</span><b data-te="dp"></b><small><i></i><span data-te="dp-s"></span> &middot; limit 0.10</small></div>
+                        <div class="te-tile" data-te-tile="eo"><span class="te-cap">Equal opportunity difference</span><b data-te="eo"></b><small><i></i><span data-te="eo-s"></span> &middot; limit 0.05</small></div>
+                        <div class="te-tile te-tile--acc"><span class="te-cap">Accuracy</span><b data-te="acc"></b><small data-te="verdict"></small></div>
+                    </div>
+                    <p class="te-note"></p>
+                    <p class="te-src">Every number is vfairness output on the UCI Adult test split, precomputed for each threshold by <code>scripts/build_landing_demos.py</code>; the page only looks them up. <a href="test-objects/index.html">The data</a> &middot; <a href="api-reference/index.html?pkg=prediction#group-threshold-optimizer">GroupThresholdOptimizer</a></p>
+                    <noscript><p class="te-note">This explorer needs JavaScript.</p></noscript>
+                </div>
+            </div>
+        </section>
+
+
+
         <section class="py-16 integration-section">
             <div class="content-container">
                 <p class="vf-eyebrow">Integrates with your ML stack</p>
@@ -864,23 +1123,14 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
         <!-- Quick Start -->
         <section class="py-16" style="background: var(--color-gray-50);">
             <div class="content-container">
-                <div class="vf-section-head"><div><p class="vf-eyebrow">Quick start</p><h2>From install to a verdict.</h2></div><p class="vf-lede">What running vfairness looks like, once 0.1.0 ships.</p></div>
-
-                <div class="callout callout-limitation" style="max-width: 780px; margin: 1.5rem auto 0;">
-                    <div class="callout-title">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
-                        Install vfairness
-                        <span class="limitation-label">Availability</span>
-                    </div>
-                    <p>0.1.0 was published on 2026-10-02. The early 0.0.1 placeholder that held this name from March 2026 has been yanked, so a resolver will not select it.</p>
-                </div>
+                <div class="vf-section-head"><div><p class="vf-eyebrow">Quick start</p><h2>From install to a verdict.</h2></div><p class="vf-lede">Install from PyPI, then run your first audit.</p></div>
 
                 <div class="code-block mt-8">
                     <div class="code-header">
                         <span class="code-lang">bash</span>
                         <button class="code-copy">Copy</button>
                     </div>
-                    <pre><code># 0.1.0 beta: prepared, no tag, not yet on PyPI
+                    <pre><code># vfairness 0.2.0 (beta), Python 3.11 or newer
 pip install vfairness</code></pre>
                 </div>
 
@@ -1213,9 +1463,9 @@ flowchart LR
                             Beta Software
                             <span class="limitation-label">Maturity</span>
                         </div>
-                        <p>vfairness is in <strong>beta</strong> (v<span id="stat-version">0.1.0</span>) published 2026-10-02. APIs may change before the stable v1.0.0 release. The version number says beta, and the beta gate agrees: <code>scripts/release_gate.py</code> reports <strong>BETA READY</strong>, with all eight beta conditions met and no known defect open. The stricter 1.0 gate is not met yet: a second, independent examiner still has to confirm part of the graded code. <a href="quality-and-hardening/index.html">Quality and Hardening</a> carries the standing figures.</p>
+                        <p>vfairness is in <strong>beta</strong> (v<span id="stat-version">0.2.0</span>) published 2026-10-26. APIs may change before the stable v1.0.0 release. The version number says beta, and the beta gate agrees: <code>scripts/release_gate.py</code> reports <strong>BETA READY</strong>, with all eight beta conditions met and no known defect open. The stricter 1.0 gate is not met yet: a second, independent examiner still has to confirm part of the graded code. <a href="quality-and-hardening/index.html">Quality and Hardening</a> carries the standing figures.</p>
                         <div class="limitation-mitigation">
-                            <strong>Note:</strong> <code>pip install vfairness</code> currently resolves to our own early 0.0.1 placeholder, not this library. Pin an exact version in requirements.txt once 0.1.0 ships.
+                            <strong>Note:</strong> vfairness needs Python 3.11 or newer. Pin an exact version in requirements.txt, for example <code>vfairness==0.2.0</code>, because the API is not frozen until 1.0.0.
                         </div>
                     </div>
 
@@ -1368,7 +1618,7 @@ flowchart LR
                         <h4>Resources</h4>
                         <ul>
                             <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
-                            <li><a href="release-pipeline/index.html">Release Pipeline (0.1.0, published 2026-10-02)</a></li>
+                            <li><a href="release-pipeline/index.html">Release Pipeline (0.2.0, published 2026-10-26)</a></li>
                             <li><a href="concepts/references.html">Academic References</a></li>
                             <li><a href="concepts/changelog.html">Changelog</a></li>
                         </ul>
@@ -1512,6 +1762,31 @@ flowchart LR
     })();
     </script>
 
+
+    <!-- Condensed capability grid: six cards first, the rest on request. Picking a
+         pipeline stage also expands it (in the capture phase, before the FLIP
+         filter snapshots positions, so hidden cards are measured in place). -->
+    <script>
+    (function () {
+        var grid = document.getElementById('feature-cards');
+        var btn = document.getElementById('feature-more');
+        var strip = document.getElementById('pipeline-strip');
+        if (!grid || !btn) return;
+        function expand() {
+            if (!grid.classList.contains('is-condensed')) return;
+            grid.classList.remove('is-condensed');
+            btn.setAttribute('aria-expanded', 'true');
+            btn.parentNode.hidden = true;
+        }
+        btn.addEventListener('click', function () {
+            expand();
+            var c = grid.querySelectorAll('.card')[6];
+            if (c) { var a = c.querySelector('a, summary, button'); if (a) a.focus({ preventScroll: true }); }
+        });
+        if (strip) strip.addEventListener('click', expand, true);
+        if (strip) strip.addEventListener('keydown', expand, true);
+    })();
+    </script>
     <!-- Pipeline-stage FLIP filter for feature cards -->
     <script>
     (function() {
@@ -1739,5 +2014,6 @@ flowchart LR
     })();
     </script>
 
+    <script src="js/landing-demos.js" defer></script>
 </body>
 </html>

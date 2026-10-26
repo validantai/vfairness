@@ -577,6 +577,7 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
                     <li><a href="#data-bias-validator">DataBiasValidator</a></li>
                     <li><a href="#model-fairness-gate">ModelFairnessGate</a></li>
                     <li><a href="#hierarchical-gate">Hierarchical Gate</a></li>
+                    <li><a href="#deployment-policies">Deployment Policies</a></li>
                     <li><a href="#fairness-report-card">FairnessReportCard</a></li>
                     <li><a href="#fairness-test-suite">FairnessTestSuite</a></li>
                     <li><a href="#pytest">pytest Integration</a></li>
@@ -1021,9 +1022,8 @@ elif dp &gt; 0.1:
                     <h2>Installation</h2>
 
                     <div class="callout callout-warning" style="border-left:3px solid #64748b;padding:0.9rem 1.1rem;margin-bottom:1.25rem;background:rgba(100,116,139,0.08);border-radius:6px;">
-                        <p style="margin:0 0 0.5rem 0;"><strong>Published 2026-10-02.</strong> The library documented on this page is 0.1.0, released from the <code>v0.1.0</code> tag on <code>validantai/vfairness</code> and installable with <code>pip install vfairness</code>.</p>
-                        <p style="margin:0 0 0.5rem 0;">A placeholder <code>vfairness</code> 0.0.1 does occupy the name on PyPI, carrying the <code>Development Status :: 1 - Planning</code> classifier. It is not this library. A plain <code>pip install vfairness</code> today resolves to that placeholder, so the commands below describe the extras as they will work once 0.1.0 ships, not an install you can perform right now.</p>
-                        <p style="margin:0;">Until then, install from a checkout of the repository. Checked against pypi.org on 2026-08-28.</p>
+                        <p style="margin:0 0 0.5rem 0;"><strong>Published 2026-10-26.</strong> The library documented on this page is 0.2.0, released from the <code>v0.2.0</code> tag on <code>validantai/vfairness</code> and installable with <code>pip install vfairness</code>. What changed since 0.1.0 is on the <a href="../concepts/changelog.html#v0.2.0">release history</a>.</p>
+                        <p style="margin:0;">It needs Python 3.11 or newer. The early 0.0.1 placeholder that held this name from March 2026 has been yanked, so a resolver will not select it (checked against pypi.org on 2026-10-02).</p>
                     </div>
 
                     <div class="code-block">
@@ -1031,11 +1031,7 @@ elif dp &gt; 0.1:
                             <span class="code-lang">bash</span>
                             <button class="code-copy">Copy</button>
                         </div>
-                        <pre><code># Today: from a checkout of the repository
-pip install -e .
-
-# Once 0.1.0 is published, the same extras apply to the released package.
-# Core installation
+                        <pre><code># Core installation
 pip install vfairness
 
 # With visualization support
@@ -1153,10 +1149,7 @@ pip install vfairness[all]</code></pre>
                             <span class="code-lang">bash</span>
                             <button class="code-copy">Copy</button>
                         </div>
-                        <pre><code class="language-bash"># These apply once 0.1.0 is published; see the note at the top of
-# Installation. Today, install from a checkout: pip install -e .
-
-# Core (numpy, pandas, scipy, scikit-learn, requests)
+                        <pre><code class="language-bash"># Core (numpy, pandas, scipy, scikit-learn, requests)
 pip install vfairness
 
 # With visualization
@@ -1559,8 +1552,8 @@ flowchart TB
   <a class="cap-status cap-status--checked cap-status--sm" href="../status/">Checked</a> graded and assessed, any defect found was fixed;
   <a class="cap-status cap-status--fix-pending cap-status--sm" href="../status/">Fix pending</a> a defect is still open, do not rely on it in the beta;
   <a class="cap-status cap-status--not-checked cap-status--sm" href="../status/">Not checked</a> nobody has established anything either way.
-  Measured across the whole public surface: 1580 checked, 0 fix pending,
-  0 not checked, of 1580 code units.
+  Measured across the whole public surface: 1599 checked, 0 fix pending,
+  0 not checked, of 1599 code units.
   A badge covering several units shows the worst of them.
   <br><br>
   <strong>Scope is a separate question from status.</strong> A symbol marked
@@ -1569,7 +1562,7 @@ flowchart TB
   verification programme: the beta bar certifies the core surface, and these sit
   outside it. A preview symbol can be perfectly well checked, and a core symbol can
   be unexamined, so the two labels are shown side by side rather than merged.
-  182 of 1580 code units are preview; what is in each and why is in
+  182 of 1599 code units are preview; what is in each and why is in
   <a href="../quality-and-hardening/#what-the-beta-covers">what the beta covers</a>.
   Full grid: <a href="../status/">status of every capability</a>.
 </div>
@@ -3689,6 +3682,19 @@ print(m['ratio_matrix']['Black']['White'])   # rate(Black)/rate(White)</code></p
                     <div style="background:#f0fdfa;border-left:4px solid #0f766e;padding:12px 16px;border-radius:6px;margin:var(--spacing-4) 0;">
                         <strong>The jurisdiction-aware legal overlay lives here, not in the metrics.</strong> The US EEOC four-fifths 0.80 line is applied only for US employment; EU / UK / CH use proportionality + objective justification with no numeric bar. Emits stable-ID <code>findings</code> (with <code>panelRef</code>), priority-ranked <code>recommendations</code> (each routed to a Navigator step + a <code>vfairnessFunction</code>), <code>metricsDeferred</code>, <code>jurisdictionBasis</code>, and an <code>auditTrail</code>.
                     </div>
+                    <h3 id="assurance-gap-rules">How a selection-rate gap is confirmed, and when it becomes a finding</h3>
+                    <p>For each protected attribute, tabular Pulse compares the worst-served group with a reference group (the most populous reliable group) and reports the gap with an interval.</p>
+                    <ul>
+                        <li><strong>The interval is the Newcombe hybrid score interval</strong> (Newcombe 1998, method 10), built from each group's Wilson score limits, so the uncertainty of both groups' rates enters it and it stays valid at zero counts and small groups. The row names it (<code>ciMethod: "newcombe_hybrid_score"</code>, <code>ciLevel</code>). With fewer than 5 rows in either group, or decisions that are not 0/1, no interval is computed and <code>ciNotComputedReason</code> says why. Continuous and rank outputs keep a percentile bootstrap on the normalized mean gap (<code>ciMethod: "percentile_bootstrap"</code>).</li>
+                        <li><strong>A gap is statistically confirmed</strong> (<code>significant</code>) only when its 95% interval excludes zero, an omnibus chi-square across all groups rejects (when there are more than two), the pair survives its <strong>selection correction</strong>, and it survives Benjamini-Hochberg correction across the attributes. The pair's p-value (<code>pValue</code>) is the dual of the interval (the smallest level at which the interval reaches zero). Because the worst group is the most extreme of several comparisons with the reference, that p is multiplied by the number of comparisons it was chosen from (<code>selectionComparisons</code>: k-1, or k(k-1)/2 when the reference itself had to be re-picked) before it may confirm the pair; that Bonferroni-corrected <code>pValueSelection</code> is what enters the Benjamini-Hochberg family. A confirmed gap therefore always prints an interval that excludes zero, while a pair whose interval excludes zero can still be unconfirmed once the choice and the number of attributes are accounted for.</li>
+                        <li><strong>Measured on a 2,700-row hiring sample (9 Oct 2026).</strong> 0 of 22 Native American against 114 of 1,601 White: the percentile bootstrap used before read 5.8 to 8.4 points, confirmed; the Newcombe interval reads -7.8 to 8.5 points, not confirmed. 0 of 318 aged 18 to 24 against 30 of 646 aged 45 to 54: 2.8 to 6.6 points, confirmed (pair p 0.0002, 0.0009 after choosing among 4 bands). On the published clean control (nothing planted) the selection correction is what keeps a chance age gap from being confirmed: 9 of 56 against 45 of 118, pair p 0.0034, 0.014 after choosing among 4 bands, not confirmed across ten attributes.</li>
+                    </ul>
+                    <p>A per-attribute row raises a disparate-impact finding (<code>DSP-n</code>) when:</p>
+                    <ol>
+                        <li>the gap is 5 points or more (severity from the gap: <code>warn</code>, <code>high</code> from 10 points when confirmed, <code>critical</code> from 20 points when confirmed);</li>
+                        <li>under US employment, the four-fifths ratio is below 0.80, at any gap (<code>critical</code> when confirmed, <code>high</code> otherwise); or</li>
+                        <li>the attribute is graded Fail (<code>tone</code> critical, which requires statistical confirmation): the finding is then <code>critical</code> whatever the gap in points, so a Fail on the four-fifths row is always traceable to a finding and to the recommendation that addresses it.</li>
+                    </ol>
                     <h3 id="assurance-api-functions">Functions</h3>
                     <div class="api-function">
                         <div class="api-function-header"><span class="api-function-name">build_assurance_verdict</span><!--cap-status--><a class="cap-status cap-status--checked" href="../status/" title="refuses honestly when nothing is measurable, and a test fails if that regresses" data-cap-status="CHECKED">Checked</a><!--/cap-status--></div>
@@ -3733,6 +3739,15 @@ for r in v['recommendations']: print(r['id'], '->', r['routeTo'])</code></pre>
                     <div style="background:#f0fdfa;border-left:4px solid #0f766e;padding:12px 16px;border-radius:6px;margin:var(--spacing-4) 0;">
                         <strong>Generative routing.</strong> <code>run_pulse</code> auto-detects a prompts+outputs artefact and routes to a generative path that <strong>reuses</strong> <code>OutputAnalyzer.analyze_all</code> (11 standard metrics, Benjamini-Hochberg corrected, no API call; the optional LLM judge is the only part that calls out) per protected attribute, mapped into the same <code>build_assurance_verdict</code> shape so the Pulse UX is unchanged. The tabular path is the default and misroute-safe.
                     </div>
+                    <h3 id="pulse-decision-labels">Text decision columns: the favourable value is declared, never guessed</h3>
+                    <p>A decision column that holds text ("Yes"/"No", "Invited"/"Rejected") does not say which value is the favourable outcome, and the right answer depends on what the column records. <code>run_pulse</code> codes it only from a declared value, in the shape the platform's other analyses use: <code>inputs["decision_labels"] = {"favourable_values": {"invite_decision": "Yes"}}</code>.</p>
+                    <ul>
+                        <li>The declared value becomes the favourable outcome and every other value the unfavourable one; missing cells stay missing. <code>outcome_polarity</code> is honoured as for a 0/1 column.</li>
+                        <li>Numeric and boolean columns, text that parses as numbers, and text whose values are 0/1 or true/false need no declaration.</li>
+                        <li>Undeclared, or declared with a value the column does not hold, the run is <strong>refused</strong>: <code>success: False</code>, <code>refused: True</code>, an <code>error</code> naming the column, its values and the setting, plus <code>decisionColumn</code> and <code>decisionValues</code> so a caller can ask the user. Nothing is guessed.</li>
+                        <li>The coding applied is published in <code>dataPreparation.decisionCoding</code>. A text ground-truth column is coded from its own declaration; undeclared, it is not used as ground truth and <code>decisionCoding.labelNotUsed</code> says why.</li>
+                    </ul>
+                    <p>Why: the old coding took a fixed list of "truthy" words as 1 (so "Invited"/"Rejected" read as nobody invited), and <code>DataBiasValidator</code> took the alphabetically later value (so "Rejected" read as favourable, and a gender four-fifths ratio of 0.36 read 0.96 on the platform's hiring sample). <code>DataBiasValidator.validate(..., outcome_favourable_value=...)</code> follows the same rule; an undeclared text outcome is reported as <code>outcome_not_coded</code>.</p>
                     <h3 id="multimodal-routing">Multimodal &amp; generative routing (Phase 4(2)-B)</h3>
                     <p><code>run_pulse</code> auto-detects the artefact kind and routes to the matching <strong>reuse</strong> path; the tabular path is the misroute-safe default. Every path maps into the same assurance verdict so the UX is unchanged.</p>
                     <div class="table-container" style="overflow-x:auto;">
@@ -13417,6 +13432,8 @@ flowchart LR
                                 <pre><code class="language-python">from vfairness import FairnessAnalyzer, log_fairness_to_mlflow
 import mlflow
 
+# Group names are coded by default. Set the key once, in the shell, and keep it
+# like a password:  export VFAIRNESS_GROUP_LABEL_KEY=...
 analyzer = FairnessAnalyzer(y_true, y_pred, gender)
 
 with mlflow.start_run():
@@ -13426,14 +13443,31 @@ with mlflow.start_run():
     log_fairness_to_mlflow(
         analyzer,              # a FairnessAnalyzer or a report dict
         prefix='fairness',
-        log_artifacts=True,    # Save full report as JSON artifact
-        include_group_stats=True
+        log_artifacts=True,    # Save the (coded) report as a JSON artifact
+        include_group_stats=True,
+        group_labels='coded',  # the default; 'names' writes real group names
     )
 
-# Logged metrics: fairness.demographic_parity_difference, etc.
-# Logged params: fairness.min_group_size, fairness.task_type
-# Logged artifacts: fairness_report.json</code></pre>
+# Logged metrics: fairness.demographic_parity_difference,
+#                 fairness.group.g_3fa91c07d2e4.tpr (one code per group), etc.
+# Logged params:  fairness.task_type, fairness.n_samples, fairness.groups (codes)
+# Logged tags:    fairness.group_labels = 'coded', fairness.group_label_key_id
+# Logged artifacts: the coded report as JSON, under fairness_report/</code></pre>
                             </div>
+
+                            <p><strong>Group names are coded by default.</strong> Every group name the run would hold (the per-group metric keys, the effect-size pairs, the <code>groups</code> and excluded-levels params, the disclosure lists and the JSON artifact) is replaced by a keyed code such as <code>g_3fa91c07d2e4</code>: the first 12 hex characters of HMAC-SHA256 of the name under your key. A plain hash would hide nothing, because "Female" is found again by hashing a short list of likely names. The same key gives the same codes in every run, so model versions stay comparable. The key comes from <code>label_key=</code> or the environment variable <code>VFAIRNESS_GROUP_LABEL_KEY</code>; with neither, the function raises <code>ValueError</code> before anything is written. <code>group_labels='names'</code> writes the real names on purpose, exactly as before.</p>
+                            <p>The mapping from name to code is never written to MLflow. Rebuild it on your own machine with the same key (the module is pre-release, so its import path may change):</p>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">python</span>
+                                    <button class="code-copy">Copy</button>
+                                </div>
+                                <pre><code class="language-python">from vfairness._group_codes import group_label_codes
+
+codes = group_label_codes(['Female', 'Male'])          # reads VFAIRNESS_GROUP_LABEL_KEY
+names = {code: name for name, code in codes.items()}   # read a coded run</code></pre>
+                            </div>
+                            <p>Order is hidden too. The library orders groups by their real names, so a coded run lists groups in code order and writes each effect-size pair as <code>&lt;lower code&gt;_vs_&lt;higher code&gt;</code>; when the library compared the pair the other way round, its values are restated for that direction (Cohen's d and h negated, risk and odds ratios inverted). The report's sentences that name groups (<code>assessment.summary</code>, <code>explanations</code>) cannot be coded and are left out of the artifact; every part left out is named in the <code>fairness.left_out_by_group_coding</code> tag, with its count in <code>fairness.n_left_out_by_group_coding</code>.</p>
 
                             <div class="api-params">
                                 <div class="api-params-label">Parameters</div>
@@ -13470,7 +13504,25 @@ with mlflow.start_run():
                                         <span class="api-param-badge optional">Optional</span>
                                         <span class="api-param-default">True</span>
                                     </div>
-                                    <div class="api-param-desc">Save the full fairness report as a JSON artifact.</div>
+                                    <div class="api-param-desc">Save the fairness report as a JSON artifact (the coded copy in coded mode; the raw report is never uploaded then).</div>
+                                </div>
+                                <div class="api-param">
+                                    <div class="api-param-header">
+                                        <span class="api-param-name">group_labels</span>
+                                        <span class="api-param-type">str</span>
+                                        <span class="api-param-badge optional">Optional</span>
+                                        <span class="api-param-default">'coded'</span>
+                                    </div>
+                                    <div class="api-param-desc"><code>'coded'</code> replaces every group name with a keyed code; <code>'names'</code> writes the real names on purpose. Anything else raises <code>ValueError</code>. Every run is tagged <code>&lt;prefix&gt;.group_labels</code>.</div>
+                                </div>
+                                <div class="api-param">
+                                    <div class="api-param-header">
+                                        <span class="api-param-name">label_key</span>
+                                        <span class="api-param-type">str | bytes | None</span>
+                                        <span class="api-param-badge optional">Optional</span>
+                                        <span class="api-param-default">None</span>
+                                    </div>
+                                    <div class="api-param-desc">The secret that codes the names. When <code>None</code>, <code>VFAIRNESS_GROUP_LABEL_KEY</code> is read. A coded run is tagged <code>&lt;prefix&gt;.group_label_key_id</code>, eight hex characters that tell keys apart without revealing them.</div>
                                 </div>
                             </div>
 
@@ -13571,10 +13623,12 @@ with wandb.init(project='my-model'):
     log_fairness_to_wandb(
         analyzer,
         prefix='fairness',
-        log_artifacts=True,       # Save full report as W&amp;B artifact
-        include_group_stats=True  # Include per-group statistics
+        log_artifacts=True,       # Save the (coded) report as a W&amp;B artifact
+        include_group_stats=True, # Include per-group statistics
+        group_labels='coded',     # the default; needs VFAIRNESS_GROUP_LABEL_KEY or label_key
     )</code></pre>
                             </div>
+                            <p>Group names are coded by default, exactly as on the <a href="#mlflow">MLflow path</a>: keyed codes in the logged keys, the run summary and the artifact, groups in code order, the mapping never written, and the summary fields <code>fairness/group_labels</code>, <code>fairness/group_label_key_id</code> and <code>fairness/left_out_by_group_coding</code> on every coded run.</p>
 
                             <div class="api-params">
                                 <div class="api-params-label">Parameters</div>
@@ -13613,6 +13667,24 @@ with wandb.init(project='my-model'):
                                     </div>
                                     <div class="api-param-desc">Include per-group statistics in logged metrics.</div>
                                 </div>
+                                <div class="api-param">
+                                    <div class="api-param-header">
+                                        <span class="api-param-name">group_labels</span>
+                                        <span class="api-param-type">str</span>
+                                        <span class="api-param-badge optional">Optional</span>
+                                        <span class="api-param-default">'coded'</span>
+                                    </div>
+                                    <div class="api-param-desc"><code>'coded'</code> or <code>'names'</code>, as for <code>log_fairness_to_mlflow</code>.</div>
+                                </div>
+                                <div class="api-param">
+                                    <div class="api-param-header">
+                                        <span class="api-param-name">label_key</span>
+                                        <span class="api-param-type">str | bytes | None</span>
+                                        <span class="api-param-badge optional">Optional</span>
+                                        <span class="api-param-default">None</span>
+                                    </div>
+                                    <div class="api-param-desc">The secret that codes the names; <code>VFAIRNESS_GROUP_LABEL_KEY</code> when <code>None</code>.</div>
+                                </div>
                             </div>
 
                             <div class="api-returns">
@@ -13643,13 +13715,16 @@ with wandb.init(project='my-model'):
     *,
     metrics: List[str] = None,        # Names to log; None logs every metric produced
     thresholds: Dict[str, float] = None,  # RECORDED beside the metrics, never enforced
-    prefix: str = 'fairness'          # Prefix for the logged names
+    prefix: str = 'fairness',         # Prefix for the logged names
+    group_labels: str = 'coded',      # 'coded' (keyed codes) or 'names'
+    label_key: str = None             # None reads VFAIRNESS_GROUP_LABEL_KEY
 )</code></pre>
                             </div>
 
                             <p>The decorated function may take any arguments it likes; the decorator never inspects them. What it does inspect is the RETURN value, and only two shapes are recognised: a 3-tuple <code>(y_pred, y_true, sensitive_attr)</code>, or a dict carrying the keys <code>y_pred</code>, <code>y_true</code> and <code>sensitive_attr</code>. From one of those it builds a <code>FairnessAnalyzer</code> report and logs it to the active run.</p>
                             <p><strong>Anything else is skipped, not computed.</strong> A bare prediction array, or a fitted model with a <code>.predict()</code> method, is not one of the two shapes: the decorator emits <code>UserWarning: auto_log_fairness: function must return (y_pred, y_true, sensitive_attr) tuple or dict with those keys. Skipping fairness logging.</code>, returns your value untouched, and logs nothing at all. The run still opens and closes cleanly, so an empty metric list is the only sign anything was missed. A missing active run, or a tracker that is not installed, ends the same way: one warning, and nothing logged.</p>
                             <p><code>thresholds</code> are <strong>recorded, not enforced</strong>. They are written as run parameters under <code>&lt;prefix&gt;.threshold.&lt;metric&gt;</code> with <code>&lt;prefix&gt;.thresholds_enforced</code> set to <code>"false"</code> beside them; nothing here compares a metric against them and no verdict is derived from them. Use <a href="#fairness-test-suite"><code>assert_fairness</code></a> for a gate that actually refuses.</p>
+                            <p>Group names are coded by default, as for <a href="#mlflow"><code>log_fairness_to_mlflow</code></a>. The key is resolved at each call before the thresholds are recorded, so a call without one (no <code>label_key</code> and no <code>VFAIRNESS_GROUP_LABEL_KEY</code>) writes nothing at all and warns how to fix it. The example below assumes the variable is set.</p>
 
                             <div class="code-block">
                                 <div class="code-header">
@@ -13659,6 +13734,7 @@ with wandb.init(project='my-model'):
                                 <pre><code class="language-python">from vfairness import auto_log_fairness
 import mlflow
 
+# Assumes VFAIRNESS_GROUP_LABEL_KEY is set (group names are coded by default).
 @auto_log_fairness(backend='mlflow', metrics=['demographic_parity_difference'])
 def evaluate_model(X, y, sensitive):
     from sklearn.linear_model import LogisticRegression
@@ -16420,6 +16496,11 @@ flowchart LR
                     </div>
 
                     <div class="callout callout-info">
+                        <div class="callout-title">A text outcome is coded from its declared favourable value</div>
+                        <p>Pass <code>validate(df, outcome_column="decision", outcome_favourable_value="Invited")</code> for a text outcome. Numeric, boolean, 0/1 and true/false columns need nothing. An undeclared text outcome is never guessed: its outcome checks are not measured and the result carries an <code>outcome_not_coded</code> issue naming the column and its values.</p>
+                    </div>
+
+                    <div class="callout callout-info">
                         <div class="callout-title">DataBiasValidator vs BiasDetector</div>
                         <p><code>BiasDetector</code> is an <em>exploratory tool</em> for data scientists (rich reports, risk scores, 43 historical patterns).
                         <code>DataBiasValidator</code> is an <em>automated gate</em> for pipelines (pass/fail, JUnit XML, configurable thresholds).
@@ -16859,9 +16940,111 @@ for w in decision.small_sample_warnings:
                                     <td>List[SmallSampleWarning]</td>
                                     <td>Warnings for groups below <code>min_group_size</code></td>
                                 </tr>
+                                <tr>
+                                    <td><code>evaluated_scope</code></td>
+                                    <td>EvaluatedScope</td>
+                                    <td>What ran: the levels evaluated, the threshold each applied, and the group sets left out with the setting that left them out (<code>ScopeLevel</code>, <code>ScopeGap</code>). Also on every <code>GateDecision</code>, and in both <code>to_dict()</code> outputs. Since 0.2.0.</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
+                </section>
+
+                <section id="deployment-policies">
+                    <h2>Deployment Policies</h2>
+                    <p>Hold a model to the coverage a deployment requires, not only to what the gate was configured to check. Since 0.2.0 (<a href="https://github.com/validantai/vfairness/issues/1" target="_blank">vfairness issue #1</a>).</p>
+
+                    <h3>Background</h3>
+                    <p>
+                        The gate knows what it was configured to check, not what a deployment requires. Switching a check off, leaving an attribute out or
+                        loosening a threshold therefore still ends in <code>approved=True</code> on the levels that ran. A <code>CoveragePolicy</code> states the
+                        requirement separately from the configuration, and <code>ModelFairnessGate.evaluate_against_policy()</code> compares the two. The
+                        measurement runs exactly as <code>evaluate_hierarchical()</code> would and is returned unchanged as <code>decision.measurement</code>.
+                        Opt-in: without a policy nothing changes, except that every decision now carries <code>evaluated_scope</code>.
+                    </p>
+
+                    <h3>Worked example: required scope versus executed scope</h3>
+                    <p>400 applicants in four cells of 100. Each attribute alone is balanced (every gender and every race group is selected at 50%), the combined cells at 80%, 20%, 20% and 80%. The policy requires gender, race and their intersection; the pipeline has intersections off.</p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-lang">python</span>
+                            <button class="code-copy">Copy</button>
+                        </div>
+                        <pre><code class="language-python">from vfairness import CoveragePolicy, GateConfig, HierarchicalGateConfig, ModelFairnessGate
+
+policy = CoveragePolicy(                       # REQUIRED scope
+    policy_id="hiring-eu",
+    version="3",
+    required_attributes=["gender", "race"],
+    required_intersections=[("gender", "race")],
+    required_metrics={"demographic_parity_difference": 0.1},
+    min_group_size=30,
+)
+gate = ModelFairnessGate(config=GateConfig(    # EXECUTED scope
+    metrics=["demographic_parity_difference"],
+    thresholds={"demographic_parity_difference": 0.1},
+))
+decision = gate.evaluate_against_policy(
+    policy, y_true, y_pred, {"gender": gender, "race": race},
+    hierarchical_config=HierarchicalGateConfig(check_intersections=False),
+)
+
+decision.measurement.status   # GateStatus.APPROVED  (the levels that ran)
+decision.permitted            # False                (the deployment decision)
+[(i.label, i.state.value, i.outcome.value) for i in decision.items]
+# [('gender', 'assessed', 'pass'),
+#  ('race', 'assessed', 'pass'),
+#  ('gender × race', 'omitted_by_configuration', 'not_measured')]
+decision.reasons
+# ['gender × race, demographic_parity_difference: omitted by configuration:
+#   check_intersections is off, so no level compared this intersection']</code></pre>
+                    </div>
+                    <p>With the intersection on (and <code>default_intersection_threshold_multiplier=1.0</code>, see below), the same policy reports <code>gender × race</code> as assessed with a measured breach of 0.6 against the bound of 0.1, and the measurement itself is BLOCKED.</p>
+
+                    <h3>Four coverage states, one per required item</h3>
+                    <p>One item per required group set on each required metric:</p>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr><th>State</th><th>Means</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>assessed</code></td><td>A level compared it, the gate enforces it at least as strictly as the policy, and every group held enough rows</td></tr>
+                                <tr><td><code>insufficient_evidence</code></td><td>It ran, but a group or a rate denominator is below the policy's own <code>min_group_size</code>, or the value could not be measured</td></tr>
+                                <tr><td><code>omitted_by_configuration</code></td><td>A level switched off, the metric not configured or not blocking, or a threshold looser than the policy bound at that level. The reason names the setting</td></tr>
+                                <tr><td><code>input_absent</code></td><td>An attribute it needs was not supplied. The required scope is never reduced to the supplied attributes</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>The measured outcome (<code>MeasuredOutcome</code>: <code>pass</code>, <code>fail</code>, <code>not_measured</code>) is graded against the policy bound and kept apart from the state (<code>CoverageState</code>), so a five-person group that happens to pass is insufficient evidence, not a pass and not a fairness failure. <code>permitted</code> is True only when every item is assessed and passes and the measurement was not blocked. Group sizes are counted against the policy's minimum, never the configured one, so <code>min_group_size=1</code> cannot hide a small cell.</p>
+
+                    <h3>PolicyDecision</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>permitted</code></td><td>bool</td><td>The deployment decision: every required item assessed and passing, and the measurement not blocked</td></tr>
+                                <tr><td><code>items</code></td><td>List[CoverageItem]</td><td>One per required group set and metric, each with a <code>state</code>, an <code>outcome</code> and the measured <code>value</code></td></tr>
+                                <tr><td><code>reasons</code></td><td>List[str]</td><td>Why it is not permitted, naming the setting or input behind each gap</td></tr>
+                                <tr><td><code>measurement</code></td><td>IntersectionalGateDecision</td><td>The unchanged hierarchical measurement</td></tr>
+                                <tr><td><code>policy_fingerprint</code>, <code>configuration_fingerprint</code></td><td>str</td><td>SHA-256 of the policy and of the effective configuration. They identify which policy and settings were used; they are not signatures</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Compatibility</h3>
+                    <p><code>approved</code> keeps its meaning (nothing blocked on the levels that ran), and so does <code>CONDITIONAL</code>; under a policy neither means &ldquo;may be deployed&rdquo;, <code>permitted</code> does. <code>gate.create_github_check(decision)</code> concludes <code>failure</code> whenever a supplied policy is not met, however the measurement came out, and <code>FairnessReportCard(decision)</code> leads with the policy result instead of &ldquo;Approved for deployment&rdquo;; its <code>to_dict()</code> adds <code>policy_permitted</code>.</p>
+
+                    <h3>The default intersection relaxation</h3>
+                    <p><code>HierarchicalGateConfig</code> relaxes intersection thresholds by 1.2 by default, so 0.1 becomes 0.12 at the intersection, which is looser than a policy bound of 0.1. The item is then omitted by configuration with the multiplier named. Set the multiplier to 1.0, or write the relaxed bound into the policy if the policy accepts it.</p>
+
+                    <h3>Re-checking a stored measurement</h3>
+                    <p><code>assess_coverage(policy, measurement, *, protected_attrs, y_true, y_pred, gate_config, hierarchical_config)</code> holds a stored measurement to a policy, for example a newer policy version. It is imported from <code>vfairness.operations.cicd</code>, as are <code>ScopeLevel</code> and <code>ScopeGap</code>; <code>CoveragePolicy</code>, <code>PolicyDecision</code>, <code>CoverageItem</code>, <code>CoverageState</code>, <code>MeasuredOutcome</code> and <code>EvaluatedScope</code> are also importable from <code>vfairness</code>.</p>
+
+                    <h3>What belongs to the integration</h3>
+                    <p>The library compares and nothing more: there is no parameter for an exception or an approver, so nothing a caller passes turns a coverage gap into a permission. Which policy applies to which deployment, who may grant an exception and how that person is verified, its scope, rationale, evidence, expiry and revocation belong to the integration that enforces the policy, which also keeps the historical assessment. How to run it in a pipeline: <a href="../workflow-integration/index.html#deployment-policy">Workflow Integration</a>.</p>
                 </section>
 
                 <section id="fairness-report-card">
@@ -17250,12 +17433,11 @@ def test_fairness_with_expected_failure():
                         <pre><code class="language-yaml"># .pre-commit-config.yaml
 repos:
   - repo: https://github.com/validantai/vfairness
-    # No vfairness version has been released or tagged yet, so there is no
-    # release tag to pin. Use a commit sha until one is cut, then pin the tag.
-    rev: &lt;commit-sha&gt;
+    rev: v0.2.0   # vfairness 0.2.0, released 26 Oct 2026
     hooks:
       - id: vfairness-check-config
         files: 'fairness[_-]config\.(ya?ml|json)$'
+        additional_dependencies: ["PyYAML&gt;=6.0"]  # needed to read .yml/.yaml configs
       - id: vfairness-check-model-card
         files: 'model[_-]card\.md$'</code></pre>
                     </div>
@@ -18261,7 +18443,7 @@ svg = bias_audit_to_svg(
                         <h4>Resources</h4>
                         <ul>
                             <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
-                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.2.0/" target="_blank">PyPI (0.2.0)</a></li>
                             <li><a href="../concepts/references.html">Academic References</a></li>
                             <li><a href="../concepts/changelog.html">Changelog</a></li>
                         </ul>

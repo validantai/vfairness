@@ -26,6 +26,7 @@ import argparse
 import datetime as _dt
 import html
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -615,9 +616,17 @@ def render() -> str:
         )
     if n_fix:
         open_items.append(f"<strong>{n_fix} code units</strong> have a known fix pending.")
+    # The release state is READ from the top CHANGELOG heading (undated while
+    # unreleased, dated by the internal release-cut script, which is not part of
+    # the public repository), the same source tests/test_release_tense.py reads,
+    # so this item cannot outlive the release.
+    top = re.search(r"^## \[[^\]]+\]\s*-\s*(.+?)\s*$", (ROOT / "CHANGELOG.md").read_text(), re.M)
+    if not (top and re.fullmatch(r"\d{4}-\d{2}-\d{2}", top.group(1))):
+        open_items.append(
+            f"<strong>Not yet published.</strong> Version {version} has never been released to "
+            "PyPI; the release pipeline is built and gated but has not run."
+        )
     open_items += [
-        f"<strong>Not yet published.</strong> Version {version} has never been released to PyPI; "
-        "the release pipeline is built and gated but has not run.",
         "<strong>Some checks have not produced a result yet</strong>: code scanning (CodeQL, "
         "OpenSSF Scorecard) waits for the public repository, and mutation testing covers one "
         "module.",

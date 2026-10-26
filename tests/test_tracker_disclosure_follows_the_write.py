@@ -144,7 +144,10 @@ def _caught(fn):
 
 def test_mlflow_says_the_group_panel_was_suppressed_rather_than_clean(fake_mlflow):
     log_fairness_to_mlflow(
-        _report_with_measured_groups(), log_artifacts=False, include_group_stats=False
+        _report_with_measured_groups(),
+        log_artifacts=False,
+        include_group_stats=False,
+        group_labels="names",
     )
     params = fake_mlflow.params
     assert not [k for k in fake_mlflow.metrics if ".group." in k], "the flag stopped working"
@@ -160,7 +163,10 @@ def test_mlflow_says_the_group_panel_was_suppressed_rather_than_clean(fake_mlflo
 
 def test_wandb_says_the_group_panel_was_suppressed_rather_than_clean(fake_wandb):
     log_fairness_to_wandb(
-        _report_with_measured_groups(), log_artifacts=False, include_group_stats=False
+        _report_with_measured_groups(),
+        log_artifacts=False,
+        include_group_stats=False,
+        group_labels="names",
     )
     summary = fake_wandb.run.summary
     assert not [k for k in fake_wandb.logged if "/group/" in k], "the flag stopped working"
@@ -178,14 +184,14 @@ def test_control_a_logged_group_panel_says_logged_and_writes_its_bars(
     at its default every series is written and the status says so."""
     report = _report_with_measured_groups()
     if backend == "mlflow":
-        log_fairness_to_mlflow(report, log_artifacts=False)
+        log_fairness_to_mlflow(report, log_artifacts=False, group_labels="names")
         assert fake_mlflow.metrics["fairness.group.M.tpr"] == 0.78
         assert fake_mlflow.metrics["fairness.group.F.tpr"] == 0.55
         assert fake_mlflow.params["fairness.group_stats_status"] == "logged"
         assert fake_mlflow.params["fairness.n_group_stats_suppressed"] == 0
         assert fake_mlflow.params["fairness.group_stats_suppressed"] == "[]"
     else:
-        log_fairness_to_wandb(report, log_artifacts=False)
+        log_fairness_to_wandb(report, log_artifacts=False, group_labels="names")
         assert fake_wandb.logged["fairness/group/M/tpr"] == 0.78
         assert fake_wandb.logged["fairness/group/F/tpr"] == 0.55
         assert fake_wandb.run.summary["fairness/group_stats_status"] == "logged"
@@ -197,7 +203,9 @@ def test_control_a_logged_group_panel_says_logged_and_writes_its_bars(
 
 def test_mlflow_names_a_tuple_shaped_interval_it_wrote_as_nothing(fake_mlflow):
     _logged, msgs = _caught(
-        lambda: log_fairness_to_mlflow(_report_with_tuple_shaped_entries(), log_artifacts=False)
+        lambda: log_fairness_to_mlflow(
+            _report_with_tuple_shaped_entries(), log_artifacts=False, group_labels="names"
+        )
     )
     params = fake_mlflow.params
     assert not [k for k in fake_mlflow.metrics if "ci_" in k or "effect_size" in k]
@@ -220,7 +228,9 @@ def test_mlflow_names_a_tuple_shaped_interval_it_wrote_as_nothing(fake_mlflow):
 
 def test_wandb_names_a_tuple_shaped_interval_it_wrote_as_nothing(fake_wandb):
     _logged, msgs = _caught(
-        lambda: log_fairness_to_wandb(_report_with_tuple_shaped_entries(), log_artifacts=False)
+        lambda: log_fairness_to_wandb(
+            _report_with_tuple_shaped_entries(), log_artifacts=False, group_labels="names"
+        )
     )
     summary = fake_wandb.run.summary
     assert not [k for k in fake_wandb.logged if "ci_" in k or "effect_size" in k]
@@ -238,7 +248,7 @@ def test_an_unreadable_group_entry_is_named_too(backend, fake_mlflow, fake_wandb
     report = _report_with_measured_groups()
     report["group_stats"]["X"] = (0.5, 0.6)
     logger = log_fairness_to_mlflow if backend == "mlflow" else log_fairness_to_wandb
-    _logged, msgs = _caught(lambda: logger(report, log_artifacts=False))
+    _logged, msgs = _caught(lambda: logger(report, log_artifacts=False, group_labels="names"))
     fields = fake_mlflow.params if backend == "mlflow" else fake_wandb.run.summary
     key = "fairness.unreadable_entries" if backend == "mlflow" else "fairness/unreadable_entries"
     assert "group_stats" in fields[key] and "X" in fields[key], fields[key]
@@ -263,7 +273,7 @@ def test_control_a_readable_report_reports_no_unreadable_entry_and_no_warning(
     }
     report["effect_sizes"] = {"F_vs_M": {"cohens_d_positive_rate": -0.81}}
     logger = log_fairness_to_mlflow if backend == "mlflow" else log_fairness_to_wandb
-    _logged, msgs = _caught(lambda: logger(report, log_artifacts=False))
+    _logged, msgs = _caught(lambda: logger(report, log_artifacts=False, group_labels="names"))
     if backend == "mlflow":
         fields, written = fake_mlflow.params, fake_mlflow.metrics
         assert written["fairness.demographic_parity_difference.ci_lower"] == 0.31

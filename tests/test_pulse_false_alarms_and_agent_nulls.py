@@ -94,6 +94,9 @@ def test_the_clean_synthetic_control_is_not_reported_as_unfit():
             "domain": "recruitment / employment screening",
             "jurisdiction": "US",
             "protected_attributes": attrs,
+            # invite_decision is "Yes"/"No": coded only from its declared
+            # favourable value, never guessed (2026-10-09).
+            "decision_labels": {"favourable_values": {"invite_decision": "Yes"}},
         },
     )["data"]
     confirmed = [p["attribute"] for p in res["perVariable"] if p.get("significant")]

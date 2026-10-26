@@ -303,9 +303,11 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
                 <ul class="sidebar-nav">
                     <li><a href="#overview">Overview</a></li>
                     <li><a href="#experiment-tracking">Experiment Tracking</a></li>
+                    <li><a href="#model-register">Model Register</a></li>
                     <li><a href="#version-control">Version Control</a></li>
                     <li><a href="#cicd-gates">CI/CD Gates</a></li>
                     <li><a href="#hierarchical-gate">Hierarchical Gate</a></li>
+                    <li><a href="#deployment-policy">Deployment Policies</a></li>
                     <li><a href="#testing">Testing</a></li>
                     <li><a href="#report-card">Report Card</a></li>
                     <li><a href="#devops-templates">DevOps Templates</a></li>
@@ -374,6 +376,18 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
                         instance or a raw report dictionary and log metrics, confidence intervals, effect sizes,
                         and group statistics.
                     </p>
+                    <p>
+                        <strong>Group names are coded by default.</strong> A tracker run is read by many people,
+                        so both functions replace every group name they write with a keyed code such as
+                        <code>g_3fa91c07d2e4</code> (HMAC-SHA256 under a team secret, never a plain hash, which
+                        a short list of likely names would undo). The same key gives the same codes in every run,
+                        so model versions stay comparable. Set the key once, kept like a password, in the
+                        environment variable <code>VFAIRNESS_GROUP_LABEL_KEY</code> (or pass <code>label_key=</code>);
+                        without it the functions refuse before anything is written. <code>group_labels="names"</code>
+                        writes the real names on purpose. The mapping from name to code is never written to the
+                        tracker; see the <a href="../api-reference/#mlflow">API reference</a> for how to rebuild it
+                        on your own machine.
+                    </p>
 
                     <h3>MLflow</h3>
                     <div class="code-block">
@@ -381,6 +395,7 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
                         <pre><code>import mlflow
 from vfairness import FairnessAnalyzer, log_fairness_to_mlflow
 
+# export VFAIRNESS_GROUP_LABEL_KEY=...   (once, in the shell)
 with mlflow.start_run():
     analyzer = FairnessAnalyzer(y_true, y_pred, gender)
     logged = log_fairness_to_mlflow(analyzer, prefix="model_v1")
@@ -404,6 +419,7 @@ wandb.finish()</code></pre>
                         <div class="code-header"><span class="code-lang">python</span></div>
                         <pre><code>from vfairness import auto_log_fairness
 
+# Group names coded with VFAIRNESS_GROUP_LABEL_KEY, as above.
 @auto_log_fairness(backend="mlflow", prefix="eval")
 def evaluate_model(X_test, y_test, sensitive_attr):
     y_pred = model.predict(X_test)
@@ -412,6 +428,48 @@ def evaluate_model(X_test, y_test, sensitive_attr):
 # Fairness metrics are automatically logged when called
 evaluate_model(X_test, y_test, gender)</code></pre>
                     </div>
+                </section>
+
+                <!-- Model Register -->
+                <section id="model-register">
+                    <h2>Model Register fingerprints <span class="gap-badge">PRE-RELEASE</span></h2>
+                    <p>
+                        A team that keeps its models in its own MLflow can register an assessed model version with the
+                        Validant Model Register without sending the model, the data or the results anywhere in clear.
+                        The pre-release module <code>vfairness._register</code> (since 0.2.0) identifies a version by its
+                        bytes where the model lives: <code>model_fingerprint()</code> returns the SHA-256 of a model file,
+                        or the manifest digest of a model folder (sorted <code>path</code>, NUL, file SHA-256 lines), and an
+                        MLflow URI (<code>models:/&lt;name&gt;/&lt;version&gt;</code>, <code>models:/&lt;name&gt;@&lt;alias&gt;</code>,
+                        <code>runs:/...</code>) is first downloaded through your own MLflow client into a temporary folder.
+                        A symbolic link in a model folder is refused. One evidence bundle per assessed version
+                        (<code>validant.register.evidence.v1</code>) holds the fingerprint, the dataset fingerprint, the
+                        system type, the MLflow identifiers (<code>model_uri</code>, <code>model_id</code>, <code>run_id</code>,
+                        <code>version</code>) and the results you choose to keep; unknown MLflow keys and values that are not
+                        JSON are refused.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from vfairness._register import (
+    build_evidence_bundle, dataset_fingerprint, model_fingerprint, write_evidence_bundle,
+)
+
+identity = model_fingerprint("models:/credit-scoring@candidate")  # or a file or folder path
+data = dataset_fingerprint("data/holdout.csv")                     # a file path or bytes
+bundle = build_evidence_bundle(
+    identity,
+    dataset_sha256=data.digest,
+    mlflow={"model_uri": "models:/credit-scoring@candidate"},
+    results={"demographic_parity_difference": 0.04},
+)
+write_evidence_bundle(bundle, "evidence.json")</code></pre>
+                    </div>
+                    <p>
+                        <strong>Private on purpose.</strong> The module has not been through the library's grading yet, so it
+                        is outside the frozen public surface, the capability ledger and the beta gate, and its names may
+                        change; it becomes the public <code>vfairness.register</code> once its units are graded. Reading an
+                        MLflow URI needs the <code>mlops</code> extra (<code>pip install 'vfairness[mlops]'</code>). See the
+                        <a href="../concepts/changelog.html#v0.2.0">0.2.0 release notes</a>.
+                    </p>
                 </section>
 
                 <!-- Version Control -->
@@ -428,11 +486,10 @@ evaluate_model(X_test, y_test, gender)</code></pre>
                         <pre><code># .pre-commit-config.yaml
 repos:
   - repo: https://github.com/validantai/vfairness
-    # No vfairness version has been released or tagged yet, so there is no
-    # release tag to pin. Use a commit sha until one is cut, then pin the tag.
-    rev: &lt;commit-sha&gt;
+    rev: v0.2.0   # vfairness 0.2.0, released 26 Oct 2026
     hooks:
       - id: vfairness-check-config   # Validates fairness config files
+        additional_dependencies: ["PyYAML&gt;=6.0"]  # needed to read .yml/.yaml configs
       - id: vfairness-check-model-card  # Checks model cards for fairness sections</code></pre>
                     </div>
 
@@ -537,6 +594,125 @@ for warning in decision.small_sample_warnings:
                         Groups with fewer samples than <code>min_group_size</code> emit
                         <code>SmallSampleWarning</code> objects instead of silently producing unreliable metrics.
                         Each warning includes the group name, sample size, and recommended minimum.
+                    </p>
+                </section>
+
+                <!-- Deployment policy: required coverage (vfairness issue #1) -->
+                <section id="deployment-policy">
+                    <h2>Deployment Policies: Required Coverage <span class="gap-badge">NEW</span></h2>
+                    <p>
+                        The gate knows what it was configured to check, not what a deployment
+                        requires. So switching a check off, leaving an attribute out or loosening a
+                        threshold still ends in <code>approved=True</code> on the levels that ran.
+                        A <code>CoveragePolicy</code> states the requirement separately from the
+                        configuration, and <code>evaluate_against_policy()</code> compares the two.
+                        It does not change the measurement: it names every difference.
+                    </p>
+
+                    <h3>Worked example: required scope versus executed scope</h3>
+                    <p>
+                        400 applicants in four cells of 100. Each attribute alone is balanced, so
+                        women, men, group x and group y are all selected at 50%. The combined cells
+                        are selected at 80%, 20%, 20% and 80%. The policy requires gender, race and
+                        their intersection; the pipeline has intersections switched off.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-header"><span class="code-lang">python</span></div>
+                        <pre><code>from vfairness import CoveragePolicy, GateConfig, HierarchicalGateConfig, ModelFairnessGate
+
+# REQUIRED scope: what the deployment policy says must be covered.
+policy = CoveragePolicy(
+    policy_id="hiring-eu",
+    version="3",
+    required_attributes=["gender", "race"],
+    required_intersections=[("gender", "race")],
+    required_metrics={"demographic_parity_difference": 0.1},
+    min_group_size=30,
+)
+
+# EXECUTED scope: what this pipeline is configured to run.
+gate = ModelFairnessGate(config=GateConfig(
+    metrics=["demographic_parity_difference"],
+    thresholds={"demographic_parity_difference": 0.1},
+))
+decision = gate.evaluate_against_policy(
+    policy, y_true, y_pred, {"gender": gender, "race": race},
+    hierarchical_config=HierarchicalGateConfig(check_intersections=False),
+)
+
+decision.measurement.status   # GateStatus.APPROVED  (the levels that ran)
+decision.permitted            # False                (the deployment decision)
+for item in decision.items:
+    print(item.label, item.state.value, item.outcome.value)
+# gender         assessed                   pass
+# race           assessed                   pass
+# gender × race  omitted_by_configuration   not_measured
+decision.reasons
+# ['gender × race, demographic_parity_difference: omitted by configuration:
+#   check_intersections is off, so no level compared this intersection']</code></pre>
+                    </div>
+                    <p>
+                        With the intersection switched on (and
+                        <code>default_intersection_threshold_multiplier=1.0</code>, see below) the
+                        same policy reports <code>gender × race</code> as <em>assessed</em> with a
+                        measured breach of 0.6 against the bound of 0.1, and the measurement itself
+                        is BLOCKED. Still not permitted, now for the right reason.
+                    </p>
+
+                    <h3>Four coverage states, and the outcome kept apart</h3>
+                    <table class="api-table">
+                        <thead>
+                            <tr><th>State</th><th>Means</th><th>Next action</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>assessed</code></td><td>A level compared it, enforced at least as strictly as the policy, on groups large enough</td><td>Read the outcome</td></tr>
+                            <tr><td><code>insufficient_evidence</code></td><td>It ran, but a group or a rate denominator is below the policy's minimum, or the value could not be measured</td><td>Collect more data</td></tr>
+                            <tr><td><code>omitted_by_configuration</code></td><td>A level switched off, the metric not configured or not blocking, or a threshold looser than the policy bound. The reason names the setting</td><td>Fix the settings</td></tr>
+                            <tr><td><code>input_absent</code></td><td>An attribute it needs was not supplied. The required scope is never reduced to what was supplied</td><td>Supply the attribute</td></tr>
+                        </tbody>
+                    </table>
+                    <p>
+                        The measured outcome (<code>pass</code>, <code>fail</code>,
+                        <code>not_measured</code>) is graded against the policy bound and recorded
+                        separately, so a five-person group that happens to pass is still
+                        <em>insufficient evidence</em>, never a pass, and never a fairness failure either.
+                        <code>permitted</code> is True only when every required item is assessed and
+                        passes and the measurement was not blocked.
+                    </p>
+
+                    <h3>What does not change</h3>
+                    <ul>
+                        <li>Without a policy, every result is the same as before. Every decision now also
+                            carries <code>evaluated_scope</code>: the levels that ran, the thresholds they
+                            applied, and the group sets left out with the setting that left them out.</li>
+                        <li><code>approved</code> still means "nothing blocked on the levels that ran", and
+                            <code>CONDITIONAL</code> keeps its meaning. Under a policy neither means
+                            "may be deployed"; <code>decision.permitted</code> does.</li>
+                        <li><code>gate.create_github_check(decision)</code> reports <code>failure</code>
+                            whenever a supplied policy is not met. <code>FairnessReportCard(decision)</code>
+                            leads with the policy result instead of "Approved for deployment".</li>
+                    </ul>
+
+                    <h3>The default intersection relaxation</h3>
+                    <p>
+                        <code>HierarchicalGateConfig</code> relaxes intersection thresholds by 1.2 by
+                        default, so 0.1 becomes 0.12 at the intersection. Under a policy bound of 0.1
+                        that is looser, and the intersection is reported as omitted by configuration
+                        with the multiplier named. Set
+                        <code>default_intersection_threshold_multiplier=1.0</code>, or write the relaxed
+                        bound into the policy if the policy accepts it.
+                    </p>
+
+                    <h3>What belongs to the integration</h3>
+                    <p>
+                        The library compares, and nothing more. It has no parameter for an exception or
+                        an approver, so nothing a caller passes turns a coverage gap into a permission.
+                        Which policy applies to which deployment, who may grant an exception and how
+                        that person is verified, its scope, rationale, evidence, expiry and revocation
+                        belong to the integration that enforces the policy, which also keeps the
+                        historical assessment. Each decision carries SHA-256 fingerprints of the policy
+                        and of the effective configuration. They identify which policy and which
+                        settings were used; they are not signatures.
                     </p>
                 </section>
 
@@ -704,6 +880,7 @@ payload = card.to_github_comment_payload()
                             <tr><td>Intersectional gate checking</td><td><code>evaluate_hierarchical()</code> + <code>HierarchicalGateConfig</code></td></tr>
                             <tr><td>Per-intersection thresholds</td><td><code>HierarchicalGateConfig.per_intersection_thresholds</code></td></tr>
                             <tr><td>Small-sample warnings</td><td><code>SmallSampleWarning</code></td></tr>
+                            <tr><td>Required coverage before deployment</td><td><code>CoveragePolicy</code> + <code>evaluate_against_policy()</code> &rarr; <code>PolicyDecision</code></td></tr>
                         </tbody>
                     </table>
                 </section>
@@ -734,7 +911,7 @@ payload = card.to_github_comment_payload()
                         <h4>Resources</h4>
                         <ul>
                             <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
-                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.2.0/" target="_blank">PyPI (0.2.0)</a></li>
                             <li><a href="../concepts/references.html">Academic References</a></li>
                             <li><a href="../concepts/changelog.html">Changelog</a></li>
                         </ul>

@@ -188,6 +188,9 @@ def fake_wandb(monkeypatch):
 
 def _decorated(**kwargs):
     y_true, y_pred, sens = _unfair_data()
+    # These pins read real group names off the run; coded labels (the default
+    # since 2026-10-24) are covered in test_tracker_group_label_codes.py.
+    kwargs.setdefault("group_labels", "names")
 
     @auto_log_fairness(**kwargs)
     def evaluate():
@@ -373,7 +376,7 @@ class TestAutoLogProtectedAttrColumnIsGone:
         """OVER-CORRECTION CONTROL. Both documented shapes still log."""
         y_true, y_pred, sens = _unfair_data()
 
-        @auto_log_fairness(backend="mlflow", prefix="t")
+        @auto_log_fairness(backend="mlflow", prefix="t", group_labels="names")
         def as_dict():
             return {"y_pred": y_pred, "y_true": y_true, "sensitive_attr": sens}
 
@@ -563,6 +566,7 @@ class TestConfidenceIntervalBoundsAreMeasuredOrAbsent:
                 }
             ),
             log_artifacts=False,
+            group_labels="names",
         )
 
         assert "fairness.demographic_parity_difference.ci_lower" not in logged
@@ -581,6 +585,7 @@ class TestConfidenceIntervalBoundsAreMeasuredOrAbsent:
         logged = log_fairness_to_mlflow(
             _ci_report({"point_estimate": 0.2, "lower_bound": None, "upper_bound": 0.31}),
             log_artifacts=False,
+            group_labels="names",
         )
 
         assert "fairness.demographic_parity_difference.ci_lower" not in logged
@@ -598,6 +603,7 @@ class TestConfidenceIntervalBoundsAreMeasuredOrAbsent:
                 }
             ),
             log_artifacts=False,
+            group_labels="names",
         )
 
         assert fake_mlflow.metrics["fairness.demographic_parity_difference.value"] == pytest.approx(
@@ -618,6 +624,7 @@ class TestConfidenceIntervalBoundsAreMeasuredOrAbsent:
         log_fairness_to_wandb(
             _ci_report({"point_estimate": 0.2, "lower_bound": None, "upper_bound": float("inf")}),
             log_artifacts=False,
+            group_labels="names",
         )
         assert "fairness/demographic_parity_difference/ci_lower" not in fake_wandb.logged
         assert "fairness/demographic_parity_difference/ci_upper" not in fake_wandb.logged
@@ -626,6 +633,7 @@ class TestConfidenceIntervalBoundsAreMeasuredOrAbsent:
         log_fairness_to_wandb(
             _ci_report({"point_estimate": 0.21, "lower_bound": 0.11, "upper_bound": 0.31}),
             log_artifacts=False,
+            group_labels="names",
         )
         assert fake_wandb.logged[
             "fairness/demographic_parity_difference/ci_lower"
@@ -639,7 +647,9 @@ class TestLoggedLibraryVersionIsTheRealOne:
     def test_the_run_is_tagged_with_the_installed_version(self, fake_mlflow):
         """REFUSAL PIN. Every run was tagged '1.1.0', a version no release ever
         carried, so a run could not be reproduced from its own audit trail."""
-        log_fairness_to_mlflow(_ci_report({"point_estimate": 0.2}), log_artifacts=False)
+        log_fairness_to_mlflow(
+            _ci_report({"point_estimate": 0.2}), log_artifacts=False, group_labels="names"
+        )
 
         assert fake_mlflow.tags["fairness.library_version"] == vfairness.__version__
         assert fake_mlflow.tags["fairness.library_version"] != "1.1.0"

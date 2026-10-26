@@ -60,6 +60,7 @@ docs/METHODOLOGY.md
 docs/MUTATION_TESTING.md
 docs/QUALITY_AND_HARDENING.md
 docs/RELEASE_NOTES_0.1.0.md
+docs/RELEASE_NOTES_0.2.0.md
 docs/RELEASE_PIPELINE.md
 docs/RELEASE_PLAN.md
 docs/ROADMAP.md
@@ -84,6 +85,7 @@ docs/site/concepts/references.html
 docs/site/css/styles.css
 docs/site/data/capability-status.json
 docs/site/data/coverage-measurement.json
+docs/site/data/landing-demos.json
 docs/site/data/library-stats.json
 docs/site/data/page-dates.json
 docs/site/data/search-index.json
@@ -126,6 +128,9 @@ docs/site/img/logos/pytest.svg
 docs/site/img/logos/pytorch.svg
 docs/site/img/logos/sklearn.svg
 docs/site/img/logos/tensorflow.svg
+docs/site/img/signal/aggregation-mask.webp
+docs/site/img/signal/corridor.webp
+docs/site/img/signal/lifecycle.webp
 docs/site/img/silent-failure-smoke-detector.png
 docs/site/img/svg-gallery/alert_timeline.svg
 docs/site/img/svg-gallery/alert_timeline_no_explanation.svg
@@ -223,6 +228,7 @@ docs/site/img/validant-icon-white.svg
 docs/site/img/validant-icon.svg
 docs/site/img/validant-logo-white.svg
 docs/site/index.html
+docs/site/js/landing-demos.js
 docs/site/js/main.js
 docs/site/js/sponsor-wall.js
 docs/site/js/usage-badges.js
@@ -268,6 +274,7 @@ docs/site/test-objects/data/synthetic/photo_laundering.csv
 docs/site/test-objects/data/synthetic/race_penalty.csv
 docs/site/test-objects/data/synthetic/surname_proxy.csv
 docs/site/test-objects/data/synthetic/zip_redlining.csv
+docs/site/test-objects/img/weakest-link.png
 docs/site/test-objects/index.html
 docs/site/test-objects/verification.json
 docs/site/training-time-interventions.md
@@ -291,6 +298,7 @@ docs/surface-grading-2026-09-30b.json
 docs/surface-grading-2026-09-30c.json
 docs/surface-grading-2026-09-30d.json
 docs/surface-grading-2026-10-01.json
+docs/surface-grading-2026-10-24.json
 docs/surface-grading-from-probe.json
 docs/surface-probe.json
 docs/xai-probe.json
@@ -321,6 +329,7 @@ scripts/broken_data_specs/agents.py
 scripts/broken_data_specs/llm.py
 scripts/broken_data_specs/ranking_vision_discovery.py
 scripts/broken_data_specs/xai.py
+scripts/build_landing_demos.py
 scripts/build_live_test_objects.py
 scripts/build_page_dates.py
 scripts/build_search_index.py

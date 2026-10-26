@@ -122,6 +122,18 @@ A fairness gap is a sample estimate, not a fact; the methodology treats it as on
   is constructed so that it is not biased upward at the parity null (a naive
   percentile interval of a max of absolute differences has zero coverage at the
   null and would declare every fair model unfair).
+- **The Pulse selection-rate gap.** The reference-versus-worst gap that Pulse
+  reports per protected attribute is a difference of two proportions, and its
+  interval is the Newcombe hybrid score interval (Newcombe 1998, method 10),
+  built from both groups' Wilson score limits, not a bootstrap. A percentile
+  bootstrap of a group with no positives resamples only zeros and so ignores
+  that group's uncertainty: on a 2,700-row hiring sample it read 5.8 to 8.4
+  points for 0 of 22 against 114 of 1,601, where the Newcombe interval reads
+  -7.8 to 8.5. The confirmation decision uses the interval's dual p-value,
+  Bonferroni-corrected for the pair being the most extreme of several
+  comparisons with the reference (`pValueSelection`, `selectionComparisons`),
+  gated by an omnibus test and Benjamini-Hochberg corrected across attributes,
+  so it cannot contradict the printed interval. The rows carry `ciMethod`.
 - **Effect sizes.** Cohen's d / h and risk / odds ratios are available alongside
   the raw gap, so a statistically significant but negligible gap is legible as
   such.

@@ -15,11 +15,12 @@ things and a total of them is a number neither produced. See
 [GRADING.md](GRADING.md) for both, and [RELEASE_PLAN.md](RELEASE_PLAN.md) for
 what is left.
 
-**Nothing has been released.** There is no `v0.1.0` tag and no artifact on PyPI
-or TestPyPI. This page is one of the gates in front of that tag, not the gate.
-The machine-checked gate is `scripts/release_gate.py`, and on 2026-10-01 it
-reports **BETA READY**, all eight beta conditions met, this census among them.
-The stricter 1.0 gate is not met yet.
+**Released as a beta.** `0.1.0` was published to PyPI on 2026-10-02 from the
+`v0.1.0` tag, and `0.2.0` on 2026-10-26 from `v0.2.0`. This page is one of the
+gates in front of each tag, not the gate. The machine-checked gate is
+`scripts/release_gate.py`, and before each tag it reported **BETA READY**, all
+eight beta conditions met, this census among them. The stricter 1.0 gate is not
+met yet.
 
 ## The one defect this plan exists to remove
 
@@ -68,7 +69,7 @@ render time:
 | --- | ---: | --- |
 | Carry a proof batch | 215 | yes, one of BGL-A/B/C/D above |
 | Plain functions with no batch | 90 | **no grade at all** |
-| Classes with no batch | 114 | no grade; mostly result containers, configs and exceptions |
+| Classes with no batch | 120 | no grade; mostly result containers, configs and exceptions |
 
 Those **90 functions were never executed on degenerate input by this
 census**. They are NOT BGL-C: BGL-C is a measured statement about a capability

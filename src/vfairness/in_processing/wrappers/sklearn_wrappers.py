@@ -149,7 +149,7 @@ class FairClassifier:
         constraint_: The constraint object used
         is_fitted_: Whether the classifier is fitted
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -744,7 +744,7 @@ class FairRegressor:
         >>> reg.fit(X_train, y_train, sensitive_attr=group)
         >>> y_pred = reg.predict_with_sensitive_attr(X_test, group_test)
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent

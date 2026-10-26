@@ -156,7 +156,7 @@ class NonDeterminismAnalyzer:
     This paragraph and tests/test_bgl5_llm_1.py are the record of what the audit
     found; the ledger row is where that has to be reconciled.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -1083,7 +1083,7 @@ def noise_floor_from_runs(
         Nothing in the result is ever ``0.0`` for something that was not
         measured. Unmeasured is ``None`` with a ``reason``.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY

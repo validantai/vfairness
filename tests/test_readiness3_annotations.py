@@ -282,10 +282,17 @@ def _changelog_text() -> str:
 
 
 def _unreleased_section(text: str) -> str:
-    """The body of the top version heading, where unreleased work accumulates."""
-    headings = [m.start() for m in re.finditer(r"^## \[", text, re.M)]
-    assert len(headings) >= 2, "changelog has fewer than two version headings"
-    return text[headings[0] : headings[1]]
+    """The body of the ``[0.1.0]`` heading, where these annotations were recorded.
+
+    It was the top version heading while 0.1.0 was unreleased, and this used to
+    take the top one. From 0.2.0 on a newer version sits above it, so the
+    section is found by its version, not by its place.
+    """
+    start = re.search(r"^## \[0\.1\.0\][^\n]*$", text, re.M)
+    assert start, "changelog has no [0.1.0] heading"
+    following = re.search(r"^## \[", text[start.end() :], re.M)
+    end = start.end() + following.start() if following else len(text)
+    return text[start.start() : end]
 
 
 REMOVED_KEYWORDS = [

@@ -207,6 +207,19 @@ class TestClassImbalanceBinaryOnly:
         assert any(i.issue_type == "extreme_class_imbalance" for i in issues)
 
     def test_string_binary_outcome_still_checked(self):
+        # A text outcome is coded from its declared favourable value
+        # (2026-10-09): "Yes" here. It is never guessed.
+        df = pd.DataFrame(
+            {
+                "gender": ["F", "M"] * 100,
+                "label": ["Yes", "No"] * 100,
+            }
+        )
+        v = DataBiasValidator(protected_attributes=["gender"])
+        issues, metrics = v._check_label_quality(df, "label", "Yes")
+        assert metrics["positive_rate"] == pytest.approx(0.5)
+
+    def test_undeclared_string_outcome_is_not_guessed(self):
         df = pd.DataFrame(
             {
                 "gender": ["F", "M"] * 100,
@@ -215,7 +228,8 @@ class TestClassImbalanceBinaryOnly:
         )
         v = DataBiasValidator(protected_attributes=["gender"])
         issues, metrics = v._check_label_quality(df, "label")
-        assert metrics["positive_rate"] == pytest.approx(0.5)
+        assert "positive_rate" not in metrics
+        assert "favourable value was not declared" in metrics["class_imbalance_check"]
 
 
 # drift.py findings 4 + 5: split at len(reference); MMD baseline vs current
@@ -279,7 +293,7 @@ class TestWeeklyDegradationDirection:
         start = pd.Timestamp("2025-01-06")  # a Monday
         for i in range(28):
             d = start + pd.Timedelta(days=i)
-            val = monday_val if d.dayofweek == 0 else other_val
+            val = monday_val if d.day_of_week == 0 else other_val
             an.update_daily_metrics(d, {"demographic_parity": val})
         return an
 

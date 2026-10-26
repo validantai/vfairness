@@ -17,6 +17,14 @@ VERIFIED BY EXECUTION, 2026-09-10, against the real check-runs API:
     c638433   job name changed (0 matches)   REFUSED (non-vacuity)
     ceb2337   red checks                     REFUSED
 
+EXTENDED 2026-10-05 (every supported version must have its own green leg),
+again by execution against the real check-runs API:
+
+    commit    state                          gate said
+    dfe7907   0.1.0, legs 3.11/3.12/3.13 OK  ALLOWED
+    a262ae3   failed suite                   REFUSED
+    dfe7907   a version with no green leg    REFUSED, naming the missing leg
+
 The third row is the one that matters most. A gate that examines nothing passes
 forever, which is the failure mode that let eleven red commits through in the
 first place, so zero matching checks is fatal rather than silent.
@@ -117,4 +125,23 @@ def test_the_runbook_still_names_the_step_this_automates(workflow):
     text = runbook.read_text(encoding="utf-8")
     assert "quality gates are green" in text.lower() or "gates are green" in text.lower(), (
         "the runbook no longer names the green-gates precondition this job enforces"
+    )
+
+
+def test_every_supported_version_needs_its_own_green_leg(workflow):
+    """A single green leg is not the suite. The private repo runs one version on
+    main pushes to save minutes; if that cut reached tests.yml here, "at least one
+    success" would release a version never tested on the other two. The gate must
+    name each version, and its list must equal the tests.yml matrix, so the two
+    cannot drift apart silently."""
+    step = next(s for s in workflow["jobs"][GATE_JOB]["steps"] if "run" in s)
+    required = step.get("env", {}).get("REQUIRED_VERSIONS", "").split()
+    assert required, "the gate no longer lists the Python versions it requires"
+    assert "for version in ${REQUIRED_VERSIONS}" in step["run"], (
+        "the gate does not check each version"
+    )
+    tests = yaml.safe_load((RELEASE.parent / "tests.yml").read_text())
+    matrix = tests["jobs"]["tests"]["strategy"]["matrix"]["python-version"]
+    assert sorted(required) == sorted(str(v) for v in matrix), (
+        f"release gate requires {required} but tests.yml runs {matrix}"
     )

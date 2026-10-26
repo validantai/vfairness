@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "capabilities": {
     "correlation_reduction": {
       "name": "CorrelationReducer",
@@ -5211,9 +5211,9 @@
     "functions": 95,
     "svg_templates": 44,
     "lines_of_code": {
-      "total": 225213,
-      "code": 167043,
-      "files": 228
+      "total": 228098,
+      "code": 169364,
+      "files": 231
     }
   }
 }

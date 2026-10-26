@@ -225,7 +225,7 @@ def analyze_statistical_disparities(
         ...     print(f"  Effect: {r.effect_size:.3f} ({r.effect_interpretation.value})")
         ...     print(f"  P-value: {r.pvalue:.4f}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY

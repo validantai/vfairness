@@ -189,7 +189,7 @@ def mae_parity_difference(
         >>> mae_diff = mae_parity_difference(y_true, y_pred, region)
         >>> print(f"MAE Parity Difference: {mae_diff:.3f}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -259,7 +259,7 @@ def rmse_parity_difference(
         >>> rmse_diff = rmse_parity_difference(y_true, y_pred, income_bracket)
         >>> print(f"RMSE Parity Difference: {rmse_diff:.3f}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -332,7 +332,7 @@ def mean_prediction_difference(
         >>> mpd = mean_prediction_difference(y_true, y_pred, gender)
         >>> print(f"Mean Prediction Difference: {mpd:.3f}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -399,7 +399,7 @@ def r2_parity_difference(
         >>> r2_diff = r2_parity_difference(y_true, y_pred, ethnicity)
         >>> print(f"R² Parity Difference: {r2_diff:.3f}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -499,7 +499,7 @@ def residual_bias(
         ...     direction = "underpredicted" if b > 0 else "overpredicted"
         ...     print(f"{group}: {direction} by {abs(b):.3f}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1073,7 +1073,7 @@ def pricing_disparity(
         evidence) when fewer than 2 groups are assessable or the group effect is not
         identified (controls collinear with the group indicators, e.g. a perfect proxy).
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1151,7 +1151,7 @@ def pricing_disparity_with_ci(
     control-estimation uncertainty too. The seal gates on the whole CI lying within the
     pre-registered price band (TOST equivalence).
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

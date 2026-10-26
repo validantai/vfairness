@@ -754,7 +754,7 @@ class CorrelationReducer(BaseFeatureTransformer):
         ... )
         >>> X_fair = reducer.fit_transform(X)
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -1322,7 +1322,7 @@ class FeatureSuppressor(BaseFeatureTransformer):
         ... )
         >>> X_fair = suppressor.fit_transform(X)
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1804,7 +1804,7 @@ class ResidualTransformer(BaseFeatureTransformer):
     References:
         - Feldman et al. (2015): Certifying and Removing Disparate Impact
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -2234,7 +2234,7 @@ class IntersectionalTransformer(BaseFeatureTransformer):
         - Crenshaw (1989): Demarginalizing the Intersection of Race and Sex
         - Buolamwini & Gebru (2018): Gender Shades
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -2348,7 +2348,9 @@ class IntersectionalTransformer(BaseFeatureTransformer):
                         ),
                     }
 
-        df.drop("_intersect", axis=1, inplace=True)
+        # df is this method's own copy (_to_dataframe), so reassigning is the same as the old
+        # inplace=True, which pandas 3.1 deprecated (PDEP-8).
+        df = df.drop(columns="_intersect")
 
         fit_warnings: List[str] = []
         # Surface grade g002 (2026-09-17): with ONE intersectional label there is
@@ -2507,7 +2509,9 @@ class IntersectionalTransformer(BaseFeatureTransformer):
                     untouched[j] = True
                     missed_groups.add("_".join(str(v) for v in group))
 
-        df.drop("_intersect", axis=1, inplace=True)
+        # df is this method's own copy (_to_dataframe), so reassigning is the same as the old
+        # inplace=True, which pandas 3.1 deprecated (PDEP-8).
+        df = df.drop(columns="_intersect")
 
         self.rows_not_transformed_ = np.flatnonzero(untouched)
         self.groups_not_transformed_ = sorted(missed_groups)
@@ -2574,7 +2578,7 @@ class ReweightingTransformer(BaseFeatureTransformer):
     References:
         - Kamiran & Calders (2012): Data Preprocessing for Discrimination-Aware Mining
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -3077,7 +3081,7 @@ class DisparateImpactRemover(BaseFeatureTransformer):
         ... )
         >>> X_fair = remover.fit_transform(X)
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -3405,7 +3409,7 @@ class LabelMassager(BaseFeatureTransformer):
         >>> massager.fit(X, y)
         >>> y_fair = massager.get_massaged_labels(X, y)
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -3958,7 +3962,7 @@ class Resampler(BaseFeatureTransformer):
         >>> resampler.fit(X, y)
         >>> X_bal, y_bal = resampler.get_resampled_data(X, y)
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 
@@ -4437,7 +4441,7 @@ class FairRepresentationTransformer(BaseFeatureTransformer):
         - Louizos et al. (2016): The Variational Fair Autoencoder.
         - Madras et al. (2018): Learning Adversarially Fair and Transferable Reps.
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

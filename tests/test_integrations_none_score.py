@@ -121,7 +121,7 @@ def fake_wandb(monkeypatch):
 
 @pytest.mark.parametrize("score", [None, float("nan")])
 def test_mlflow_not_assessable_logs_no_score(fake_mlflow, score):
-    logged = log_fairness_to_mlflow(_report(score), log_artifacts=False)
+    logged = log_fairness_to_mlflow(_report(score), log_artifacts=False, group_labels="names")
 
     assert "fairness.fairness_score" not in fake_mlflow.metrics
     assert "fairness.fairness_score" not in logged
@@ -134,7 +134,7 @@ def test_mlflow_not_assessable_logs_no_score(fake_mlflow, score):
 
 
 def test_mlflow_assessed_score_still_logged(fake_mlflow):
-    logged = log_fairness_to_mlflow(_report(0.75), log_artifacts=False)
+    logged = log_fairness_to_mlflow(_report(0.75), log_artifacts=False, group_labels="names")
 
     assert fake_mlflow.metrics["fairness.fairness_score"] == 0.75
     assert logged["fairness.fairness_score"] == 0.75
@@ -143,7 +143,7 @@ def test_mlflow_assessed_score_still_logged(fake_mlflow):
 
 @pytest.mark.parametrize("score", [None, float("nan")])
 def test_wandb_not_assessable_logs_no_score(fake_wandb, score):
-    logged = log_fairness_to_wandb(_report(score), log_artifacts=False)
+    logged = log_fairness_to_wandb(_report(score), log_artifacts=False, group_labels="names")
 
     assert "fairness/fairness_score" not in fake_wandb.logged
     assert "fairness/fairness_score" not in logged
@@ -156,7 +156,7 @@ def test_wandb_not_assessable_logs_no_score(fake_wandb, score):
 
 
 def test_wandb_assessed_score_still_logged(fake_wandb):
-    logged = log_fairness_to_wandb(_report(0.5), log_artifacts=False)
+    logged = log_fairness_to_wandb(_report(0.5), log_artifacts=False, group_labels="names")
 
     assert fake_wandb.logged["fairness/fairness_score"] == 0.5
     assert logged["fairness/fairness_score"] == 0.5
@@ -166,7 +166,7 @@ def test_wandb_assessed_score_still_logged(fake_wandb):
 def test_mlflow_still_rejects_a_non_report(fake_mlflow):
     """Negative case: the type guard is not weakened by the None handling."""
     with pytest.raises(TypeError):
-        log_fairness_to_mlflow("not a report", log_artifacts=False)
+        log_fairness_to_mlflow("not a report", log_artifacts=False, group_labels="names")
 
 
 # --------------------------------------------------------------------------

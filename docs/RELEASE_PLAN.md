@@ -161,12 +161,12 @@ That single change is the difference between this plan being affordable and not.
 <!-- BGL:remaining:start -->
 _Generated 2026-10-02 from `scripts/release_gate.py`._
 
-**0** of the **1580** public code units carry no grade.
-1580 do: 222 from the capability census and 1374 from the wider-surface waves.
+**0** of the **1599** public code units carry no grade.
+1599 do: 222 from the capability census and 1393 from the wider-surface waves.
 
-Executed is a separate and weaker measurement, and the two are never added: criterion B1 reads `1580 of 1580 executed and recorded`. Running a unit is not judging whether it refuses honestly.
+Executed is a separate and weaker measurement, and the two are never added: criterion B1 reads `1599 of 1599 executed and recorded`. Running a unit is not judging whether it refuses honestly.
 
-**618** of the grades that do exist have had no independent check, and 291 of 872 grades were overturned when one was made. That queue, not the ungraded remainder, is the nearest thing to a blocker.
+**637** of the grades that do exist have had no independent check, and 291 of 872 grades were overturned when one was made. That queue, not the ungraded remainder, is the nearest thing to a blocker.
 <!-- BGL:remaining:end -->
 
 That figure is generated because it was typed here and rotted four times: 887 on

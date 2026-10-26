@@ -147,7 +147,7 @@ Library Comparisons:
     - MLOps integration (MLflow, pytest)
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __author__ = "Glinz & Company GmbH (validant.ai)"
 
 # NEW MODULE STRUCTURE (Recommended for new code)
@@ -409,11 +409,16 @@ from .multi_agent import (
 from .operations.cicd import (
     # Monitoring
     BiasMonitor,
+    # Deployment policies (vfairness issue #1)
+    CoverageItem,
+    CoveragePolicy,
+    CoverageState,
     # Data Validation
     DataBiasValidator,
     DataValidationConfig,
     DataValidationResult,
     DriftAlert,
+    EvaluatedScope,
     FairnessReportCard,
     FairnessTestResult,
     # Testing
@@ -424,11 +429,13 @@ from .operations.cicd import (
     # Hierarchical Intersectional Gate (Unit 5)
     HierarchicalGateConfig,
     IntersectionalGateDecision,
+    MeasuredOutcome,
     MetricEvaluation,
     # Deployment Gate
     ModelFairnessGate,
     MonitorConfig,
     MonitoringResult,
+    PolicyDecision,
     SmallSampleWarning,
     # Pre-commit hooks
     check_fairness_config,
@@ -1130,6 +1137,13 @@ __all__ = [
     "IntersectionalGateDecision",
     "SmallSampleWarning",
     "FairnessReportCard",
+    # What a decision evaluated, and deployment policies (vfairness issue #1)
+    "EvaluatedScope",
+    "CoveragePolicy",
+    "CoverageItem",
+    "CoverageState",
+    "MeasuredOutcome",
+    "PolicyDecision",
     "FairnessTestSuite",
     "FairnessTestResult",
     "fairness_test",

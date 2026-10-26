@@ -930,7 +930,7 @@ def detect_protected_attributes(
         >>> for c in candidates:
         ...     print(f"{c.column}: {c.confidence:.1%} confidence ({c.reason})")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1085,7 +1085,7 @@ def detect_protected_attributes(
             reasons.append(f"Medium-cardinality categorical ({n_unique} values)")
 
         # SIGNAL 5: Data type scoring (0.05-0.1 confidence)
-        if dtype == "object" or pd.api.types.is_categorical_dtype(dtype):
+        if dtype == "object" or isinstance(dtype, pd.CategoricalDtype):
             confidence += 0.1
             reasons.append("Categorical data type")
         elif is_age_column and is_numeric:
@@ -1809,7 +1809,7 @@ def scan_fairness_violations(
     and is STALE until that ledger, its evidence file and the published tables are
     regenerated together. Read this paragraph, not the stamp, for what is known.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -2262,7 +2262,7 @@ def discover_intersectional_groups(
         >>> for r in results:
         ...     print(f"{r['attributes']}: {r['disparity']:.1%} disparity")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY

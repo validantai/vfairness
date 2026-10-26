@@ -893,15 +893,6 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape"&&p.classList
                 <section id="installation">
                     <h2>Installation</h2>
 
-                    <div class="callout callout-limitation">
-                        <div class="callout-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
-                            None of these commands work yet
-                            <span class="limitation-label">Availability</span>
-                        </div>
-                        <p>0.1.0 has <strong>not been published</strong>. The <code>vfairness</code> name on PyPI carries our own early <strong>0.0.1</strong> placeholder from March 2026: a 4.5&nbsp;KB distribution that exports nothing and has no <code>FairnessAnalyzer</code>. So <code>pip install vfairness</code> succeeds today and then every example on this page fails at the import line. The commands below are the ones that will work when 0.1.0 ships; they are shown now so they can be checked against the artifact on the day it does.</p>
-                    </div>
-
                     <div class="code-block">
                         <div class="code-header">
                             <span class="code-lang">bash</span>
@@ -926,7 +917,7 @@ pip install "vfairness[mlops]"
 pip install "vfairness[all]"</code></pre>
                     </div>
 
-                    <p style="font-size: 0.84rem;">0.1.0 was published on 2026-10-02 and installs with <code>pip install vfairness</code>. The version number says beta, and the beta gate agreed when it was cut: <code>scripts/release_gate.py</code> reports BETA READY, with all eight beta conditions met. The stricter 1.0 gate is not met yet: a second, independent examiner still has to confirm part of the graded code. The API is not frozen until 1.0.0. See the <a href="../release-pipeline/index.html">Releasing</a> for how versions will ship, and <a href="../quality-and-hardening/index.html">Quality and Hardening</a> for what has been graded, what has not, and which defects are still open.</p>
+                    <p style="font-size: 0.84rem;">0.2.0 was published on 2026-10-26 and installs with <code>pip install vfairness</code> (the first beta, 0.1.0, on 2026-10-02). The version number says beta, and the beta gate agreed when it was cut: <code>scripts/release_gate.py</code> reports BETA READY, with all eight beta conditions met. The stricter 1.0 gate is not met yet: a second, independent examiner still has to confirm part of the graded code. The API is not frozen until 1.0.0. See the <a href="../release-pipeline/index.html">Releasing</a> for how versions will ship, and <a href="../quality-and-hardening/index.html">Quality and Hardening</a> for what has been graded, what has not, and which defects are still open.</p>
 
                     <div class="code-block">
                         <div class="code-header">
@@ -1005,7 +996,7 @@ print(f"vfairness {vfairness.__version__}")</code></pre>
 
                     <div class="notebook-link">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h4"/></svg>
-                        <span><strong>Complete Library Validation:</strong> <code>notebooks/vfairness_0_library_validation.ipynb</code> validates the core functions across preprocessing, training, calibration, evaluation and operations. It ships with the source, so it becomes linkable once the repository is published; the public repository is a placeholder today, and the link would 404.</span>
+                        <span><strong>Complete Library Validation:</strong> <code>notebooks/vfairness_0_library_validation.ipynb</code> validates the core functions across preprocessing, training, calibration, evaluation and operations. It ships with the source in <a href="https://github.com/validantai/vfairness/tree/main/notebooks">the public repository</a>.</span>
                     </div>
 
                 </section>
@@ -1705,7 +1696,7 @@ def evaluate_model(X, y, sensitive):
     return model.predict(X), y, sensitive  # fairness metrics logged automatically</code></pre>
                     </div>
 
-                    <p style="font-size: 0.84rem;">Experiment tracking needs the <code>[mlops]</code> extra (<code>pip install "vfairness[mlops]"</code> for MLflow and Weights &amp; Biases). Without it, <code>log_fairness_to_wandb</code> raises an <code>ImportError</code>, and the <code>auto_log_fairness</code> decorator warns and skips logging.</p>
+                    <p style="font-size: 0.84rem;">Experiment tracking needs the <code>[mlops]</code> extra (<code>pip install "vfairness[mlops]"</code> for MLflow and Weights &amp; Biases). Without it, <code>log_fairness_to_wandb</code> raises an <code>ImportError</code>, and the <code>auto_log_fairness</code> decorator warns and skips logging. Group names are written as keyed codes by default, so set <code>VFAIRNESS_GROUP_LABEL_KEY</code> (any secret, kept like a password; the same key gives the same codes in every run) before logging, or pass <code>group_labels='names'</code> to write real names on purpose. Without a key the tracker functions refuse before anything is written.</p>
 
                     <p style="font-size: 0.84rem;">See the <a href="../workflow-integration/index.html">Workflow Integration Guide</a> for CI/CD YAML templates, pre-commit hooks, pytest plugin setup, and end-to-end examples.</p>
                 </section>
@@ -1766,7 +1757,7 @@ def evaluate_model(X, y, sensitive):
                         <h4>Resources</h4>
                         <ul>
                             <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
-                            <li><a href="https://pypi.org/project/vfairness/0.1.0/" target="_blank">PyPI (0.1.0)</a></li>
+                            <li><a href="https://pypi.org/project/vfairness/0.2.0/" target="_blank">PyPI (0.2.0)</a></li>
                             <li><a href="../concepts/references.html">Academic References</a></li>
                             <li><a href="../concepts/changelog.html">Changelog</a></li>
                         </ul>

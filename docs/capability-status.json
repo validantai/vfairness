@@ -16,7 +16,7 @@
   "Top level"
  ],
  "counts": {
-  "CHECKED": 1580
+  "CHECKED": 1599
  },
  "declared_limitations": 20,
  "evidence_dates": [
@@ -26,7 +26,8 @@
   "2026-09-27",
   "2026-09-29",
   "2026-09-30",
-  "2026-10-01"
+  "2026-10-01",
+  "2026-10-24"
  ],
  "extras_present": {
   "causal": true,
@@ -37,7 +38,7 @@
   "xai": true
  },
  "measured_on": "2026-09-11",
- "newest_evidence": "2026-10-01",
+ "newest_evidence": "2026-10-24",
  "preview_areas": [
   "Legal",
   "MCP tools",
@@ -51,7 +52,7 @@
   "FIX PENDING": "graded and assessed, and a defect is still open. Do not rely on it in the beta.",
   "NOT CHECKED": "no evidence either way. Nobody has established that it refuses honestly, and nobody has established that it does not."
  },
- "surface_total": 1580,
+ "surface_total": 1599,
  "tier1_areas": [
   "Agent fairness testing",
   "Bias detection",
@@ -10833,6 +10834,213 @@
    ],
    "status": "CHECKED"
   },
+  "vfairness.operations.cicd.coverage.CoverageItem": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "exported_as": "CoverageItem",
+   "grade": "PROVEN",
+   "kind": "class",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.coverage.CoverageItem.to_dict": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "exported_as": "CoverageItem().to_dict",
+   "grade": "PROVEN",
+   "kind": "method",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.coverage.CoveragePolicy": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "exported_as": "CoveragePolicy",
+   "grade": "PROVEN",
+   "kind": "class",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.coverage.CoveragePolicy.to_dict": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "exported_as": "CoveragePolicy().to_dict",
+   "grade": "PROVEN",
+   "kind": "method",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.coverage.CoverageState": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "exported_as": "CoverageState",
+   "grade": "PROVEN",
+   "kind": "class",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.coverage.MeasuredOutcome": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "exported_as": "MeasuredOutcome",
+   "grade": "PROVEN",
+   "kind": "class",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.coverage.PolicyDecision": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "exported_as": "PolicyDecision",
+   "grade": "PROVEN",
+   "kind": "class",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.coverage.PolicyDecision.to_dict": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "exported_as": "PolicyDecision().to_dict",
+   "grade": "PROVEN",
+   "kind": "method",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.coverage.PolicyDecision.to_markdown_report": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "exported_as": "PolicyDecision().to_markdown_report",
+   "grade": "PROVEN",
+   "kind": "method",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.coverage.assess_coverage": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "grade": "PROVEN",
+   "kind": "function",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.coverage.policy_check_conclusion": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "grade": "PROVEN",
+   "kind": "function",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.coverage.policy_result_line": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "grade": "PROVEN",
+   "kind": "function",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.gate.EvaluatedScope": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "exported_as": "EvaluatedScope",
+   "grade": "PROVEN",
+   "kind": "class",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.gate.EvaluatedScope.to_dict": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "exported_as": "EvaluatedScope().to_dict",
+   "grade": "PROVEN",
+   "kind": "method",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
   "vfairness.operations.cicd.gate.FairnessReportCard": {
    "area": "CI/CD gates",
    "detail": "verified by running it; no test pins the behaviour, so a regression would be silent",
@@ -11141,6 +11349,21 @@
    ],
    "status": "CHECKED"
   },
+  "vfairness.operations.cicd.gate.ModelFairnessGate.evaluate_against_policy": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "exported_as": "ModelFairnessGate().evaluate_against_policy",
+   "grade": "PROVEN",
+   "kind": "method",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
   "vfairness.operations.cicd.gate.ModelFairnessGate.evaluate_from_metrics": {
    "area": "CI/CD gates",
    "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
@@ -11183,6 +11406,62 @@
    "scope": "core",
    "sources": [
     "grading wave 2026-09-27b"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.gate.ScopeGap": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "grade": "PROVEN",
+   "kind": "class",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.gate.ScopeGap.to_dict": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "grade": "PROVEN",
+   "kind": "method",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.gate.ScopeLevel": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "grade": "PROVEN",
+   "kind": "class",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
+   ],
+   "status": "CHECKED"
+  },
+  "vfairness.operations.cicd.gate.ScopeLevel.to_dict": {
+   "area": "CI/CD gates",
+   "detail": "refuses honestly when nothing is measurable, and a test fails if that regresses",
+   "grade": "PROVEN",
+   "kind": "method",
+   "pins": [
+    "tests/test_first_examination_coverage_policy_units.py"
+   ],
+   "scope": "core",
+   "sources": [
+    "grading wave 2026-10-24"
    ],
    "status": "CHECKED"
   },

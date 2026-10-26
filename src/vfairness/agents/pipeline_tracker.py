@@ -64,7 +64,7 @@ class PipelineTracker:
         >>> tracker.record_stage("reasoning", np.array([0.9, 0.8]), np.array([0.5, 0.4]))
         >>> results = tracker.compute_cumulative()
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent

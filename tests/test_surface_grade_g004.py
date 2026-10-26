@@ -183,7 +183,7 @@ class TestWeekdayCheckNeedsTwoWeekdays:
         # Fridays, so the overall mean is (4*0.40 + 24*0.05)/28 = 0.1 and the
         # worst weekday mean is exactly 0.40, which is far above 1.05 * 0.1.
         dates, _ = _consecutive(28, range(28))
-        values = [0.40 if d.dayofweek == 4 else 0.05 for d in dates]
+        values = [0.40 if d.day_of_week == 4 else 0.05 for d in dates]
         (degraded, worst), _ = _caught(
             lambda: _analyzer(dates, values).detect_weekly_degradation(METRIC)
         )
@@ -329,7 +329,7 @@ class TestSeasonalPatternRefusalIsAudible:
         # OVER-CORRECTION CONTROL. 28 days from a Monday, value == weekday/10,
         # so slot k must average to exactly k/10.
         dates, _ = _consecutive(28, range(28))
-        values = [d.dayofweek / 10.0 for d in dates]
+        values = [d.day_of_week / 10.0 for d in dates]
         pattern, warned = _caught(lambda: _analyzer(dates, values).detect_seasonal_pattern(METRIC))
 
         assert pattern == {k: pytest.approx(k / 10.0) for k in range(7)}

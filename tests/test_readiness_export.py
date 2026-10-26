@@ -61,7 +61,21 @@ BOUNDARY_TEST = "tests/test_export_boundary.py"
 
 #: Suffixes the scan is allowed to leave unread. Anything else that reads as
 #: binary is could-not-check and must be reported, not skipped quietly.
-_MEDIA_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".woff", ".woff2", ".ttf"}
+#: ".webp" joined on 2026-10-05: 185bd9e published three .webp drawings under
+#: docs/site/img/signal/, a raster image format like .png and .jpg, and this
+#: required gate had been red on main for every commit since.
+_MEDIA_SUFFIXES = {
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".webp",
+    ".ico",
+    ".pdf",
+    ".woff",
+    ".woff2",
+    ".ttf",
+}
 
 # Same reasoning as tests/test_export_boundary.py: the export script lives only
 # in the private monorepo, so in the public repo there is no export to inspect

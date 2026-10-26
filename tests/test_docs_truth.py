@@ -238,22 +238,22 @@ def _changelog_sections(text: str) -> Dict[str, str]:
 
 
 def test_changelog_top_section_is_the_unreleased_version() -> None:
-    """The top heading must be the unreleased version, undated, and the only one.
+    """The top version heading is the current version, dated, and the only one.
 
     Findings #3 and #9 were that an [Unreleased] section described code already
     inside the wheel a tag would publish. PyPI is immutable, so release notes
     that misfile a release's own contents cannot be corrected afterwards.
 
-    The fix chosen on 2026-08-28 (Daniel) is stronger than emptying that section:
-    there is NO separate [Unreleased] heading at all. While 0.1.0 is itself
-    unreleased, a second holding pen only re-creates the same trap of work
-    sitting under one heading while shipping inside another. Everything
-    accumulates under `## [0.1.0] - UNRELEASED` until the tag is pushed.
+    The fix chosen on 2026-08-28 (Daniel): no bracketed [Unreleased] heading.
+    While a version is unreleased, its work accumulates under its own heading;
+    after a tag, work waits under an unbracketed "Unreleased (on main, after the
+    vX tag)" heading and becomes the next version's dated heading at the cut.
 
-    This also pins that the heading carries NO DATE. Earlier revisions claimed a
-    cut on 2026-08-23 and then re-dated it to 2026-08-27; both were fiction,
-    because no tag exists and nothing has been published. A date here asserts a
-    release event, so it may only appear in the same change that pushes the tag.
+    The top bracketed heading must be ``vfairness.__version__`` (it was pinned to
+    0.1.0 until 0.2.0, which turned this red at the cut) and carry the
+    publication date: a date asserts a release event, so it appears only in the
+    change that cuts the release. Earlier revisions dated a release that had not
+    happened, twice.
     """
     text = CHANGELOG.read_text(encoding="utf-8")
     sections = _changelog_sections(text)
@@ -261,15 +261,20 @@ def test_changelog_top_section_is_the_unreleased_version() -> None:
 
     stray = [h for h in heads if h.startswith("[Unreleased]")]
     assert not stray, (
-        "a separate [Unreleased] heading is back. While 0.1.0 is unreleased, "
-        "entries belong under it, not in a second holding pen: "
+        "a bracketed [Unreleased] heading is back. Entries belong under their "
+        "version's own heading, not in a second holding pen: "
         f"{stray}"
     )
 
+    import vfairness
+
+    version = vfairness.__version__
     top = heads[0]
-    assert top.startswith("[0.1.0]"), f"top changelog section is not [0.1.0]: {top!r}"
+    assert top.startswith(f"[{version}]"), (
+        f"top changelog section is not [{version}] (vfairness.__version__): {top!r}"
+    )
     assert "UNRELEASED" not in top.upper(), (
-        f"0.1.0 is released, so the top section must carry its date, not UNRELEASED; got {top!r}"
+        f"{version} is released, so the top section must carry its date, not UNRELEASED; got {top!r}"
     )
     assert re.search(r"\d{4}-\d{2}-\d{2}", top), (
         f"the released heading must carry the publication date; got {top!r}"

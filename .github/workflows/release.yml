@@ -78,6 +78,13 @@ jobs:
           # Every check whose name starts with this must have concluded success.
           # It matches the matrix legs "Full suite + coverage (3.11|3.12|3.13)".
           REQUIRED_PREFIX: "Full suite + coverage"
+          # EVERY supported version must have its own green leg (added 2026-10-05,
+          # Daniel). The private repo cut main pushes to one version to save
+          # minutes; if the same cut ever reaches tests.yml here, "at least one
+          # green leg" would let a release through untested on the other two.
+          # Keep this list equal to the tests.yml matrix and to the package's
+          # python_requires classifiers.
+          REQUIRED_VERSIONS: "3.11 3.12 3.13"
         run: |
           set -euo pipefail
           sha="${{ github.sha }}"
@@ -119,7 +126,17 @@ jobs:
             exit 1
           fi
 
-          echo "OK: ${count} full-suite check(s) reported success on ${sha}."
+          for version in ${REQUIRED_VERSIONS}; do
+            leg="${REQUIRED_PREFIX} (${version})"
+            if ! printf '%s\n' "${matching}" | awk -F'\t' -v leg="${leg}" '$1 == leg && $2 == "success" { found = 1 } END { exit !found }'; then
+              echo "::error::No successful '${leg}' check on ${sha}." >&2
+              echo "Every supported Python version must pass on the exact commit being" >&2
+              echo "released. Run the full matrix on it (tests.yml), then retag." >&2
+              exit 1
+            fi
+          done
+
+          echo "OK: ${count} full-suite check(s) reported success on ${sha}, including ${REQUIRED_VERSIONS}."
 
   build:
     name: Build + verify distribution

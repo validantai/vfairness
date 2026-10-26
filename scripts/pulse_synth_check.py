@@ -136,6 +136,10 @@ def check(name: str, csv_path: Path, debug_dir=None) -> Tuple[bool, Dict]:
         "jurisdiction": "US",
         "source_kind": "tabular",
         "protected_attributes": [c for c in PROTECTED if c in audit.columns],
+        # invite_decision is text ("Yes"/"No"); Pulse codes a text decision only
+        # from its declared favourable value and never guesses (2026-10-09).
+        # "Yes" is an invitation, the favourable outcome.
+        "decision_labels": {"favourable_values": {"invite_decision": "Yes"}},
     }
     res = run_pulse(audit, inputs)
     if isinstance(res, dict) and "data" in res:

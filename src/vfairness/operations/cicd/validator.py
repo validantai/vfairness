@@ -15,54 +15,69 @@ from xml.sax.saxutils import escape, quoteattr
 import numpy as np
 import pandas as pd
 
+#: Text values whose meaning needs no declaration, as (coded 0, coded 1), after
+#: strip + lower. "yes"/"no", "approved"/"denied" and the like are NOT here: which
+#: side is favourable depends on what the column records.
+_SELF_DESCRIBING_BINARY = (("0", "1"), ("false", "true"), ("f", "t"))
 
-def _to_numeric_binary(series: "pd.Series") -> "pd.Series":
-    """Coerce an outcome column to a numeric 0/1 (float) series for rate maths.
 
-    Real datasets carry the outcome as "Yes"/"No", "true"/"false",
-    pandas StringDtype, etc. Calling `.mean()` on those raises
-    `dtype 'str' does not support operation 'mean'`. Any 2-class column is
-    mapped to 0/1 (larger / truthy class -> 1); already-numeric columns pass
-    through. Non-binary non-numeric columns return NaN so callers degrade
-    gracefully instead of crashing.
+def _undeclared_text_values(
+    series: "pd.Series", favourable_value: Any = None
+) -> Optional[List[str]]:
+    """The column's text values when it is text that cannot be coded without a
+    declared favourable value (and none was given); None when it can be coded."""
+    if favourable_value is not None:
+        return None
+    if pd.api.types.is_numeric_dtype(series) or pd.api.types.is_bool_dtype(series):
+        return None
+    text = series.dropna().astype("string").str.strip()
+    if not len(text) or pd.to_numeric(text, errors="coerce").notna().all():
+        return None
+    seen = set(text.str.lower().unique())
+    if any(seen <= {zero, one} for zero, one in _SELF_DESCRIBING_BINARY):
+        return None
+    return sorted({str(v) for v in text.unique()})
+
+
+def _to_numeric_binary(series: "pd.Series", favourable_value: Any = None) -> "pd.Series":
+    """Code an outcome column as numeric 0/1 (float) for rate maths, without guessing.
+
+    Numeric and boolean columns pass through, as does text that parses as
+    numbers. Text whose values carry their own meaning (0/1, true/false, t/f)
+    is coded by them. Any other text is coded from ``favourable_value``: that
+    value is 1 and every other value 0, missing cells stay missing.
+
+    NEVER GUESSED (2026-10-09). This used to code a fixed list of "truthy" words
+    as 1 and, failing that, the alphabetically later of two values. On an
+    "Invited"/"Rejected" column that made "Rejected" the favourable outcome: on
+    a hiring sample the gender four-fifths ratio read 0.96 (pass) where the true
+    reading is 0.36 (fail). Undeclared text now comes back all-NaN, which every
+    caller already treats as could-not-measure, and ``validate`` names the
+    missing declaration (``outcome_not_coded``).
+
+    Raises:
+        ValueError: a declared ``favourable_value`` the column does not hold.
     """
     if pd.api.types.is_numeric_dtype(series) or pd.api.types.is_bool_dtype(series):
         return pd.to_numeric(series, errors="coerce")
-    s = series.astype("string").str.strip().str.lower()
-    truthy = {
-        "yes",
-        "true",
-        "1",
-        "y",
-        "t",
-        "approved",
-        "hired",
-        "selected",
-        "positive",
-        "pass",
-        "accept",
-        "accepted",
-    }
-    falsy = {
-        "no",
-        "false",
-        "0",
-        "n",
-        "f",
-        "denied",
-        "rejected",
-        "negative",
-        "fail",
-        "failed",
-        "decline",
-        "declined",
-    }
-    known = set(s.dropna().unique())
-    if known and known <= (truthy | falsy):
-        return s.map(lambda v: 1.0 if v in truthy else (0.0 if v in falsy else np.nan))
-    uniq = sorted(known)
-    if len(uniq) == 2:
-        return s.map({uniq[0]: 0.0, uniq[1]: 1.0})
+    text = series.astype("string").str.strip()
+    present = text.dropna()
+    if len(present) and pd.to_numeric(present, errors="coerce").notna().all():
+        return pd.to_numeric(text, errors="coerce")
+    if favourable_value is not None:
+        fav = str(favourable_value).strip()
+        values = sorted({str(v) for v in present.unique()})
+        if fav not in values:
+            raise ValueError(
+                f"outcome_favourable_value {fav!r} is not one of the outcome column's "
+                f"values {values[:8]}; declare one of them."
+            )
+        return (text == fav).astype("float64").where(series.notna())
+    low = text.str.lower()
+    seen = set(low.dropna().unique())
+    for zero, one in _SELF_DESCRIBING_BINARY:
+        if seen and seen <= {zero, one}:
+            return (low == one).astype("float64").where(series.notna())
     return pd.Series(np.nan, index=series.index, dtype="float64")
 
 
@@ -441,7 +456,7 @@ class DataBiasValidator:
         ...     for issue in result.errors:
         ...         print(f"  - {issue.message}")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -494,12 +509,19 @@ class DataBiasValidator:
         df: pd.DataFrame,
         outcome_column: Optional[str] = None,
         feature_columns: Optional[List[str]] = None,
+        outcome_favourable_value: Any = None,
     ) -> DataValidationResult:
         """Validate a DataFrame for bias issues.
 
         Args:
             df: DataFrame to validate.
             outcome_column: Name of the outcome/target column (if available).
+            outcome_favourable_value: For a TEXT outcome column, the value that
+                is the favourable outcome (for example ``"Invited"``); every
+                other value is the unfavourable one. Not needed for numeric,
+                boolean, 0/1 or true/false columns. Text is never guessed: an
+                undeclared text outcome is reported as ``outcome_not_coded``
+                and its outcome checks are not measured.
             feature_columns: Restrict the column-level checks (missing-value
                 patterns, constant columns, duplicate rows, and the
                 ``n_features`` count) to these columns, plus the protected
@@ -602,7 +624,9 @@ class DataBiasValidator:
                     )
                 )
             else:
-                disp_issues, disp_metrics = self._check_outcome_disparity(df, outcome_column)
+                disp_issues, disp_metrics = self._check_outcome_disparity(
+                    df, outcome_column, outcome_favourable_value
+                )
                 issues.extend(disp_issues)
                 metrics["outcome_disparity"] = disp_metrics
                 checks_run.append("outcome_disparity")
@@ -617,7 +641,9 @@ class DataBiasValidator:
         # Check label quality
         if self.config.check_label_quality and outcome_column:
             if outcome_column in df.columns:
-                label_issues, label_metrics = self._check_label_quality(df, outcome_column)
+                label_issues, label_metrics = self._check_label_quality(
+                    df, outcome_column, outcome_favourable_value
+                )
                 issues.extend(label_issues)
                 metrics["label_quality"] = label_metrics
                 checks_run.append("label_quality")
@@ -745,16 +771,40 @@ class DataBiasValidator:
         return issues, metrics
 
     def _check_outcome_disparity(
-        self, df: pd.DataFrame, outcome_column: str
+        self, df: pd.DataFrame, outcome_column: str, favourable_value: Any = None
     ) -> tuple[List[ValidationIssue], Dict[str, Any]]:
         """Check for outcome rate disparities between groups."""
-        issues = []
-        metrics = {}
+        issues: List[ValidationIssue] = []
+        metrics: Dict[str, Any] = {}
 
-        # Coerce string / yes-no / StringDtype outcomes to numeric 0/1 so
-        # per-group means are computable (real outcome columns are rarely
-        # already numeric).
-        _num_outcome = _to_numeric_binary(df[outcome_column])
+        # A text outcome is coded only from a declared favourable value
+        # (_to_numeric_binary). Undeclared, it is not coded (every rate below is
+        # then undefined, reported per attribute as disparity_not_measurable)
+        # and the reason is named once, here, so a reader is told what to set.
+        undeclared = _undeclared_text_values(df[outcome_column], favourable_value)
+        if undeclared is not None:
+            shown = undeclared[:8]
+            metrics["outcome_not_coded"] = {"column": outcome_column, "values": shown}
+            issues.append(
+                ValidationIssue(
+                    issue_type="outcome_not_coded",
+                    severity=ValidationSeverity.ERROR,
+                    message=(
+                        f"The outcome column '{outcome_column}' holds text values "
+                        f"{shown}; which one is the favourable outcome was not declared, "
+                        "and it is not guessed, so outcome disparity was not measured. "
+                        "This is a could-not-check result, not a finding of no disparity."
+                    ),
+                    details={"values": shown},
+                    recommendation=(
+                        "Pass outcome_favourable_value= (one of the values above) to "
+                        "validate(), or code the outcome column as 0 and 1."
+                    ),
+                )
+            )
+
+        # Coerce the outcome to numeric 0/1 so per-group means are computable.
+        _num_outcome = _to_numeric_binary(df[outcome_column], favourable_value)
 
         for attr in self.protected_attributes:
             # Calculate outcome rates per group
@@ -953,7 +1003,7 @@ class DataBiasValidator:
         return issues, metrics
 
     def _check_label_quality(
-        self, df: pd.DataFrame, outcome_column: str
+        self, df: pd.DataFrame, outcome_column: str, favourable_value: Any = None
     ) -> tuple[List[ValidationIssue], Dict[str, Any]]:
         """Check for label quality issues."""
         issues = []
@@ -980,10 +1030,15 @@ class DataBiasValidator:
         # "positive rate" computed over a continuous or multi-class outcome
         # (e.g. the mean of raw incomes) is meaningless, so those are
         # skipped with an explicit note instead of reporting nonsense.
-        numeric_outcome = _to_numeric_binary(outcome)
+        numeric_outcome = _to_numeric_binary(outcome, favourable_value)
         observed_values = set(numeric_outcome.dropna().unique())
         is_binary = bool(observed_values) and observed_values <= {0.0, 1.0}
-        if not is_binary:
+        if _undeclared_text_values(outcome, favourable_value) is not None:
+            metrics["class_imbalance_check"] = (
+                "skipped: the outcome is text and its favourable value was not "
+                "declared (outcome_favourable_value), so it was not coded"
+            )
+        elif not is_binary:
             metrics["class_imbalance_check"] = (
                 "skipped: outcome is not binary, positive rate is undefined"
             )

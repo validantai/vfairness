@@ -184,9 +184,26 @@ def _coerce_binary(series: pd.Series) -> Tuple[np.ndarray, Optional[float]]:
     if s.dtype == bool:
         return s.astype(int).to_numpy(), 0.5
     unique = s.unique()
+    if len(unique) <= 2 and not pd.api.types.is_numeric_dtype(s):
+        # TEXT IS NEVER GUESSED (2026-10-09). This mapped the alphabetically
+        # later value to 1, so on "Invited"/"Rejected" the favourable outcome
+        # became "Rejected" (a 0.36 four-fifths ratio read 0.96). Only values
+        # that carry their own meaning are coded here; anything else must be
+        # coded from a declared favourable value before it arrives (the live
+        # path: orchestrator._code_decision_column). This module is
+        # quarantined; the refusal keeps the defect from travelling with a port.
+        low = {str(v).strip().lower(): v for v in unique}
+        for zero, one in (("0", "1"), ("false", "true")):
+            if set(low) <= {zero, one}:
+                mapping = {low[k]: (1 if k == one else 0) for k in low}
+                return s.map(mapping).astype(int).to_numpy(), None
+        raise ValueError(
+            f"text decision values {sorted(low)} need a declared favourable value; "
+            "they are never coded by guessing"
+        )
     if len(unique) <= 2:
-        # map larger / "yes" / "true" / "1" -> 1
-        ordered = sorted(unique, key=lambda x: str(x))
+        # Numeric two-valued column: the larger value is 1.
+        ordered = sorted(unique)
         mapping = {ordered[0]: 0, ordered[-1]: 1}
         return s.map(mapping).fillna(0).astype(int).to_numpy(), None
     # continuous score -> threshold at 0.5 or median
@@ -705,51 +722,73 @@ def _intersectional_grid(
     secondary: Optional[str],
     pred_arr: np.ndarray,
     reference_rate: float,
-) -> Tuple[List[str], List[str], List[Dict[str, Any]], float]:
+    min_group: int = _MIN_GROUP_SIZE,
+) -> Tuple[List[str], List[str], List[Dict[str, Any]], Optional[float]]:
+    """Gap of each cell's selection rate from the reference rate.
+
+    A CELL BELOW THE FLOOR IS NOT MEASURED (2026-10-09). This used to give an
+    empty cell a gap of 0.0 and apply no size floor, so an empty or two-person
+    cell read as "at parity" and could neither be told from a measured zero
+    nor kept out of the worst cell and the concentration share. Same defect
+    and same fix as the platform's intersectional heatmap (2026-10-09): a
+    cell with fewer than ``min_group`` rows, empty included, carries
+    ``gap`` None and ``measured`` False, keeps its ``n``, and is left out of
+    the worst cell and of the concentration. With no measured cell the
+    concentration is None (could not check), never 0.0.
+
+    This module is quarantined (``run_pulse_pipeline`` raises before reaching
+    this function); the live Pulse grid comes from the orchestrator, which
+    already excludes cells below its floor. Fixed here so the defect cannot
+    travel with a port.
+    """
     # Same auto-binning as the headline read, so the grid groups match.
     primary_series = _group_series(df, primary)
+
+    def _cell(row: str, col: str, mask: np.ndarray) -> Dict[str, Any]:
+        n = int(mask.sum())
+        if n < min_group:
+            return {
+                "rowLabel": row,
+                "colLabel": col,
+                "gap": None,
+                "n": n,
+                "measured": False,
+                "reason": f"n={n} < min_group={min_group}: not measured",
+                "worst": False,
+            }
+        rate = float(pred_arr[mask].mean())
+        return {
+            "rowLabel": row,
+            "colLabel": col,
+            "gap": abs(reference_rate - rate),
+            "n": n,
+            "measured": True,
+            "worst": False,
+        }
+
     if secondary is None:
         # Single-row grid: primary x "overall"
         rows = sorted(primary_series.unique().tolist())
         cols = ["overall"]
-        cells: List[Dict[str, Any]] = []
-        worst_gap = -1.0
-        worst_idx = 0
-        for r in rows:
-            mask = primary_series == r
-            rate = float(pred_arr[mask.to_numpy()].mean()) if mask.any() else 0.0
-            gap = abs(reference_rate - rate)
-            cells.append({"rowLabel": r, "colLabel": "overall", "gap": gap, "worst": False})
-            if gap > worst_gap:
-                worst_gap = gap
-                worst_idx = len(cells) - 1
-        if cells:
-            cells[worst_idx]["worst"] = True
-        total = sum(c["gap"] for c in cells)
-        return rows, cols, cells, (worst_gap / total if total > 0 else 0.0)
-
-    secondary_series = _group_series(df, secondary)
-    rows = sorted(primary_series.unique().tolist())
-    cols = sorted(secondary_series.unique().tolist())
-    cells = []
-    worst_gap = -1.0
-    worst_idx = 0
-    for r in rows:
-        for c in cols:
-            mask = ((primary_series == r) & (secondary_series == c)).to_numpy()
-            if mask.sum() == 0:
-                gap = 0.0
-            else:
-                rate = float(pred_arr[mask].mean())
-                gap = abs(reference_rate - rate)
-            cells.append({"rowLabel": r, "colLabel": c, "gap": gap, "worst": False})
-            if gap > worst_gap:
-                worst_gap = gap
-                worst_idx = len(cells) - 1
-    if cells:
-        cells[worst_idx]["worst"] = True
-    total = sum(c["gap"] for c in cells)
-    return rows, cols, cells, (worst_gap / total if total > 0 else 0.0)
+        cells: List[Dict[str, Any]] = [
+            _cell(r, "overall", (primary_series == r).to_numpy()) for r in rows
+        ]
+    else:
+        secondary_series = _group_series(df, secondary)
+        rows = sorted(primary_series.unique().tolist())
+        cols = sorted(secondary_series.unique().tolist())
+        cells = [
+            _cell(r, c, ((primary_series == r) & (secondary_series == c)).to_numpy())
+            for r in rows
+            for c in cols
+        ]
+    measured = [c for c in cells if c["measured"]]
+    if not measured:
+        return rows, cols, cells, None
+    worst = max(measured, key=lambda c: c["gap"])
+    worst["worst"] = True
+    total = sum(c["gap"] for c in measured)
+    return rows, cols, cells, (worst["gap"] / total if total > 0 else 0.0)
 
 
 def _pareto_frontier(

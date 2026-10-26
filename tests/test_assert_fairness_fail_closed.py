@@ -446,7 +446,9 @@ def _report_with_ci(point_estimate):
 
 class TestTrackersRefuseANaNPointEstimate:
     def test_mlflow_does_not_log_a_nan_point_estimate(self, fake_mlflow):
-        logged = log_fairness_to_mlflow(_report_with_ci(float("nan")), log_artifacts=False)
+        logged = log_fairness_to_mlflow(
+            _report_with_ci(float("nan")), log_artifacts=False, group_labels="names"
+        )
         key = "fairness.demographic_parity_difference.value"
         assert key not in fake_mlflow.metrics
         assert key not in logged
@@ -455,16 +457,20 @@ class TestTrackersRefuseANaNPointEstimate:
 
     def test_mlflow_does_not_log_a_none_point_estimate(self, fake_mlflow):
         """float(None) raised TypeError rather than skipping the value."""
-        logged = log_fairness_to_mlflow(_report_with_ci(None), log_artifacts=False)
+        logged = log_fairness_to_mlflow(
+            _report_with_ci(None), log_artifacts=False, group_labels="names"
+        )
         assert "fairness.demographic_parity_difference.value" not in logged
 
     def test_mlflow_still_logs_a_measured_point_estimate(self, fake_mlflow):
         """Over-correction control."""
-        log_fairness_to_mlflow(_report_with_ci(0.25), log_artifacts=False)
+        log_fairness_to_mlflow(_report_with_ci(0.25), log_artifacts=False, group_labels="names")
         assert fake_mlflow.metrics["fairness.demographic_parity_difference.value"] == 0.25
 
     def test_wandb_does_not_log_a_nan_point_estimate(self, fake_wandb):
-        logged = log_fairness_to_wandb(_report_with_ci(float("nan")), log_artifacts=False)
+        logged = log_fairness_to_wandb(
+            _report_with_ci(float("nan")), log_artifacts=False, group_labels="names"
+        )
         key = "fairness/demographic_parity_difference/value"
         assert key not in fake_wandb.logged
         assert key not in logged
@@ -472,10 +478,12 @@ class TestTrackersRefuseANaNPointEstimate:
         assert not nans, f"a NaN reached the tracker: {fake_wandb.logged}"
 
     def test_wandb_does_not_log_a_none_point_estimate(self, fake_wandb):
-        logged = log_fairness_to_wandb(_report_with_ci(None), log_artifacts=False)
+        logged = log_fairness_to_wandb(
+            _report_with_ci(None), log_artifacts=False, group_labels="names"
+        )
         assert "fairness/demographic_parity_difference/value" not in logged
 
     def test_wandb_still_logs_a_measured_point_estimate(self, fake_wandb):
         """Over-correction control."""
-        log_fairness_to_wandb(_report_with_ci(0.25), log_artifacts=False)
+        log_fairness_to_wandb(_report_with_ci(0.25), log_artifacts=False, group_labels="names")
         assert fake_wandb.logged["fairness/demographic_parity_difference/value"] == 0.25

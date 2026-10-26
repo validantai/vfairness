@@ -162,7 +162,7 @@ class LimeExplainer(Explainer):
     tests/test_beta_go_live_proof_ledger.py::test_no_docstring_stamp_is_stale asserts
     must be zero. The ledger regeneration is recorded as a hand-back.
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

@@ -523,7 +523,7 @@ def _log_to_fake_mlflow(monkeypatch, y_true, y_pred, attr, via_analyzer=False):
         warnings.simplefilter("ignore")
         analyzer = FairnessAnalyzer(y_true, y_pred, attr)
         subject = analyzer if via_analyzer else analyzer.get_report()
-        log_fairness_to_mlflow(subject, log_artifacts=False)
+        log_fairness_to_mlflow(subject, log_artifacts=False, group_labels="names")
     return fake
 
 

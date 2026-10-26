@@ -12,8 +12,11 @@ Pipeline (each stage wrapped -- a partial failure degrades, never raises):
      identifiers excluded, quantile bins, sibling preference)
   2. data quality                  (build_quality_report / DataBiasValidator)
   3. PER protected variable: FairnessAnalyzer.compute_all_metrics with
-     BOOTSTRAP CONFIDENCE INTERVALS (statistical rigor) + group sizes;
-     significance = CI excludes 0 / clears the four-fifths line
+     BOOTSTRAP CONFIDENCE INTERVALS (statistical rigor) + group sizes; the
+     headline reference-vs-worst selection-rate gap carries a NEWCOMBE
+     HYBRID SCORE interval (valid at zero counts and small n) and
+     significance = that interval excludes 0, gated by an omnibus test and
+     BH-FDR corrected across attributes
   4. bias taxonomy + proxies + intersectional  (BiasDetector.full_audit)
   5. causal overview               (build_causal_skeleton -> direct vs
      indirect/proxy paths, optional DoWhy identifiability)
@@ -348,21 +351,132 @@ def _coerce_binary(s: pd.Series) -> np.ndarray:
             return num.fillna(0).astype(int).to_numpy()
         thr = float(np.nanmedian(num)) if num.notna().any() else 0.5
         return (num.fillna(thr - 1) >= thr).astype(int).to_numpy()
+    # TEXT IS NEVER GUESSED (2026-10-09). This used to code a fixed list of
+    # "truthy" words as 1 and everything else as 0, so an "Invited"/"Rejected"
+    # column read as nobody invited at all. run_pulse now codes a text decision
+    # or label column from its declared favourable value before anything reads
+    # it (_code_decision_column), so text only reaches this point when the
+    # values carry their own meaning (0/1 or true/false), or when a caller
+    # skipped the declaration, which is refused rather than guessed.
     low = s.astype("string").str.strip().str.lower()
-    truthy = {
-        "yes",
-        "true",
-        "1",
-        "y",
-        "approved",
-        "hired",
-        "selected",
-        "positive",
-        "accept",
-        "accepted",
-        "pass",
+    seen = set(low.dropna().unique())
+    for zero, one in _SELF_DESCRIBING_BINARY:
+        if seen and seen <= {zero, one}:
+            return (low == one).fillna(False).astype(int).to_numpy()
+    raise ValueError(
+        f"text column '{s.name}' holds {sorted(seen)[:8]}; it must be coded from a "
+        "declared favourable value (inputs.decision_labels.favourable_values), "
+        "never guessed"
+    )
+
+
+#: Text values whose meaning needs no declaration: (the value coded 0, the value
+#: coded 1), compared after strip + lower. Anything else ("Yes"/"No",
+#: "Invited"/"Rejected") names an outcome whose favourable side depends on the
+#: column, so it must be declared.
+_SELF_DESCRIBING_BINARY: Tuple[Tuple[str, str], ...] = (("0", "1"), ("false", "true"))
+
+
+def _declared_favourable_value(inputs: Dict[str, Any], column: str) -> Tuple[bool, Any]:
+    """The favourable value declared for ``column``, as ``(declared, value)``.
+
+    Read from ``inputs["decision_labels"]["favourable_values"][column]``, the
+    shape the platform's other analyses already send for a text decision
+    column (2026-10-09). camelCase and the US spelling are accepted as the same
+    key; nothing else is inferred.
+    """
+    dl = inputs.get("decision_labels") or inputs.get("decisionLabels") or {}
+    if not isinstance(dl, dict):
+        return False, None
+    for key in ("favourable_values", "favourableValues", "favorable_values", "favorableValues"):
+        fv = dl.get(key)
+        if isinstance(fv, dict) and column in fv and fv[column] is not None:
+            return True, fv[column]
+    return False, None
+
+
+def _code_decision_column(
+    series: pd.Series, column: str, inputs: Dict[str, Any], polarity: str
+) -> Tuple[Optional[pd.Series], Optional[Dict[str, Any]], Optional[str]]:
+    """Code a decision (or label) column to 0/1 without guessing.
+
+    Returns ``(coded, record, refusal)``:
+
+    * numeric or boolean columns, and text that parses as numbers, are
+      returned unchanged (``coded`` None): their meaning is already numeric;
+    * text whose values are 0/1 or true/false is coded by those values;
+    * any other text is coded from the declared favourable value: that value
+      is the favourable outcome and every other value the unfavourable one,
+      written as 1/0 under ``positive_favorable`` and 0/1 under
+      ``positive_unfavorable``, so the polarity flip run_pulse applies
+      afterwards lands the favourable outcome on 1 either way. Missing cells
+      stay missing.
+    * undeclared, or declared with a value the column does not hold: ``refusal``
+      says so by name. Nothing is guessed.
+
+    ``record`` states the coding that was applied (it is published in
+    ``dataPreparation.decisionCoding``).
+    """
+    if series.dtype == bool or pd.api.types.is_numeric_dtype(series):
+        return None, None, None
+    present = series.dropna()
+    text = present.astype("string").str.strip()
+    if len(text) and pd.to_numeric(text, errors="coerce").notna().all():
+        return pd.to_numeric(series, errors="coerce"), None, None
+    values = sorted({str(v) for v in text.unique()})
+    low = series.astype("string").str.strip().str.lower()
+    seen = set(low.dropna().unique())
+    for zero, one in _SELF_DESCRIBING_BINARY:
+        if seen and seen <= {zero, one}:
+            coded = (low == one).astype("float64").where(series.notna())
+            record = {
+                "column": column,
+                "declared": False,
+                "basis": f"the values are {zero}/{one}",
+                "favourableValue": one,
+            }
+            return coded, record, None
+    declared, fav = _declared_favourable_value(inputs, column)
+    shown = ", ".join(f"'{v}'" for v in values[:8]) + (", ..." if len(values) > 8 else "")
+    if not declared:
+        return (
+            None,
+            None,
+            (
+                f"The decision column '{column}' holds text values ({shown}), so Pulse "
+                "cannot tell which outcome is favourable, and it does not guess. "
+                "Declare it in the Pulse inputs as "
+                f"decision_labels.favourable_values['{column}'] (for example "
+                f"'{values[0]}' or '{values[-1]}'), or provide '{column}' coded as 0 "
+                "and 1."
+            ),
+        )
+    fav_s = str(fav).strip()
+    if fav_s not in values:
+        return (
+            None,
+            None,
+            (
+                f"The favourable value declared for '{column}', '{fav_s}', is not one "
+                f"of its values ({shown}), so the column cannot be coded. Declare one "
+                f"of those values in decision_labels.favourable_values['{column}']."
+            ),
+        )
+    is_fav = series.astype("string").str.strip() == fav_s
+    fav_code, other_code = (0.0, 1.0) if polarity == "positive_unfavorable" else (1.0, 0.0)
+    coded = is_fav.map({True: fav_code, False: other_code}).astype("float64")
+    coded = coded.where(series.notna())
+    counts = text.value_counts()
+    record = {
+        "column": column,
+        "declared": True,
+        "favourableValue": fav_s,
+        "outcomePolarity": polarity,
+        "coding": {v: int(fav_code if v == fav_s else other_code) for v in values},
+        "rows": {v: int(counts.get(v, 0)) for v in values},
+        "missing": int(series.isna().sum()),
     }
-    return low.isin(truthy).astype(int).to_numpy()
+    return coded, record, None
 
 
 def _pick(df: pd.DataFrame, names) -> Optional[str]:
@@ -1285,10 +1399,17 @@ def _per_variable(
     pool = reliable if len(reliable) >= 2 else interpretable if len(interpretable) >= 2 else rates
     ref = max(pool, key=lambda d: d["n"])
     worst = min(pool, key=lambda d: d["rate"])
+    # How many comparisons the reported pair was picked from. The worst group
+    # is the lowest-rate of the k-1 non-reference groups, so its test against
+    # the reference is the most extreme of k-1 tests; the confirmation below
+    # corrects for that choice (see `p_selection`).
+    n_compared = max(1, len(pool) - 1)
     if worst["label"] == ref["label"]:
         # The majority is itself the worst-served group: compare it against
         # the best-served reliable group instead so the gap is meaningful.
         ref = max(pool, key=lambda d: d["rate"])
+        # Both ends are now chosen: the most extreme of all k(k-1)/2 pairs.
+        n_compared = max(1, len(pool) * (len(pool) - 1) // 2)
     # G-32: honor a caller-requested reference group when it exists in the
     # data. The requested group becomes the comparison baseline; the worst
     # group is then the lowest-rate group other than the reference. The
@@ -1311,6 +1432,7 @@ def _per_variable(
                 others = [gr for gr in rates if gr["label"] != ref["label"]]
             if others:
                 worst = min(others, key=lambda d: d["rate"])
+                n_compared = len(others)
     gap = ref["rate"] - worst["rate"]
     # EEOC four-fifths screen uses the highest-rate group as the benchmark,
     # independent of which group we narrate against.
@@ -1318,32 +1440,67 @@ def _per_variable(
     four_fifths = (worst["rate"] / best_rate) if best_rate > 0 else 0.0
 
     p_omnibus: Optional[float] = None
-    # Bootstrap CI on the gap (statistical rigor: is it real or noise?).
-    rng = np.random.default_rng(0)
-    boots = []
+    # Interval on the gap (statistical rigor: is it real or noise?).
+    #
+    # NEWCOMBE HYBRID SCORE INTERVAL, NOT A BOOTSTRAP (2026-10-09). This was a
+    # percentile bootstrap. A group with no positives resamples only zeros, so
+    # it adds no variance and the interval carried only the reference group's
+    # sampling error. Measured on the platform's recruitment sample: 0 of 22
+    # Native American applicants invited against 114 of 1,601 White read
+    # "95% CI 5.8 to 8.4 points", statistically confirmed after FDR correction
+    # (adjusted p 0.009), while the permutation test across race_ethnicity read
+    # p 0.70 and the Wilson interval for 0 of 22 alone runs to 14.9%. The
+    # Newcombe interval (Newcombe 1998, method 10) is built from each group's
+    # Wilson limits, so both groups' uncertainty enters and it is valid at zero
+    # counts and small n; on that pair it reads -7.8 to 8.5 points and is not
+    # confirmed. Its p-value is the interval's dual (see
+    # _newcombe_hybrid_score_difference), so `significant`, the p-value that
+    # enters the BH-FDR family and the printed interval can never disagree.
     rmask = g == ref["label"]
     wmask = g == worst["label"]
     rp, wp = y_pred[rmask], y_pred[wmask]
-    if len(rp) >= 5 and len(wp) >= 5:
-        for _ in range(_BOOTSTRAP):
-            b = (
-                rp[rng.integers(0, len(rp), len(rp))].mean()
-                - wp[rng.integers(0, len(wp), len(wp))].mean()
-            )
-            boots.append(b)
-        lo, hi = np.quantile(boots, [(1 - _CI) / 2, 1 - (1 - _CI) / 2])
-        significant = bool(lo > 0)  # CI excludes 0 -> a real disparity
-        # Two-sided bootstrap p-value for H0: gap == 0, with +1 smoothing
-        # so it can never be exactly 0. This feeds the BH-FDR correction
-        # APPLIED ACROSS ALL ATTRIBUTES in run_pulse -- a single
-        # uncorrected per-attribute test inflates the family-wise false
-        # positive rate (~34% over 8 attributes) and is the dominant
-        # spurious-Adverse driver. `significant` here is provisional and
-        # is overwritten by the corrected decision downstream.
-        ba = np.asarray(boots, dtype=float)
-        nb = len(ba)
-        p_two = 2.0 * min((np.sum(ba <= 0) + 1) / (nb + 1), (np.sum(ba >= 0) + 1) / (nb + 1))
-        p_value = float(min(1.0, p_two))
+    ci_method: Optional[str] = None
+    ci_not_computed: Optional[str] = None
+    decisions_binary = bool(
+        np.isin(np.asarray(rp, dtype=float), (0.0, 1.0)).all()
+        and np.isin(np.asarray(wp, dtype=float), (0.0, 1.0)).all()
+    )
+    if len(rp) >= 5 and len(wp) >= 5 and decisions_binary:
+        from vfairness.evaluation.vfairness_metrics._statistics import (
+            _newcombe_hybrid_score_difference,
+        )
+
+        _d, lo, hi, p_value = _newcombe_hybrid_score_difference(
+            int(np.sum(rp)), int(len(rp)), int(np.sum(wp)), int(len(wp)), _CI
+        )
+        ci_method = "newcombe_hybrid_score"
+        # SELECTION-AWARE CONFIRMATION (2026-10-09). The pair is not chosen in
+        # advance: the worst group is the most extreme of `n_compared` tests
+        # against the reference, so under "no group differs" its p is the
+        # smallest of n_compared p-values and P(min p <= t) <= n_compared * t
+        # (Bonferroni). `p_selection` is that bound, and it is what may confirm
+        # the pair and what enters the BH-FDR family below. The interval stays
+        # the plain 95% interval for the pair; a confirmed gap still always
+        # prints one that excludes 0, because p_selection >= p_value.
+        # Measured on the published clean control (synthetic/clean.csv, nothing
+        # planted, US employment): age 9 of 56 against 45 of 118, pair p 0.0034
+        # (Fisher 0.0030, so the interval is not the issue), omnibus p 0.025.
+        # Entering the family at the pair p confirmed it (BH 0.034) and read
+        # the control as unfit; the bootstrap had hidden this only through its
+        # 1/1000 resolution (p 0.006). Corrected for choosing the extreme of 4
+        # bands it enters at 0.0137 and is not confirmed. On the synthetic
+        # pack this keeps every planted mechanism main confirmed and drops its
+        # three spurious confirmations.
+        p_selection = float(min(1.0, n_compared * p_value))
+        significant = bool(lo > 0) and p_selection < (1.0 - _CI)
+        # `p_value` is the two-sided p for H0: gap == 0, dual to the interval
+        # above (p < 1 - _CI exactly when the interval excludes 0). Its
+        # selection-adjusted form feeds the BH-FDR correction APPLIED ACROSS
+        # ALL ATTRIBUTES in run_pulse, because a single uncorrected
+        # per-attribute test inflates the family-wise false positive rate
+        # (~34% over 8 attributes) and is the dominant spurious-Adverse
+        # driver. `significant` here is provisional and is overwritten by the
+        # corrected decision downstream.
         # The omnibus p is recorded so a reader can see the test that gated
         # this attribute; the gate below uses the same table.
         if len(pool) > 2:
@@ -1366,7 +1523,7 @@ def _per_variable(
 
             p_omnibus = _safe(_omnibus_p, None)
         # Selection-aware omnibus gate (audit fix pv-1): `worst` is the
-        # MINIMUM-rate group of k, so the ref-vs-worst bootstrap above is an
+        # MINIMUM-rate group of k, so the ref-vs-worst interval above is an
         # implicit max over k-1 comparisons and is anti-conservative under
         # the null (max-gap inflation, ~2.4x per AgentFairBench). Require a
         # k-group omnibus chi-square over ALL interpretable groups to reject
@@ -1394,14 +1551,23 @@ def _per_variable(
 
             significant = bool(_safe(_omnibus, True))
     else:
-        # Too few rows in the reference or worst group to bootstrap a CI.
-        # The previous code set lo=hi=gap, which made significant=(gap>0)
-        # ALWAYS TRUE for any non-zero gap on a tiny group -- the exact
-        # opposite of the intended "a small group must never inflate
+        # Too few rows in the reference or worst group (under 5), or decisions
+        # that are not 0/1 so a difference of PROPORTIONS does not describe
+        # them. Either way no interval is reported: the third state, never a
+        # number. The previous code set lo=hi=gap, which made
+        # significant=(gap>0) ALWAYS TRUE for any non-zero gap on a tiny group,
+        # the exact opposite of the intended "a small group must never inflate
         # severity". A disparity that cannot be tested is NOT significant.
         lo, hi = float("nan"), float("nan")
         significant = False
         p_value = None
+        p_selection = None
+        ci_not_computed = (
+            "The decisions are not 0/1, so no interval for a difference of "
+            "proportions was computed."
+            if not decisions_binary
+            else "Fewer than 5 rows in the reference or worst group, so no interval was computed."
+        )
 
     # Cohen's h on the worst/best proportion gap. h = 2 * (arcsin(sqrt(p1))
     # - arcsin(sqrt(p2))). h is the standard effect-size statistic for two
@@ -1426,11 +1592,22 @@ def _per_variable(
         "gap": gap,
         "ciLow": None if lo != lo else float(lo),
         "ciHigh": None if hi != hi else float(hi),
+        # Which interval the two numbers above are, and at what level, so a
+        # report names the method from the engine instead of assuming one.
+        # None (with the reason) when no interval was computed.
+        "ciMethod": ci_method,
+        "ciLevel": _CI if ci_method else None,
+        "ciNotComputedReason": ci_not_computed,
         "fourFifthsRatio": four_fifths,
         "pValue": p_value,
+        # The pair's p corrected for being the most extreme of
+        # `selectionComparisons` tests; this is what confirms the pair and
+        # what enters the BH-FDR family.
+        "pValueSelection": p_selection,
+        "selectionComparisons": int(n_compared),
         "pValueOmnibus": p_omnibus,
         "significant": significant,
-        # Snapshot of the per-attribute bootstrap-CI verdict BEFORE
+        # Snapshot of the per-attribute interval verdict BEFORE
         # BH-FDR correction. _fdr_correct() may overwrite `significant`
         # with the family-wise corrected value; this field never moves,
         # so the GUI can name which of the two checks rejected the gap.
@@ -3925,8 +4102,11 @@ def _nonbinary_tabular_pulse(
             ref = max(pool, key=lambda d: d["rate"])
         gap = float(ref["rate"] - worst["rate"])
 
-        # Bootstrap CI + two-sided p on the normalized gap (mirrors the
-        # binary _per_variable inference so downstream reads are uniform).
+        # Bootstrap CI + two-sided p on the normalized gap, with the same
+        # field names as the binary _per_variable so downstream reads are
+        # uniform. The binary path's Newcombe interval is for a difference of
+        # PROPORTIONS and does not apply to a mean of a continuous score, so
+        # the percentile bootstrap stays here and `ciMethod` says so.
         rng = np.random.default_rng(0)
         rp = yv[gv == ref["label"]]
         wp = yv[gv == worst["label"]]
@@ -4042,6 +4222,8 @@ def _nonbinary_tabular_pulse(
             "gap": gap,
             "ciLow": ci_low,
             "ciHigh": ci_high,
+            "ciMethod": "percentile_bootstrap" if ci_low is not None else None,
+            "ciLevel": _CI if ci_low is not None else None,
             # Four-fifths is a selection-RATE screen: inapplicable to
             # continuous / rank outputs. None, never a fake ratio.
             "fourFifthsRatio": None,
@@ -4672,6 +4854,58 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
         }
     has_truth = label_col is not None and label_col != pred_col
 
+    # 0. A TEXT DECISION IS CODED FROM ITS DECLARED FAVOURABLE VALUE, NEVER
+    #    GUESSED (2026-10-09). The decision cells are rewritten to 0/1 here,
+    #    before anything reads them, because several stages read the raw column
+    #    from the frame (bias detector, temporal drift, causal skeleton) and each
+    #    used to code text its own way: this file took a fixed list of "truthy"
+    #    words as 1 (so "Invited"/"Rejected" read as nobody invited), and the
+    #    data validator took the alphabetically later value (so "Rejected" read
+    #    as the favourable outcome and a 0.36 four-fifths ratio read 0.96).
+    #    Undeclared text decisions are refused by name. An undeclared text
+    #    LABEL column is not guessed either: it is left out as ground truth,
+    #    and the reason is published.
+    _polarity_in = str(
+        inputs.get("outcome_polarity") or inputs.get("outcomePolarity") or "positive_favorable"
+    )
+    decision_coding: Dict[str, Any] = {}
+    _pred_coded, _pred_record, _pred_refusal = _code_decision_column(
+        df[pred_col], str(pred_col), inputs, _polarity_in
+    )
+    if _pred_refusal:
+        _shown_values = sorted({str(v).strip() for v in df[pred_col].dropna().unique()})
+        return {
+            "success": False,
+            "refused": True,
+            "error": _pred_refusal,
+            "decisionColumn": str(pred_col),
+            "decisionValues": _shown_values[:50],
+            "setting": "decision_labels.favourable_values",
+        }
+    if _pred_coded is not None or (has_truth and label_col is not None):
+        df = df.copy()
+    if _pred_coded is not None:
+        df[pred_col] = _pred_coded
+    if _pred_record:
+        decision_coding["decision"] = _pred_record
+    if has_truth and label_col is not None:
+        _lab_coded, _lab_record, _lab_refusal = _code_decision_column(
+            df[label_col], str(label_col), inputs, _polarity_in
+        )
+        if _lab_refusal:
+            has_truth = False
+            decision_coding["labelNotUsed"] = {
+                "column": str(label_col),
+                "reason": _lab_refusal.replace("The decision column", "The label column")
+                + " Until then it is not used as ground truth, and the label-dependent "
+                "metrics are not computed.",
+            }
+        else:
+            if _lab_coded is not None:
+                df[label_col] = _lab_coded
+            if _lab_record:
+                decision_coding["label"] = _lab_record
+
     # 1. canonical preparation (Phase 1)
     from vfairness.preprocessing import prepare_protected_attributes
 
@@ -4834,6 +5068,9 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
         #: its value was not recorded. Empty on a complete frame.
         "rowsExcludedNoProtectedValueByAttribute": dict(protected_rows_excluded_by_attr),
     }
+    if decision_coding:
+        # How each text decision / label column was coded, and from what.
+        data_preparation["decisionCoding"] = decision_coding
     if protected_rows_excluded:
         _per_attr_counts = "; ".join(
             f'"{a}": {n}' for a, n in protected_rows_excluded_by_attr.items()
@@ -5225,7 +5462,7 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
             )
         return _axis_views[key]
 
-    # 3. per-variable metrics with bootstrap CIs. G-32: a caller-requested
+    # 3. per-variable metrics with Newcombe score CIs on the gap. G-32: a caller-requested
     #    reference group (inputs.reference_group[attr]) is threaded through
     #    so the comparison baseline honors the request when the group
     #    exists; the disclosure lands in the referenceGroups block below.
@@ -5273,14 +5510,22 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
         # Gate, then correct. An attribute the omnibus gate rejected
         # (significantRaw False) enters the family at p = 1: it can neither be
         # confirmed nor lower the threshold for the others. Gated-in attributes
-        # enter with their pairwise p. Measured 2026-10-01 on the synthetic
+        # enter with their pairwise p, corrected since 2026-10-09 for the pair
+        # being the most extreme of several. Measured 2026-10-01 on the synthetic
         # pack: entering the gated-out national origin at its selected-pair p
         # (0.010) is what pulled the clean control's age (0.006) under the BH
         # line; entering every attribute at max(pairwise, omnibus) instead
         # silenced it but also missed the planted race penalty (race omnibus
         # p 0.0078 over ten attributes).
         def _family_p(r):
-            return float(r["pValue"]) if r.get("significantRaw") else 1.0
+            if not r.get("significantRaw"):
+                return 1.0
+            # The selection-adjusted pair p (see _per_variable) when present:
+            # entering at the plain pair p re-confirmed age on the clean
+            # control (BH 0.034, 2026-10-09). Rows from other producers that
+            # carry no selection correction keep their own p.
+            ps = r.get("pValueSelection")
+            return float(ps) if isinstance(ps, (int, float)) else float(r["pValue"])
 
         pvals = np.array([_family_p(rows[i]) for i in idx], dtype=float)
         res = benjamini_hochberg_correction(pvals, alpha=1.0 - _CI)
@@ -7315,7 +7560,8 @@ def run_pulse(df: pd.DataFrame, inputs: Dict[str, Any], progress=None) -> Dict[s
     scope = build_scope_block(
         "tabular",
         covered=[
-            "Selection-rate disparity with bootstrap confidence intervals per protected attribute",
+            "Selection-rate disparity with Newcombe score confidence intervals per "
+            "protected attribute",
             "Full bias-taxonomy screen, proxy / leakage battery, and the "
             "statistical robustness battery (BH-FDR corrected)",
             f"Intersectional subgroups at n >= {min_group} (smaller cells "

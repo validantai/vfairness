@@ -277,7 +277,7 @@ class PlattScaling(BaseCalibrator):
         Platt, J. (1999). Probabilistic Outputs for Support Vector Machines.
         Advances in Large Margin Classifiers, 61-74.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -596,7 +596,7 @@ class IsotonicCalibrator(BaseCalibrator):
         Zadrozny, B. & Elkan, C. (2002). Transforming Classifier Scores into
         Accurate Multiclass Probability Estimates. KDD.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -925,7 +925,7 @@ class BetaCalibrator(BaseCalibrator):
         A Well-Founded and Easily Implemented Improvement on Logistic Calibration.
         AISTATS.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -1254,7 +1254,7 @@ class TemperatureScaling(BaseCalibrator):
         Guo, C., et al. (2017). On Calibration of Modern Neural Networks.
         ICML.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -1559,7 +1559,7 @@ class HistogramBinning(BaseCalibrator):
         Estimates from Decision Trees and Naive Bayesian Classifiers.
         ICML.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -1877,7 +1877,7 @@ def create_calibrator(method: Union[str, CalibrationMethod], **kwargs) -> BaseCa
         >>> calibrator = create_calibrator('isotonic')
         >>> calibrator = create_calibrator(CalibrationMethod.PLATT, regularization=0.1)
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

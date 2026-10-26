@@ -2,11 +2,10 @@
 
 A comprehensive visual guide to the vfairness library for measuring fairness in machine learning models and detecting bias.
 
-> **Availability.** 0.1.0 is prepared and **unreleased**: the repository carries
-> no tags and nothing from this codebase has reached PyPI or TestPyPI. The
-> `vfairness` name on PyPI currently holds our own early 0.0.1 placeholder that
-> exports nothing, so the `pip install` commands in this document describe the
-> intended install and do not work yet.
+> **Availability.** vfairness is on PyPI as a public beta: `pip install vfairness`
+> on Python 3.11 or newer installs 0.2.0 (published 2026-10-26; the first beta,
+> 0.1.0, was published 2026-10-02). The early 0.0.1 placeholder that held the name
+> before the first release has been yanked.
 >
 > **How the code here was checked (2026-08-28).** The six workflow blocks under
 > *Quick Reference* and the two under *Explainability* and *Intersectionality*
@@ -1272,7 +1271,7 @@ flowchart TB
     subgraph MLOPS["⚙️ MLOps Integration"]
         subgraph MLFLOW["MLflow Logging"]
             MF1["log_fairness_to_mlflow()"]
-            MF2["• All metrics<br/>• Group stats<br/>• Effect sizes<br/>• Pass/fail"]
+            MF2["• All metrics<br/>• Group stats<br/>• Effect sizes<br/>• Pass/fail<br/>• Group names coded by default"]
         end
 
         subgraph PYTEST["pytest Assertions"]

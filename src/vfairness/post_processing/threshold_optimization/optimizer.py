@@ -930,7 +930,7 @@ class ThresholdOptimizer(BaseThresholdOptimizer):
         >>> optimizer.fit(y_true, y_prob, gender)
         >>> y_pred = optimizer.predict(y_prob, gender)
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -1129,7 +1129,7 @@ class GroupThresholdOptimizer(BaseThresholdOptimizer):
         {'male': 0.42, 'female': 0.58}
         >>> y_pred = optimizer.predict(y_prob, gender)
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -1449,7 +1449,7 @@ class MultiObjectiveThresholdOptimizer(BaseThresholdOptimizer):
         >>> optimizer.select_point(index=0)
         >>> y_pred = optimizer.predict(y_prob, gender)
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -1881,7 +1881,7 @@ def create_threshold_optimizer(
         ...     tolerance=0.05
         ... )
 
-    Beta Go-Live proof status (2026-10-01): BGL-B SEMI-PROVEN. Executed and judged
+    Beta Go-Live proof status (2026-10-24): BGL-B SEMI-PROVEN. Executed and judged
     honest, but nothing in the suite holds it there. The behaviour is observed, not
     protected: a refactor can reintroduce the defect with every gate staying green.
 

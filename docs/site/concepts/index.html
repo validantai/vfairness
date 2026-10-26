@@ -762,7 +762,7 @@ flowchart LR
                     <p>Point estimates of fairness metrics are insufficient. Proper validation requires quantifying uncertainty and testing for statistical significance.</p>
 
                     <h3>Confidence Intervals</h3>
-                    <p>vfairness provides two approaches:</p>
+                    <p>vfairness uses these approaches:</p>
 
                     <div class="table-container">
                         <table>
@@ -783,6 +783,11 @@ flowchart LR
                                     <td><strong>Bayesian CI</strong> (a group's RATE, not a disparity)</td>
                                     <td>n &lt; 30 per group</td>
                                     <td>Prior distribution + observed data = posterior, take credible interval. <code>bayesian_proportion_ci</code>, <code>bayesian_difference_ci</code>, <code>bayesian_mean_ci</code>, <code>get_group_metrics_with_ci(method='bayesian')</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Newcombe hybrid score CI</strong> (the Pulse selection-rate gap)</td>
+                                    <td>a difference of two proportions, including a group with nobody selected and small groups</td>
+                                    <td>Combine the two groups' Wilson score limits (Newcombe 1998, method 10), so both groups' uncertainty enters. A bootstrap of a group with no positives resamples only zeros and reads falsely narrow. The confirmation uses the interval's dual p-value, corrected for the pair being the most extreme of several comparisons, so it never contradicts the printed interval. See <a href="../api-reference/index.html#assurance-gap-rules">how a gap is confirmed</a>.</td>
                                 </tr>
                                 <tr>
                                     <td><strong>Not implemented</strong></td>
@@ -1703,7 +1708,7 @@ flowchart LR
                         <h4>Resources</h4>
                         <ul>
                             <li><a href="https://github.com/validantai/vfairness" target="_blank">GitHub</a></li>
-                            <li><a href="../release-pipeline/index.html">Release Pipeline (0.1.0, published 2026-10-02)</a></li>
+                            <li><a href="../release-pipeline/index.html">Release Pipeline (0.2.0, published 2026-10-26)</a></li>
                             <li><a href="references.html">Academic References</a></li>
                             <li><a href="changelog.html">Changelog</a></li>
                         </ul>

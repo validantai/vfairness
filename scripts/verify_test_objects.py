@@ -119,6 +119,8 @@ RUNS = [
             "domain": "recruitment / employment screening",
             "jurisdiction": "US",
             "protected_attributes": ["gender", "race_ethnicity", "age", "disability_status"],
+            # Text decision ("Yes"/"No"): coded only from the declared value.
+            "decision_labels": {"favourable_values": {"invite_decision": "Yes"}},
         },
         "recruit",
     ),
@@ -290,6 +292,8 @@ def main() -> None:
             "domain": "recruitment / employment screening",
             "jurisdiction": "US",
             "protected_attributes": [c for c in SYNTH_PROTECTED if c in df.columns],
+            # Text decision ("Yes"/"No"): coded only from the declared value.
+            "decision_labels": {"favourable_values": {"invite_decision": "Yes"}},
         }
         s = _summary(run_pulse(df, inputs))
         flagged = _flagged(s)

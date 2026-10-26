@@ -862,7 +862,7 @@ class PredictionReweighter(BaseReweighter):
         >>> reweighter.fit(y_true, y_prob, gender)
         >>> y_prob_fair = reweighter.transform(y_prob, gender)
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -1242,7 +1242,7 @@ class RejectionOptionClassifier(BaseReweighter):
         >>> roc.fit(y_true, y_prob, gender)
         >>> y_pred_fair = roc.predict(y_prob, gender)
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -1635,7 +1635,7 @@ class CalibratedEqualizer(BaseReweighter):
         >>> equalizer.fit(y_true, y_prob, gender)
         >>> y_prob_equal = equalizer.transform(y_prob, gender)
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -1878,7 +1878,7 @@ class DistributionMatcher(BaseReweighter):
         >>> matcher.fit(y_true, y_prob, gender)
         >>> y_prob_matched = matcher.transform(y_prob, gender)
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. An independent
@@ -2138,7 +2138,7 @@ def create_reweighter(
         ...     theta=0.15
         ... )
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY

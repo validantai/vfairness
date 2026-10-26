@@ -335,7 +335,7 @@ def test_mlflow_writes_the_odds_ratio_and_cohens_h_the_producer_measured(fake_ml
     effects = _real_producer_effect_sizes()
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
-        log_fairness_to_mlflow(_tracker_report(effects), log_artifacts=False)
+        log_fairness_to_mlflow(_tracker_report(effects), log_artifacts=False, group_labels="names")
     written = sorted(k for k in fake_mlflow.metrics if ".effect_size." in k)
     assert written == [
         "fairness.effect_size.A_vs_B.cohens_d",
@@ -356,7 +356,7 @@ def test_mlflow_writes_the_odds_ratio_and_cohens_h_the_producer_measured(fake_ml
 
 def test_wandb_writes_the_odds_ratio_and_cohens_h_the_producer_measured(fake_wandb):
     effects = _real_producer_effect_sizes()
-    log_fairness_to_wandb(_tracker_report(effects), log_artifacts=False)
+    log_fairness_to_wandb(_tracker_report(effects), log_artifacts=False, group_labels="names")
     written = sorted(k for k in fake_wandb.logged if "/effect_size/" in k)
     assert written == [
         "fairness/effect_size/A_vs_B/cohens_d",
@@ -386,11 +386,11 @@ def test_an_unmeasured_odds_ratio_and_cohens_h_are_named_not_silent(
     }
     report = _tracker_report(effects)
     if backend == "mlflow":
-        log_fairness_to_mlflow(report, log_artifacts=False)
+        log_fairness_to_mlflow(report, log_artifacts=False, group_labels="names")
         fields, sep = fake_mlflow.params, "."
         written = sorted(k for k in fake_mlflow.metrics if ".effect_size." in k)
     else:
-        log_fairness_to_wandb(report, log_artifacts=False)
+        log_fairness_to_wandb(report, log_artifacts=False, group_labels="names")
         fields, sep = fake_wandb.run.summary, "/"
         written = sorted(k for k in fake_wandb.logged if "/effect_size/" in k)
     assert fields[f"fairness{sep}n_effect_sizes_not_measured"] == 2, fields[
@@ -419,7 +419,7 @@ def test_wandb_writes_the_measured_standard_error_its_disclosure_names(fake_wand
     }
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
-        log_fairness_to_wandb(_tracker_report(ci=ci), log_artifacts=False)
+        log_fairness_to_wandb(_tracker_report(ci=ci), log_artifacts=False, group_labels="names")
     key = "fairness/demographic_parity_difference/std_error"
     assert key in fake_wandb.logged, sorted(fake_wandb.logged)
     assert fake_wandb.logged[key] == pytest.approx(0.06)
@@ -434,7 +434,7 @@ def test_wandb_names_an_unmeasured_standard_error_and_writes_no_key_for_it(fake_
         "upper_bound": 0.53,
         "standard_error": float("nan"),
     }
-    log_fairness_to_wandb(_tracker_report(ci=ci), log_artifacts=False)
+    log_fairness_to_wandb(_tracker_report(ci=ci), log_artifacts=False, group_labels="names")
     assert "fairness/demographic_parity_difference/std_error" not in fake_wandb.logged
     summary = fake_wandb.run.summary
     assert summary["fairness/n_intervals_not_measured"] == 1
@@ -449,8 +449,8 @@ def test_control_both_trackers_write_the_same_four_interval_series(fake_mlflow, 
         "upper_bound": 0.53,
         "standard_error": 0.06,
     }
-    log_fairness_to_mlflow(_tracker_report(ci=ci), log_artifacts=False)
-    log_fairness_to_wandb(_tracker_report(ci=ci), log_artifacts=False)
+    log_fairness_to_mlflow(_tracker_report(ci=ci), log_artifacts=False, group_labels="names")
+    log_fairness_to_wandb(_tracker_report(ci=ci), log_artifacts=False, group_labels="names")
     ml = sorted(
         k.rsplit(".", 1)[-1]
         for k in fake_mlflow.metrics

@@ -847,7 +847,7 @@ class FairnessMonitor:
     >>> result.metrics
     {'disparate_impact_group_gender': ..., ...}
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -2456,7 +2456,7 @@ class TemporalFairnessAnalyzer:
     ...     analyzer.update_daily_metrics(date, {"demographic_parity": 0.05 + i * 0.002})
     >>> degraded, val = analyzer.detect_weekly_degradation("demographic_parity")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -2523,8 +2523,9 @@ class TemporalFairnessAnalyzer:
         self._daily_metrics = pd.concat([self._daily_metrics, new_row], ignore_index=True)
         cutoff = pd.Timestamp(date).normalize() - pd.Timedelta(days=self.lookback_days)
         self._daily_metrics = self._daily_metrics[self._daily_metrics["date"] > cutoff].copy()
-        self._daily_metrics.sort_values("date", inplace=True)
-        self._daily_metrics.reset_index(drop=True, inplace=True)
+        # Reassigned, not inplace=True: pandas 3.1 deprecated the inplace keyword (PDEP-8), and
+        # its warning broke the library's "says nothing on healthy data" tests (23 Oct 2026).
+        self._daily_metrics = self._daily_metrics.sort_values("date").reset_index(drop=True)
 
     # Temporal pattern analysis
 
@@ -2630,7 +2631,7 @@ class TemporalFairnessAnalyzer:
             higher_is_better = direction is MetricDirection.HIGHER_IS_BETTER
 
         df = self._daily_metrics.copy()
-        df["weekday"] = df["date"].dt.dayofweek
+        df["weekday"] = df["date"].dt.day_of_week
         overall_mean = df[metric_name].mean()
         weekly_means = df.groupby("weekday")[metric_name].mean()
         # BGL g004, 2026-09-17. The 14-row floor above counts ROWS, and this

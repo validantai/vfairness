@@ -1,0 +1,203 @@
+{
+ "_what_this_is": "First examinations. Every unit here had NO grade: nobody had run it on undefined input, which is where every defect this campaign found was living. audited is FALSE on every row by construction.",
+ "measured_on": "2026-10-24",
+ "wave": "grade-1",
+ "counts": {
+  "PROVEN": 19
+ },
+ "reports_read": 1,
+ "reports_glob": "/tmp/claude-501/coverage-grade/grade-*.json",
+ "unresolved_by_this_method": [],
+ "items": {
+  "vfairness.operations.cicd.coverage.CoverageState": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "label returns the raw value (underscores): 2 test(s) failed (test_coverage_state_has_exactly_the_four_states_and_prints_them_in_words, test_policy_decision_markdown_report_carries_the_policy_and_the_measurement); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. Exactly four members in order assessed, insufficient_evidence, omitted_by_configuration, input_absent; label prints the words every surface shows ('omitted by configuration')."
+  },
+  "vfairness.operations.cicd.coverage.MeasuredOutcome": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "label returns the raw value (underscores): 1 test(s) failed (test_measured_outcome_has_exactly_three_outcomes_and_prints_them_in_words); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. Exactly three members pass, fail, not_measured; label prints 'not measured'."
+  },
+  "vfairness.operations.cicd.coverage.CoveragePolicy": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "the bare-string guard removed, so 'race' is read as the attributes r, a, c, e: 1 test(s) failed (test_coverage_policy_normalises_a_healthy_policy_and_refuses_a_bare_string); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. A healthy policy normalises intersection order and de-duplicates ('race','sex') and ['sex','race'] into one ('sex','race'); group_sets lists each attribute then each intersection. A bare string 'race' is refused with ConfigurationError rather than read as four one-letter attributes; the wider refusal set (16 unenforceable policies) is pinned in tests/test_issue1_coverage_policy.py."
+  },
+  "vfairness.operations.cicd.coverage.CoveragePolicy.to_dict": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "min_group_size dropped from the dict: 1 test(s) failed (test_coverage_policy_to_dict_is_the_whole_requirement); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. Returns the whole requirement, every field, and survives a JSON round trip unchanged."
+  },
+  "vfairness.operations.cicd.coverage.CoverageItem": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "satisfied ignores the coverage state (a passing value counts however it was covered): 2 test(s) failed (test_coverage_item_is_satisfied_only_when_assessed_and_passing, test_coverage_item_to_dict_carries_every_field_and_both_verdict_halves); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. satisfied is True for exactly one of the 12 state x outcome combinations (assessed and pass); label joins the attributes with ' × '."
+  },
+  "vfairness.operations.cicd.coverage.CoverageItem.to_dict": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "undersized dropped from the dict: 1 test(s) failed (test_coverage_item_to_dict_carries_every_field_and_both_verdict_halves); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. Every field, both halves of the verdict (state and outcome) and the derived satisfied flag, compared in full."
+  },
+  "vfairness.operations.cicd.coverage.PolicyDecision": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "gaps always empty: 1 test(s) failed (test_policy_decision_names_its_gaps_and_summarises_them); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24 on four cells of 100 (attributes at 0.5, cells at 0.8/0.2/0.2/0.8). With check_intersections off: gaps names sex × race omitted by configuration, summary 'NOT PERMITTED ... 2 of 3'. On fair data: no gaps, 'PERMITTED ... 3 of 3'."
+  },
+  "vfairness.operations.cicd.coverage.PolicyDecision.to_dict": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "reasons dropped from the dict: 1 test(s) failed (test_policy_decision_to_dict_keeps_the_measurement_and_the_requirement); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. The nine keys, the policy and the measurement equal to their own to_dict, reasons empty and permitted True on a clean run, JSON-serialisable."
+  },
+  "vfairness.operations.cicd.coverage.PolicyDecision.to_markdown_report": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "the measurement report left out: 1 test(s) failed (test_policy_decision_markdown_report_carries_the_policy_and_the_measurement); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. Starts with the policy report, carries the row 'sex × race | ... | omitted by configuration', and then the measurement's own report after it."
+  },
+  "vfairness.operations.cicd.coverage.assess_coverage": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "the outcome graded against the configured threshold instead of the policy bound: 1 test(s) failed (test_assess_coverage_re_judges_a_stored_measurement_against_a_newer_policy); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24 on one stored hierarchical measurement held to three policy versions: bounds 0.5 and 0.6 permit (the configured 0.5 is at least as strict); bound 0.2 does not, the cell is omitted by configuration with outcome fail against the policy bound. The stored measurement serialises identically before and after (pure)."
+  },
+  "vfairness.operations.cicd.coverage.policy_result_line": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "always PERMITTED: 1 test(s) failed (test_policy_result_line_says_permitted_or_not_with_the_policy_named); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. Exactly '**Deployment policy**: `PERMITTED` under `p` v1' on a clean run and the NOT PERMITTED line when the intersection was switched off."
+  },
+  "vfairness.operations.cicd.coverage.policy_check_conclusion": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "a CONDITIONAL measurement concludes success instead of neutral: 1 test(s) failed (test_policy_check_conclusion_is_failure_neutral_or_success); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. success on a clean permitted run, failure when not permitted, neutral for a permitted policy over a CONDITIONAL measurement (a non-required metric that could not be computed)."
+  },
+  "vfairness.operations.cicd.gate.ScopeLevel": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "an intersection level records the base threshold, not the relaxed one it applied: 1 test(s) failed (test_scope_level_records_the_threshold_each_level_applied); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24 through evaluate_hierarchical: attr:sex records ('sex',) and 0.1; the intersection level records ('sex','race') and the 0.12 the default 1.2 multiplier actually applied."
+  },
+  "vfairness.operations.cicd.gate.ScopeLevel.to_dict": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "thresholds dropped from the dict: 2 test(s) failed (test_evaluated_scope_to_dict_is_the_whole_record, test_scope_level_to_dict); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. name, attributes as a list, thresholds as a dict, compared in full."
+  },
+  "vfairness.operations.cicd.gate.ScopeGap": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "an attribute left out by check_single_attributes is attributed to check_intersections: 1 test(s) failed (test_scope_gap_names_the_setting_that_left_each_group_set_out); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24: with check_single_attributes and check_intersections off, race is named for check_single_attributes (sex is the overall level's attribute and was evaluated) and sex × race for check_intersections; intersection_depth 1 names intersection_depth; the default configuration has no gap."
+  },
+  "vfairness.operations.cicd.gate.ScopeGap.to_dict": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "setting dropped from the dict: 2 test(s) failed (test_evaluated_scope_to_dict_is_the_whole_record, test_scope_gap_to_dict); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. attributes, setting and reason, compared in full."
+  },
+  "vfairness.operations.cicd.gate.EvaluatedScope": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "the gate's minimum recorded instead of the hierarchy's, which the levels certified against: 1 test(s) failed (test_evaluated_scope_records_the_configuration_the_levels_ran_with); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24: supplied attributes, metrics, blocking_metrics None, and the hierarchy's min_group_size of 50 (the one the levels certified against, not the gate's 30); the flat entry point records one 'flat' level with its thresholds."
+  },
+  "vfairness.operations.cicd.gate.EvaluatedScope.to_dict": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "not_evaluated dropped from the dict: 1 test(s) failed (test_evaluated_scope_to_dict_is_the_whole_record); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24. The whole record with nested levels and gaps, compared in full."
+  },
+  "vfairness.operations.cicd.gate.ModelFairnessGate.evaluate_against_policy": {
+   "grade": "PROVEN",
+   "wave": "grade-1",
+   "grade_batch": "first-examination-coverage-policy-2026-10-24",
+   "audited": false,
+   "first_examination": true,
+   "test_file": "tests/test_first_examination_coverage_policy_units.py",
+   "sabotage": "the type check removed, so a dict is accepted as a policy: 1 test(s) failed (test_evaluate_against_policy_returns_the_unchanged_measurement_and_refuses_a_non_policy); restored byte-identical (SHA-256), 19 of 19 pass",
+   "judgement": "Run 2026-10-24: returns a PolicyDecision whose measurement has the same levels and the same approved=True as evaluate_hierarchical alone with check_intersections off, while permitted is False; a dict passed as the policy raises TypeError."
+  }
+ }
+}

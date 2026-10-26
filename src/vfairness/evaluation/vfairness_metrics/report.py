@@ -462,7 +462,7 @@ def classification_fairness_report(
         ...     print(f"Most advantaged: {priv['group']} ({priv['positive_rate']:.1%})")
         ...     print(f"Most disadvantaged: {disadv['group']} ({disadv['positive_rate']:.1%})")
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY

@@ -48,18 +48,18 @@ The reason travels with the badge, because the reasons are not equivalent:
 <!-- STATUS:matrix:start -->
 | Published status | Units | Share |
 | --- | ---: | ---: |
-| **CHECKED** | 1580 | 100.0% |
+| **CHECKED** | 1599 | 100.0% |
 | **FIX PENDING** | 0 | 0.0% |
 | **NOT CHECKED** | 0 | 0.0% |
-| | **1580** | 100% |
+| | **1599** | 100% |
 
 | Scope | Units | Checked | Fix pending | Not checked | Not independently checked |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Core, what the beta promises | 1398 | 1398 | 0 | 0 | 485 |
+| Core, what the beta promises | 1417 | 1417 | 0 | 0 | 504 |
 | Preview, documented, not certified | 182 | 182 | 0 | 0 | 123 |
-| **Total** | **1580** | **1580** | **0** | **0** | **608** |
+| **Total** | **1599** | **1599** | **0** | **0** | **627** |
 
-The release gate reports 618 not independently checked; this table reports 608. The gate counts graded rows and this table counts code units, and 10 of the gate's rows grade a re-export spelling of a unit already counted here.
+The release gate reports 637 not independently checked; this table reports 627. The gate counts graded rows and this table counts code units, and 10 of the gate's rows grade a re-export spelling of a unit already counted here.
 
 *Not independently checked* counts grades one examiner reached and nobody has yet tried to refute. Of the grades that HAVE been independently checked, 291 of 872 (33.4%) were overturned, so treat those rows as claims with evidence behind them rather than settled results.
 
@@ -70,9 +70,9 @@ The release gate reports 618 not independently checked; this table reports 608. 
 | In-processing mitigation | core | 175 | 0 | 0 | 175 | 44 |
 | LLM fairness testing | core | 151 | 0 | 0 | 151 | 60 |
 | Preprocessing mitigation | core | 103 | 0 | 0 | 103 | 36 |
+| CI/CD gates | core | 96 | 0 | 0 | 96 | 51 |
 | Explainability (XAI) | core | 82 | 0 | 0 | 82 | 54 |
 | Reporting | core | 79 | 0 | 0 | 79 | 18 |
-| CI/CD gates | core | 77 | 0 | 0 | 77 | 32 |
 | Monitoring | core | 65 | 0 | 0 | 65 | 11 |
 | Bias detection | core | 65 | 0 | 0 | 65 | 21 |
 | Agent fairness testing | core | 61 | 0 | 0 | 61 | 21 |
@@ -88,9 +88,9 @@ The release gate reports 618 not independently checked; this table reports 608. 
 | Open defect, by what closing it takes | Units |
 | --- | ---: |
 
-| The public path (`vfairness.X`), 831 units | Units | Share |
+| The public path (`vfairness.X`), 843 units | Units | Share |
 | --- | ---: | ---: |
-| CHECKED | 831 | 100.0% |
+| CHECKED | 843 | 100.0% |
 | FIX PENDING | 0 | 0.0% |
 | NOT CHECKED | 0 | 0.0% |
 <!-- STATUS:matrix:end -->

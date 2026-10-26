@@ -11,13 +11,21 @@ Features:
     - pytest assertion function for CI/CD pipelines
     - Integration with common ML workflow tools
 
+Group names are coded by default. Both tracker writers replace every group name
+they write with a keyed code (``g_`` plus 12 hex characters), so a run never
+shows "Female" or "Over 60" to whoever can read the tracker. The key comes from
+the environment variable ``VFAIRNESS_GROUP_LABEL_KEY`` (any secret string, kept
+like a password) or from ``label_key=...``; without one the writers refuse
+before anything is written. ``group_labels="names"`` writes the real names on
+purpose. The examples below assume the variable is set.
+
 Example (MLflow):
     >>> import mlflow
     >>> from vfairness import FairnessAnalyzer, log_fairness_to_mlflow
     >>>
     >>> with mlflow.start_run():
     ...     analyzer = FairnessAnalyzer(y_true, y_pred, gender)
-    ...     log_fairness_to_mlflow(analyzer)
+    ...     log_fairness_to_mlflow(analyzer)  # group names coded with the key
 
 Example (W&B):
     >>> import wandb
@@ -25,7 +33,7 @@ Example (W&B):
     >>>
     >>> wandb.init(project="my-model")
     >>> analyzer = FairnessAnalyzer(y_true, y_pred, gender)
-    >>> log_fairness_to_wandb(analyzer)
+    >>> log_fairness_to_wandb(analyzer)  # group names coded with the key
 
 Example (Auto-logging):
     >>> from vfairness import auto_log_fairness
@@ -48,10 +56,13 @@ Example (pytest):
 
 import warnings
 from functools import wraps
-from typing import Any, Callable, Dict, List, Literal, NamedTuple, Optional
+from typing import Any, Callable, Dict, List, Literal, NamedTuple, Optional, Union
 
 import numpy as np
 
+# Imported as a module under a private name: the coding helpers are pre-release
+# and must not appear as public names of this module.
+from ... import _group_codes
 from ..._triage import is_measured
 from ._metric_direction import ThresholdOutcome, check_threshold
 from ._validation import ArrayLike
@@ -478,6 +489,73 @@ def _library_version() -> str:
     return version if isinstance(version, str) and version else "unknown"
 
 
+def _code_for_tracker(
+    report: Dict[str, Any], mode: str, key: Optional[bytes], caller: str
+) -> tuple[Dict[str, Any], List[str]]:
+    """The report a tracker writer writes from, and what coding left out of it.
+
+    In ``"names"`` mode this is the report itself, untouched, which is why that
+    mode writes exactly what the writers wrote before coding existed. In
+    ``"coded"`` mode every group name is replaced where it sits (see
+    ``vfairness._group_codes``), and EVERY write below reads the coded copy: the
+    metric keys, the params, the disclosure lists and the artifact cannot
+    disagree about which names were hidden, because there is only one source.
+
+    CRITICAL (fail closed): this runs BEFORE the first write. A key that is
+    missing or a shared code raises here, and the run stays empty rather than
+    half-written with real names in it.
+    """
+    if mode == "names":
+        return report, []
+    assert key is not None  # resolved by the caller in coded mode
+    coded, left_out, unexpected = _group_codes.code_report(report, key)
+    if unexpected:
+        # The two prose fields are left out on every coded run and need no warning;
+        # anything else means this report holds something coding could not read.
+        warnings.warn(
+            f"{caller}: {len(unexpected)} part(s) of the report could not be coded "
+            f"safely, so they were left out of the run rather than written with group "
+            f"names in them: {', '.join(unexpected)}. They are named in the "
+            f"left_out_by_group_coding tag.",
+            UserWarning,
+            stacklevel=3,
+        )
+    return coded, left_out
+
+
+def _group_label_tags(mode: str, key: Optional[bytes], left_out: List[str]) -> Dict[str, Any]:
+    """The tags that say how a run's group labels were written, on EVERY run.
+
+    ``group_labels`` is always present, so a run's labels are never ambiguous
+    between "coded" and "this version did not record it". In coded mode the key id
+    says which key coded the run (two runs are comparable only under the same
+    key) without revealing the key, and the left-out pair names every part of the
+    report the coded run does not hold.
+    """
+    tags: Dict[str, Any] = {"group_labels": mode}
+    if mode == "coded":
+        assert key is not None
+        tags["group_label_key_id"] = _group_codes.key_id(key)
+        tags["n_left_out_by_group_coding"] = len(left_out)
+        tags["left_out_by_group_coding"] = _group_codes.left_out_text(left_out)
+    return tags
+
+
+def _artifact_coding_note(key: Optional[bytes], left_out: List[str]) -> Dict[str, Any]:
+    """The note a coded report artifact carries about itself."""
+    assert key is not None
+    return {
+        "group_labels": "coded",
+        "key_id": _group_codes.key_id(key),
+        "left_out": list(left_out),
+        "how_to_read": (
+            "Group names are keyed codes. Rebuild name to code on your own machine with "
+            "vfairness._group_codes.group_label_codes(names) and the same key. The "
+            "parts listed in left_out are not in this file."
+        ),
+    }
+
+
 # MLflow Integration
 
 
@@ -486,6 +564,8 @@ def log_fairness_to_mlflow(
     prefix: str = "fairness",
     log_artifacts: bool = True,
     include_group_stats: bool = True,
+    group_labels: str = "coded",
+    label_key: Optional[Union[str, bytes]] = None,
 ) -> Dict[str, Any]:
     """
     Log fairness results to an active MLflow run.
@@ -493,12 +573,40 @@ def log_fairness_to_mlflow(
     Logs all fairness metrics, confidence intervals (if computed), effect sizes,
     and group statistics to the currently active MLflow run.
 
+    Group names are CODED by default. Every group name the run would hold (the
+    per-group keys ``<prefix>.group.<group>.<stat>``, the effect-size pairs, the
+    ``groups`` and excluded-levels params, the disclosure lists and the JSON
+    report artifact) is replaced by a keyed code such as ``g_3fa91c07d2e4``, the
+    same code in every run under the same key, so versions stay comparable. The
+    mapping from name to code is never written; rebuild it on your own machine
+    with ``vfairness._group_codes.group_label_codes(names)`` (pre-release, so
+    its import path may change). Groups are listed in code order and every
+    effect-size pair is written as ``<lower code>_vs_<higher code>``, restated for
+    that direction when the library compared the pair the other way round
+    (Cohen's d and h negated, risk and odds ratios inverted), because the
+    library's own order follows the real names and would give them away. The
+    report's sentences that name groups (``assessment.summary``,
+    ``explanations``) cannot be coded and are left out of the artifact; every
+    part left out is named in the ``<prefix>.left_out_by_group_coding`` tag.
+
     Args:
         analyzer_or_report: Either a FairnessAnalyzer instance or a report dict
             from classification_fairness_report/regression_fairness_report
         prefix: Prefix for all logged metrics (default: "fairness")
         log_artifacts: Whether to log report as JSON artifact
         include_group_stats: Whether to log per-group statistics
+        group_labels: ``"coded"`` (the default) writes keyed codes in place of
+            group names; ``"names"`` writes the real names on purpose, exactly
+            as this function did before coding existed.
+        label_key: The secret that codes the names (str or bytes). When None,
+            the environment variable ``VFAIRNESS_GROUP_LABEL_KEY`` is read. Keep
+            it like a password: anyone holding it can recompute the codes.
+
+    Every run is tagged ``<prefix>.group_labels`` (``"coded"`` or ``"names"``).
+    A coded run is also tagged ``<prefix>.group_label_key_id``, eight hex
+    characters derived from the key that tell keys apart without revealing them,
+    and ``<prefix>.n_left_out_by_group_coding`` /
+    ``<prefix>.left_out_by_group_coding``.
 
     Returns:
         Dict with all logged metric names and values. ``<prefix>.fairness_score``
@@ -521,16 +629,26 @@ def log_fairness_to_mlflow(
     Raises:
         ImportError: If MLflow is not installed
         RuntimeError: If no active MLflow run exists
+        ValueError: If ``group_labels`` is neither ``"coded"`` nor ``"names"``,
+            if coded mode finds no key (neither ``label_key`` nor
+            ``VFAIRNESS_GROUP_LABEL_KEY``), or if two different group labels
+            would get the same code. Raised before anything is written.
 
     Example:
         >>> import mlflow
         >>> from vfairness import FairnessAnalyzer, log_fairness_to_mlflow
         >>>
+        >>> # Once, in the shell: export VFAIRNESS_GROUP_LABEL_KEY='<a team secret>'
         >>> with mlflow.start_run():
         ...     analyzer = FairnessAnalyzer(y_true, y_pred, gender)
         ...     logged = log_fairness_to_mlflow(analyzer, prefix="model_v1")
         ...     print(f"Logged {len(logged)} metrics")
+        >>>
+        >>> # Real group names, on purpose:
+        >>> log_fairness_to_mlflow(analyzer, group_labels="names")
     """
+    mode = _group_codes.check_mode(group_labels, caller="log_fairness_to_mlflow")
+
     try:
         import mlflow
     except ImportError:
@@ -543,6 +661,15 @@ def log_fairness_to_mlflow(
         raise RuntimeError(
             "No active MLflow run. Use mlflow.start_run() first or pass the run context."
         )
+
+    # CRITICAL (fail closed): the key is resolved BEFORE the first write. Coded is
+    # the default, and a run without a key must stay empty: a half-written run
+    # whose metric keys already carry real group names cannot be taken back.
+    label_secret = (
+        _group_codes.resolve_key(label_key, caller="log_fairness_to_mlflow")
+        if mode == "coded"
+        else None
+    )
 
     # Annotated Dict[str, Any]: this records what was logged, which includes the
     # non-numeric fairness_score_status entry for a not-assessable run.
@@ -558,6 +685,15 @@ def log_fairness_to_mlflow(
         report = analyzer_or_report
     else:
         raise TypeError(f"Expected FairnessAnalyzer or report dict, got {type(analyzer_or_report)}")
+
+    # Every write below reads THIS report: in coded mode the coded copy, so no
+    # path can write a name the others hid. Raises before any write.
+    report, left_out = _code_for_tracker(report, mode, label_secret, "log_fairness_to_mlflow")
+
+    # How this run's group labels were written, first, so a run that holds any
+    # coded key also says it is coded even if a later write fails.
+    for tag_key, tag_value in _group_label_tags(mode, label_secret, left_out).items():
+        mlflow.set_tag(f"{prefix}.{tag_key}", tag_value)
 
     # Log basic metrics. The guard is `_logged_as_metric` so the disclosure below
     # names exactly the series this loop did not write.
@@ -715,7 +851,14 @@ def log_fairness_to_mlflow(
                 return obj.value
             return obj
 
+        # In coded mode ``report`` IS the coded copy: the raw report, with its
+        # sentences naming groups, is never uploaded. The artifact says so itself,
+        # for a reader who downloads it without the run's tags.
         serializable_report = make_serializable(report)
+        if mode == "coded":
+            serializable_report["group_label_coding"] = _artifact_coding_note(
+                label_secret, left_out
+            )
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(serializable_report, f, indent=2)
@@ -736,6 +879,8 @@ def log_fairness_to_wandb(
     prefix: str = "fairness",
     log_artifacts: bool = True,
     include_group_stats: bool = True,
+    group_labels: str = "coded",
+    label_key: Optional[Union[str, bytes]] = None,
 ) -> Dict[str, Any]:
     """
     Log fairness results to an active Weights & Biases run.
@@ -744,12 +889,30 @@ def log_fairness_to_wandb(
     Logs all fairness metrics, confidence intervals, effect sizes,
     and group statistics to the currently active W&B run.
 
+    Group names are CODED by default, exactly as on the MLflow path: every group
+    name in the logged keys, the run summary and the report artifact is replaced
+    by a keyed code such as ``g_3fa91c07d2e4``, groups are listed in code order,
+    effect-size pairs are written as ``<lower code>_vs_<higher code>`` (restated
+    for that direction when needed), the mapping is never written, and the
+    report's sentences that name groups are left out of the artifact and named in
+    ``<prefix>/left_out_by_group_coding``. Rebuild name to code locally with
+    ``vfairness._group_codes.group_label_codes(names)`` (pre-release).
+
     Args:
         analyzer_or_report: Either a FairnessAnalyzer instance or a report dict
             from classification_fairness_report/regression_fairness_report.
         prefix: Prefix for all logged metrics (default: "fairness").
         log_artifacts: Whether to log the full report as a JSON artifact.
         include_group_stats: Whether to log per-group statistics.
+        group_labels: ``"coded"`` (the default) writes keyed codes in place of
+            group names; ``"names"`` writes the real names on purpose, exactly
+            as this function did before coding existed.
+        label_key: The secret that codes the names (str or bytes). When None,
+            the environment variable ``VFAIRNESS_GROUP_LABEL_KEY`` is read.
+
+    The run summary always carries ``<prefix>/group_labels`` (``"coded"`` or
+    ``"names"``); a coded run also carries ``<prefix>/group_label_key_id`` and
+    ``<prefix>/n_left_out_by_group_coding`` / ``<prefix>/left_out_by_group_coding``.
 
     Returns:
         Dict with all logged metric names and values. ``<prefix>/fairness_score``
@@ -772,17 +935,23 @@ def log_fairness_to_wandb(
     Raises:
         ImportError: If wandb is not installed.
         RuntimeError: If no active W&B run exists.
+        ValueError: If ``group_labels`` is neither ``"coded"`` nor ``"names"``,
+            if coded mode finds no key, or if two different group labels would
+            get the same code. Raised before anything is written.
 
     Example:
         >>> import wandb
         >>> from vfairness import FairnessAnalyzer, log_fairness_to_wandb
         >>>
+        >>> # Once, in the shell: export VFAIRNESS_GROUP_LABEL_KEY='<a team secret>'
         >>> wandb.init(project="fairness-audit")
         >>> analyzer = FairnessAnalyzer(y_true, y_pred, gender)
         >>> logged = log_fairness_to_wandb(analyzer)
         >>> print(f"Logged {len(logged)} metrics")
         >>> wandb.finish()
     """
+    mode = _group_codes.check_mode(group_labels, caller="log_fairness_to_wandb")
+
     try:
         import wandb
     except ImportError:
@@ -792,6 +961,14 @@ def log_fairness_to_wandb(
 
     if wandb.run is None:
         raise RuntimeError("No active W&B run. Use wandb.init() first.")
+
+    # CRITICAL (fail closed): resolved before the first write, as on the MLflow
+    # path. See log_fairness_to_mlflow.
+    label_secret = (
+        _group_codes.resolve_key(label_key, caller="log_fairness_to_wandb")
+        if mode == "coded"
+        else None
+    )
 
     # Annotated Dict[str, Any]: this records what was logged, which includes the
     # non-numeric fairness_score_status entry for a not-assessable run.
@@ -805,6 +982,11 @@ def log_fairness_to_wandb(
         report = analyzer_or_report
     else:
         raise TypeError(f"Expected FairnessAnalyzer or report dict, got {type(analyzer_or_report)}")
+
+    # One source for every write below, as on the MLflow path. Raises before any.
+    report, left_out = _code_for_tracker(report, mode, label_secret, "log_fairness_to_wandb")
+    for tag_key, tag_value in _group_label_tags(mode, label_secret, left_out).items():
+        wandb.run.summary[f"{prefix}/{tag_key}"] = tag_value
 
     log_data: Dict[str, Any] = {}
 
@@ -957,7 +1139,12 @@ def log_fairness_to_wandb(
                 return obj.value
             return obj
 
+        # The coded copy in coded mode, never the raw report. See the MLflow path.
         serializable_report = make_serializable(report)
+        if mode == "coded":
+            serializable_report["group_label_coding"] = _artifact_coding_note(
+                label_secret, left_out
+            )
 
         artifact = wandb.Artifact(f"{prefix}_report", type="fairness_report")
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
@@ -1053,6 +1240,8 @@ def auto_log_fairness(
     metrics: Optional[List[str]] = None,
     thresholds: Optional[Dict[str, float]] = None,
     prefix: str = "fairness",
+    group_labels: str = "coded",
+    label_key: Optional[Union[str, bytes]] = None,
 ) -> Callable:
     """
     Decorator that automatically logs fairness metrics after a function call.
@@ -1076,6 +1265,14 @@ def auto_log_fairness(
             from them, which is why ``<prefix>.thresholds_enforced`` is logged as
             ``"false"`` alongside. Use :func:`assert_fairness` to gate on them.
         prefix: Prefix for logged metric names.
+        group_labels: ``"coded"`` (the default) or ``"names"``, passed to the
+            writer; see :func:`log_fairness_to_mlflow`. An unknown value is
+            refused when the decorator is applied.
+        label_key: The secret that codes group names; when None the writer reads
+            ``VFAIRNESS_GROUP_LABEL_KEY``. Resolved at each call, BEFORE the
+            thresholds are recorded, so a call without a key writes nothing at
+            all and warns how to fix it (the decorator never raises after the
+            wrapped function has run).
 
     Returns:
         Decorator function.
@@ -1097,6 +1294,17 @@ def auto_log_fairness(
         >>> # When called, fairness metrics are automatically logged
         >>> evaluate_model(X_test, y_test, gender)
     """
+    # A wrong mode is a mistake in the decorator's own arguments, so it is refused
+    # here, at decoration, rather than turned into a warning on every call.
+    mode = _group_codes.check_mode(group_labels, caller="auto_log_fairness")
+
+    def _key_or_refuse() -> Optional[bytes]:
+        # Raises ValueError without a key. The handler around every backend below
+        # turns it into a warning, and nothing has been written at that point:
+        # this runs before the thresholds are recorded.
+        if mode == "names":
+            return None
+        return _group_codes.resolve_key(label_key, caller="auto_log_fairness")
 
     def decorator(func: Callable) -> Callable:
         @wraps(func)
@@ -1146,8 +1354,13 @@ def auto_log_fairness(
                             # thresholds first means the run still says which
                             # thresholds were quoted and that nothing enforced
                             # them, rather than losing that with the metrics.
+                            # The key comes before both: without one, nothing at
+                            # all is written (see _key_or_refuse).
+                            label_secret = _key_or_refuse()
                             _record_thresholds(mlflow, thresholds, prefix, "mlflow")
-                            log_fairness_to_mlflow(report, prefix=prefix)
+                            log_fairness_to_mlflow(
+                                report, prefix=prefix, group_labels=mode, label_key=label_secret
+                            )
                         else:
                             warnings.warn(
                                 "auto_log_fairness: no active MLflow run. "
@@ -1166,8 +1379,11 @@ def auto_log_fairness(
 
                         if wandb.run is not None:
                             # Same order as the MLflow branch, same reason.
+                            label_secret = _key_or_refuse()
                             _record_thresholds(wandb, thresholds, prefix, "wandb")
-                            log_fairness_to_wandb(report, prefix=prefix)
+                            log_fairness_to_wandb(
+                                report, prefix=prefix, group_labels=mode, label_key=label_secret
+                            )
                         else:
                             warnings.warn(
                                 "auto_log_fairness: no active W&B run. Skipping fairness logging.",

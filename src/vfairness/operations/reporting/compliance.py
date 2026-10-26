@@ -530,7 +530,7 @@ def generate_risk_register_from_audit(
     >>> entry["status"]
     'not_assessed'
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -759,7 +759,7 @@ def generate_dpia_sections(
         (list of section dicts with ``section_number``, ``title``,
         ``article``, ``status``, ``content``).
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1640,7 +1640,7 @@ def generate_annex_iv_data(
         Keys: ``annex_iv_id``, ``generated_at``, ``system_name``,
         ``overall_coverage``, ``sections`` (list of section dicts).
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -1964,7 +1964,7 @@ def generate_model_card(
         string-match to find out, so the state is also raised. Added BGL-S2b
         (2026-09-17); until then the only channel was the prose.
 
-    Beta Go-Live proof status (2026-10-01): BGL-A PROVEN. Executed on healthy input
+    Beta Go-Live proof status (2026-10-24): BGL-A PROVEN. Executed on healthy input
     and on the degenerate inputs where nothing it claims to measure exists; in each
     it either refused or returned a value that was checked to be a true measurement,
     and a test in the suite names it beside a refusal assertion. NOT INDEPENDENTLY
@@ -2844,7 +2844,23 @@ def build_assurance_verdict(
         for i, (gap, v) in enumerate(_graded, 1):
             ff = v.get("fourFifthsRatio")
             sig = v.get("significant")
-            if gap < 0.05 and not (us_emp and ff is not None and ff < 0.8):
+            # ONE DECISION FOR THE STATUS AND THE FINDING (2026-10-09). The
+            # row's `tone` is the status the attribute is graded with (the
+            # platform report prints critical as "Fail" on the four-fifths
+            # row), and the orchestrator only leaves it at critical when the
+            # disparity is statistically confirmed (_cap_unconfirmed, and the
+            # post-FDR recompute in run_pulse). The rule below used to raise a
+            # finding only for a gap of 5 points or more outside US
+            # employment, so a confirmed exclusion at a low base rate was
+            # graded Fail with no finding and no recommendation behind it.
+            # Measured on the platform's recruitment sample: age, 0 of 318
+            # applicants aged 18 to 24 invited, four-fifths ratio 0.00, tone
+            # critical, confirmed, gap 4.6 points to the reference: no DSP
+            # finding. A confirmed Fail now always raises one, at critical,
+            # the severity the status already states; `sig is True` repeats
+            # the confirmation requirement for rows built by other callers.
+            graded_fail = str(v.get("tone") or "").strip().lower() == "critical" and sig is True
+            if gap < 0.05 and not (us_emp and ff is not None and ff < 0.8) and not graded_fail:
                 continue
             if us_emp and ff is not None and ff < 0.8:
                 sev = "critical" if sig else "high"
@@ -2860,6 +2876,14 @@ def build_assurance_verdict(
                     "objective-justification (no fixed numeric bar): "
                     "a disparity of this size requires documented "
                     "objective justification."
+                )
+            if graded_fail:
+                sev = "critical"
+                ff_num = _as_measured_number(ff)
+                ratio_txt = f"four-fifths ratio {ff_num:.2f}, " if ff_num is not None else ""
+                legal = (
+                    f"Graded Fail on this attribute ({ratio_txt}statistically confirmed), "
+                    "so it is a material finding however small the gap in points. " + legal
                 )
             # CRITICAL, three states inside a regulatory sentence. `or 0` fires
             # on the ciLow/ciHigh the producers set to None ON PURPOSE when the
@@ -2891,8 +2915,11 @@ def build_assurance_verdict(
             # never established.
             ci_lo = _as_measured_number(v.get("ciLow"))
             ci_hi = _as_measured_number(v.get("ciHigh"))
+            # "to", not a hyphen: the Newcombe interval on a small group often
+            # starts below zero, and "95% CI -8-8 pts" reads as two minus
+            # signs. Same wording as the orchestrator's verdict summary.
             ci_txt = (
-                f"95% CI {round(ci_lo * 100)}-{round(ci_hi * 100)} pts"
+                f"95% CI {round(ci_lo * 100)} to {round(ci_hi * 100)} pts"
                 if ci_lo is not None and ci_hi is not None
                 else "no 95% confidence interval was computed, so the precision of this "
                 "estimate could not be checked"

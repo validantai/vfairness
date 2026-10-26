@@ -491,15 +491,29 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.uv]
-# The core library supports 3.14 (the task consumer runs it), but several heavy
-# native extras (torch, shap, pywt) do not yet ship 3.14 or Windows wheels, so a
-# universal lock across all of requires-python is unsolvable. The lock therefore
-# targets the real deploy surface: macOS and Linux on Python 3.11 through 3.13
-# (lower bound matches requires-python and Scientific Python SPEC 0).
+# The lock targets the real deploy surface: macOS and Linux. Until 23 Oct 2026 it
+# stopped at Python 3.13 because torch, shap and pywt shipped no 3.14 wheels, so a
+# lock across all of requires-python was unsolvable. They do now (torch 2.14.1,
+# shap 0.54.1, pywavelets 1.10.0 resolve on 3.14), and the production runtime is
+# 3.14, so the lock covers 3.11 through 3.14 (lower bound matches requires-python
+# and Scientific Python SPEC 0). Windows stays out: not a deploy surface.
 environments = [
-    "python_version >= '3.11' and python_version < '3.14' and sys_platform == 'darwin'",
-    "python_version >= '3.11' and python_version < '3.14' and sys_platform == 'linux'",
+    "python_version >= '3.11' and python_version < '3.15' and sys_platform == 'darwin'",
+    "python_version >= '3.11' and python_version < '3.15' and sys_platform == 'linux'",
 ]
+
+# torch from its CPU-only index on Linux (23 Oct 2026). CI installs from this lock
+# (vfairness-tests.yml), and the default PyPI wheel for Linux carries the whole CUDA
+# runtime, about 2.5 GB, which once filled a runner's disk ("No space left on
+# device", 2026-08-28) on a machine with no GPU. macOS wheels on PyPI are CPU-only
+# already, so macOS keeps PyPI. explicit = true: only torch is looked up there.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
 
 # Starting-point static type config. Strictness can ratchet up over time.
 [tool.mypy]

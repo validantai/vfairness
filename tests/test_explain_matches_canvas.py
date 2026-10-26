@@ -423,7 +423,7 @@ def test_the_weekly_degradation_recommendation_carries_no_em_dash():
     for day in range(28):
         date = start + pd.Timedelta(days=day)
         # A weekday-shaped degradation: one weekday runs far above the mean.
-        spike = date.dayofweek == 4
+        spike = date.day_of_week == 4
         analyzer.update_daily_metrics(
             date, {"demographic_parity": 0.30 if spike else 0.05 + day * 0.0005}
         )

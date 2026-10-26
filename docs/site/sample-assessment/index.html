@@ -7,7 +7,7 @@
     <meta name="description" content="End-to-end fairness audit walkthrough using vfairness — from data validation to EU AI Act model card. Credit scoring case study with code, SVG artifacts, and compliance documentation.">
     <meta name="keywords" content="AI fairness audit, EU AI Act, model card, bias detection, vfairness, credit scoring, algorithmic audit">
     <meta name="author" content="validant.ai">
-    <meta name="version" content="0.1.0">
+    <meta name="version" content="0.2.0">
 
     <title>Sample Assessment &mdash; End-to-End Fairness Audit | vfairness</title>
 
@@ -1684,6 +1684,8 @@ report_card_to_svg(
             <button class="code-copy" onclick="navigator.clipboard.writeText(this.closest('.code-block').querySelector('code').textContent)">Copy</button>
         </div>
         <pre><code># Option A: explicit logging after Phase 6
+# Group names are written as keyed codes by default: set VFAIRNESS_GROUP_LABEL_KEY first
+# (any secret, kept like a password), or pass group_labels="names" on purpose.
 from vfairness import log_fairness_to_mlflow
 import mlflow
 
@@ -1710,11 +1712,10 @@ def evaluate_model(model, X_test, y_test, sensitive):
         <pre><code># .pre-commit-config.yaml
 repos:
   - repo: https://github.com/validantai/vfairness
-    # No vfairness version has been released or tagged yet, so there is no
-    # release tag to pin. Use a commit sha until one is cut, then pin the tag.
-    rev: &lt;commit-sha&gt;
+    rev: v0.2.0   # vfairness 0.2.0, released 26 Oct 2026
     hooks:
       - id: vfairness-check-config    # validates fairness JSON configs
+        additional_dependencies: ["PyYAML&gt;=6.0"]  # and .yml/.yaml ones
       - id: vfairness-check-model-card # ensures model cards include fairness sections</code></pre>
     </div>
 

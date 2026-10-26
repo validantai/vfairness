@@ -257,7 +257,9 @@ def test_mlflow_logger_never_names_the_interval_it_could_not_log(fake_mlflow):
     reads 0 / "[]". `_unmeasured_note` reads report["metrics"] and
     report["group_stats"] only.
     """
-    log_fairness_to_mlflow(_report_whose_interval_failed(), log_artifacts=False)
+    log_fairness_to_mlflow(
+        _report_whose_interval_failed(), log_artifacts=False, group_labels="names"
+    )
 
     assert "fairness.demographic_parity_difference.value" in fake_mlflow.metrics
     assert "fairness.demographic_parity_difference.ci_lower" not in fake_mlflow.metrics
@@ -277,7 +279,9 @@ def test_mlflow_logger_never_names_the_interval_it_could_not_log(fake_mlflow):
 
 def test_wandb_logger_never_names_the_interval_it_could_not_log(fake_wandb):
     """The W&B path has the identical gap, on the surface a reader scans."""
-    log_fairness_to_wandb(_report_whose_interval_failed(), log_artifacts=False)
+    log_fairness_to_wandb(
+        _report_whose_interval_failed(), log_artifacts=False, group_labels="names"
+    )
 
     # INVERTED (BGL-5): the interval is still logged as nothing and the run
     # summary now names it. Before the fix the summary held only the metric and
